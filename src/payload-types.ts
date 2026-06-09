@@ -72,6 +72,13 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    specialties: Specialty;
+    'claim-types': ClaimType;
+    'assessment-types': AssessmentType;
+    'areas-of-expertise': AreasOfExpertise;
+    specialists: Specialist;
+    team: Team;
+    events: Event;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -94,6 +101,13 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
+    'claim-types': ClaimTypesSelect<false> | ClaimTypesSelect<true>;
+    'assessment-types': AssessmentTypesSelect<false> | AssessmentTypesSelect<true>;
+    'areas-of-expertise': AreasOfExpertiseSelect<false> | AreasOfExpertiseSelect<true>;
+    specialists: SpecialistsSelect<false> | SpecialistsSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -794,6 +808,306 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialties".
+ */
+export interface Specialty {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claim-types".
+ */
+export interface ClaimType {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assessment-types".
+ */
+export interface AssessmentType {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "areas-of-expertise".
+ */
+export interface AreasOfExpertise {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialists".
+ */
+export interface Specialist {
+  id: number;
+  /**
+   * Full display name including honorific, e.g. "Dr Adam Parr".
+   */
+  title: string;
+  /**
+   * e.g. "Consultant Spinal Surgeon".
+   */
+  position?: string | null;
+  /**
+   * Optional. Falls back to an initials avatar on the frontend.
+   */
+  photo?: (number | null) | Media;
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Cities / regions where this specialist consults.
+   */
+  locations?:
+    | {
+        location: string;
+        id?: string | null;
+      }[]
+    | null;
+  qualifications?:
+    | {
+        qualification: string;
+        id?: string | null;
+      }[]
+    | null;
+  accreditations?:
+    | {
+        accreditation: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  specialty: number | Specialty;
+  claimTypes?: (number | ClaimType)[] | null;
+  assessmentTypes?: (number | AssessmentType)[] | null;
+  areasOfExpertise?: (number | AreasOfExpertise)[] | null;
+  /**
+   * Show in featured listings (e.g. the homepage).
+   */
+  featured?: boolean | null;
+  /**
+   * Optional surname used for sorting the directory.
+   */
+  lastName?: string | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: number;
+  title: string;
+  /**
+   * e.g. "IT Manager | Lawyer".
+   */
+  role?: string | null;
+  photo?: (number | null) | Media;
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  qualifications?:
+    | {
+        qualification: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  department: 'operations' | 'business-development' | 'reception-bookings' | 'quality-assurance';
+  /**
+   * Sort order within the department (lower shows first).
+   */
+  order?: number | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  /**
+   * Start date & time. Drives the upcoming/past split.
+   */
+  date: string;
+  /**
+   * e.g. "12:30 pm – 1:30 pm".
+   */
+  timeLabel?: string | null;
+  location?: string | null;
+  host?: ('aamle' | 'verify') | null;
+  /**
+   * External booking link (e.g. AAMLE).
+   */
+  registrationUrl?: string | null;
+  image?: (number | null) | Media;
+  /**
+   * Short summary used in listings.
+   */
+  excerpt?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional write-up shown after the event has passed.
+   */
+  recap?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  eventType:
+    | 'networking'
+    | 'client-training'
+    | 'industry-briefing'
+    | 'workshop'
+    | 'webinar'
+    | 'breakfast-seminar'
+    | 'masterclass'
+    | 'specialist-seminar';
+  /**
+   * Optional — link to specialist or team presenters.
+   */
+  presenters?:
+    | (
+        | {
+            relationTo: 'specialists';
+            value: number | Specialist;
+          }
+        | {
+            relationTo: 'team';
+            value: number | Team;
+          }
+      )[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -845,10 +1159,19 @@ export interface Search {
   id: number;
   title?: string | null;
   priority?: number | null;
-  doc: {
-    relationTo: 'posts';
-    value: number | Post;
-  };
+  doc:
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      }
+    | {
+        relationTo: 'specialists';
+        value: number | Specialist;
+      }
+    | {
+        relationTo: 'events';
+        value: number | Event;
+      };
   slug?: string | null;
   meta?: {
     title?: string | null;
@@ -1001,6 +1324,34 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'specialties';
+        value: number | Specialty;
+      } | null)
+    | ({
+        relationTo: 'claim-types';
+        value: number | ClaimType;
+      } | null)
+    | ({
+        relationTo: 'assessment-types';
+        value: number | AssessmentType;
+      } | null)
+    | ({
+        relationTo: 'areas-of-expertise';
+        value: number | AreasOfExpertise;
+      } | null)
+    | ({
+        relationTo: 'specialists';
+        value: number | Specialist;
+      } | null)
+    | ({
+        relationTo: 'team';
+        value: number | Team;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1375,6 +1726,158 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialties_select".
+ */
+export interface SpecialtiesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claim-types_select".
+ */
+export interface ClaimTypesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assessment-types_select".
+ */
+export interface AssessmentTypesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "areas-of-expertise_select".
+ */
+export interface AreasOfExpertiseSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialists_select".
+ */
+export interface SpecialistsSelect<T extends boolean = true> {
+  title?: T;
+  position?: T;
+  photo?: T;
+  bio?: T;
+  locations?:
+    | T
+    | {
+        location?: T;
+        id?: T;
+      };
+  qualifications?:
+    | T
+    | {
+        qualification?: T;
+        id?: T;
+      };
+  accreditations?:
+    | T
+    | {
+        accreditation?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  specialty?: T;
+  claimTypes?: T;
+  assessmentTypes?: T;
+  areasOfExpertise?: T;
+  featured?: T;
+  lastName?: T;
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  title?: T;
+  role?: T;
+  photo?: T;
+  bio?: T;
+  qualifications?:
+    | T
+    | {
+        qualification?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  department?: T;
+  order?: T;
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  date?: T;
+  timeLabel?: T;
+  location?: T;
+  host?: T;
+  registrationUrl?: T;
+  image?: T;
+  excerpt?: T;
+  description?: T;
+  recap?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  eventType?: T;
+  presenters?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2062,6 +2565,18 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'posts';
           value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'specialists';
+          value: number | Specialist;
+        } | null)
+      | ({
+          relationTo: 'team';
+          value: number | Team;
+        } | null)
+      | ({
+          relationTo: 'events';
+          value: number | Event;
         } | null);
     global?: string | null;
     user?: (number | null) | User;

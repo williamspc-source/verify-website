@@ -2,6 +2,8 @@ import type { Payload, PayloadRequest } from 'payload'
 import { readFileSync } from 'fs'
 import path from 'path'
 
+import { seedDataLayer } from './seed/seedDataLayer'
+
 /* =====================================================================
    Non-destructive scaffold seed for the VERIFY site.
 
@@ -9,7 +11,7 @@ import path from 'path'
    collections. It creates the nested page tree (idempotently, by slug)
    and populates the Header + Footer globals so every nav link resolves.
 
-   The data-driven section landings (specialists, the-waiting-room,
+   The data-driven section landings (specialists, in-the-loop,
    events) are created as plain placeholder pages for now; later they
    gain a list/archive block rather than a new route.
    ===================================================================== */
@@ -100,12 +102,12 @@ const PAGE_TREE: PageNode[] = [
   { slug: 'for-clients', title: 'For Clients', parent: 'information-centre' },
   { slug: 'for-claimants', title: 'For Claimants', parent: 'information-centre' },
 
-  { slug: 'the-waiting-room', title: 'The Waiting Room' },
+  { slug: 'in-the-loop', title: 'In the Loop' },
   { slug: 'events', title: 'Events & Seminars' },
 
-  { slug: 'legal', title: 'Legal' },
-  { slug: 'privacy-policy', title: 'Privacy Policy', parent: 'legal' },
-  { slug: 'terms-conditions', title: 'Terms & Conditions', parent: 'legal' },
+  // Legal pages are standalone (no "Legal" landing page).
+  { slug: 'privacy-policy', title: 'Privacy Policy' },
+  { slug: 'terms-conditions', title: 'Terms & Conditions' },
 ]
 
 const LINKEDIN = 'https://www.linkedin.com/company/verify-medico-legal-solutions/'
@@ -210,7 +212,7 @@ export const seedVerify = async ({
           ],
         },
         pageLink('specialists', 'Specialists'),
-        pageLink('the-waiting-room', 'The Waiting Room'),
+        pageLink('in-the-loop', 'In the Loop'),
         pageLink('events', 'Events & Seminars'),
         pageLink('contact', 'Contact Us'),
       ],
@@ -240,7 +242,7 @@ export const seedVerify = async ({
             pageLink('services', 'Our Services'),
             pageLink('specialists', 'Specialists'),
             pageLink('information-centre', 'Information Centre'),
-            pageLink('the-waiting-room', 'The Waiting Room'),
+            pageLink('in-the-loop', 'In the Loop'),
             pageLink('events', 'Events & Seminars'),
             pageLink('contact', 'Contact us'),
           ],
@@ -327,6 +329,9 @@ export const seedVerify = async ({
   } catch (e) {
     payload.logger.error({ err: e, message: 'Branding seed skipped (public asset files missing?)' })
   }
+
+  // ── Data layer: taxonomy lookups + specialists / team / events ──
+  await seedDataLayer({ payload, req })
 
   payload.logger.info('VERIFY scaffold seed complete.')
 }

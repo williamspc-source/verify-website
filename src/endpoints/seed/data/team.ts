@@ -1,0 +1,173 @@
+// Internal VERIFY staff, transcribed from the design reference.
+
+export type TeamSeed = {
+  slug: string
+  title: string
+  role: string
+  department: 'operations' | 'business-development' | 'reception-bookings' | 'quality-assurance'
+  order: number
+  bio: string
+}
+
+export const TEAM: TeamSeed[] = [
+  {
+    slug: 'wes-lerch',
+    title: 'Wes Lerch',
+    role: 'Managing Director',
+    department: 'operations',
+    order: 1,
+    bio: "VERIFY's Managing Director Wes Lerch has over 25 years' experience in personal injury law and insurance litigation. As the founding partner of a prominent plaintiff personal injury law firm, Wes worked with various medico-legal providers and identified the need for a different and better approach to medico-legal reporting.",
+  },
+  {
+    slug: 'fruzsina-toth',
+    title: 'Fruzsina Toth',
+    role: 'Operations Manager',
+    department: 'operations',
+    order: 2,
+    bio: "Fruzsina Toth (Fruzsi) is warmly welcomed as the new Operations Manager at VERIFY. Building on the success of her implementation of a new project management software as Project Manager, Fruzsi is excited to continue to grow VERIFY's success in an operations role. She is dedicated to the constant improvement of VERIFY's service quality, business procedures and processes to enhance VERIFY's performance as a leading provider in the field.\n\nShe has extensive experience in business administration working in diverse corporate environments, including but not limited to small firms and large multinational companies. After obtaining her Bachelor's in Communication and Media Studies with a minor in Public Relations and Marketing, Fruzsi went on to obtain her Master's Degree in International Tourism and Hospitality Management from James Cook University Brisbane. Continually recognised for her academic achievements, Fruzsi is a valued member of the VERIFY team and looks forward to supporting our continued growth and success.",
+  },
+  {
+    slug: 'spencer-winchester',
+    title: 'Spencer Winchester',
+    role: 'IT Manager | Lawyer',
+    department: 'operations',
+    order: 3,
+    bio: 'Spencer Winchester is VERIFY\'s IT Manager and resident tech expert. He has experience working in various levels of government, including the Federal Circuit and Family Court of Australia, Queensland Health, and the Public Trustee of Queensland. Spencer completed his Bachelor of Laws in 2021 and a Graduate Diploma in Legal Practice in 2023. In 2024, he achieved accreditation as an AMA-5 Certified Impairment Rater and was admitted as a lawyer at the Supreme Court of Queensland. With a strong interest in legal technology, he leads the integration of tech solutions within VERIFY, while also serving as the in-house go-to for tech support.',
+  },
+  {
+    slug: 'richa',
+    title: 'Richa',
+    role: 'Accounts Clerk',
+    department: 'operations',
+    order: 4,
+    bio: 'Richa is the Accounts Clerk at VERIFY, handling invoicing, reporting, and bookkeeping tasks. She has experience in both accounting and administration, having worked as a general administrator and accountant across various industries. Having recently completed her MBA-MPA, she brings strong attention to detail to her role and values precision and integrity, qualities that drive her interest in accounting. Outside of work, Richa enjoys sketching as a creative outlet.',
+  },
+  {
+    slug: 'sydney-shepard',
+    title: 'Sydney Shepard',
+    role: 'Business Development Manager',
+    department: 'business-development',
+    order: 1,
+    bio: "Sydney Shepard is the Business Development Manager at VERIFY. Passionate about expanding VERIFY's relationships with a range of clients and specialists within the medico-legal industry, Sydney's previous work within VERIFY across the Reception, Bookings, and Quality Assurance divisions has equipped her with an encyclopaedic knowledge of VERIFY's processes. She has an extensive marketing background through her work history across diverse sectors including sales, entertainment, event-planning, and the Queensland Department of Education. Sydney is committed to maintaining VERIFY's quality of service to a standard unmatched within the medico-legal industry, with the ultimate goal of combining her marketing and education backgrounds to create innovative and impactful solutions for the medico-legal sector.",
+  },
+  {
+    slug: 'thanh-nguyen',
+    title: 'Thanh Nguyen',
+    role: 'Digital Marketing and Data Coordinator',
+    department: 'business-development',
+    order: 2,
+    bio: "Thanh Nguyen is the Digital Marketing and Data Coordinator within the Business Development team at VERIFY. She is dedicated to supporting the team in enhancing the clarity, efficiency, and performance of VERIFY's digital presence. With a Bachelor's degree in Business Intelligence and Information Systems, Thanh brings strong analytical and problem-solving skills to her work. She has a keen interest in data and technology, and her ability to combine efficiency with attention to detail is evident in both her role and previous administrative experience at VERIFY.",
+  },
+  {
+    slug: 'leilani-villatoro',
+    title: 'Leilani Villatoro',
+    role: 'Bookings Supervisor',
+    department: 'reception-bookings',
+    order: 1,
+    bio: 'Leilani Villatoro is the Bookings Supervisor in the Reception division at VERIFY. With a strong background in customer service and administration, Leilani brings a professional yet approachable demeanour to her role. Having achieved a Bachelor of Behavioural Science (Psychology) and a Certificate IV in Justice and Criminology, Leilani has a particular interest in forensic psychiatry. Outside of her professional life, Leilani enjoys baking, photography, and staying active through fitness.',
+  },
+  {
+    slug: 'jaynalyn-malijan',
+    title: 'Jaynalyn Malijan',
+    role: 'Bookings Officer',
+    department: 'reception-bookings',
+    order: 2,
+    bio: "Jaynalyn Malijan (Jayna) is VERIFY's Bookings Officer. She assists with essential administrative tasks, including sending booking confirmations, coordinating doctors' schedules, and ensuring seamless claimant communication. Jayna completed her Bachelor of Science in Psychology and has experience working in human resources, focusing on recruitment and employee engagement, in addition to work as a corporate hospitality liaison. She is a Certified Human Resource Associate and is passionate about enhancing her communication skills and connecting with people. In her spare time, Jayna enjoys hiking, taking language lessons, and serving as a leader in her local community.",
+  },
+  {
+    slug: 'ruby-connelly',
+    title: 'Ruby Connelly',
+    role: 'Bookings Admin',
+    department: 'reception-bookings',
+    order: 3,
+    bio: 'Ruby Connelly is VERIFY\'s Bookings Admin. She is a first-year university student currently undertaking a Bachelor of Education at Queensland University of Technology, with the aspiration of becoming a primary school teacher. With experience across a wide range of customer service roles and previous studies in nursing, Ruby is passionate about clear, positive, and efficient communication to ensure all parties are satisfied and well cared for. Outside of office hours, she enjoys swimming, listening to crime podcasts, and occasionally expressing her musical side by playing the guitar.',
+  },
+  {
+    slug: 'ruby-turner',
+    title: 'Ruby Turner',
+    role: 'Bookings Admin',
+    department: 'reception-bookings',
+    order: 4,
+    bio: 'Ruby Turner is VERIFY\'s Bookings Admin. She is a second-year Science student at the University of Queensland, pursuing a career in clinical health. She is committed to supporting others and is motivated by ensuring everyone feels valued and supported. With strong communication skills and a compassionate nature, Ruby brings a thoughtful and supportive approach to both professional and everyday settings. Beyond her academic pursuits, she enjoys reading, socialising with friends, sewing, staying active, and shopping.',
+  },
+  {
+    slug: 'evie-le',
+    title: 'Evie Le',
+    role: 'Quality Assurance Manager',
+    department: 'quality-assurance',
+    order: 1,
+    bio: "Evie Le is a Quality Assurance Manager at VERIFY, where she oversees the QA team's delivery of accurate medico-legal reports and medical brief summaries. Evie brings extensive experience in marketing, management, communications, events, and administration, as well as certifications including the AMA-5 Permanent Impairment Evaluator from ACIME (October 2023). In addition, her proficiency with a variety of software tools complements her meticulous approach to upholding the highest standards in the medico-legal industry.",
+  },
+  {
+    slug: 'ricaliza-perlas',
+    title: 'Ricaliza Perlas',
+    role: 'Offshore Manager',
+    department: 'quality-assurance',
+    order: 2,
+    bio: 'Ricaliza Perlas (Liza) is the Offshore Manager at VERIFY. Liza holds a Bachelor of Arts degree in English and is completing a Juris Doctor degree. Previously, she gained valuable experience as a Legal Assistant at a private law office, reflecting her commitment to both language proficiency and legal studies. In May 2024, she was accredited as an AMA-5 Certified Impairment Rater. Liza is deeply passionate about fostering work-life balance and ensuring the well-being of her team to maximise productivity and ensure efficient and high-quality output.',
+  },
+  {
+    slug: 'sharla-johnston',
+    title: 'Sharla Johnston',
+    role: 'Quality Assurance Lead',
+    department: 'quality-assurance',
+    order: 3,
+    bio: 'Sharla Johnston is VERIFY\'s Quality Assurance Lead, overseeing day-to-day QA operations, including proofreading, compliance checks, workflow management, and supervision of junior QA staff. She holds a Bachelor of Psychological Sciences (Honours Class 1) and has extensive prior work experience as a medical receptionist and secretary to a psychiatrist, and in market research. The thoughtfulness that Sharla is known for in the office is also evidenced by her previous volunteering efforts at Brisbane Relief Hub, providing essential services to those most in need.',
+  },
+  {
+    slug: 'aki-tsimouris',
+    title: 'Aki Tsimouris',
+    role: 'Quality Assurance Officer',
+    department: 'quality-assurance',
+    order: 4,
+    bio: 'Aki Tsimouris is a Quality Assurance Officer at VERIFY. Known for her energetic nature and love of lists, Aki holds a Diploma of Paralegal Services and is experienced in managing people in fast-paced, customer service-centric settings. In her spare time, Aki enjoys fashion design and attending live music gigs.',
+  },
+  {
+    slug: 'mel-smith',
+    title: 'Mel Smith',
+    role: 'Quality Assurance Officer',
+    department: 'quality-assurance',
+    order: 5,
+    bio: "Mel Smith is a Quality Assurance Officer at VERIFY, bringing four years of specialised experience in personal injury law to her role. With a strong foundation in legal processes and casework, she ensures the accuracy, consistency, and compliance of medico-legal reports that support complex litigation matters. Mel's background in personal injury law, including motor vehicle accidents, workplace injury, and public liability, provides a unique insight into the quality expectations of both legal and medical professionals. By meticulously reviewing reports for legal and factual integrity, liaising with experts, and ensuring timely, high-quality deliverables for clients, Mel ensures VERIFY's standards are upheld and further strengthened. Outside of work, Mel is a passionate video game enthusiast, a hobby that mirrors her strengths in strategy, problem-solving, and focus.",
+  },
+  {
+    slug: 'james-heffernan',
+    title: 'James Heffernan',
+    role: 'Quality Assurance Officer',
+    department: 'quality-assurance',
+    order: 6,
+    bio: 'James Heffernan provides support to the Quality Assurance team at VERIFY in the role of Quality Assurance Officer. James is a second-year university student and is currently undertaking a Bachelor of Commerce/Law (Hons) at the University of Queensland.',
+  },
+  {
+    slug: 'kimberly-patente',
+    title: 'Kimberly Patente',
+    role: 'Quality Assurance Officer',
+    department: 'quality-assurance',
+    order: 7,
+    bio: "Kimberly Patente (Kim) is a Quality Assurance Officer at VERIFY. With 2 years' experience as a Legal Administrative Assistant and a year as a Human Resources Specialist, her dedication and organisational skills are evident. When off the clock, Kim is actively involved in teaching children under the Department of Social Welfare and Development (DSWD) through her local church and singing in choir.",
+  },
+  {
+    slug: 'zenuel-bermundo',
+    title: 'Zenuel Bermundo',
+    role: 'Quality Assurance Officer',
+    department: 'quality-assurance',
+    order: 8,
+    bio: 'Zenuel Bermundo (Zen) is a Quality Assurance Officer at VERIFY. In 2023, he graduated with a degree in Education, majoring in Social Studies. He is passionate about administrative work, enjoys connecting with people, and has a keen interest in listening to unique stories. Zen is committed to excellence in his tasks, ensuring high-quality output and timely completion. He continuously enhances his skills through on-the-job learning, striving for personal and professional growth.',
+  },
+  {
+    slug: 'jefferson-cortez',
+    title: 'Jefferson Cortez',
+    role: 'Quality Assurance Officer',
+    department: 'quality-assurance',
+    order: 9,
+    bio: "Jefferson Cortez (Jeffy) is a Quality Assurance Officer at VERIFY. He holds a certificate in Mathematics and a degree in Business Administration, majoring in Legal Management. Jeffy's prior experience in working at both a law office and a prosecutor's office has cultivated his interest in legal and administrative processes, and he thrives on challenges and new experiences. Outside of work, Jeffy enjoys volunteering, running, calligraphy, and playing mobile games.",
+  },
+  {
+    slug: 'madeline-cook',
+    title: 'Madeline Cook',
+    role: 'Quality Assurance Clerk',
+    department: 'quality-assurance',
+    order: 10,
+    bio: 'Madeline Cook is a Quality Assurance Clerk at VERIFY. Madeline is a second-year university student and is currently undertaking a Bachelor of Arts/ Law (Hons) at the University of Queensland. In her free time, she enjoys playing team sports and going to the beach.',
+  },
+]

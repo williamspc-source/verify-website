@@ -14,19 +14,33 @@ import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+  return doc?.title ? `${doc.title} | VERIFY Medico-Legal Solutions` : 'VERIFY Medico-Legal Solutions'
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
-  const url = getServerSideURL()
+// Collection-aware canonical URL. Pages are nested (nested-docs → breadcrumbs);
+// the content collections each live under their own path prefix.
+const collectionUrlPrefix: Record<string, string> = {
+  posts: '/posts',
+  specialists: '/specialists',
+  events: '/events',
+  team: '/about/team',
+}
 
-  // Pages are nested (nested-docs plugin): the last breadcrumb holds the full path.
-  if (doc && 'breadcrumbs' in doc && Array.isArray(doc.breadcrumbs) && doc.breadcrumbs.length) {
-    const path = doc.breadcrumbs[doc.breadcrumbs.length - 1]?.url
-    if (path) return `${url}${path}`
+const generateURL: GenerateURL<Post | Page> = ({ collectionSlug, doc }) => {
+  const url = getServerSideURL()
+  const slug = (doc as { slug?: string | null })?.slug
+  if (!slug) return url
+
+  if (collectionSlug === 'pages') {
+    if ('breadcrumbs' in doc && Array.isArray(doc.breadcrumbs) && doc.breadcrumbs.length) {
+      const path = doc.breadcrumbs[doc.breadcrumbs.length - 1]?.url
+      if (path) return `${url}${path}`
+    }
+    return `${url}/${slug}`
   }
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+  const prefix = collectionSlug ? collectionUrlPrefix[collectionSlug] : undefined
+  return `${url}${prefix ?? ''}/${slug}`
 }
 
 export const plugins: Plugin[] = [
@@ -88,7 +102,7 @@ export const plugins: Plugin[] = [
     },
   }),
   searchPlugin({
-    collections: ['posts'],
+    collections: ['posts', 'specialists', 'events'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
       fields: ({ defaultFields }) => {

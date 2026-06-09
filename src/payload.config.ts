@@ -9,6 +9,13 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
+import { Specialties } from './collections/Specialties'
+import { ClaimTypes } from './collections/ClaimTypes'
+import { AssessmentTypes } from './collections/AssessmentTypes'
+import { AreasOfExpertise } from './collections/AreasOfExpertise'
+import { Specialists } from './collections/Specialists'
+import { Team } from './collections/Team'
+import { Events } from './collections/Events'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { SiteSettings } from './SiteSettings/config'
@@ -63,7 +70,22 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    // Taxonomy lookups (registered before the content that references them)
+    Specialties,
+    ClaimTypes,
+    AssessmentTypes,
+    AreasOfExpertise,
+    // People & content
+    Specialists,
+    Team,
+    Events,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings],
   plugins,
