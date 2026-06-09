@@ -20,6 +20,12 @@ const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
   const url = getServerSideURL()
 
+  // Pages are nested (nested-docs plugin): the last breadcrumb holds the full path.
+  if (doc && 'breadcrumbs' in doc && Array.isArray(doc.breadcrumbs) && doc.breadcrumbs.length) {
+    const path = doc.breadcrumbs[doc.breadcrumbs.length - 1]?.url
+    if (path) return `${url}${path}`
+  }
+
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
 
@@ -47,7 +53,8 @@ export const plugins: Plugin[] = [
     },
   }),
   nestedDocsPlugin({
-    collections: ['categories'],
+    collections: ['categories', 'pages'],
+    generateLabel: (_, doc) => doc.title as string,
     generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
   }),
   seoPlugin({

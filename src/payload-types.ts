@@ -112,10 +112,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -216,6 +218,15 @@ export interface Page {
    */
   generateSlug?: boolean | null;
   slug: string;
+  parent?: (number | null) | Page;
+  breadcrumbs?:
+    | {
+        doc?: (number | null) | Page;
+        url?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1100,6 +1111,15 @@ export interface PagesSelect<T extends boolean = true> {
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;
+  parent?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1654,9 +1674,76 @@ export interface Header {
           url?: string | null;
           label: string;
         };
+        /**
+         * Optional dropdown shown when hovering this nav item.
+         */
+        subItems?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+              };
+              /**
+               * Optional third-level menu shown when hovering this item.
+               */
+              subSubItems?:
+                | {
+                    link: {
+                      type?: ('reference' | 'custom') | null;
+                      newTab?: boolean | null;
+                      reference?:
+                        | ({
+                            relationTo: 'pages';
+                            value: number | Page;
+                          } | null)
+                        | ({
+                            relationTo: 'posts';
+                            value: number | Post;
+                          } | null);
+                      url?: string | null;
+                      label: string;
+                    };
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Primary button shown at the right of the header (e.g. "Book an Appointment").
+   */
+  cta: {
+    enabled?: boolean | null;
+    link: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: number | Post;
+          } | null);
+      url?: string | null;
+      label: string;
+    };
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1666,7 +1753,57 @@ export interface Header {
  */
 export interface Footer {
   id: number;
-  navItems?:
+  tagline?: string | null;
+  columns?:
+    | {
+        title: string;
+        links?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  contact?: {
+    phone?: string | null;
+    /**
+     * e.g. tel:0733560469
+     */
+    phoneHref?: string | null;
+    email?: string | null;
+    address?: string | null;
+  };
+  hours?:
+    | {
+        days?: string | null;
+        time?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  social?:
+    | {
+        platform: 'linkedin' | 'facebook' | 'instagram' | 'x';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  legalLinks?:
     | {
         link: {
           type?: ('reference' | 'custom') | null;
@@ -1691,10 +1828,173 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  siteName?: string | null;
+  /**
+   * Main logo shown in the header (and footer if no footer logo is set).
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Optional override for the footer; falls back to the main logo.
+   */
+  logoFooter?: (number | null) | Media;
+  /**
+   * Browser tab / app icon. Use a square PNG or SVG.
+   */
+  favicon?: (number | null) | Media;
+  /**
+   * Default preview image when pages are shared. Ideally 1200×630.
+   */
+  socialImage?: (number | null) | Media;
+  /**
+   * Overrides the site colour palette at runtime. Empty fields use the built-in defaults.
+   */
+  colors?: {
+    /**
+     * Hex, e.g. #1c75bc. Leave empty to use the built-in default.
+     */
+    primary?: string | null;
+    /**
+     * Hex, e.g. #155fa0. Leave empty to use the built-in default.
+     */
+    primaryStrong?: string | null;
+    /**
+     * Hex, e.g. #414042. Leave empty to use the built-in default.
+     */
+    text?: string | null;
+    /**
+     * Hex, e.g. #737373. Leave empty to use the built-in default.
+     */
+    mutedText?: string | null;
+    /**
+     * Hex, e.g. #cbe5fa. Leave empty to use the built-in default.
+     */
+    accent?: string | null;
+    /**
+     * Hex, e.g. #c6c6c6. Leave empty to use the built-in default.
+     */
+    border?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
   navItems?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        subItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              subSubItems?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          type?: T;
+                          newTab?: T;
+                          reference?: T;
+                          url?: T;
+                          label?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  cta?:
+    | T
+    | {
+        enabled?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  tagline?: T;
+  columns?:
+    | T
+    | {
+        title?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  contact?:
+    | T
+    | {
+        phone?: T;
+        phoneHref?: T;
+        email?: T;
+        address?: T;
+      };
+  hours?:
+    | T
+    | {
+        days?: T;
+        time?: T;
+        id?: T;
+      };
+  social?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  legalLinks?:
     | T
     | {
         link?:
@@ -1714,22 +2014,23 @@ export interface HeaderSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer_select".
+ * via the `definition` "site-settings_select".
  */
-export interface FooterSelect<T extends boolean = true> {
-  navItems?:
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  logo?: T;
+  logoFooter?: T;
+  favicon?: T;
+  socialImage?: T;
+  colors?:
     | T
     | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-            };
-        id?: T;
+        primary?: T;
+        primaryStrong?: T;
+        text?: T;
+        mutedText?: T;
+        accent?: T;
+        border?: T;
       };
   updatedAt?: T;
   createdAt?: T;

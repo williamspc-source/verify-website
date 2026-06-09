@@ -1,22 +1,22 @@
 import type { Metadata } from 'next'
 
-import type { Media, Page, Post, Config } from '../payload-types'
+import type { Page, Post } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
+import { getCachedGlobal } from './getGlobals'
 
-const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
+const mediaURL = (image: unknown, fallback: string): string => {
   const serverUrl = getServerSideURL()
 
-  let url = serverUrl + '/website-template-OG.webp'
-
   if (image && typeof image === 'object' && 'url' in image) {
-    const ogUrl = image.sizes?.og?.url
-
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+    const media = image as { url?: string | null; sizes?: { og?: { url?: string | null } } }
+    const ogUrl = media.sizes?.og?.url
+    if (ogUrl) return serverUrl + ogUrl
+    if (media.url) return serverUrl + media.url
   }
 
-  return url
+  return fallback
 }
 
 export const generateMeta = async (args: {
@@ -24,11 +24,15 @@ export const generateMeta = async (args: {
 }): Promise<Metadata> => {
   const { doc } = args
 
-  const ogImage = getImageURL(doc?.meta?.image)
+  // Site-wide defaults (name + fallback social image) come from Site Settings.
+  const settings = await getCachedGlobal('site-settings', 1)()
+  const siteName = settings?.siteName || 'VERIFY Medico-Legal Solutions'
+  const fallbackOg = mediaURL(settings?.socialImage, getServerSideURL() + '/website-template-OG.webp')
 
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Payload Website Template'
-    : 'Payload Website Template'
+  // Per-page SEO image (plugin-seo) overrides the site default.
+  const ogImage = mediaURL(doc?.meta?.image, fallbackOg)
+
+  const title = doc?.meta?.title ? `${doc.meta.title} | ${siteName}` : siteName
 
   return {
     description: doc?.meta?.description,

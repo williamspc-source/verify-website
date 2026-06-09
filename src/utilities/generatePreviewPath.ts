@@ -10,18 +10,23 @@ type Props = {
   collection: keyof typeof collectionPrefixMap
   slug: string
   req: PayloadRequest
+  // Full nested path (e.g. /services/medico-legal/ime) for nested-docs pages.
+  // When provided it takes precedence over the collection-prefix + slug form.
+  path?: string | null
 }
 
-export const generatePreviewPath = ({ collection, slug }: Props) => {
+export const generatePreviewPath = ({ collection, slug, path }: Props) => {
   if (slug === undefined || slug === null) {
     return null
   }
 
-  // Encode to support slugs with special characters
-  const encodedSlug = encodeURIComponent(slug)
+  // Prefer an explicit nested path; otherwise build from the collection prefix + slug.
+  const resolvedPath = path
+    ? '/' + path.split('/').filter(Boolean).map(encodeURIComponent).join('/')
+    : `${collectionPrefixMap[collection]}/${encodeURIComponent(slug)}`
 
   const encodedParams = new URLSearchParams({
-    path: `${collectionPrefixMap[collection]}/${encodedSlug}`,
+    path: resolvedPath,
     previewSecret: process.env.PREVIEW_SECRET || '',
   } satisfies PreviewSearchParams)
 

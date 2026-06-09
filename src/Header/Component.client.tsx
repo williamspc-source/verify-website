@@ -1,42 +1,58 @@
 'use client'
-import { useHeaderTheme } from '@/providers/HeaderTheme'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
-import { Logo } from '@/components/Logo/Logo'
+import { cn } from '@/utilities/ui'
+import { CMSLink } from '@/components/Link'
+import { Logo, type BrandLogo } from '@/components/Logo/Logo'
 import { HeaderNav } from './Nav'
 
 interface HeaderClientProps {
   data: Header
+  logo: BrandLogo | null
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
-  /* Storing the value in a useState to avoid hydration errors */
-  const [theme, setTheme] = useState<string | null>(null)
-  const { headerTheme, setHeaderTheme } = useHeaderTheme()
+export const HeaderClient: React.FC<HeaderClientProps> = ({ data, logo }) => {
+  const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
 
+  // Close the mobile menu whenever the route changes.
   useEffect(() => {
-    setHeaderTheme(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMenuOpen(false)
   }, [pathname])
 
-  useEffect(() => {
-    if (headerTheme && headerTheme !== theme) setTheme(headerTheme)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [headerTheme])
+  const cta = data?.cta
 
   return (
-    <header className="container relative z-20   " {...(theme ? { 'data-theme': theme } : {})}>
-      <div className="py-8 flex justify-between">
-        <Link href="/">
-          <Logo loading="eager" priority="high" className="invert dark:invert-0" />
-        </Link>
-        <HeaderNav data={data} />
+    <nav className={cn('site-nav', menuOpen && 'nav-open')}>
+      <div className="container">
+        <div className="nav-inner">
+          <Link href="/" className="nav-logo" aria-label="VERIFY Medico-Legal Solutions">
+            <Logo {...(logo ?? {})} loading="eager" priority="high" />
+          </Link>
+
+          <HeaderNav data={data} />
+
+          {cta?.enabled && cta?.link?.label ? (
+            <CMSLink {...cta.link} appearance="inline" className="btn btn-primary nav-cta" />
+          ) : null}
+
+          <button
+            type="button"
+            className="hamburger"
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
-    </header>
+    </nav>
   )
 }

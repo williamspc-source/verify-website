@@ -21,6 +21,15 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
+// Full nested URL for a page from its nested-docs breadcrumbs (used for preview).
+const breadcrumbPath = (data: Record<string, unknown> | undefined): string | undefined => {
+  const breadcrumbs = data?.breadcrumbs as { url?: string | null }[] | undefined
+  if (Array.isArray(breadcrumbs) && breadcrumbs.length) {
+    return breadcrumbs[breadcrumbs.length - 1]?.url ?? undefined
+  }
+  return undefined
+}
+
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
   access: {
@@ -42,6 +51,7 @@ export const Pages: CollectionConfig<'pages'> = {
       url: ({ data, req }) =>
         generatePreviewPath({
           slug: data?.slug,
+          path: breadcrumbPath(data),
           collection: 'pages',
           req,
         }),
@@ -49,6 +59,7 @@ export const Pages: CollectionConfig<'pages'> = {
     preview: (data, { req }) =>
       generatePreviewPath({
         slug: data?.slug as string,
+        path: breadcrumbPath(data),
         collection: 'pages',
         req,
       }),

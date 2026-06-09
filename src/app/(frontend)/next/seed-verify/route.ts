@@ -1,5 +1,5 @@
 import { createLocalReq, getPayload } from 'payload'
-import { seed } from '@/endpoints/seed'
+import { seedVerify } from '@/endpoints/seedVerify'
 import config from '@payload-config'
 import { headers } from 'next/headers'
 
@@ -17,15 +17,13 @@ export async function POST(): Promise<Response> {
   }
 
   try {
-    // Create a Payload request object to pass to the Local API for transactions
-    // At this point you should pass in a user, locale, and any other context you need for the Local API
     const payloadReq = await createLocalReq({ user }, payload)
 
-    await seed({ payload, req: payloadReq })
+    await seedVerify({ payload, req: payloadReq })
 
     return Response.json({ success: true })
   } catch (e) {
-    payload.logger.error({ err: e, message: 'Error seeding data' })
-    return new Response('Error seeding data.', { status: 500 })
+    payload.logger.error({ err: e, message: 'Error running VERIFY scaffold seed' })
+    return new Response('Error running VERIFY scaffold seed.', { status: 500 })
   }
 }
