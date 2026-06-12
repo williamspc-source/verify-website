@@ -9,6 +9,7 @@ import { homeStatic } from '@/endpoints/seed/home-static'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
+import { toClassName } from '@/utilities/cssClass'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
@@ -81,16 +82,21 @@ export default async function Page({ params: paramsPromise }: Args) {
   }
 
   const { hero, layout } = page
+  const pageClass = toClassName((page as { cssClass?: string | string[] | null }).cssClass)
 
   return (
-    <article className="pt-16 pb-24">
+    <article className={['pt-16 pb-24', pageClass].filter(Boolean).join(' ')}>
       <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={path} />
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
+      <RenderHero
+        {...hero}
+        breadcrumbs={(page as { breadcrumbs?: { label?: string | null; url?: string | null }[] }).breadcrumbs}
+        title={page.title}
+      />
       <RenderBlocks blocks={layout} />
     </article>
   )

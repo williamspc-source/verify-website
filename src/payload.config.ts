@@ -16,9 +16,12 @@ import { AreasOfExpertise } from './collections/AreasOfExpertise'
 import { Specialists } from './collections/Specialists'
 import { Team } from './collections/Team'
 import { Events } from './collections/Events'
+import { AvailabilitySessions } from './collections/AvailabilitySessions'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { SiteSettings } from './SiteSettings/config'
+import { SpecialistAvailability } from './SpecialistAvailability/config'
+import { CustomStyles } from './Styles/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -85,9 +88,10 @@ export default buildConfig({
     Specialists,
     Team,
     Events,
+    AvailabilitySessions,
   ],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer, SiteSettings],
+  globals: [Header, Footer, SiteSettings, SpecialistAvailability, CustomStyles],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

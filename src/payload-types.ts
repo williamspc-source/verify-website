@@ -79,6 +79,7 @@ export interface Config {
     specialists: Specialist;
     team: Team;
     events: Event;
+    'availability-sessions': AvailabilitySession;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -108,6 +109,7 @@ export interface Config {
     specialists: SpecialistsSelect<false> | SpecialistsSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    'availability-sessions': AvailabilitySessionsSelect<false> | AvailabilitySessionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -127,11 +129,15 @@ export interface Config {
     header: Header;
     footer: Footer;
     'site-settings': SiteSetting;
+    'specialist-availability': SpecialistAvailability;
+    'custom-styles': CustomStyle;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'specialist-availability': SpecialistAvailabilitySelect<false> | SpecialistAvailabilitySelect<true>;
+    'custom-styles': CustomStylesSelect<false> | CustomStylesSelect<true>;
   };
   locale: null;
   widgets: {
@@ -175,7 +181,31 @@ export interface Page {
   id: number;
   title: string;
   hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    type: 'none' | 'pageHero' | 'homeHero' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    /**
+     * Small uppercase label above the heading.
+     */
+    eyebrow?: string | null;
+    heading?: string | null;
+    subtitle?: string | null;
+    /**
+     * Show the breadcrumb trail above the heading.
+     */
+    showBreadcrumb?: boolean | null;
+    /**
+     * The dictionary-style panel shown beside the home hero.
+     */
+    definition?: {
+      /**
+       * e.g. "verify"
+       */
+      term?: string | null;
+      /**
+       * e.g. "/ˈvɛrɪfʌɪ/ · verb"
+       */
+      pronunciation?: string | null;
+      text?: string | null;
+    };
     richText?: {
       root: {
         type: string;
@@ -215,9 +245,33 @@ export interface Page {
           id?: string | null;
         }[]
       | null;
+    /**
+     * Hero image.
+     */
     media?: (number | null) | Media;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    cssClass?: string[] | null;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | FAQBlock
+    | GatewayCardsBlock
+    | FeatureGridBlock
+    | StatsBandBlock
+    | ProcessStepsBlock
+    | TabsBlockType
+    | SplitFeatureBlock
+    | CTABandBlock
+    | SpecialtyGridBlock
+    | PeopleGridBlock
+    | SlideCarouselBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -227,6 +281,10 @@ export interface Page {
     description?: string | null;
   };
   publishedAt?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -508,6 +566,10 @@ export interface CallToActionBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'cta';
@@ -558,6 +620,10 @@ export interface ContentBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'content';
@@ -568,6 +634,10 @@ export interface ContentBlock {
  */
 export interface MediaBlock {
   media: number | Media;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
@@ -602,6 +672,10 @@ export interface ArchiveBlock {
         value: number | Post;
       }[]
     | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
@@ -628,6 +702,10 @@ export interface FormBlock {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'formBlock';
@@ -808,54 +886,906 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  /**
+   * Optional heading shown above the questions.
+   */
+  heading?: string | null;
+  items?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Opening one question closes the others.
+   */
+  exclusive?: boolean | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GatewayCardsBlock".
+ */
+export interface GatewayCardsBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  columns?: ('2' | '3' | '4') | null;
+  cards?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'award'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'calendar'
+              | 'check'
+              | 'clipboard-check'
+              | 'clock'
+              | 'file-text'
+              | 'graduation-cap'
+              | 'heart-pulse'
+              | 'mail'
+              | 'map-pin'
+              | 'message'
+              | 'phone'
+              | 'scale'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'stethoscope'
+              | 'user-check'
+              | 'users'
+              | 'video'
+            )
+          | null;
+        title: string;
+        description?: string | null;
+        /**
+         * Listed in the lower panel above the call-to-action button.
+         */
+        links?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'gatewayCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureGridBlock".
+ */
+export interface FeatureGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  columns?: ('2' | '3' | '4') | null;
+  cardStyle?: ('card' | 'plain') | null;
+  items?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'award'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'calendar'
+              | 'check'
+              | 'clipboard-check'
+              | 'clock'
+              | 'file-text'
+              | 'graduation-cap'
+              | 'heart-pulse'
+              | 'mail'
+              | 'map-pin'
+              | 'message'
+              | 'phone'
+              | 'scale'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'stethoscope'
+              | 'user-check'
+              | 'users'
+              | 'video'
+            )
+          | null;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featureGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBandBlock".
+ */
+export interface StatsBandBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  stats?:
+    | {
+        /**
+         * The number to count up to.
+         */
+        value: number;
+        /**
+         * e.g. "$" (optional).
+         */
+        prefix?: string | null;
+        /**
+         * e.g. "+" or "%" (optional).
+         */
+        suffix?: string | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statsBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessStepsBlock".
+ */
+export interface ProcessStepsBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  /**
+   * How many steps per row on desktop.
+   */
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Steps are auto-numbered in order (01, 02, …).
+   */
+  steps?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'award'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'calendar'
+              | 'check'
+              | 'clipboard-check'
+              | 'clock'
+              | 'file-text'
+              | 'graduation-cap'
+              | 'heart-pulse'
+              | 'mail'
+              | 'map-pin'
+              | 'message'
+              | 'phone'
+              | 'scale'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'stethoscope'
+              | 'user-check'
+              | 'users'
+              | 'video'
+            )
+          | null;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'processSteps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TabsBlockType".
+ */
+export interface TabsBlockType {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  tabs?:
+    | {
+        label: string;
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  tabStyle?: ('pills' | 'underline') | null;
+  /**
+   * Index of the tab open by default (0 = first).
+   */
+  defaultTab?: number | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'tabs';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SplitFeatureBlock".
+ */
+export interface SplitFeatureBlock {
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  /**
+   * Each row alternates image side automatically unless overridden.
+   */
+  rows?:
+    | {
+        image?: (number | null) | Media;
+        imageSide?: ('auto' | 'left' | 'right') | null;
+        eyebrow?: string | null;
+        title: string;
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        bullets?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'splitFeature';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CTABandBlock".
+ */
+export interface CTABandBlock {
+  heading: string;
+  text?: string | null;
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpecialtyGridBlock".
+ */
+export interface SpecialtyGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  source?: ('auto' | 'manual') | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Icon used for every specialty.
+   */
+  defaultIcon?:
+    | (
+        | 'activity'
+        | 'award'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'calendar'
+        | 'check'
+        | 'clipboard-check'
+        | 'clock'
+        | 'file-text'
+        | 'graduation-cap'
+        | 'heart-pulse'
+        | 'mail'
+        | 'map-pin'
+        | 'message'
+        | 'phone'
+        | 'scale'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'stethoscope'
+        | 'user-check'
+        | 'users'
+        | 'video'
+      )
+    | null;
+  linkToDirectory?: boolean | null;
+  /**
+   * Links become <path>?specialty=<slug>.
+   */
+  directoryPath?: string | null;
+  items?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'award'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'calendar'
+              | 'check'
+              | 'clipboard-check'
+              | 'clock'
+              | 'file-text'
+              | 'graduation-cap'
+              | 'heart-pulse'
+              | 'mail'
+              | 'map-pin'
+              | 'message'
+              | 'phone'
+              | 'scale'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'stethoscope'
+              | 'user-check'
+              | 'users'
+              | 'video'
+            )
+          | null;
+        label: string;
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'specialtyGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PeopleGridBlock".
+ */
+export interface PeopleGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
+  source?: ('specialists' | 'team' | 'manual') | null;
+  onlyAdvertised?: boolean | null;
+  featuredOnly?: boolean | null;
+  /**
+   * Optional — limit to one specialty.
+   */
+  specialty?: (number | null) | Specialty;
+  /**
+   * Optional — limit to one department.
+   */
+  department?: ('operations' | 'business-development' | 'reception-bookings' | 'quality-assurance') | null;
+  people?:
+    | (
+        | {
+            relationTo: 'specialists';
+            value: number | Specialist;
+          }
+        | {
+            relationTo: 'team';
+            value: number | Team;
+          }
+      )[]
+    | null;
+  layout?: ('grid' | 'carousel') | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Max people to show (collection sources).
+   */
+  limit?: number | null;
+  /**
+   * Enable once individual profile pages exist.
+   */
+  linkProfiles?: boolean | null;
+  /**
+   * Infinite auto-scrolling marquee (pauses on hover). Arrows flip the scroll direction.
+   */
+  carouselOptions?: {
+    /**
+     * Lower = faster scroll.
+     */
+    speed?: number | null;
+    direction?: ('left' | 'right') | null;
+    showArrows?: boolean | null;
+  };
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'peopleGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialties".
  */
 export interface Specialty {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "claim-types".
- */
-export interface ClaimType {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "assessment-types".
- */
-export interface AssessmentType {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "areas-of-expertise".
- */
-export interface AreasOfExpertise {
   id: number;
   title: string;
   /**
@@ -937,6 +1867,18 @@ export interface Specialist {
    */
   featured?: boolean | null;
   /**
+   * Show this specialist on the Specialist Availability page.
+   */
+  advertise?: boolean | null;
+  /**
+   * Feature this specialist in the availability carousel.
+   */
+  availabilityHighlight?: boolean | null;
+  /**
+   * Shown when this specialist has no upcoming sessions (e.g. "Call to book").
+   */
+  availabilityNote?: string | null;
+  /**
    * Optional surname used for sorting the directory.
    */
   lastName?: string | null;
@@ -949,6 +1891,51 @@ export interface Specialist {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claim-types".
+ */
+export interface ClaimType {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assessment-types".
+ */
+export interface AssessmentType {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "areas-of-expertise".
+ */
+export interface AreasOfExpertise {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1005,6 +1992,62 @@ export interface Team {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SlideCarouselBlock".
+ */
+export interface SlideCarouselBlock {
+  eyebrow?: string | null;
+  heading: string;
+  autoplay?: boolean | null;
+  interval?: number | null;
+  slides?:
+    | {
+        title: string;
+        body?: string | null;
+        accent?: ('seminars' | 'insights' | 'networking' | 'sponsorships') | null;
+        /**
+         * Short word shown on the coloured panel (e.g. "Seminar").
+         */
+        visualLabel?: string | null;
+        /**
+         * Optional. Fills the coloured panel when set.
+         */
+        image?: (number | null) | Media;
+        pills?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'slideCarousel';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1105,6 +2148,40 @@ export interface Event {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "availability-sessions".
+ */
+export interface AvailabilitySession {
+  id: number;
+  specialist: number | Specialist;
+  /**
+   * The day of availability.
+   */
+  date: string;
+  startTime: string;
+  endTime: string;
+  mode: 'in-person' | 'telehealth' | 'either';
+  /**
+   * Optional — for in-person sessions, e.g. "Brisbane CBD".
+   */
+  location?: string | null;
+  /**
+   * Optional internal/marketing note shown with the slot.
+   */
+  notes?: string | null;
+  /**
+   * Set to "Booked" to hide a slot once it is taken (removed manually).
+   */
+  status: 'available' | 'booked';
+  /**
+   * Stops advertising after this date. Defaults to the end of the month.
+   */
+  expiresAt: string;
+  title?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1354,6 +2431,10 @@ export interface PayloadLockedDocument {
         value: number | Event;
       } | null)
     | ({
+        relationTo: 'availability-sessions';
+        value: number | AvailabilitySession;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1425,6 +2506,17 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         type?: T;
+        eyebrow?: T;
+        heading?: T;
+        subtitle?: T;
+        showBreadcrumb?: T;
+        definition?:
+          | T
+          | {
+              term?: T;
+              pronunciation?: T;
+              text?: T;
+            };
         richText?: T;
         links?:
           | T
@@ -1442,6 +2534,7 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
             };
         media?: T;
+        cssClass?: T;
       };
   layout?:
     | T
@@ -1451,6 +2544,17 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        faq?: T | FAQBlockSelect<T>;
+        gatewayCards?: T | GatewayCardsBlockSelect<T>;
+        featureGrid?: T | FeatureGridBlockSelect<T>;
+        statsBand?: T | StatsBandBlockSelect<T>;
+        processSteps?: T | ProcessStepsBlockSelect<T>;
+        tabs?: T | TabsBlockTypeSelect<T>;
+        splitFeature?: T | SplitFeatureBlockSelect<T>;
+        ctaBand?: T | CTABandBlockSelect<T>;
+        specialtyGrid?: T | SpecialtyGridBlockSelect<T>;
+        peopleGrid?: T | PeopleGridBlockSelect<T>;
+        slideCarousel?: T | SlideCarouselBlockSelect<T>;
       };
   meta?:
     | T
@@ -1460,6 +2564,7 @@ export interface PagesSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  cssClass?: T;
   generateSlug?: T;
   slug?: T;
   parent?: T;
@@ -1496,6 +2601,7 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  cssClass?: T;
   id?: T;
   blockName?: T;
 }
@@ -1522,6 +2628,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  cssClass?: T;
   id?: T;
   blockName?: T;
 }
@@ -1531,6 +2638,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
  */
 export interface MediaBlockSelect<T extends boolean = true> {
   media?: T;
+  cssClass?: T;
   id?: T;
   blockName?: T;
 }
@@ -1545,6 +2653,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   categories?: T;
   limit?: T;
   selectedDocs?: T;
+  cssClass?: T;
   id?: T;
   blockName?: T;
 }
@@ -1556,6 +2665,406 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock_select".
+ */
+export interface FAQBlockSelect<T extends boolean = true> {
+  heading?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  exclusive?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GatewayCardsBlock_select".
+ */
+export interface GatewayCardsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  columns?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureGridBlock_select".
+ */
+export interface FeatureGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  columns?: T;
+  cardStyle?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBandBlock_select".
+ */
+export interface StatsBandBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  stats?:
+    | T
+    | {
+        value?: T;
+        prefix?: T;
+        suffix?: T;
+        label?: T;
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessStepsBlock_select".
+ */
+export interface ProcessStepsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  columns?: T;
+  steps?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TabsBlockType_select".
+ */
+export interface TabsBlockTypeSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  tabs?:
+    | T
+    | {
+        label?: T;
+        content?: T;
+        id?: T;
+      };
+  tabStyle?: T;
+  defaultTab?: T;
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SplitFeatureBlock_select".
+ */
+export interface SplitFeatureBlockSelect<T extends boolean = true> {
+  background?: T;
+  rows?:
+    | T
+    | {
+        image?: T;
+        imageSide?: T;
+        eyebrow?: T;
+        title?: T;
+        body?: T;
+        bullets?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CTABandBlock_select".
+ */
+export interface CTABandBlockSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  links?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpecialtyGridBlock_select".
+ */
+export interface SpecialtyGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  source?: T;
+  columns?: T;
+  defaultIcon?: T;
+  linkToDirectory?: T;
+  directoryPath?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PeopleGridBlock_select".
+ */
+export interface PeopleGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  source?: T;
+  onlyAdvertised?: T;
+  featuredOnly?: T;
+  specialty?: T;
+  department?: T;
+  people?: T;
+  layout?: T;
+  columns?: T;
+  limit?: T;
+  linkProfiles?: T;
+  carouselOptions?:
+    | T
+    | {
+        speed?: T;
+        direction?: T;
+        showArrows?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SlideCarouselBlock_select".
+ */
+export interface SlideCarouselBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  autoplay?: T;
+  interval?: T;
+  slides?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        accent?: T;
+        visualLabel?: T;
+        image?: T;
+        pills?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
   id?: T;
   blockName?: T;
 }
@@ -1810,6 +3319,9 @@ export interface SpecialistsSelect<T extends boolean = true> {
   assessmentTypes?: T;
   areasOfExpertise?: T;
   featured?: T;
+  advertise?: T;
+  availabilityHighlight?: T;
+  availabilityNote?: T;
   lastName?: T;
   publishedAt?: T;
   generateSlug?: T;
@@ -1878,6 +3390,24 @@ export interface EventsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "availability-sessions_select".
+ */
+export interface AvailabilitySessionsSelect<T extends boolean = true> {
+  specialist?: T;
+  date?: T;
+  startTime?: T;
+  endTime?: T;
+  mode?: T;
+  location?: T;
+  notes?: T;
+  status?: T;
+  expiresAt?: T;
+  title?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2386,6 +3916,79 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-availability".
+ */
+export interface SpecialistAvailability {
+  id: number;
+  heading?: string | null;
+  /**
+   * Introductory copy shown above the availability list.
+   */
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  carouselTitle?: string | null;
+  /**
+   * Where the prefilled enquiry email is sent.
+   */
+  enquiryEmail?: string | null;
+  enquirySubject?: string | null;
+  enquiryBodyIntro?: string | null;
+  enquiryBodyFooter?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "custom-styles".
+ */
+export interface CustomStyle {
+  id: number;
+  /**
+   * Define a reusable style once, then apply it by name on any block/hero/page. Target the stable vf-* hook classes (e.g. .vf-card, .vf-section-header__title, .vf-carousel__arrow) and brand tokens (var(--primary), var(--accent), var(--shadow-lg), var(--radius)…). See src/Styles/HOOKS.md for the full hook + token reference. Scope to a block via ".your-class .vf-card { … }".
+   */
+  presets?:
+    | {
+        /**
+         * e.g. "card-elevated" (no dot, no spaces).
+         */
+        name: string;
+        /**
+         * Friendly name shown in the picker.
+         */
+        label?: string | null;
+        /**
+         * What this style does / when to use it.
+         */
+        description?: string | null;
+        /**
+         * Full CSS rule(s), e.g. ".card-elevated > * { box-shadow: var(--shadow-lg); }". Match the selector to the class name above.
+         */
+        css: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional base/root CSS not tied to a class — e.g. ":root { … }", "@font-face { … }". Injected as-is on every page.
+   */
+  globalCss?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -2535,6 +4138,41 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         accent?: T;
         border?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-availability_select".
+ */
+export interface SpecialistAvailabilitySelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  carouselTitle?: T;
+  enquiryEmail?: T;
+  enquirySubject?: T;
+  enquiryBodyIntro?: T;
+  enquiryBodyFooter?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "custom-styles_select".
+ */
+export interface CustomStylesSelect<T extends boolean = true> {
+  presets?:
+    | T
+    | {
+        name?: T;
+        label?: T;
+        description?: T;
+        css?: T;
+        id?: T;
+      };
+  globalCss?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

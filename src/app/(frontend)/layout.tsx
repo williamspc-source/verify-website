@@ -6,6 +6,8 @@ import { Montserrat, Open_Sans } from 'next/font/google'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
+import { CustomCSS } from '@/components/CustomCSS'
+import { MotionObserver } from '@/components/Reveal'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
@@ -51,6 +53,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <body>
+        <CustomCSS />
+        <MotionObserver />
         <Providers>
           <AdminBar
             adminBarProps={{

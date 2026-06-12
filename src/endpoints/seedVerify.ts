@@ -3,6 +3,8 @@ import { readFileSync } from 'fs'
 import path from 'path'
 
 import { seedDataLayer } from './seed/seedDataLayer'
+import { seedAvailability } from './seed/seedAvailability'
+import { seedShowcase } from './seed/seedShowcase'
 
 /* =====================================================================
    Non-destructive scaffold seed for the VERIFY site.
@@ -17,17 +19,20 @@ import { seedDataLayer } from './seed/seedDataLayer'
    ===================================================================== */
 
 // ── Minimal Lexical helpers (matches endpoints/seed/home-static.ts) ──
-const textNode = (text: string) => ({
+// `format` is the Lexical inline-format bitmask (1 = bold).
+const textNode = (text: string, format = 0) => ({
   type: 'text',
   detail: 0,
-  format: 0,
+  format,
   mode: 'normal',
   style: '',
   text,
   version: 1,
 })
 
-const heading = (text: string, tag: 'h1' | 'h2' = 'h1') => ({
+const bold = (text: string) => textNode(text, 1)
+
+const heading = (text: string, tag: 'h1' | 'h2' | 'h3' = 'h1') => ({
   type: 'heading',
   tag,
   children: [textNode(text)],
@@ -37,13 +42,36 @@ const heading = (text: string, tag: 'h1' | 'h2' = 'h1') => ({
   version: 1,
 })
 
-const paragraph = (text: string) => ({
+// Accepts a string or an array of inline nodes (for mixed bold/normal text).
+const paragraph = (content: string | unknown[]) => ({
   type: 'paragraph',
-  children: [textNode(text)],
+  children: typeof content === 'string' ? [textNode(content)] : content,
   direction: 'ltr',
   format: '',
   indent: 0,
   textFormat: 0,
+  version: 1,
+})
+
+const listItem = (content: string | unknown[], value: number) => ({
+  type: 'listitem',
+  children: typeof content === 'string' ? [textNode(content)] : content,
+  direction: 'ltr',
+  format: '',
+  indent: 0,
+  value,
+  version: 1,
+})
+
+const list = (listType: 'bullet' | 'number', items: (string | unknown[])[]) => ({
+  type: 'list',
+  listType,
+  tag: listType === 'number' ? 'ol' : 'ul',
+  start: 1,
+  children: items.map((item, i) => listItem(item, i + 1)),
+  direction: 'ltr',
+  format: '',
+  indent: 0,
   version: 1,
 })
 
@@ -57,6 +85,58 @@ const richText = (children: unknown[]) => ({
     version: 1,
   },
 })
+
+// ── For Claimants page content (migrated from .design-reference) ──
+const forClaimantsLayout = () => [
+  {
+    blockType: 'content' as const,
+    columns: [
+      {
+        size: 'full' as const,
+        enableLink: false,
+        richText: richText([
+          heading('The IME process', 'h2'),
+          list('number', [
+            [bold('The appointment is booked. '), textNode('The medico-legal appointment is scheduled by the lawyers, and the medical brief is sent to the doctor.')],
+            [bold('Before the appointment. '), textNode('For videolink assessments, our team will contact you to test your device. Complete any paperwork you received electronically.')],
+            [bold('On the day. '), textNode('Arrive at least 15 minutes early — you will have some paperwork to complete. Bring photo ID (driver licence or passport) and attend the examination.')],
+            [bold('What happens next. '), textNode('The specialist writes the report and our team provides it to your solicitor.')],
+          ]),
+          heading('What to bring', 'h2'),
+          list('bullet', [
+            'Photographic identification (driver licence or passport)',
+            'The Claimant Questionnaire completed by you',
+            'The Informed Consent form completed by you',
+            'For a physical examination: any X-rays, CT scans and MRI results',
+          ]),
+          paragraph('VERIFY will provide the Claimant Questionnaire and Informed Consent form to your lawyer before the IME.'),
+          heading('What to wear', 'h2'),
+          paragraph('You may need to partially disrobe for a physical examination, so we recommend loose-fitting clothing and appropriate underwear. Short-sleeve or sleeveless tops are better for upper-limb injuries; loose shorts or a medium-length skirt are better for lower-limb and hip injuries. Avoid long tight pants or jeans.'),
+          heading('When to arrive', 'h2'),
+          paragraph('We recommend arriving 20 minutes before your IME, and at least 15 minutes before, as you may need to complete additional paperwork before the examination commences.'),
+          heading('Videolink appointments', 'h2'),
+          paragraph('Videolink IMEs are conducted over a private link sent directly to you. At least three days before, arrange a suitable device (laptop, or desktop with camera and microphone, or a smart mobile device) and identify a quiet, comfortable and secure location. As this is a medical examination for a legal claim, you must be by yourself for the duration of the appointment unless support persons are pre-approved. Our admin team will be in touch to test your connection beforehand.'),
+        ]),
+      },
+    ],
+  },
+  {
+    blockType: 'faq' as const,
+    heading: 'Frequently asked questions',
+    items: [
+      { question: 'What is an Independent Medico-Legal Examination (IME)?', answer: richText([paragraph("An IME is designed to provide an impartial, expert medical opinion about a claimant's injuries or medical conditions. The expert evaluates whether the injury is stable and stationary, permanent or otherwise, and determines how it affects the claimant's capacity to work and function.")]) },
+      { question: 'Who is an independent medical examiner?', answer: richText([paragraph("The independent medical examiner is an expert in their field of medicine or allied health, engaged by lawyers and insurers to provide an independent opinion on the claimant's injury, treatment and impairments. Importantly, the examiner is not the claimant's treating doctor.")]) },
+      { question: 'What happens at the IME?', answer: richText([paragraph('The examiner will have received and read a letter from your lawyer with all relevant medical notes before the IME. You will complete paperwork and produce photographic identification. The examiner may ask how the accident happened, about your injuries, symptoms and treatment, and how this has affected your work and daily living. For a physical injury, a physical examination focused on the injured area (and sometimes more general) will be conducted. A written report is then provided to your lawyer.')]) },
+      { question: 'What should I bring to the IME?', answer: richText([paragraph('For a physical examination, bring any X-rays, CT scans and MRI results. For all examinations, bring photographic identification (driver licence or passport), the completed Claimant Questionnaire, and the completed Informed Consent form. VERIFY provides the questionnaire and consent form to your lawyer beforehand.')]) },
+      { question: 'How long will the IME take?', answer: richText([paragraph('It varies with the complexity of your injuries and the specialist. Allow one hour for an orthopaedic surgeon or neurosurgeon; up to 90 minutes for a neurologist if additional testing is required; 90 minutes to 2 hours for a psychiatric examination; and two to three hours for an occupational therapist.')]) },
+      { question: 'Can I bring someone with me?', answer: richText([paragraph('You are welcome to bring a family member, friend or support person, however they will generally wait in reception for the duration of the IME. If the examiner allows a support person to attend, they are there only to support you — not to participate, ask questions or answer on your behalf.')]) },
+      { question: 'Can I get a copy of the report?', answer: richText([paragraph('The report is provided to your lawyer. If you wish to request a copy, you will need to speak directly to your lawyer — we are unable to release the report directly to you.')]) },
+      { question: 'Do I have to pay for the examination?', answer: richText([paragraph('No. You do not pay for the examination in our office or directly to the doctor. The cost of the examination and the medico-legal report is invoiced to your solicitor.')]) },
+      { question: 'What if I need an interpreter?', answer: richText([paragraph('We will organise an interpreter for you if required. We need adequate notice from your lawyer to schedule this.')]) },
+      { question: 'What if I am running late or cannot attend?', answer: richText([paragraph('Contact VERIFY immediately. We will inform the examiner of the situation. Late cancellation fees and non-attendance fees may apply.')]) },
+    ],
+  },
+]
 
 const heroFor = (title: string) => ({
   type: 'lowImpact' as const,
@@ -97,6 +177,7 @@ const PAGE_TREE: PageNode[] = [
   { slug: 'admin-services', title: 'Administrative Services', parent: 'medico-legal' },
 
   { slug: 'specialists', title: 'Specialists' },
+  { slug: 'specialist-availability', title: 'Specialist Availability', parent: 'specialists' },
 
   { slug: 'information-centre', title: 'Information Centre' },
   { slug: 'for-clients', title: 'For Clients', parent: 'information-centre' },
@@ -112,6 +193,178 @@ const PAGE_TREE: PageNode[] = [
 
 const LINKEDIN = 'https://www.linkedin.com/company/verify-medico-legal-solutions/'
 const FACEBOOK = 'https://www.facebook.com/profile.php?id=100066385885275'
+
+// ── Starter Custom Styles preset library ──
+// Each preset bundles a class name + its CSS. Applied via the strict picker on
+// blocks/heroes/pages. Selectors target the stable `vf-*` hooks and brand tokens.
+const STYLE_PRESETS: { name: string; label: string; description: string; css: string }[] = [
+  // Cards
+  {
+    name: 'card-elevated',
+    label: 'Cards · Elevated',
+    description: 'Larger brand-tinted shadow on every card in the block.',
+    css: '.card-elevated .vf-card { box-shadow: var(--shadow-lg); }',
+  },
+  {
+    name: 'card-bordered',
+    label: 'Cards · Bold border',
+    description: 'Adds a 2px primary border to cards.',
+    css: '.card-bordered .vf-card { border-width: 2px; border-color: var(--primary); }',
+  },
+  {
+    name: 'card-accent-bar',
+    label: 'Cards · Accent bar on hover',
+    description: 'A primary bar wipes across the top of a card on hover.',
+    css: `.card-accent-bar .vf-card { position: relative; overflow: hidden; }
+.card-accent-bar .vf-card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--primary); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--transition); }
+.card-accent-bar .vf-card:hover::before { transform: scaleX(1); }`,
+  },
+  {
+    name: 'card-hover-zoom',
+    label: 'Cards · Hover zoom',
+    description: 'Cards scale up slightly on hover.',
+    css: `.card-hover-zoom .vf-card { transition: transform .3s var(--transition); }
+.card-hover-zoom .vf-card:hover { transform: scale(1.03); }`,
+  },
+  {
+    name: 'card-gradient',
+    label: 'Cards · Soft gradient',
+    description: 'Light accent→white gradient background on cards.',
+    css: '.card-gradient .vf-card { background: linear-gradient(140deg, var(--accent), #fff); }',
+  },
+  {
+    name: 'card-flat',
+    label: 'Cards · Flat',
+    description: 'Removes shadow for a flat, bordered look.',
+    css: '.card-flat .vf-card { box-shadow: none; border-color: var(--border); }',
+  },
+  // Buttons (apply via the Element styles → Buttons slot)
+  {
+    name: 'btn-pill',
+    label: 'Button · Pill',
+    description: 'Fully rounded button.',
+    css: '.btn-pill { border-radius: 999px; }',
+  },
+  {
+    name: 'btn-shine',
+    label: 'Button · Shine',
+    description: 'A light sweeps across the button on hover.',
+    css: `.btn-shine { position: relative; overflow: hidden; }
+.btn-shine::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent); transform: translateX(-100%); transition: transform .5s; }
+.btn-shine:hover::before { transform: translateX(100%); }`,
+  },
+  {
+    name: 'btn-glow',
+    label: 'Button · Glow',
+    description: 'Glowing shadow on hover.',
+    css: '.btn-glow:hover { box-shadow: 0 8px 24px rgba(28,117,188,.4); }',
+  },
+  {
+    name: 'btn-block',
+    label: 'Button · Full width',
+    description: 'Stretches the button to full width.',
+    css: '.btn-block { width: 100%; justify-content: center; }',
+  },
+  // Headings (apply via Element styles → Heading)
+  {
+    name: 'heading-underline',
+    label: 'Heading · Underline',
+    description: 'Primary underline beneath the heading text.',
+    css: '.heading-underline { display: inline-block; padding-bottom: .25em; border-bottom: 3px solid var(--primary); }',
+  },
+  {
+    name: 'heading-gradient',
+    label: 'Heading · Gradient text',
+    description: 'Primary→light-blue gradient fill on the heading.',
+    css: '.heading-gradient { background: linear-gradient(90deg, var(--primary), var(--secondary-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }',
+  },
+  {
+    name: 'heading-primary',
+    label: 'Heading · Primary colour',
+    description: 'Colours the heading in the brand primary.',
+    css: '.heading-primary { color: var(--primary); }',
+  },
+  // Badges (apply to the block root)
+  {
+    name: 'badge-solid',
+    label: 'Badges · Solid',
+    description: 'Solid primary badges.',
+    css: '.badge-solid .vf-badge { background: var(--primary); color: var(--primary-foreground); }',
+  },
+  {
+    name: 'badge-outline',
+    label: 'Badges · Outline',
+    description: 'Outlined badges.',
+    css: '.badge-outline .vf-badge { background: transparent; border: 1px solid var(--primary); color: var(--primary); }',
+  },
+  // Sections / bands (apply to the block root)
+  {
+    name: 'section-tight',
+    label: 'Section · Tight padding',
+    description: 'Reduces the section’s vertical padding.',
+    css: '.section-tight.vf-section { padding-top: 2.5rem; padding-bottom: 2.5rem; }',
+  },
+  {
+    name: 'section-loose',
+    label: 'Section · Loose padding',
+    description: 'Increases the section’s vertical padding.',
+    css: '.section-loose.vf-section { padding-top: 7rem; padding-bottom: 7rem; }',
+  },
+  {
+    name: 'band-gradient-blue',
+    label: 'Band · Light blue gradient',
+    description: 'Soft light-blue gradient background.',
+    css: '.band-gradient-blue.vf-section { background: linear-gradient(135deg, #eef9ff, #d9efff); }',
+  },
+  {
+    name: 'band-gradient-dark',
+    label: 'Band · Dark blue gradient',
+    description: 'Dark brand gradient with light text.',
+    css: `.band-gradient-dark.vf-section { background: linear-gradient(135deg, #0d4f85, #1c75bc); color: #fff; }
+.band-gradient-dark .vf-section-header__subtitle { color: rgba(255,255,255,.85); }
+.band-gradient-dark .vf-section-header__eyebrow { color: rgba(255,255,255,.8); }`,
+  },
+  // Carousel
+  {
+    name: 'carousel-fade-edges',
+    label: 'Carousel · Faded edges',
+    description: 'Fades the carousel’s left/right edges.',
+    css: '.carousel-fade-edges .vf-carousel__track { -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }',
+  },
+  {
+    name: 'carousel-arrows-overlay',
+    label: 'Carousel · Overlay arrows',
+    description: 'Places the arrows over the carousel sides.',
+    css: `.carousel-arrows-overlay .vf-carousel__controls { position: absolute; inset: 50% 0 auto 0; transform: translateY(-50%); justify-content: space-between; margin: 0; pointer-events: none; }
+.carousel-arrows-overlay .vf-carousel__arrow { pointer-events: auto; box-shadow: var(--shadow-lg); }`,
+  },
+  // Icons / avatars
+  {
+    name: 'icon-fill-hover',
+    label: 'Icons · Fill on hover',
+    description: 'Card icon fills with primary on card hover.',
+    css: '.icon-fill-hover .vf-card:hover .vf-card__icon { background: var(--primary); color: #fff; }',
+  },
+  {
+    name: 'avatar-gradient',
+    label: 'Avatars · Gradient initials',
+    description: 'Gradient background behind initials avatars.',
+    css: '.avatar-gradient .vf-person-card__avatar-initials { background: linear-gradient(135deg, var(--primary), var(--secondary-2)); color: #fff; }',
+  },
+  // Effects
+  {
+    name: 'divider-accent',
+    label: 'Divider · Bold',
+    description: 'Widens/thickens the section-header divider.',
+    css: '.divider-accent .vf-section-header__divider { width: 80px; height: 4px; }',
+  },
+  {
+    name: 'lift-on-hover',
+    label: 'Effect · Lift on hover',
+    description: 'Lifts the element on hover.',
+    css: '.lift-on-hover { transition: transform .3s var(--transition); } .lift-on-hover:hover { transform: translateY(-4px); }',
+  },
+]
 
 export const seedVerify = async ({
   payload,
@@ -204,21 +457,26 @@ export const seedVerify = async ({
           ],
         },
         {
+          ...pageLink('specialists', 'Specialists'),
+          subItems: [
+            pageLink('specialists', 'Specialist Panel'),
+            pageLink('specialist-availability', 'Specialist Availability'),
+          ],
+        },
+        {
           ...pageLink('information-centre', 'Information Centre'),
           subItems: [
-            pageLink('information-centre', 'Overview & FAQs'),
             pageLink('for-clients', 'For Clients'),
             pageLink('for-claimants', 'For Claimants'),
           ],
         },
-        pageLink('specialists', 'Specialists'),
         pageLink('in-the-loop', 'In the Loop'),
         pageLink('events', 'Events & Seminars'),
         pageLink('contact', 'Contact Us'),
       ],
       cta: {
         enabled: true,
-        link: pageLink('contact', 'Book an Appointment').link,
+        link: pageLink('specialist-availability', 'See Specialist Availability').link,
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
@@ -241,7 +499,8 @@ export const seedVerify = async ({
             pageLink('about', 'About VERIFY'),
             pageLink('services', 'Our Services'),
             pageLink('specialists', 'Specialists'),
-            pageLink('information-centre', 'Information Centre'),
+            pageLink('for-claimants', 'Information for Claimants'),
+            pageLink('for-clients', 'Information for Clients'),
             pageLink('in-the-loop', 'In the Loop'),
             pageLink('events', 'Events & Seminars'),
             pageLink('contact', 'Contact us'),
@@ -267,6 +526,84 @@ export const seedVerify = async ({
     } as any,
   })
   payload.logger.info('— Populated footer global')
+
+  // ── Specialist Availability settings global ──
+  await payload.updateGlobal({
+    slug: 'specialist-availability',
+    depth: 0,
+    req,
+    context: { disableRevalidate: true },
+    data: {
+      heading: 'Specialist Availability',
+      intro: richText([
+        paragraph(
+          'Browse current availability for our featured specialists. Select the sessions that suit your matter and send us an enquiry — our team will confirm the booking with you.',
+        ),
+      ]),
+      carouselTitle: 'Featured specialists',
+      enquiryEmail: 'admin@vmls.com.au',
+      enquirySubject: 'Specialist Availability Enquiry',
+      enquiryBodyIntro:
+        'Hello VERIFY team,\n\nI would like to enquire about the following appointment sessions:',
+      enquiryBodyFooter:
+        'My name is:\nMy contact number is:\nClaim / referrer details (if any):\n\nThank you.',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any,
+  })
+  payload.logger.info('— Populated specialist availability global')
+
+  // ── Custom Styles global (starter presets) ──
+  {
+    const existingStyles = await payload.findGlobal({ slug: 'custom-styles', depth: 0, req })
+    if (!existingStyles?.presets?.length) {
+      await payload.updateGlobal({
+        slug: 'custom-styles',
+        depth: 0,
+        req,
+        context: { disableRevalidate: true },
+        data: {
+          presets: STYLE_PRESETS,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      })
+      payload.logger.info(`— Seeded ${STYLE_PRESETS.length} Custom Styles presets`)
+    }
+  }
+
+  // ── For Claimants page content (only while still the placeholder) ──
+  {
+    const fc = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: 'for-claimants' } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    const page = fc.docs[0]
+    const layout = (page?.layout ?? []) as { blockType?: string }[]
+    const isPlaceholder =
+      Array.isArray(layout) &&
+      layout.length === 1 &&
+      layout[0]?.blockType === 'content' &&
+      JSON.stringify(layout[0]).includes('scaffolded and ready for content')
+
+    if (page && isPlaceholder) {
+      await payload.update({
+        collection: 'pages',
+        id: page.id,
+        depth: 0,
+        req,
+        context: { disableRevalidate: true },
+        data: {
+          layout: forClaimantsLayout(),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      })
+      payload.logger.info('— Populated For Claimants content (IME info + FAQ)')
+    } else {
+      payload.logger.info('— For Claimants already has content, skipping')
+    }
+  }
 
   // ── Branding: upload logo + favicon to Media, populate Site Settings ──
   try {
@@ -332,6 +669,12 @@ export const seedVerify = async ({
 
   // ── Data layer: taxonomy lookups + specialists / team / events ──
   await seedDataLayer({ payload, req })
+
+  // ── Specialist availability demo data (advertised specialists + sessions) ──
+  await seedAvailability({ payload, req })
+
+  // ── Style Guide showcase page (every block, for review/handoff) ──
+  await seedShowcase({ payload, req })
 
   payload.logger.info('VERIFY scaffold seed complete.')
 }

@@ -10,10 +10,13 @@ import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 
 import { fields } from './fields'
 import { getClientSideURL } from '@/utilities/getURL'
+import { cn } from '@/utilities/ui'
+import { toClassName } from '@/utilities/cssClass'
 
 export type FormBlockType = {
   blockName?: string
   blockType?: 'formBlock'
+  cssClass?: string | string[] | null
   enableIntro: boolean
   form: FormType
   introContent?: DefaultTypedEditorState
@@ -29,6 +32,7 @@ export const FormBlock: React.FC<
     form: formFromProps,
     form: { id: formID, confirmationMessage, confirmationType, redirect, submitButtonLabel } = {},
     introContent,
+    cssClass,
   } = props
 
   const formMethods = useForm({
@@ -114,7 +118,7 @@ export const FormBlock: React.FC<
   )
 
   return (
-    <div className="container lg:max-w-[48rem]">
+    <div className={cn('container lg:max-w-[48rem]', toClassName(cssClass))}>
       {enableIntro && introContent && !hasSubmitted && (
         <RichText className="mb-8 lg:mb-12" data={introContent} enableGutter={false} />
       )}

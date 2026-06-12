@@ -8,6 +8,12 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@/fields/linkGroup'
+import { cssClassField } from '@/fields/blockFields'
+
+const isType =
+  (...types: string[]) =>
+  (_: unknown, siblingData: { type?: string } = {}) =>
+    types.includes(siblingData?.type ?? '')
 
 export const hero: Field = {
   name: 'hero',
@@ -16,28 +22,61 @@ export const hero: Field = {
     {
       name: 'type',
       type: 'select',
-      defaultValue: 'lowImpact',
+      defaultValue: 'pageHero',
       label: 'Type',
-      options: [
-        {
-          label: 'None',
-          value: 'none',
-        },
-        {
-          label: 'High Impact',
-          value: 'highImpact',
-        },
-        {
-          label: 'Medium Impact',
-          value: 'mediumImpact',
-        },
-        {
-          label: 'Low Impact',
-          value: 'lowImpact',
-        },
-      ],
       required: true,
+      options: [
+        { label: 'None', value: 'none' },
+        { label: 'Page hero (interior pages)', value: 'pageHero' },
+        { label: 'Home hero (with definition panel)', value: 'homeHero' },
+        { label: 'High impact (full-bleed image)', value: 'highImpact' },
+        { label: 'Medium impact', value: 'mediumImpact' },
+        { label: 'Low impact', value: 'lowImpact' },
+      ],
     },
+    // ── pageHero / homeHero fields ──
+    {
+      name: 'eyebrow',
+      type: 'text',
+      admin: {
+        description: 'Small uppercase label above the heading.',
+        condition: isType('pageHero', 'homeHero'),
+      },
+    },
+    {
+      name: 'heading',
+      type: 'text',
+      admin: { condition: isType('pageHero', 'homeHero') },
+    },
+    {
+      name: 'subtitle',
+      type: 'textarea',
+      admin: { condition: isType('pageHero', 'homeHero') },
+    },
+    {
+      name: 'showBreadcrumb',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        description: 'Show the breadcrumb trail above the heading.',
+        condition: isType('pageHero'),
+      },
+    },
+    {
+      name: 'definition',
+      type: 'group',
+      label: 'Definition panel',
+      admin: {
+        description: 'The dictionary-style panel shown beside the home hero.',
+        condition: isType('homeHero'),
+      },
+      fields: [
+        { name: 'term', type: 'text', admin: { description: 'e.g. "verify"' } },
+        { name: 'pronunciation', type: 'text', admin: { description: 'e.g. "/ˈvɛrɪfʌɪ/ · verb"' } },
+        { name: 'text', type: 'textarea', label: 'Definition' },
+      ],
+    },
+    // ── legacy richText heroes ──
     {
       name: 'richText',
       type: 'richText',
@@ -52,6 +91,7 @@ export const hero: Field = {
         },
       }),
       label: false,
+      admin: { condition: isType('highImpact', 'mediumImpact', 'lowImpact') },
     },
     linkGroup({
       overrides: {
@@ -61,12 +101,13 @@ export const hero: Field = {
     {
       name: 'media',
       type: 'upload',
-      admin: {
-        condition: (_, { type } = {}) => ['highImpact', 'mediumImpact'].includes(type),
-      },
       relationTo: 'media',
-      required: true,
+      admin: {
+        description: 'Hero image.',
+        condition: isType('highImpact', 'mediumImpact', 'homeHero'),
+      },
     },
+    { ...cssClassField, admin: { ...cssClassField.admin, condition: isType('pageHero', 'homeHero') } } as Field,
   ],
   label: false,
 }

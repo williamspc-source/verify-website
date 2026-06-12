@@ -145,6 +145,42 @@ export const Specialists: CollectionConfig<'specialists'> = {
         description: 'Show in featured listings (e.g. the homepage).',
       },
     },
+    // ── Specialist Availability advertising ──
+    // `advertise` puts the specialist on the Specialist Availability page even
+    // with no sessions (the "call to book" case). Specialists with upcoming
+    // sessions show their slots; otherwise `availabilityNote` is shown.
+    {
+      name: 'advertise',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Advertise availability',
+      admin: {
+        position: 'sidebar',
+        description: 'Show this specialist on the Specialist Availability page.',
+      },
+    },
+    {
+      name: 'availabilityHighlight',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Highlight in carousel',
+      admin: {
+        position: 'sidebar',
+        description: 'Feature this specialist in the availability carousel.',
+        condition: (_, siblingData) => Boolean(siblingData?.advertise),
+      },
+    },
+    {
+      name: 'availabilityNote',
+      type: 'text',
+      label: 'No-slots note',
+      defaultValue: 'Call to book',
+      admin: {
+        position: 'sidebar',
+        description: 'Shown when this specialist has no upcoming sessions (e.g. "Call to book").',
+        condition: (_, siblingData) => Boolean(siblingData?.advertise),
+      },
+    },
     {
       name: 'lastName',
       type: 'text',

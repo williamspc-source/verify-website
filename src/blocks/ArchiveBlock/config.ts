@@ -7,6 +7,8 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
+import { cssClassField } from '@/fields/blockFields'
+
 export const Archive: Block = {
   slug: 'archive',
   interfaceName: 'ArchiveBlock',
@@ -86,6 +88,7 @@ export const Archive: Block = {
       label: 'Selection',
       relationTo: ['posts'],
     },
+    cssClassField,
   ],
   labels: {
     plural: 'Archives',

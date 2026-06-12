@@ -22,3 +22,6 @@ node_modules/
 /playwright/.cache/
 .design-reference/
 tsconfig.tsbuildinfo
+
+# Local Claude Code instructions (not pushed)
+CLAUDE.md

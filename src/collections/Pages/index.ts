@@ -1,13 +1,25 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
+import { FAQ } from '../../blocks/FAQ/config'
 import { FormBlock } from '../../blocks/Form/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { GatewayCards } from '../../blocks/GatewayCards/config'
+import { FeatureGrid } from '../../blocks/FeatureGrid/config'
+import { StatsBand } from '../../blocks/StatsBand/config'
+import { ProcessSteps } from '../../blocks/ProcessSteps/config'
+import { TabsBlock } from '../../blocks/Tabs/config'
+import { SplitFeature } from '../../blocks/SplitFeature/config'
+import { CTABand } from '../../blocks/CTABand/config'
+import { SpecialtyGrid } from '../../blocks/SpecialtyGrid/config'
+import { PeopleGrid } from '../../blocks/PeopleGrid/config'
+import { SlideCarousel } from '../../blocks/SlideCarousel/config'
 import { hero } from '@/heros/config'
+import { cssClassField } from '@/fields/blockFields'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
@@ -83,7 +95,24 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [
+                CallToAction,
+                Content,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                FAQ,
+                GatewayCards,
+                FeatureGrid,
+                StatsBand,
+                ProcessSteps,
+                TabsBlock,
+                SplitFeature,
+                CTABand,
+                SpecialtyGrid,
+                PeopleGrid,
+                SlideCarousel,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,
@@ -128,6 +157,7 @@ export const Pages: CollectionConfig<'pages'> = {
         position: 'sidebar',
       },
     },
+    { ...cssClassField, admin: { ...cssClassField.admin, position: 'sidebar' } } as Field,
     slugField(),
   ],
   hooks: {

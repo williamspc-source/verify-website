@@ -7,6 +7,7 @@ import RichText from '@/components/RichText'
 import type { MediaBlock as MediaBlockProps } from '@/payload-types'
 
 import { Media } from '../../components/Media'
+import { toClassName } from '@/utilities/cssClass'
 
 type Props = MediaBlockProps & {
   breakout?: boolean
@@ -28,6 +29,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
     staticImage,
     disableInnerContainer,
   } = props
+  const cssClass = (props as { cssClass?: string | string[] | null }).cssClass
 
   let caption
   if (media && typeof media === 'object') caption = media.caption
@@ -40,6 +42,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
           container: enableGutter,
         },
         className,
+        toClassName(cssClass),
       )}
     >
       {(media || staticImage) && (
