@@ -8,10 +8,13 @@ import {
 
 import { link } from '@/fields/link'
 import {
+  anchorIdField,
   backgroundField,
   cssClassField,
   displayFields,
   elementClassesField,
+  iconField,
+  sectionHeaderFields,
 } from '@/fields/blockFields'
 
 export const SplitFeature: Block = {
@@ -19,6 +22,7 @@ export const SplitFeature: Block = {
   interfaceName: 'SplitFeatureBlock',
   labels: { singular: 'Split Feature', plural: 'Split Features' },
   fields: [
+    ...sectionHeaderFields,
     backgroundField,
     {
       name: 'rows',
@@ -38,7 +42,13 @@ export const SplitFeature: Block = {
             { label: 'Right', value: 'right' },
           ],
         },
-        { name: 'eyebrow', type: 'text' },
+        {
+          type: 'row',
+          fields: [
+            { name: 'eyebrow', type: 'text', admin: { width: '50%' } },
+            iconField({ admin: { width: '50%', description: 'Optional icon above the title.' } }),
+          ],
+        },
         { name: 'title', type: 'text', required: true },
         {
           name: 'body',
@@ -52,12 +62,21 @@ export const SplitFeature: Block = {
           }),
         },
         {
+          name: 'bulletsLabel',
+          type: 'text',
+          admin: { description: 'Optional mini-heading above the bullets (e.g. "When to Request").' },
+        },
+        {
           name: 'bullets',
           type: 'array',
           labels: { singular: 'Bullet', plural: 'Bullets' },
-          fields: [{ name: 'text', type: 'text', required: true }],
+          fields: [
+            { name: 'text', type: 'text', required: true },
+            iconField({ admin: { description: 'Optional per-bullet icon.' } }),
+          ],
         },
         link({ appearances: false }),
+        anchorIdField,
       ],
     },
     cssClassField,

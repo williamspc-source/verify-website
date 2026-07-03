@@ -5,6 +5,7 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateSpecialist } from './hooks/revalidateSpecialist'
 import { slugField } from 'payload'
+import { iconField } from '@/fields/blockFields'
 
 import {
   MetaDescriptionField,
@@ -70,19 +71,64 @@ export const Specialists: CollectionConfig<'specialists'> = {
             },
             {
               name: 'locations',
-              type: 'array',
-              admin: { description: 'Cities / regions where this specialist consults.' },
-              fields: [{ name: 'location', type: 'text', required: true }],
+              type: 'relationship',
+              relationTo: 'locations',
+              hasMany: true,
+              admin: {
+                description:
+                  'Cities / regions where this specialist consults. Drives the directory location filter.',
+              },
             },
             {
               name: 'qualifications',
               type: 'array',
-              fields: [{ name: 'qualification', type: 'text', required: true }],
+              fields: [
+                { name: 'qualification', type: 'text', required: true },
+                iconField({
+                  admin: { description: 'Optional icon (e.g. graduation-cap, certificate).' },
+                }),
+              ],
             },
             {
               name: 'accreditations',
+              type: 'relationship',
+              relationTo: 'accreditations',
+              hasMany: true,
+              admin: {
+                description:
+                  'Impairment-rating credentials — drives the Specialist Panel accreditation filter and the profile chips.',
+              },
+            },
+            {
+              name: 'languages',
               type: 'array',
-              fields: [{ name: 'accreditation', type: 'text', required: true }],
+              admin: { description: 'Languages spoken (e.g. English).' },
+              fields: [{ name: 'language', type: 'text', required: true }],
+            },
+            {
+              name: 'bookingUrl',
+              type: 'text',
+              label: 'Booking link',
+              admin: { description: 'Optional direct booking / enquiry URL.' },
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'cv',
+                  type: 'upload',
+                  relationTo: 'media',
+                  label: 'CV (PDF)',
+                  admin: { width: '50%', description: 'Optional downloadable CV.' },
+                },
+                {
+                  name: 'sampleReport',
+                  type: 'upload',
+                  relationTo: 'media',
+                  label: 'Sample report (PDF)',
+                  admin: { width: '50%', description: 'Optional redacted sample report.' },
+                },
+              ],
             },
           ],
         },
@@ -145,40 +191,42 @@ export const Specialists: CollectionConfig<'specialists'> = {
         description: 'Show in featured listings (e.g. the homepage).',
       },
     },
-    // ── Specialist Availability advertising ──
-    // `advertise` puts the specialist on the Specialist Availability page even
-    // with no sessions (the "call to book" case). Specialists with upcoming
-    // sessions show their slots; otherwise `availabilityNote` is shown.
+    // ── Specialist Availability ──
+    // `advertise` features the specialist in the carousel on the Specialist
+    // Availability page. The session list below the carousel is driven entirely
+    // by the Availability Sessions collection — a specialist only appears in the
+    // list when they have available sessions (no "call to book" rows).
     {
       name: 'advertise',
       type: 'checkbox',
       defaultValue: false,
-      label: 'Advertise availability',
+      label: 'Feature in availability carousel',
       admin: {
         position: 'sidebar',
-        description: 'Show this specialist on the Specialist Availability page.',
+        description:
+          'Show this specialist in the featured carousel on the Specialist Availability page. Their session list is driven separately by their Availability Sessions.',
       },
     },
+    // Deprecated — superseded by the model above. Hidden (column retained; drop
+    // via a migration later). Carousel = `advertise`; list = availability sessions.
     {
       name: 'availabilityHighlight',
       type: 'checkbox',
       defaultValue: false,
-      label: 'Highlight in carousel',
-      admin: {
-        position: 'sidebar',
-        description: 'Feature this specialist in the availability carousel.',
-        condition: (_, siblingData) => Boolean(siblingData?.advertise),
-      },
+      admin: { position: 'sidebar', hidden: true },
     },
     {
       name: 'availabilityNote',
       type: 'text',
-      label: 'No-slots note',
       defaultValue: 'Call to book',
+      admin: { position: 'sidebar', hidden: true },
+    },
+    {
+      name: 'firstName',
+      type: 'text',
       admin: {
         position: 'sidebar',
-        description: 'Shown when this specialist has no upcoming sessions (e.g. "Call to book").',
-        condition: (_, siblingData) => Boolean(siblingData?.advertise),
+        description: 'Optional given name used for sorting the directory by first name.',
       },
     },
     {

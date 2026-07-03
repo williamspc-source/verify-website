@@ -73,13 +73,21 @@ export interface Config {
     categories: Category;
     users: User;
     specialties: Specialty;
+    'specialty-categories': SpecialtyCategory;
     'claim-types': ClaimType;
     'assessment-types': AssessmentType;
     'areas-of-expertise': AreasOfExpertise;
+    accreditations: Accreditation;
+    locations: Location;
+    streams: Stream;
     specialists: Specialist;
     team: Team;
     events: Event;
     'availability-sessions': AvailabilitySession;
+    services: Service;
+    resources: Resource;
+    offices: Office;
+    testimonials: Testimonial;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -103,13 +111,21 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
+    'specialty-categories': SpecialtyCategoriesSelect<false> | SpecialtyCategoriesSelect<true>;
     'claim-types': ClaimTypesSelect<false> | ClaimTypesSelect<true>;
     'assessment-types': AssessmentTypesSelect<false> | AssessmentTypesSelect<true>;
     'areas-of-expertise': AreasOfExpertiseSelect<false> | AreasOfExpertiseSelect<true>;
+    accreditations: AccreditationsSelect<false> | AccreditationsSelect<true>;
+    locations: LocationsSelect<false> | LocationsSelect<true>;
+    streams: StreamsSelect<false> | StreamsSelect<true>;
     specialists: SpecialistsSelect<false> | SpecialistsSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     'availability-sessions': AvailabilitySessionsSelect<false> | AvailabilitySessionsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    offices: OfficesSelect<false> | OfficesSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -130,14 +146,22 @@ export interface Config {
     footer: Footer;
     'site-settings': SiteSetting;
     'specialist-availability': SpecialistAvailability;
+    'specialist-profile': SpecialistProfile;
+    'article-settings': ArticleSetting;
+    'events-settings': EventsSetting;
     'custom-styles': CustomStyle;
+    'design-system': DesignSystem;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'specialist-availability': SpecialistAvailabilitySelect<false> | SpecialistAvailabilitySelect<true>;
+    'specialist-profile': SpecialistProfileSelect<false> | SpecialistProfileSelect<true>;
+    'article-settings': ArticleSettingsSelect<false> | ArticleSettingsSelect<true>;
+    'events-settings': EventsSettingsSelect<false> | EventsSettingsSelect<true>;
     'custom-styles': CustomStylesSelect<false> | CustomStylesSelect<true>;
+    'design-system': DesignSystemSelect<false> | DesignSystemSelect<true>;
   };
   locale: null;
   widgets: {
@@ -193,6 +217,129 @@ export interface Page {
      */
     showBreadcrumb?: boolean | null;
     /**
+     * Light interior hero, or a dark gradient band.
+     */
+    theme?: ('light' | 'dark') | null;
+    align?: ('left' | 'center') | null;
+    /**
+     * Decorative brand shield behind the hero (uses the Site Settings logo/shield).
+     */
+    showShield?: boolean | null;
+    /**
+     * Optional icon + text row under the hero (e.g. phone / email / hours on Contact).
+     */
+    metaItems?:
+      | {
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          text: string;
+          href?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
      * The dictionary-style panel shown beside the home hero.
      */
     definition?: {
@@ -205,6 +352,10 @@ export interface Page {
        */
       pronunciation?: string | null;
       text?: string | null;
+      /**
+       * Visual treatment for the definition panel.
+       */
+      definitionStyle?: ('glow' | 'frame') | null;
     };
     richText?: {
       root: {
@@ -224,7 +375,7 @@ export interface Page {
     links?:
       | {
           link: {
-            type?: ('reference' | 'custom') | null;
+            type?: ('reference' | 'custom' | 'enquiry') | null;
             newTab?: boolean | null;
             reference?:
               | ({
@@ -238,6 +389,113 @@ export interface Page {
             url?: string | null;
             label: string;
             /**
+             * Optional leading icon shown before the label.
+             */
+            icon?:
+              | (
+                  | 'activity'
+                  | 'arrow-down'
+                  | 'arrow-right'
+                  | 'arrows-out'
+                  | 'award'
+                  | 'bag-simple'
+                  | 'bell-ringing'
+                  | 'bone'
+                  | 'book-open'
+                  | 'brain'
+                  | 'briefcase'
+                  | 'building'
+                  | 'bus'
+                  | 'calendar'
+                  | 'calendar-blank'
+                  | 'calendar-check'
+                  | 'car'
+                  | 'caret-left'
+                  | 'caret-right'
+                  | 'cell-signal-full'
+                  | 'certificate'
+                  | 'chart-bar'
+                  | 'chat'
+                  | 'chat-circle-text'
+                  | 'chats'
+                  | 'chats-circle'
+                  | 'check'
+                  | 'check-circle'
+                  | 'check-square'
+                  | 'clipboard-check'
+                  | 'clipboard-text'
+                  | 'clock'
+                  | 'currency-dollar'
+                  | 'desktop'
+                  | 'download'
+                  | 'download-simple'
+                  | 'envelope'
+                  | 'envelope-simple'
+                  | 'file-magnifying-glass'
+                  | 'file-plus'
+                  | 'file-text'
+                  | 'files'
+                  | 'first-aid'
+                  | 'gavel'
+                  | 'globe'
+                  | 'graduation-cap'
+                  | 'handshake'
+                  | 'headset'
+                  | 'heart-pulse'
+                  | 'heartbeat'
+                  | 'home'
+                  | 'house'
+                  | 'identification-card'
+                  | 'info'
+                  | 'link'
+                  | 'list'
+                  | 'lock'
+                  | 'lock-simple'
+                  | 'magnifying-glass'
+                  | 'mail'
+                  | 'map-pin'
+                  | 'medal'
+                  | 'message'
+                  | 'monitor'
+                  | 'navigation-arrow'
+                  | 'paper-plane-tilt'
+                  | 'person-arms-spread'
+                  | 'phone'
+                  | 'question'
+                  | 'scale'
+                  | 'scales'
+                  | 'seal-check'
+                  | 'search'
+                  | 'send'
+                  | 'shield'
+                  | 'shield-check'
+                  | 'sign-in'
+                  | 'sliders'
+                  | 'sort-ascending'
+                  | 'squares-four'
+                  | 'star'
+                  | 'stethoscope'
+                  | 't-shirt'
+                  | 'target'
+                  | 'translate'
+                  | 'upload'
+                  | 'upload-simple'
+                  | 'user'
+                  | 'user-check'
+                  | 'user-circle'
+                  | 'user-plus'
+                  | 'users'
+                  | 'users-three'
+                  | 'video'
+                  | 'video-camera'
+                  | 'warning'
+                  | 'warning-circle'
+                  | 'wheelchair'
+                  | 'wifi-high'
+                  | 'wind'
+                )
+              | null;
+            /**
              * Choose how the link should be rendered.
              */
             appearance?: ('default' | 'outline') | null;
@@ -246,7 +504,7 @@ export interface Page {
         }[]
       | null;
     /**
-     * Hero image.
+     * Hero image (background for impact heroes; a side/decorative image on page heroes).
      */
     media?: (number | null) | Media;
     /**
@@ -255,6 +513,8 @@ export interface Page {
     cssClass?: string[] | null;
   };
   layout: (
+    | SectionBlock
+    | RowBlock
     | CallToActionBlock
     | ContentBlock
     | MediaBlock
@@ -270,7 +530,18 @@ export interface Page {
     | CTABandBlock
     | SpecialtyGridBlock
     | PeopleGridBlock
+    | ServicesGridBlock
+    | TestimonialsGridBlock
+    | AvailabilityBlock
     | SlideCarouselBlock
+    | SpecialistDirectoryBlock
+    | SpecialtyDirectoryBlock
+    | ResourcesGridBlock
+    | AppointmentGuideBlock
+    | MapEmbedBlock
+    | ContactDetailsBlock
+    | IconListBlock
+    | CalloutBlock
   )[];
   meta?: {
     title?: string | null;
@@ -311,6 +582,38 @@ export interface Post {
   id: number;
   title: string;
   heroImage?: (number | null) | Media;
+  /**
+   * Short summary shown on listings / cards.
+   */
+  excerpt?: string | null;
+  /**
+   * Estimated reading time, e.g. 2.
+   */
+  readTime?: number | null;
+  /**
+   * Shown in the article meta bar and author card. Type a byline directly, or link a Team member / Specialist to source it. Collective bylines like "VERIFY Editorial Team" are supported via the free-text fields.
+   */
+  author?: {
+    /**
+     * Auto-sources name/role/photo/bio from a Team member or Specialist.
+     */
+    source?:
+      | ({
+          relationTo: 'team';
+          value: number | Team;
+        } | null)
+      | ({
+          relationTo: 'specialists';
+          value: number | Specialist;
+        } | null);
+    name?: string | null;
+    /**
+     * e.g. "Senior Coordination Manager".
+     */
+    role?: string | null;
+    photo?: (number | null) | Media;
+    bio?: string | null;
+  };
   content: {
     root: {
       type: string;
@@ -326,8 +629,38 @@ export interface Post {
     };
     [k: string]: unknown;
   };
+  /**
+   * Optional downloadable files (e.g. a checklist PDF).
+   */
+  attachments?:
+    | {
+        file: number | Media;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Auto-generate the in-article contents from headings.
+   */
+  showToc?: boolean | null;
   relatedPosts?: (number | Post)[] | null;
   categories?: (number | Category)[] | null;
+  /**
+   * Which In-the-Loop section this belongs to (drives URL + hub placement).
+   */
+  stream?: (number | null) | Stream;
+  /**
+   * Show in the featured carousel on the In-the-Loop hub.
+   */
+  featured?: boolean | null;
+  /**
+   * Optional — the specialty for a Specialist Spotlight post.
+   */
+  specialty?: (number | null) | Specialty;
+  /**
+   * Optional — the specialist featured in a spotlight.
+   */
+  relatedSpecialist?: (number | null) | Specialist;
   meta?: {
     title?: string | null;
     /**
@@ -359,7 +692,7 @@ export interface Post {
  */
 export interface Media {
   id: number;
-  alt?: string | null;
+  alt: string;
   caption?: {
     root: {
       type: string;
@@ -474,11 +807,883 @@ export interface FolderInterface {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: number;
+  title: string;
+  /**
+   * e.g. "IT Manager | Lawyer".
+   */
+  role?: string | null;
+  photo?: (number | null) | Media;
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  qualifications?:
+    | {
+        qualification: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional titled sections beyond the bio (e.g. Expertise, Affiliations).
+   */
+  sections?:
+    | {
+        heading: string;
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  department: 'operations' | 'business-development' | 'reception-bookings' | 'quality-assurance';
+  /**
+   * Sort order within the department (lower shows first).
+   */
+  order?: number | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialists".
+ */
+export interface Specialist {
+  id: number;
+  /**
+   * Full display name including honorific, e.g. "Dr Adam Parr".
+   */
+  title: string;
+  /**
+   * e.g. "Consultant Spinal Surgeon".
+   */
+  position?: string | null;
+  /**
+   * Optional. Falls back to an initials avatar on the frontend.
+   */
+  photo?: (number | null) | Media;
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Cities / regions where this specialist consults. Drives the directory location filter.
+   */
+  locations?: (number | Location)[] | null;
+  qualifications?:
+    | {
+        qualification: string;
+        /**
+         * Optional icon (e.g. graduation-cap, certificate).
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Impairment-rating credentials — drives the Specialist Panel accreditation filter and the profile chips.
+   */
+  accreditations?: (number | Accreditation)[] | null;
+  /**
+   * Languages spoken (e.g. English).
+   */
+  languages?:
+    | {
+        language: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional direct booking / enquiry URL.
+   */
+  bookingUrl?: string | null;
+  /**
+   * Optional downloadable CV.
+   */
+  cv?: (number | null) | Media;
+  /**
+   * Optional redacted sample report.
+   */
+  sampleReport?: (number | null) | Media;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  specialty: number | Specialty;
+  claimTypes?: (number | ClaimType)[] | null;
+  assessmentTypes?: (number | AssessmentType)[] | null;
+  areasOfExpertise?: (number | AreasOfExpertise)[] | null;
+  /**
+   * Show in featured listings (e.g. the homepage).
+   */
+  featured?: boolean | null;
+  /**
+   * Show this specialist in the featured carousel on the Specialist Availability page. Their session list is driven separately by their Availability Sessions.
+   */
+  advertise?: boolean | null;
+  availabilityHighlight?: boolean | null;
+  availabilityNote?: string | null;
+  /**
+   * Optional given name used for sorting the directory by first name.
+   */
+  firstName?: string | null;
+  /**
+   * Optional surname used for sorting the directory.
+   */
+  lastName?: string | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locations".
+ */
+export interface Location {
+  id: number;
+  /**
+   * e.g. "Brisbane CBD", "Gold Coast", "Telehealth / Videolink".
+   */
+  title: string;
+  /**
+   * Optional grouping (e.g. "South East Queensland").
+   */
+  region?: string | null;
+  /**
+   * Lower numbers appear first in filters.
+   */
+  order?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accreditations".
+ */
+export interface Accreditation {
+  id: number;
+  /**
+   * e.g. "AMA 5", "GEPI 2", "CIME (ABIME)", "PIRS".
+   */
+  title: string;
+  /**
+   * Icon shown with the accreditation chip (e.g. seal-check).
+   */
+  icon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  description?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialties".
+ */
+export interface Specialty {
+  id: number;
+  title: string;
+  /**
+   * Icon shown for this specialty in directories/grids.
+   */
+  icon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  /**
+   * Filter group on the Specialty List page (Surgery / Psychiatry / …).
+   */
+  category?: (number | null) | SpecialtyCategory;
+  description?: string | null;
+  /**
+   * Short tags shown under the specialty (e.g. Hip & knee, Trauma).
+   */
+  keyAreas?:
+    | {
+        area: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialty-categories".
+ */
+export interface SpecialtyCategory {
+  id: number;
+  /**
+   * e.g. "Surgery", "Psychiatry & Psychology", "Medicine", "Allied Health".
+   */
+  title: string;
+  /**
+   * Icon shown on the filter button for this group.
+   */
+  icon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  /**
+   * Lower numbers appear first in the filter bar / accordion.
+   */
+  order?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claim-types".
+ */
+export interface ClaimType {
+  id: number;
+  title: string;
+  description?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assessment-types".
+ */
+export interface AssessmentType {
+  id: number;
+  title: string;
+  description?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "areas-of-expertise".
+ */
+export interface AreasOfExpertise {
+  id: number;
+  title: string;
+  description?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
   id: number;
   title: string;
+  /**
+   * Icon shown on the category/topic chip.
+   */
+  icon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  /**
+   * Optional hex for the category chip, e.g. #1c75bc.
+   */
+  color?: string | null;
+  description?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -493,6 +1698,136 @@ export interface Category {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "streams".
+ */
+export interface Stream {
+  id: number;
+  /**
+   * e.g. "QA Insights", "News & Updates", "Specialist Spotlights".
+   */
+  title: string;
+  /**
+   * Icon shown on the stream tab / category chip.
+   */
+  icon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  description?: string | null;
+  /**
+   * Lower numbers appear first in the hub section nav.
+   */
+  order?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -524,9 +1859,169 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock".
+ * via the `definition` "SectionBlock".
  */
-export interface CallToActionBlock {
+export interface SectionBlock {
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Space above the content.
+   */
+  paddingTop?: ('none' | 'compact' | 'normal' | 'spacious' | 'xl') | null;
+  /**
+   * Space below the content.
+   */
+  paddingBottom?: ('none' | 'compact' | 'normal' | 'spacious' | 'xl') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  align?: ('left' | 'center') | null;
+  content?:
+    | (
+        | RowBlock
+        | HeadingBlock
+        | TextBlock
+        | ButtonBlock
+        | ImageBlock
+        | SpacerBlock
+        | DividerBlock
+        | IconBlock
+        | ContentBlock
+        | MediaBlock
+        | CallToActionBlock
+        | FAQBlock
+        | GatewayCardsBlock
+        | FeatureGridBlock
+        | ProcessStepsBlock
+        | SpecialtyGridBlock
+        | PeopleGridBlock
+        | ServicesGridBlock
+        | TestimonialsGridBlock
+        | StatsBandBlock
+        | TabsBlockType
+        | SplitFeatureBlock
+        | CTABandBlock
+        | CalloutBlock
+        | ContactDetailsBlock
+        | IconListBlock
+        | MapEmbedBlock
+      )[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'section';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RowBlock".
+ */
+export interface RowBlock {
+  /**
+   * Space between columns.
+   */
+  gap?: ('none' | 'tight' | 'normal' | 'wide') | null;
+  /**
+   * How columns line up vertically.
+   */
+  alignY?: ('top' | 'center' | 'bottom' | 'stretch') | null;
+  /**
+   * Each column becomes a grid track. Add columns to widen the row.
+   */
+  columns?:
+    | {
+        /**
+         * How many grid columns this column occupies (Auto = equal share).
+         */
+        span?: ('auto' | '1' | '2' | '3' | '4') | null;
+        align?: ('left' | 'center' | 'right') | null;
+        content?:
+          | (
+              | HeadingBlock
+              | TextBlock
+              | ButtonBlock
+              | ImageBlock
+              | SpacerBlock
+              | DividerBlock
+              | IconBlock
+              | ContentBlock
+              | MediaBlock
+              | CallToActionBlock
+              | FAQBlock
+              | GatewayCardsBlock
+              | FeatureGridBlock
+              | ProcessStepsBlock
+              | SpecialtyGridBlock
+              | PeopleGridBlock
+              | ServicesGridBlock
+              | TestimonialsGridBlock
+              | StatsBandBlock
+              | TabsBlockType
+              | SplitFeatureBlock
+              | CTABandBlock
+              | CalloutBlock
+              | ContactDetailsBlock
+              | IconListBlock
+              | MapEmbedBlock
+            )[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'row';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeadingBlock".
+ */
+export interface HeadingBlock {
+  text: string;
+  /**
+   * HTML tag for SEO/accessibility. Visual size is set separately.
+   */
+  level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+  /**
+   * Visual size, independent of the heading level.
+   */
+  size?: ('sm' | 'md' | 'lg' | 'xl' | 'display') | null;
+  align?: ('left' | 'center' | 'right') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heading';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextBlock".
+ */
+export interface TextBlock {
   richText?: {
     root: {
       type: string;
@@ -542,10 +2037,25 @@ export interface CallToActionBlock {
     };
     [k: string]: unknown;
   } | null;
+  size?: ('sm' | 'base' | 'lg') | null;
+  align?: ('left' | 'center' | 'right') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'text';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ButtonBlock".
+ */
+export interface ButtonBlock {
   links?:
     | {
         link: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -559,6 +2069,113 @@ export interface CallToActionBlock {
           url?: string | null;
           label: string;
           /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          /**
            * Choose how the link should be rendered.
            */
           appearance?: ('default' | 'outline') | null;
@@ -566,13 +2183,182 @@ export interface CallToActionBlock {
         id?: string | null;
       }[]
     | null;
+  size?: ('sm' | 'md' | 'lg') | null;
+  align?: ('left' | 'center' | 'right') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'cta';
+  blockType: 'button';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageBlock".
+ */
+export interface ImageBlock {
+  media: number | Media;
+  width?: ('full' | 'wide' | 'normal' | 'narrow') | null;
+  rounded?: ('none' | 'sm' | 'md' | 'full') | null;
+  align?: ('left' | 'center' | 'right') | null;
+  /**
+   * Optional caption shown below the image.
+   */
+  caption?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'image';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpacerBlock".
+ */
+export interface SpacerBlock {
+  size?: ('xs' | 'sm' | 'md' | 'lg' | 'xl') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'spacer';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DividerBlock".
+ */
+export interface DividerBlock {
+  style?: ('line' | 'dots' | 'gradient') | null;
+  width?: ('full' | 'narrow') | null;
+  align?: ('left' | 'center' | 'right') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'divider';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconBlock".
+ */
+export interface IconBlock {
+  /**
+   * Icon shown with this item.
+   */
+  icon:
+    | 'activity'
+    | 'arrow-down'
+    | 'arrow-right'
+    | 'arrows-out'
+    | 'award'
+    | 'bag-simple'
+    | 'bell-ringing'
+    | 'bone'
+    | 'book-open'
+    | 'brain'
+    | 'briefcase'
+    | 'building'
+    | 'bus'
+    | 'calendar'
+    | 'calendar-blank'
+    | 'calendar-check'
+    | 'car'
+    | 'caret-left'
+    | 'caret-right'
+    | 'cell-signal-full'
+    | 'certificate'
+    | 'chart-bar'
+    | 'chat'
+    | 'chat-circle-text'
+    | 'chats'
+    | 'chats-circle'
+    | 'check'
+    | 'check-circle'
+    | 'check-square'
+    | 'clipboard-check'
+    | 'clipboard-text'
+    | 'clock'
+    | 'currency-dollar'
+    | 'desktop'
+    | 'download'
+    | 'download-simple'
+    | 'envelope'
+    | 'envelope-simple'
+    | 'file-magnifying-glass'
+    | 'file-plus'
+    | 'file-text'
+    | 'files'
+    | 'first-aid'
+    | 'gavel'
+    | 'globe'
+    | 'graduation-cap'
+    | 'handshake'
+    | 'headset'
+    | 'heart-pulse'
+    | 'heartbeat'
+    | 'home'
+    | 'house'
+    | 'identification-card'
+    | 'info'
+    | 'link'
+    | 'list'
+    | 'lock'
+    | 'lock-simple'
+    | 'magnifying-glass'
+    | 'mail'
+    | 'map-pin'
+    | 'medal'
+    | 'message'
+    | 'monitor'
+    | 'navigation-arrow'
+    | 'paper-plane-tilt'
+    | 'person-arms-spread'
+    | 'phone'
+    | 'question'
+    | 'scale'
+    | 'scales'
+    | 'seal-check'
+    | 'search'
+    | 'send'
+    | 'shield'
+    | 'shield-check'
+    | 'sign-in'
+    | 'sliders'
+    | 'sort-ascending'
+    | 'squares-four'
+    | 'star'
+    | 'stethoscope'
+    | 't-shirt'
+    | 'target'
+    | 'translate'
+    | 'upload'
+    | 'upload-simple'
+    | 'user'
+    | 'user-check'
+    | 'user-circle'
+    | 'user-plus'
+    | 'users'
+    | 'users-three'
+    | 'video'
+    | 'video-camera'
+    | 'warning'
+    | 'warning-circle'
+    | 'wheelchair'
+    | 'wifi-high'
+    | 'wind';
+  size?: ('sm' | 'md' | 'lg') | null;
+  color?: ('primary' | 'accent' | 'muted' | 'inherit') | null;
+  align?: ('left' | 'center' | 'right') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'iconBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -599,7 +2385,7 @@ export interface ContentBlock {
         } | null;
         enableLink?: boolean | null;
         link?: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -612,6 +2398,113 @@ export interface ContentBlock {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
           /**
            * Choose how the link should be rendered.
            */
@@ -644,9 +2537,4097 @@ export interface MediaBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CallToActionBlock".
+ */
+export interface CallToActionBlock {
+  richText?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FAQBlock".
+ */
+export interface FAQBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Lay the questions out in one or two columns.
+   */
+  columns?: ('1' | '2') | null;
+  items?:
+    | {
+        question: string;
+        /**
+         * Optional icon.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        /**
+         * Optional image shown with this item (accordion-with-image layout).
+         */
+        image?: (number | null) | Media;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        /**
+         * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+         */
+        anchorId?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Opening one question closes the others.
+   */
+  exclusive?: boolean | null;
+  openFirst?: boolean | null;
+  /**
+   * A "still have questions?" card shown after the list.
+   */
+  helpCard?: {
+    heading?: string | null;
+    body?: string | null;
+    email?: string | null;
+    phone?: string | null;
+  };
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GatewayCardsBlock".
+ */
+export interface GatewayCardsBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  columns?: ('2' | '3' | '4') | null;
+  cards?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        /**
+         * Small label above the title.
+         */
+        eyebrow?: string | null;
+        /**
+         * Secondary line under the title (e.g. audience).
+         */
+        subtitle?: string | null;
+        title: string;
+        description?: string | null;
+        /**
+         * Card accent colour theme.
+         */
+        accent?: ('blue' | 'steel' | 'charcoal') | null;
+        /**
+         * Light or dark card surface (for the split chooser).
+         */
+        theme?: ('light' | 'dark') | null;
+        /**
+         * Listed in the lower panel above the call-to-action button.
+         */
+        links?:
+          | {
+              link: {
+                type?: ('reference' | 'custom' | 'enquiry') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+                /**
+                 * Optional leading icon shown before the label.
+                 */
+                icon?:
+                  | (
+                      | 'activity'
+                      | 'arrow-down'
+                      | 'arrow-right'
+                      | 'arrows-out'
+                      | 'award'
+                      | 'bag-simple'
+                      | 'bell-ringing'
+                      | 'bone'
+                      | 'book-open'
+                      | 'brain'
+                      | 'briefcase'
+                      | 'building'
+                      | 'bus'
+                      | 'calendar'
+                      | 'calendar-blank'
+                      | 'calendar-check'
+                      | 'car'
+                      | 'caret-left'
+                      | 'caret-right'
+                      | 'cell-signal-full'
+                      | 'certificate'
+                      | 'chart-bar'
+                      | 'chat'
+                      | 'chat-circle-text'
+                      | 'chats'
+                      | 'chats-circle'
+                      | 'check'
+                      | 'check-circle'
+                      | 'check-square'
+                      | 'clipboard-check'
+                      | 'clipboard-text'
+                      | 'clock'
+                      | 'currency-dollar'
+                      | 'desktop'
+                      | 'download'
+                      | 'download-simple'
+                      | 'envelope'
+                      | 'envelope-simple'
+                      | 'file-magnifying-glass'
+                      | 'file-plus'
+                      | 'file-text'
+                      | 'files'
+                      | 'first-aid'
+                      | 'gavel'
+                      | 'globe'
+                      | 'graduation-cap'
+                      | 'handshake'
+                      | 'headset'
+                      | 'heart-pulse'
+                      | 'heartbeat'
+                      | 'home'
+                      | 'house'
+                      | 'identification-card'
+                      | 'info'
+                      | 'link'
+                      | 'list'
+                      | 'lock'
+                      | 'lock-simple'
+                      | 'magnifying-glass'
+                      | 'mail'
+                      | 'map-pin'
+                      | 'medal'
+                      | 'message'
+                      | 'monitor'
+                      | 'navigation-arrow'
+                      | 'paper-plane-tilt'
+                      | 'person-arms-spread'
+                      | 'phone'
+                      | 'question'
+                      | 'scale'
+                      | 'scales'
+                      | 'seal-check'
+                      | 'search'
+                      | 'send'
+                      | 'shield'
+                      | 'shield-check'
+                      | 'sign-in'
+                      | 'sliders'
+                      | 'sort-ascending'
+                      | 'squares-four'
+                      | 'star'
+                      | 'stethoscope'
+                      | 't-shirt'
+                      | 'target'
+                      | 'translate'
+                      | 'upload'
+                      | 'upload-simple'
+                      | 'user'
+                      | 'user-check'
+                      | 'user-circle'
+                      | 'user-plus'
+                      | 'users'
+                      | 'users-three'
+                      | 'video'
+                      | 'video-camera'
+                      | 'warning'
+                      | 'warning-circle'
+                      | 'wheelchair'
+                      | 'wifi-high'
+                      | 'wind'
+                    )
+                  | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'gatewayCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureGridBlock".
+ */
+export interface FeatureGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  columns?: ('1' | '2' | '3' | '4') | null;
+  cardStyle?: ('card' | 'plain') | null;
+  items?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        title: string;
+        /**
+         * Optional second-line / type label under the title (e.g. "In-Person").
+         */
+        titleSuffix?: string | null;
+        description?: string | null;
+        /**
+         * Optional simple bulleted list.
+         */
+        bullets?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Optional label above a nested detail list (e.g. "What's Included").
+         */
+        detailsLabel?: string | null;
+        /**
+         * Nested icon + title + description sub-items (e.g. Assessment Format cards).
+         */
+        details?:
+          | {
+              /**
+               * Icon shown with this item.
+               */
+              icon?:
+                | (
+                    | 'activity'
+                    | 'arrow-down'
+                    | 'arrow-right'
+                    | 'arrows-out'
+                    | 'award'
+                    | 'bag-simple'
+                    | 'bell-ringing'
+                    | 'bone'
+                    | 'book-open'
+                    | 'brain'
+                    | 'briefcase'
+                    | 'building'
+                    | 'bus'
+                    | 'calendar'
+                    | 'calendar-blank'
+                    | 'calendar-check'
+                    | 'car'
+                    | 'caret-left'
+                    | 'caret-right'
+                    | 'cell-signal-full'
+                    | 'certificate'
+                    | 'chart-bar'
+                    | 'chat'
+                    | 'chat-circle-text'
+                    | 'chats'
+                    | 'chats-circle'
+                    | 'check'
+                    | 'check-circle'
+                    | 'check-square'
+                    | 'clipboard-check'
+                    | 'clipboard-text'
+                    | 'clock'
+                    | 'currency-dollar'
+                    | 'desktop'
+                    | 'download'
+                    | 'download-simple'
+                    | 'envelope'
+                    | 'envelope-simple'
+                    | 'file-magnifying-glass'
+                    | 'file-plus'
+                    | 'file-text'
+                    | 'files'
+                    | 'first-aid'
+                    | 'gavel'
+                    | 'globe'
+                    | 'graduation-cap'
+                    | 'handshake'
+                    | 'headset'
+                    | 'heart-pulse'
+                    | 'heartbeat'
+                    | 'home'
+                    | 'house'
+                    | 'identification-card'
+                    | 'info'
+                    | 'link'
+                    | 'list'
+                    | 'lock'
+                    | 'lock-simple'
+                    | 'magnifying-glass'
+                    | 'mail'
+                    | 'map-pin'
+                    | 'medal'
+                    | 'message'
+                    | 'monitor'
+                    | 'navigation-arrow'
+                    | 'paper-plane-tilt'
+                    | 'person-arms-spread'
+                    | 'phone'
+                    | 'question'
+                    | 'scale'
+                    | 'scales'
+                    | 'seal-check'
+                    | 'search'
+                    | 'send'
+                    | 'shield'
+                    | 'shield-check'
+                    | 'sign-in'
+                    | 'sliders'
+                    | 'sort-ascending'
+                    | 'squares-four'
+                    | 'star'
+                    | 'stethoscope'
+                    | 't-shirt'
+                    | 'target'
+                    | 'translate'
+                    | 'upload'
+                    | 'upload-simple'
+                    | 'user'
+                    | 'user-check'
+                    | 'user-circle'
+                    | 'user-plus'
+                    | 'users'
+                    | 'users-three'
+                    | 'video'
+                    | 'video-camera'
+                    | 'warning'
+                    | 'warning-circle'
+                    | 'wheelchair'
+                    | 'wifi-high'
+                    | 'wind'
+                  )
+                | null;
+              title: string;
+              description?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featureGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessStepsBlock".
+ */
+export interface ProcessStepsBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * How many steps per row on desktop.
+   */
+  columns?: ('1' | '2' | '3' | '4' | '5') | null;
+  /**
+   * Steps are auto-numbered in order (01, 02, …).
+   */
+  steps?:
+    | {
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        /**
+         * Optional pill label, e.g. "Free to Join".
+         */
+        badge?: string | null;
+        /**
+         * Optional — leave empty for a number-only step.
+         */
+        title?: string | null;
+        description?: string | null;
+        /**
+         * Optional bulleted list under the description.
+         */
+        bullets?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'processSteps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpecialtyGridBlock".
+ */
+export interface SpecialtyGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  source?: ('auto' | 'manual') | null;
+  /**
+   * Which taxonomy to list.
+   */
+  taxonomy?: ('specialties' | 'claim-types' | 'areas-of-expertise' | 'assessment-types') | null;
+  /**
+   * Icon cards, or an arrow checklist (e.g. "Claims We Support").
+   */
+  variant?: ('cards' | 'checklist') | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Icon used for every specialty.
+   */
+  defaultIcon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  linkToDirectory?: boolean | null;
+  /**
+   * Links become <path>?specialty=<slug>.
+   */
+  directoryPath?: string | null;
+  items?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        label: string;
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'specialtyGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PeopleGridBlock".
+ */
+export interface PeopleGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  source?: ('specialists' | 'team' | 'manual') | null;
+  onlyAdvertised?: boolean | null;
+  featuredOnly?: boolean | null;
+  /**
+   * Optional — limit to one specialty.
+   */
+  specialty?: (number | null) | Specialty;
+  /**
+   * Optional — limit to one location.
+   */
+  location?: (number | null) | Location;
+  /**
+   * Optional — limit to one department.
+   */
+  department?: ('operations' | 'business-development' | 'reception-bookings' | 'quality-assurance') | null;
+  /**
+   * Render each department as its own labelled group (Meet the Team layout).
+   */
+  groupByDepartment?: boolean | null;
+  people?:
+    | (
+        | {
+            relationTo: 'specialists';
+            value: number | Specialist;
+          }
+        | {
+            relationTo: 'team';
+            value: number | Team;
+          }
+      )[]
+    | null;
+  layout?: ('grid' | 'carousel') | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Max people to show (0 = show all).
+   */
+  limit?: number | null;
+  /**
+   * Optional buttons shown below the grid (e.g. "View Full Panel").
+   */
+  footerLinks?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Enable once individual profile pages exist.
+   */
+  linkProfiles?: boolean | null;
+  /**
+   * Infinite auto-scrolling marquee (pauses on hover). Arrows flip the scroll direction.
+   */
+  carouselOptions?: {
+    /**
+     * Lower = faster scroll.
+     */
+    speed?: number | null;
+    direction?: ('left' | 'right') | null;
+    showArrows?: boolean | null;
+  };
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'peopleGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesGridBlock".
+ */
+export interface ServicesGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  source?: ('auto' | 'manual') | null;
+  /**
+   * Optional — limit to one category.
+   */
+  category?: ('medico-legal' | 'administrative' | 'educational') | null;
+  /**
+   * Optional — finer group (examinations vs reporting).
+   */
+  serviceGroup?: ('examination' | 'reporting' | 'administrative' | 'education') | null;
+  /**
+   * Card grid, or an expandable accordion (with per-service image + body).
+   */
+  layout?: ('grid' | 'accordion') | null;
+  services?: (number | Service)[] | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Max services to show (auto source).
+   */
+  limit?: number | null;
+  /**
+   * Enable once service pages exist.
+   */
+  linkToService?: boolean | null;
+  /**
+   * Links become <prefix>/<slug>.
+   */
+  servicePathPrefix?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'servicesGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  /**
+   * Groups the service (mirrors the contact form categories).
+   */
+  category: 'medico-legal' | 'administrative' | 'educational';
+  /**
+   * Finer grouping so grids can isolate examinations vs reporting within Medico-Legal.
+   */
+  serviceGroup?: ('examination' | 'reporting' | 'administrative' | 'education') | null;
+  /**
+   * Icon shown on the service card.
+   */
+  icon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  /**
+   * Optional image for service cards / accordion rows.
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Optional. Point the service card at a specific URL/anchor (e.g. /services/medico-legal/reporting-services#file-review) instead of the auto-generated service page.
+   */
+  linkOverride?: string | null;
+  /**
+   * Card blurb shown in grids (1–2 sentences).
+   */
+  shortDescription?: string | null;
+  /**
+   * Full detail shown on the service page.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Highlight in featured listings.
+   */
+  featured?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsGridBlock".
+ */
+export interface TestimonialsGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  source?: ('auto' | 'manual') | null;
+  featuredOnly?: boolean | null;
+  testimonials?: (number | Testimonial)[] | null;
+  layout?: ('grid' | 'carousel') | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Max testimonials to show (auto source).
+   */
+  limit?: number | null;
+  carouselOptions?: {
+    visible?: number | null;
+    showArrows?: boolean | null;
+  };
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonialsGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: number;
+  /**
+   * The testimonial text (no surrounding quotation marks needed).
+   */
+  quote: string;
+  /**
+   * e.g. "Senior Associate, Legal Firm — Brisbane".
+   */
+  authorRole: string;
+  /**
+   * Optional — many testimonials are anonymous.
+   */
+  authorName?: string | null;
+  /**
+   * Optional organisation name.
+   */
+  org?: string | null;
+  /**
+   * Optional. Falls back to a placeholder avatar on the frontend.
+   */
+  avatar?: (number | null) | Media;
+  /**
+   * Star rating (1–5).
+   */
+  rating?: number | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Show in featured testimonial listings.
+   */
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBandBlock".
+ */
+export interface StatsBandBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  stats?:
+    | {
+        /**
+         * The number to count up to.
+         */
+        value: number;
+        /**
+         * e.g. "$" (optional).
+         */
+        prefix?: string | null;
+        /**
+         * e.g. "+" or "%" (optional).
+         */
+        suffix?: string | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statsBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TabsBlockType".
+ */
+export interface TabsBlockType {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  tabs?:
+    | {
+        label: string;
+        /**
+         * Optional tab icon.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        /**
+         * Blocks shown when this tab is active (grids, steps, text, etc.).
+         */
+        content?:
+          | (
+              | HeadingBlock
+              | TextBlock
+              | ButtonBlock
+              | ImageBlock
+              | SpacerBlock
+              | DividerBlock
+              | IconBlock
+              | ContentBlock
+              | MediaBlock
+              | CallToActionBlock
+              | FAQBlock
+              | GatewayCardsBlock
+              | FeatureGridBlock
+              | ProcessStepsBlock
+              | SpecialtyGridBlock
+              | PeopleGridBlock
+              | ServicesGridBlock
+              | TestimonialsGridBlock
+              | StatsBandBlock
+              | SplitFeatureBlock
+              | CTABandBlock
+            )[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  tabStyle?: ('pills' | 'underline') | null;
+  /**
+   * Index of the tab open by default (0 = first).
+   */
+  defaultTab?: number | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'tabs';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SplitFeatureBlock".
+ */
+export interface SplitFeatureBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Each row alternates image side automatically unless overridden.
+   */
+  rows?:
+    | {
+        image?: (number | null) | Media;
+        imageSide?: ('auto' | 'left' | 'right') | null;
+        eyebrow?: string | null;
+        /**
+         * Optional icon above the title.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        title: string;
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        /**
+         * Optional mini-heading above the bullets (e.g. "When to Request").
+         */
+        bulletsLabel?: string | null;
+        bullets?:
+          | {
+              text: string;
+              /**
+               * Optional per-bullet icon.
+               */
+              icon?:
+                | (
+                    | 'activity'
+                    | 'arrow-down'
+                    | 'arrow-right'
+                    | 'arrows-out'
+                    | 'award'
+                    | 'bag-simple'
+                    | 'bell-ringing'
+                    | 'bone'
+                    | 'book-open'
+                    | 'brain'
+                    | 'briefcase'
+                    | 'building'
+                    | 'bus'
+                    | 'calendar'
+                    | 'calendar-blank'
+                    | 'calendar-check'
+                    | 'car'
+                    | 'caret-left'
+                    | 'caret-right'
+                    | 'cell-signal-full'
+                    | 'certificate'
+                    | 'chart-bar'
+                    | 'chat'
+                    | 'chat-circle-text'
+                    | 'chats'
+                    | 'chats-circle'
+                    | 'check'
+                    | 'check-circle'
+                    | 'check-square'
+                    | 'clipboard-check'
+                    | 'clipboard-text'
+                    | 'clock'
+                    | 'currency-dollar'
+                    | 'desktop'
+                    | 'download'
+                    | 'download-simple'
+                    | 'envelope'
+                    | 'envelope-simple'
+                    | 'file-magnifying-glass'
+                    | 'file-plus'
+                    | 'file-text'
+                    | 'files'
+                    | 'first-aid'
+                    | 'gavel'
+                    | 'globe'
+                    | 'graduation-cap'
+                    | 'handshake'
+                    | 'headset'
+                    | 'heart-pulse'
+                    | 'heartbeat'
+                    | 'home'
+                    | 'house'
+                    | 'identification-card'
+                    | 'info'
+                    | 'link'
+                    | 'list'
+                    | 'lock'
+                    | 'lock-simple'
+                    | 'magnifying-glass'
+                    | 'mail'
+                    | 'map-pin'
+                    | 'medal'
+                    | 'message'
+                    | 'monitor'
+                    | 'navigation-arrow'
+                    | 'paper-plane-tilt'
+                    | 'person-arms-spread'
+                    | 'phone'
+                    | 'question'
+                    | 'scale'
+                    | 'scales'
+                    | 'seal-check'
+                    | 'search'
+                    | 'send'
+                    | 'shield'
+                    | 'shield-check'
+                    | 'sign-in'
+                    | 'sliders'
+                    | 'sort-ascending'
+                    | 'squares-four'
+                    | 'star'
+                    | 'stethoscope'
+                    | 't-shirt'
+                    | 'target'
+                    | 'translate'
+                    | 'upload'
+                    | 'upload-simple'
+                    | 'user'
+                    | 'user-check'
+                    | 'user-circle'
+                    | 'user-plus'
+                    | 'users'
+                    | 'users-three'
+                    | 'video'
+                    | 'video-camera'
+                    | 'warning'
+                    | 'warning-circle'
+                    | 'wheelchair'
+                    | 'wifi-high'
+                    | 'wind'
+                  )
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        /**
+         * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+         */
+        anchorId?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'splitFeature';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CTABandBlock".
+ */
+export interface CTABandBlock {
+  /**
+   * Small uppercase label above the heading (e.g. "Get Started").
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the accent colour.
+   */
+  heading: string;
+  text?: string | null;
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaBand';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CalloutBlock".
+ */
+export interface CalloutBlock {
+  style?: ('info' | 'note' | 'success' | 'warning') | null;
+  icon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  /**
+   * Optional pill label, e.g. "Good to know".
+   */
+  tag?: string | null;
+  heading?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'callout';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactDetailsBlock".
+ */
+export interface ContactDetailsBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Pull phone / email / address / hours from the Footer + Site Settings globals.
+   */
+  useGlobal?: boolean | null;
+  /**
+   * Manual override — each row is an icon + label + value (+ optional link/note).
+   */
+  items?:
+    | {
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        label: string;
+        value: string;
+        /**
+         * Optional (tel:/mailto:/URL).
+         */
+        href?: string | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'contactDetails';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconListBlock".
+ */
+export interface IconListBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  columns?: ('1' | '2' | '3') | null;
+  items?:
+    | {
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        text: string;
+        link?: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'iconList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MapEmbedBlock".
+ */
+export interface MapEmbedBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  kind?: ('map' | 'embed') | null;
+  /**
+   * Optional — pull the address + office info panel from an Office record.
+   */
+  office?: (number | null) | Office;
+  /**
+   * Map embed src, or a YouTube/Vimeo URL. Overrides the office map if set.
+   */
+  embedUrl?: string | null;
+  aspect?: ('16-9' | '4-3' | '1-1' | 'map') | null;
+  /**
+   * Accessible title.
+   */
+  title?: string | null;
+  showOfficeInfo?: boolean | null;
+  /**
+   * e.g. Get directions / Call / Email.
+   */
+  actions?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mapEmbed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "offices".
+ */
+export interface Office {
+  id: number;
+  /**
+   * e.g. "Brisbane (Head Office)".
+   */
+  title: string;
+  /**
+   * Full postal address (line breaks preserved).
+   */
+  address?: string | null;
+  /**
+   * Display phone, e.g. "07 3356 0469".
+   */
+  phone?: string | null;
+  email?: string | null;
+  /**
+   * The src URL from a Google Maps "Embed a map" iframe. Leave empty to derive from the address.
+   */
+  mapEmbedUrl?: string | null;
+  hours?:
+    | {
+        days?: string | null;
+        time?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional caveat, e.g. the 7:30am staffing note.
+   */
+  hoursNote?: string | null;
+  transport?:
+    | {
+        label: string;
+        note?: string | null;
+        href?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  parking?:
+    | {
+        name: string;
+        address?: string | null;
+        walkTime?: string | null;
+        heightLimit?: string | null;
+        href?: string | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Any additional guidance shown in the location module.
+   */
+  note?: string | null;
+  order?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ArchiveBlock".
  */
 export interface ArchiveBlock {
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
   introContent?: {
     root: {
       type: string;
@@ -663,22 +6644,275 @@ export interface ArchiveBlock {
     [k: string]: unknown;
   } | null;
   populateBy?: ('collection' | 'selection') | null;
-  relationTo?: 'posts' | null;
+  relationTo?: ('posts' | 'events') | null;
+  /**
+   * Upcoming vs past is derived from each event date.
+   */
+  view?: ('upcoming' | 'past') | null;
   categories?: (number | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
-    | {
-        relationTo: 'posts';
-        value: number | Post;
-      }[]
+    | (
+        | {
+            relationTo: 'posts';
+            value: number | Post;
+          }
+        | {
+            relationTo: 'events';
+            value: number | Event;
+          }
+      )[]
     | null;
+  columns?: ('2' | '3' | '4') | null;
+  viewAllLink: {
+    link: {
+      type?: ('reference' | 'custom' | 'enquiry') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: number | Post;
+          } | null);
+      url?: string | null;
+      label: string;
+      /**
+       * Optional leading icon shown before the label.
+       */
+      icon?:
+        | (
+            | 'activity'
+            | 'arrow-down'
+            | 'arrow-right'
+            | 'arrows-out'
+            | 'award'
+            | 'bag-simple'
+            | 'bell-ringing'
+            | 'bone'
+            | 'book-open'
+            | 'brain'
+            | 'briefcase'
+            | 'building'
+            | 'bus'
+            | 'calendar'
+            | 'calendar-blank'
+            | 'calendar-check'
+            | 'car'
+            | 'caret-left'
+            | 'caret-right'
+            | 'cell-signal-full'
+            | 'certificate'
+            | 'chart-bar'
+            | 'chat'
+            | 'chat-circle-text'
+            | 'chats'
+            | 'chats-circle'
+            | 'check'
+            | 'check-circle'
+            | 'check-square'
+            | 'clipboard-check'
+            | 'clipboard-text'
+            | 'clock'
+            | 'currency-dollar'
+            | 'desktop'
+            | 'download'
+            | 'download-simple'
+            | 'envelope'
+            | 'envelope-simple'
+            | 'file-magnifying-glass'
+            | 'file-plus'
+            | 'file-text'
+            | 'files'
+            | 'first-aid'
+            | 'gavel'
+            | 'globe'
+            | 'graduation-cap'
+            | 'handshake'
+            | 'headset'
+            | 'heart-pulse'
+            | 'heartbeat'
+            | 'home'
+            | 'house'
+            | 'identification-card'
+            | 'info'
+            | 'link'
+            | 'list'
+            | 'lock'
+            | 'lock-simple'
+            | 'magnifying-glass'
+            | 'mail'
+            | 'map-pin'
+            | 'medal'
+            | 'message'
+            | 'monitor'
+            | 'navigation-arrow'
+            | 'paper-plane-tilt'
+            | 'person-arms-spread'
+            | 'phone'
+            | 'question'
+            | 'scale'
+            | 'scales'
+            | 'seal-check'
+            | 'search'
+            | 'send'
+            | 'shield'
+            | 'shield-check'
+            | 'sign-in'
+            | 'sliders'
+            | 'sort-ascending'
+            | 'squares-four'
+            | 'star'
+            | 'stethoscope'
+            | 't-shirt'
+            | 'target'
+            | 'translate'
+            | 'upload'
+            | 'upload-simple'
+            | 'user'
+            | 'user-check'
+            | 'user-circle'
+            | 'user-plus'
+            | 'users'
+            | 'users-three'
+            | 'video'
+            | 'video-camera'
+            | 'warning'
+            | 'warning-circle'
+            | 'wheelchair'
+            | 'wifi-high'
+            | 'wind'
+          )
+        | null;
+    };
+  };
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  /**
+   * Start date & time. Drives the upcoming/past split.
+   */
+  date: string;
+  /**
+   * e.g. "12:30 pm – 1:30 pm".
+   */
+  timeLabel?: string | null;
+  location?: string | null;
+  host?: ('aamle' | 'verify') | null;
+  /**
+   * External booking link (e.g. AAMLE).
+   */
+  registrationUrl?: string | null;
+  /**
+   * e.g. "Register on AAMLE", "Register Your Interest". Optional.
+   */
+  registrationLabel?: string | null;
+  cpdEligible?: boolean | null;
+  cpdPoints?: number | null;
+  /**
+   * e.g. "Free", "$120". Defaults to Free if empty.
+   */
+  cost?: string | null;
+  /**
+   * Optional — link to a Location for structured filtering. The free-text "location" above is still shown if set.
+   */
+  locationRef?: (number | null) | Location;
+  image?: (number | null) | Media;
+  /**
+   * Short summary used in listings.
+   */
+  excerpt?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional write-up shown after the event has passed.
+   */
+  recap?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  eventType:
+    | 'networking'
+    | 'client-training'
+    | 'industry-briefing'
+    | 'workshop'
+    | 'webinar'
+    | 'breakfast-seminar'
+    | 'masterclass'
+    | 'specialist-seminar';
+  /**
+   * Optional — link to specialist or team presenters.
+   */
+  presenters?:
+    | (
+        | {
+            relationTo: 'specialists';
+            value: number | Specialist;
+          }
+        | {
+            relationTo: 'team';
+            value: number | Team;
+          }
+      )[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -886,1112 +7120,21 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FAQBlock".
+ * via the `definition` "AvailabilityBlock".
  */
-export interface FAQBlock {
+export interface AvailabilityBlock {
   /**
-   * Optional heading shown above the questions.
+   * Specialists with "Feature in availability carousel" (advertise) enabled.
    */
-  heading?: string | null;
-  items?:
-    | {
-        question: string;
-        answer: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Opening one question closes the others.
-   */
-  exclusive?: boolean | null;
+  showCarousel?: boolean | null;
+  showLegend?: boolean | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'faq';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "GatewayCardsBlock".
- */
-export interface GatewayCardsBlock {
-  /**
-   * Small uppercase label above the heading (optional).
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  subheading?: string | null;
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  columns?: ('2' | '3' | '4') | null;
-  cards?:
-    | {
-        /**
-         * Icon shown with this item.
-         */
-        icon?:
-          | (
-              | 'activity'
-              | 'award'
-              | 'book-open'
-              | 'brain'
-              | 'briefcase'
-              | 'building'
-              | 'calendar'
-              | 'check'
-              | 'clipboard-check'
-              | 'clock'
-              | 'file-text'
-              | 'graduation-cap'
-              | 'heart-pulse'
-              | 'mail'
-              | 'map-pin'
-              | 'message'
-              | 'phone'
-              | 'scale'
-              | 'search'
-              | 'send'
-              | 'shield'
-              | 'stethoscope'
-              | 'user-check'
-              | 'users'
-              | 'video'
-            )
-          | null;
-        title: string;
-        description?: string | null;
-        /**
-         * Listed in the lower panel above the call-to-action button.
-         */
-        links?:
-          | {
-              link: {
-                type?: ('reference' | 'custom') | null;
-                newTab?: boolean | null;
-                reference?:
-                  | ({
-                      relationTo: 'pages';
-                      value: number | Page;
-                    } | null)
-                  | ({
-                      relationTo: 'posts';
-                      value: number | Post;
-                    } | null);
-                url?: string | null;
-                label: string;
-              };
-              id?: string | null;
-            }[]
-          | null;
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  /**
-   * Hover effect for cards/items in this block.
-   */
-  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'gatewayCards';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FeatureGridBlock".
- */
-export interface FeatureGridBlock {
-  /**
-   * Small uppercase label above the heading (optional).
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  subheading?: string | null;
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  columns?: ('2' | '3' | '4') | null;
-  cardStyle?: ('card' | 'plain') | null;
-  items?:
-    | {
-        /**
-         * Icon shown with this item.
-         */
-        icon?:
-          | (
-              | 'activity'
-              | 'award'
-              | 'book-open'
-              | 'brain'
-              | 'briefcase'
-              | 'building'
-              | 'calendar'
-              | 'check'
-              | 'clipboard-check'
-              | 'clock'
-              | 'file-text'
-              | 'graduation-cap'
-              | 'heart-pulse'
-              | 'mail'
-              | 'map-pin'
-              | 'message'
-              | 'phone'
-              | 'scale'
-              | 'search'
-              | 'send'
-              | 'shield'
-              | 'stethoscope'
-              | 'user-check'
-              | 'users'
-              | 'video'
-            )
-          | null;
-        title: string;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  /**
-   * Hover effect for cards/items in this block.
-   */
-  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'featureGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatsBandBlock".
- */
-export interface StatsBandBlock {
-  /**
-   * Small uppercase label above the heading (optional).
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  subheading?: string | null;
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  stats?:
-    | {
-        /**
-         * The number to count up to.
-         */
-        value: number;
-        /**
-         * e.g. "$" (optional).
-         */
-        prefix?: string | null;
-        /**
-         * e.g. "+" or "%" (optional).
-         */
-        suffix?: string | null;
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'statsBand';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ProcessStepsBlock".
- */
-export interface ProcessStepsBlock {
-  /**
-   * Small uppercase label above the heading (optional).
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  subheading?: string | null;
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  /**
-   * How many steps per row on desktop.
-   */
-  columns?: ('2' | '3' | '4') | null;
-  /**
-   * Steps are auto-numbered in order (01, 02, …).
-   */
-  steps?:
-    | {
-        /**
-         * Icon shown with this item.
-         */
-        icon?:
-          | (
-              | 'activity'
-              | 'award'
-              | 'book-open'
-              | 'brain'
-              | 'briefcase'
-              | 'building'
-              | 'calendar'
-              | 'check'
-              | 'clipboard-check'
-              | 'clock'
-              | 'file-text'
-              | 'graduation-cap'
-              | 'heart-pulse'
-              | 'mail'
-              | 'map-pin'
-              | 'message'
-              | 'phone'
-              | 'scale'
-              | 'search'
-              | 'send'
-              | 'shield'
-              | 'stethoscope'
-              | 'user-check'
-              | 'users'
-              | 'video'
-            )
-          | null;
-        title: string;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  /**
-   * Hover effect for cards/items in this block.
-   */
-  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'processSteps';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TabsBlockType".
- */
-export interface TabsBlockType {
-  /**
-   * Small uppercase label above the heading (optional).
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  subheading?: string | null;
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  tabs?:
-    | {
-        label: string;
-        content: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  tabStyle?: ('pills' | 'underline') | null;
-  /**
-   * Index of the tab open by default (0 = first).
-   */
-  defaultTab?: number | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'tabs';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "SplitFeatureBlock".
- */
-export interface SplitFeatureBlock {
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  /**
-   * Each row alternates image side automatically unless overridden.
-   */
-  rows?:
-    | {
-        image?: (number | null) | Media;
-        imageSide?: ('auto' | 'left' | 'right') | null;
-        eyebrow?: string | null;
-        title: string;
-        body?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        bullets?:
-          | {
-              text: string;
-              id?: string | null;
-            }[]
-          | null;
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'splitFeature';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CTABandBlock".
- */
-export interface CTABandBlock {
-  heading: string;
-  text?: string | null;
-  links?:
-    | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'ctaBand';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "SpecialtyGridBlock".
- */
-export interface SpecialtyGridBlock {
-  /**
-   * Small uppercase label above the heading (optional).
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  subheading?: string | null;
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  source?: ('auto' | 'manual') | null;
-  columns?: ('2' | '3' | '4') | null;
-  /**
-   * Icon used for every specialty.
-   */
-  defaultIcon?:
-    | (
-        | 'activity'
-        | 'award'
-        | 'book-open'
-        | 'brain'
-        | 'briefcase'
-        | 'building'
-        | 'calendar'
-        | 'check'
-        | 'clipboard-check'
-        | 'clock'
-        | 'file-text'
-        | 'graduation-cap'
-        | 'heart-pulse'
-        | 'mail'
-        | 'map-pin'
-        | 'message'
-        | 'phone'
-        | 'scale'
-        | 'search'
-        | 'send'
-        | 'shield'
-        | 'stethoscope'
-        | 'user-check'
-        | 'users'
-        | 'video'
-      )
-    | null;
-  linkToDirectory?: boolean | null;
-  /**
-   * Links become <path>?specialty=<slug>.
-   */
-  directoryPath?: string | null;
-  items?:
-    | {
-        /**
-         * Icon shown with this item.
-         */
-        icon?:
-          | (
-              | 'activity'
-              | 'award'
-              | 'book-open'
-              | 'brain'
-              | 'briefcase'
-              | 'building'
-              | 'calendar'
-              | 'check'
-              | 'clipboard-check'
-              | 'clock'
-              | 'file-text'
-              | 'graduation-cap'
-              | 'heart-pulse'
-              | 'mail'
-              | 'map-pin'
-              | 'message'
-              | 'phone'
-              | 'scale'
-              | 'search'
-              | 'send'
-              | 'shield'
-              | 'stethoscope'
-              | 'user-check'
-              | 'users'
-              | 'video'
-            )
-          | null;
-        label: string;
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  /**
-   * Hover effect for cards/items in this block.
-   */
-  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'specialtyGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PeopleGridBlock".
- */
-export interface PeopleGridBlock {
-  /**
-   * Small uppercase label above the heading (optional).
-   */
-  eyebrow?: string | null;
-  heading?: string | null;
-  subheading?: string | null;
-  /**
-   * Section background colour.
-   */
-  background?: ('white' | 'muted' | 'accent' | 'primary') | null;
-  source?: ('specialists' | 'team' | 'manual') | null;
-  onlyAdvertised?: boolean | null;
-  featuredOnly?: boolean | null;
-  /**
-   * Optional — limit to one specialty.
-   */
-  specialty?: (number | null) | Specialty;
-  /**
-   * Optional — limit to one department.
-   */
-  department?: ('operations' | 'business-development' | 'reception-bookings' | 'quality-assurance') | null;
-  people?:
-    | (
-        | {
-            relationTo: 'specialists';
-            value: number | Specialist;
-          }
-        | {
-            relationTo: 'team';
-            value: number | Team;
-          }
-      )[]
-    | null;
-  layout?: ('grid' | 'carousel') | null;
-  columns?: ('2' | '3' | '4') | null;
-  /**
-   * Max people to show (collection sources).
-   */
-  limit?: number | null;
-  /**
-   * Enable once individual profile pages exist.
-   */
-  linkProfiles?: boolean | null;
-  /**
-   * Infinite auto-scrolling marquee (pauses on hover). Arrows flip the scroll direction.
-   */
-  carouselOptions?: {
-    /**
-     * Lower = faster scroll.
-     */
-    speed?: number | null;
-    direction?: ('left' | 'right') | null;
-    showArrows?: boolean | null;
-  };
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  /**
-   * Apply preset classes to specific parts of this block.
-   */
-  elementClasses?: {
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    heading?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    card?: string[] | null;
-    /**
-     * Pick styles defined in Globals → Custom Styles.
-     */
-    button?: string[] | null;
-  };
-  /**
-   * Content width for this section.
-   */
-  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
-  /**
-   * Animate the section in as it scrolls into view.
-   */
-  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
-  /**
-   * Hover effect for cards/items in this block.
-   */
-  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'peopleGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialties".
- */
-export interface Specialty {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialists".
- */
-export interface Specialist {
-  id: number;
-  /**
-   * Full display name including honorific, e.g. "Dr Adam Parr".
-   */
-  title: string;
-  /**
-   * e.g. "Consultant Spinal Surgeon".
-   */
-  position?: string | null;
-  /**
-   * Optional. Falls back to an initials avatar on the frontend.
-   */
-  photo?: (number | null) | Media;
-  bio?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Cities / regions where this specialist consults.
-   */
-  locations?:
-    | {
-        location: string;
-        id?: string | null;
-      }[]
-    | null;
-  qualifications?:
-    | {
-        qualification: string;
-        id?: string | null;
-      }[]
-    | null;
-  accreditations?:
-    | {
-        accreditation: string;
-        id?: string | null;
-      }[]
-    | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  specialty: number | Specialty;
-  claimTypes?: (number | ClaimType)[] | null;
-  assessmentTypes?: (number | AssessmentType)[] | null;
-  areasOfExpertise?: (number | AreasOfExpertise)[] | null;
-  /**
-   * Show in featured listings (e.g. the homepage).
-   */
-  featured?: boolean | null;
-  /**
-   * Show this specialist on the Specialist Availability page.
-   */
-  advertise?: boolean | null;
-  /**
-   * Feature this specialist in the availability carousel.
-   */
-  availabilityHighlight?: boolean | null;
-  /**
-   * Shown when this specialist has no upcoming sessions (e.g. "Call to book").
-   */
-  availabilityNote?: string | null;
-  /**
-   * Optional surname used for sorting the directory.
-   */
-  lastName?: string | null;
-  publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "claim-types".
- */
-export interface ClaimType {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "assessment-types".
- */
-export interface AssessmentType {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "areas-of-expertise".
- */
-export interface AreasOfExpertise {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team".
- */
-export interface Team {
-  id: number;
-  title: string;
-  /**
-   * e.g. "IT Manager | Lawyer".
-   */
-  role?: string | null;
-  photo?: (number | null) | Media;
-  bio?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  qualifications?:
-    | {
-        qualification: string;
-        id?: string | null;
-      }[]
-    | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  department: 'operations' | 'business-development' | 'reception-bookings' | 'quality-assurance';
-  /**
-   * Sort order within the department (lower shows first).
-   */
-  order?: number | null;
-  publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
+  blockType: 'availability';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2051,95 +7194,270 @@ export interface SlideCarouselBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events".
+ * via the `definition` "SpecialistDirectoryBlock".
  */
-export interface Event {
+export interface SpecialistDirectoryBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  enableSearch?: boolean | null;
+  enableSpecialty?: boolean | null;
+  enableLocation?: boolean | null;
+  enableAccreditation?: boolean | null;
+  /**
+   * Directory sort order.
+   */
+  sortBy?: ('lastName' | 'firstName') | null;
+  searchPlaceholder?: string | null;
+  /**
+   * Use {count}.
+   */
+  countTemplate?: string | null;
+  specialtyLabel?: string | null;
+  locationLabel?: string | null;
+  accreditationLabel?: string | null;
+  emptyHeading?: string | null;
+  emptyBody?: string | null;
+  /**
+   * Primary card button label.
+   */
+  cardCtaLabel?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'specialistDirectory';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpecialtyDirectoryBlock".
+ */
+export interface SpecialtyDirectoryBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  showFilterBar?: boolean | null;
+  /**
+   * List each specialty’s specialists inside the accordion.
+   */
+  showRosters?: boolean | null;
+  showKeyAreas?: boolean | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'specialtyDirectory';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ResourcesGridBlock".
+ */
+export interface ResourcesGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  source?: ('auto' | 'manual') | null;
+  /**
+   * Optional — limit to one audience.
+   */
+  audience?: ('clients' | 'claimants' | 'all') | null;
+  /**
+   * Optional — limit to one type.
+   */
+  resourceType?: ('checklist' | 'guide' | 'template' | 'fact-sheet') | null;
+  resources?: (number | Resource)[] | null;
+  columns?: ('2' | '3' | '4') | null;
+  /**
+   * Max resources (auto source).
+   */
+  limit?: number | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Hover effect for cards/items in this block.
+   */
+  hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'resourcesGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources".
+ */
+export interface Resource {
   id: number;
   title: string;
   /**
-   * Start date & time. Drives the upcoming/past split.
+   * Icon shown on the resource card.
    */
-  date: string;
-  /**
-   * e.g. "12:30 pm – 1:30 pm".
-   */
-  timeLabel?: string | null;
-  location?: string | null;
-  host?: ('aamle' | 'verify') | null;
-  /**
-   * External booking link (e.g. AAMLE).
-   */
-  registrationUrl?: string | null;
-  image?: (number | null) | Media;
-  /**
-   * Short summary used in listings.
-   */
-  excerpt?: string | null;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Optional write-up shown after the event has passed.
-   */
-  recap?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  eventType:
-    | 'networking'
-    | 'client-training'
-    | 'industry-briefing'
-    | 'workshop'
-    | 'webinar'
-    | 'breakfast-seminar'
-    | 'masterclass'
-    | 'specialist-seminar';
-  /**
-   * Optional — link to specialist or team presenters.
-   */
-  presenters?:
+  icon?:
     | (
-        | {
-            relationTo: 'specialists';
-            value: number | Specialist;
-          }
-        | {
-            relationTo: 'team';
-            value: number | Team;
-          }
-      )[]
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
     | null;
+  resourceType?: ('checklist' | 'guide' | 'template' | 'fact-sheet') | null;
+  audience?: ('clients' | 'claimants' | 'all') | null;
+  description?: string | null;
+  /**
+   * Downloadable file (e.g. PDF). Leave empty to link out instead.
+   */
+  file?: (number | null) | Media;
+  /**
+   * Used when no file is uploaded — links the card to this URL instead.
+   */
+  externalUrl?: string | null;
+  /**
+   * e.g. "Download", "Read guide". Defaults to "Download" if empty.
+   */
+  ctaLabel?: string | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -2147,7 +7465,503 @@ export interface Event {
   slug: string;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AppointmentGuideBlock".
+ */
+export interface AppointmentGuideBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * The top-level toggle (e.g. In-Person, Videolink).
+   */
+  types?:
+    | {
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        label: string;
+        sublabel?: string | null;
+        tabs?:
+          | {
+              icon?:
+                | (
+                    | 'activity'
+                    | 'arrow-down'
+                    | 'arrow-right'
+                    | 'arrows-out'
+                    | 'award'
+                    | 'bag-simple'
+                    | 'bell-ringing'
+                    | 'bone'
+                    | 'book-open'
+                    | 'brain'
+                    | 'briefcase'
+                    | 'building'
+                    | 'bus'
+                    | 'calendar'
+                    | 'calendar-blank'
+                    | 'calendar-check'
+                    | 'car'
+                    | 'caret-left'
+                    | 'caret-right'
+                    | 'cell-signal-full'
+                    | 'certificate'
+                    | 'chart-bar'
+                    | 'chat'
+                    | 'chat-circle-text'
+                    | 'chats'
+                    | 'chats-circle'
+                    | 'check'
+                    | 'check-circle'
+                    | 'check-square'
+                    | 'clipboard-check'
+                    | 'clipboard-text'
+                    | 'clock'
+                    | 'currency-dollar'
+                    | 'desktop'
+                    | 'download'
+                    | 'download-simple'
+                    | 'envelope'
+                    | 'envelope-simple'
+                    | 'file-magnifying-glass'
+                    | 'file-plus'
+                    | 'file-text'
+                    | 'files'
+                    | 'first-aid'
+                    | 'gavel'
+                    | 'globe'
+                    | 'graduation-cap'
+                    | 'handshake'
+                    | 'headset'
+                    | 'heart-pulse'
+                    | 'heartbeat'
+                    | 'home'
+                    | 'house'
+                    | 'identification-card'
+                    | 'info'
+                    | 'link'
+                    | 'list'
+                    | 'lock'
+                    | 'lock-simple'
+                    | 'magnifying-glass'
+                    | 'mail'
+                    | 'map-pin'
+                    | 'medal'
+                    | 'message'
+                    | 'monitor'
+                    | 'navigation-arrow'
+                    | 'paper-plane-tilt'
+                    | 'person-arms-spread'
+                    | 'phone'
+                    | 'question'
+                    | 'scale'
+                    | 'scales'
+                    | 'seal-check'
+                    | 'search'
+                    | 'send'
+                    | 'shield'
+                    | 'shield-check'
+                    | 'sign-in'
+                    | 'sliders'
+                    | 'sort-ascending'
+                    | 'squares-four'
+                    | 'star'
+                    | 'stethoscope'
+                    | 't-shirt'
+                    | 'target'
+                    | 'translate'
+                    | 'upload'
+                    | 'upload-simple'
+                    | 'user'
+                    | 'user-check'
+                    | 'user-circle'
+                    | 'user-plus'
+                    | 'users'
+                    | 'users-three'
+                    | 'video'
+                    | 'video-camera'
+                    | 'warning'
+                    | 'warning-circle'
+                    | 'wheelchair'
+                    | 'wifi-high'
+                    | 'wind'
+                  )
+                | null;
+              label: string;
+              items?:
+                | {
+                    /**
+                     * Icon shown with this item.
+                     */
+                    icon?:
+                      | (
+                          | 'activity'
+                          | 'arrow-down'
+                          | 'arrow-right'
+                          | 'arrows-out'
+                          | 'award'
+                          | 'bag-simple'
+                          | 'bell-ringing'
+                          | 'bone'
+                          | 'book-open'
+                          | 'brain'
+                          | 'briefcase'
+                          | 'building'
+                          | 'bus'
+                          | 'calendar'
+                          | 'calendar-blank'
+                          | 'calendar-check'
+                          | 'car'
+                          | 'caret-left'
+                          | 'caret-right'
+                          | 'cell-signal-full'
+                          | 'certificate'
+                          | 'chart-bar'
+                          | 'chat'
+                          | 'chat-circle-text'
+                          | 'chats'
+                          | 'chats-circle'
+                          | 'check'
+                          | 'check-circle'
+                          | 'check-square'
+                          | 'clipboard-check'
+                          | 'clipboard-text'
+                          | 'clock'
+                          | 'currency-dollar'
+                          | 'desktop'
+                          | 'download'
+                          | 'download-simple'
+                          | 'envelope'
+                          | 'envelope-simple'
+                          | 'file-magnifying-glass'
+                          | 'file-plus'
+                          | 'file-text'
+                          | 'files'
+                          | 'first-aid'
+                          | 'gavel'
+                          | 'globe'
+                          | 'graduation-cap'
+                          | 'handshake'
+                          | 'headset'
+                          | 'heart-pulse'
+                          | 'heartbeat'
+                          | 'home'
+                          | 'house'
+                          | 'identification-card'
+                          | 'info'
+                          | 'link'
+                          | 'list'
+                          | 'lock'
+                          | 'lock-simple'
+                          | 'magnifying-glass'
+                          | 'mail'
+                          | 'map-pin'
+                          | 'medal'
+                          | 'message'
+                          | 'monitor'
+                          | 'navigation-arrow'
+                          | 'paper-plane-tilt'
+                          | 'person-arms-spread'
+                          | 'phone'
+                          | 'question'
+                          | 'scale'
+                          | 'scales'
+                          | 'seal-check'
+                          | 'search'
+                          | 'send'
+                          | 'shield'
+                          | 'shield-check'
+                          | 'sign-in'
+                          | 'sliders'
+                          | 'sort-ascending'
+                          | 'squares-four'
+                          | 'star'
+                          | 'stethoscope'
+                          | 't-shirt'
+                          | 'target'
+                          | 'translate'
+                          | 'upload'
+                          | 'upload-simple'
+                          | 'user'
+                          | 'user-check'
+                          | 'user-circle'
+                          | 'user-plus'
+                          | 'users'
+                          | 'users-three'
+                          | 'video'
+                          | 'video-camera'
+                          | 'warning'
+                          | 'warning-circle'
+                          | 'wheelchair'
+                          | 'wifi-high'
+                          | 'wind'
+                        )
+                      | null;
+                    heading: string;
+                    body?: {
+                      root: {
+                        type: string;
+                        children: {
+                          type: any;
+                          version: number;
+                          [k: string]: unknown;
+                        }[];
+                        direction: ('ltr' | 'rtl') | null;
+                        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                        indent: number;
+                        version: number;
+                      };
+                      [k: string]: unknown;
+                    } | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              highlightCards?:
+                | {
+                    /**
+                     * Icon shown with this item.
+                     */
+                    icon?:
+                      | (
+                          | 'activity'
+                          | 'arrow-down'
+                          | 'arrow-right'
+                          | 'arrows-out'
+                          | 'award'
+                          | 'bag-simple'
+                          | 'bell-ringing'
+                          | 'bone'
+                          | 'book-open'
+                          | 'brain'
+                          | 'briefcase'
+                          | 'building'
+                          | 'bus'
+                          | 'calendar'
+                          | 'calendar-blank'
+                          | 'calendar-check'
+                          | 'car'
+                          | 'caret-left'
+                          | 'caret-right'
+                          | 'cell-signal-full'
+                          | 'certificate'
+                          | 'chart-bar'
+                          | 'chat'
+                          | 'chat-circle-text'
+                          | 'chats'
+                          | 'chats-circle'
+                          | 'check'
+                          | 'check-circle'
+                          | 'check-square'
+                          | 'clipboard-check'
+                          | 'clipboard-text'
+                          | 'clock'
+                          | 'currency-dollar'
+                          | 'desktop'
+                          | 'download'
+                          | 'download-simple'
+                          | 'envelope'
+                          | 'envelope-simple'
+                          | 'file-magnifying-glass'
+                          | 'file-plus'
+                          | 'file-text'
+                          | 'files'
+                          | 'first-aid'
+                          | 'gavel'
+                          | 'globe'
+                          | 'graduation-cap'
+                          | 'handshake'
+                          | 'headset'
+                          | 'heart-pulse'
+                          | 'heartbeat'
+                          | 'home'
+                          | 'house'
+                          | 'identification-card'
+                          | 'info'
+                          | 'link'
+                          | 'list'
+                          | 'lock'
+                          | 'lock-simple'
+                          | 'magnifying-glass'
+                          | 'mail'
+                          | 'map-pin'
+                          | 'medal'
+                          | 'message'
+                          | 'monitor'
+                          | 'navigation-arrow'
+                          | 'paper-plane-tilt'
+                          | 'person-arms-spread'
+                          | 'phone'
+                          | 'question'
+                          | 'scale'
+                          | 'scales'
+                          | 'seal-check'
+                          | 'search'
+                          | 'send'
+                          | 'shield'
+                          | 'shield-check'
+                          | 'sign-in'
+                          | 'sliders'
+                          | 'sort-ascending'
+                          | 'squares-four'
+                          | 'star'
+                          | 'stethoscope'
+                          | 't-shirt'
+                          | 'target'
+                          | 'translate'
+                          | 'upload'
+                          | 'upload-simple'
+                          | 'user'
+                          | 'user-check'
+                          | 'user-circle'
+                          | 'user-plus'
+                          | 'users'
+                          | 'users-three'
+                          | 'video'
+                          | 'video-camera'
+                          | 'warning'
+                          | 'warning-circle'
+                          | 'wheelchair'
+                          | 'wifi-high'
+                          | 'wind'
+                        )
+                      | null;
+                    title: string;
+                    bullets?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              callout?: {
+                style?: ('info' | 'note' | 'warning') | null;
+                text?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'appointmentGuide';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2407,6 +8221,10 @@ export interface PayloadLockedDocument {
         value: number | Specialty;
       } | null)
     | ({
+        relationTo: 'specialty-categories';
+        value: number | SpecialtyCategory;
+      } | null)
+    | ({
         relationTo: 'claim-types';
         value: number | ClaimType;
       } | null)
@@ -2417,6 +8235,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'areas-of-expertise';
         value: number | AreasOfExpertise;
+      } | null)
+    | ({
+        relationTo: 'accreditations';
+        value: number | Accreditation;
+      } | null)
+    | ({
+        relationTo: 'locations';
+        value: number | Location;
+      } | null)
+    | ({
+        relationTo: 'streams';
+        value: number | Stream;
       } | null)
     | ({
         relationTo: 'specialists';
@@ -2433,6 +8263,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'availability-sessions';
         value: number | AvailabilitySession;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'resources';
+        value: number | Resource;
+      } | null)
+    | ({
+        relationTo: 'offices';
+        value: number | Office;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: number | Testimonial;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2510,12 +8356,24 @@ export interface PagesSelect<T extends boolean = true> {
         heading?: T;
         subtitle?: T;
         showBreadcrumb?: T;
+        theme?: T;
+        align?: T;
+        showShield?: T;
+        metaItems?:
+          | T
+          | {
+              icon?: T;
+              text?: T;
+              href?: T;
+              id?: T;
+            };
         definition?:
           | T
           | {
               term?: T;
               pronunciation?: T;
               text?: T;
+              definitionStyle?: T;
             };
         richText?: T;
         links?:
@@ -2529,6 +8387,7 @@ export interface PagesSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    icon?: T;
                     appearance?: T;
                   };
               id?: T;
@@ -2539,6 +8398,8 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
+        section?: T | SectionBlockSelect<T>;
+        row?: T | RowBlockSelect<T>;
         cta?: T | CallToActionBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
@@ -2554,7 +8415,18 @@ export interface PagesSelect<T extends boolean = true> {
         ctaBand?: T | CTABandBlockSelect<T>;
         specialtyGrid?: T | SpecialtyGridBlockSelect<T>;
         peopleGrid?: T | PeopleGridBlockSelect<T>;
+        servicesGrid?: T | ServicesGridBlockSelect<T>;
+        testimonialsGrid?: T | TestimonialsGridBlockSelect<T>;
+        availability?: T | AvailabilityBlockSelect<T>;
         slideCarousel?: T | SlideCarouselBlockSelect<T>;
+        specialistDirectory?: T | SpecialistDirectoryBlockSelect<T>;
+        specialtyDirectory?: T | SpecialtyDirectoryBlockSelect<T>;
+        resourcesGrid?: T | ResourcesGridBlockSelect<T>;
+        appointmentGuide?: T | AppointmentGuideBlockSelect<T>;
+        mapEmbed?: T | MapEmbedBlockSelect<T>;
+        contactDetails?: T | ContactDetailsBlockSelect<T>;
+        iconList?: T | IconListBlockSelect<T>;
+        callout?: T | CalloutBlockSelect<T>;
       };
   meta?:
     | T
@@ -2582,10 +8454,130 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock_select".
+ * via the `definition` "SectionBlock_select".
  */
-export interface CallToActionBlockSelect<T extends boolean = true> {
+export interface SectionBlockSelect<T extends boolean = true> {
+  background?: T;
+  containerWidth?: T;
+  paddingTop?: T;
+  paddingBottom?: T;
+  motion?: T;
+  align?: T;
+  content?:
+    | T
+    | {
+        row?: T | RowBlockSelect<T>;
+        heading?: T | HeadingBlockSelect<T>;
+        text?: T | TextBlockSelect<T>;
+        button?: T | ButtonBlockSelect<T>;
+        image?: T | ImageBlockSelect<T>;
+        spacer?: T | SpacerBlockSelect<T>;
+        divider?: T | DividerBlockSelect<T>;
+        iconBlock?: T | IconBlockSelect<T>;
+        content?: T | ContentBlockSelect<T>;
+        mediaBlock?: T | MediaBlockSelect<T>;
+        cta?: T | CallToActionBlockSelect<T>;
+        faq?: T | FAQBlockSelect<T>;
+        gatewayCards?: T | GatewayCardsBlockSelect<T>;
+        featureGrid?: T | FeatureGridBlockSelect<T>;
+        processSteps?: T | ProcessStepsBlockSelect<T>;
+        specialtyGrid?: T | SpecialtyGridBlockSelect<T>;
+        peopleGrid?: T | PeopleGridBlockSelect<T>;
+        servicesGrid?: T | ServicesGridBlockSelect<T>;
+        testimonialsGrid?: T | TestimonialsGridBlockSelect<T>;
+        statsBand?: T | StatsBandBlockSelect<T>;
+        tabs?: T | TabsBlockTypeSelect<T>;
+        splitFeature?: T | SplitFeatureBlockSelect<T>;
+        ctaBand?: T | CTABandBlockSelect<T>;
+        callout?: T | CalloutBlockSelect<T>;
+        contactDetails?: T | ContactDetailsBlockSelect<T>;
+        iconList?: T | IconListBlockSelect<T>;
+        mapEmbed?: T | MapEmbedBlockSelect<T>;
+      };
+  cssClass?: T;
+  anchorId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RowBlock_select".
+ */
+export interface RowBlockSelect<T extends boolean = true> {
+  gap?: T;
+  alignY?: T;
+  columns?:
+    | T
+    | {
+        span?: T;
+        align?: T;
+        content?:
+          | T
+          | {
+              heading?: T | HeadingBlockSelect<T>;
+              text?: T | TextBlockSelect<T>;
+              button?: T | ButtonBlockSelect<T>;
+              image?: T | ImageBlockSelect<T>;
+              spacer?: T | SpacerBlockSelect<T>;
+              divider?: T | DividerBlockSelect<T>;
+              iconBlock?: T | IconBlockSelect<T>;
+              content?: T | ContentBlockSelect<T>;
+              mediaBlock?: T | MediaBlockSelect<T>;
+              cta?: T | CallToActionBlockSelect<T>;
+              faq?: T | FAQBlockSelect<T>;
+              gatewayCards?: T | GatewayCardsBlockSelect<T>;
+              featureGrid?: T | FeatureGridBlockSelect<T>;
+              processSteps?: T | ProcessStepsBlockSelect<T>;
+              specialtyGrid?: T | SpecialtyGridBlockSelect<T>;
+              peopleGrid?: T | PeopleGridBlockSelect<T>;
+              servicesGrid?: T | ServicesGridBlockSelect<T>;
+              testimonialsGrid?: T | TestimonialsGridBlockSelect<T>;
+              statsBand?: T | StatsBandBlockSelect<T>;
+              tabs?: T | TabsBlockTypeSelect<T>;
+              splitFeature?: T | SplitFeatureBlockSelect<T>;
+              ctaBand?: T | CTABandBlockSelect<T>;
+              callout?: T | CalloutBlockSelect<T>;
+              contactDetails?: T | ContactDetailsBlockSelect<T>;
+              iconList?: T | IconListBlockSelect<T>;
+              mapEmbed?: T | MapEmbedBlockSelect<T>;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  anchorId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeadingBlock_select".
+ */
+export interface HeadingBlockSelect<T extends boolean = true> {
+  text?: T;
+  level?: T;
+  size?: T;
+  align?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextBlock_select".
+ */
+export interface TextBlockSelect<T extends boolean = true> {
   richText?: T;
+  size?: T;
+  align?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ButtonBlock_select".
+ */
+export interface ButtonBlockSelect<T extends boolean = true> {
   links?:
     | T
     | {
@@ -2597,10 +8589,61 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
               appearance?: T;
             };
         id?: T;
       };
+  size?: T;
+  align?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageBlock_select".
+ */
+export interface ImageBlockSelect<T extends boolean = true> {
+  media?: T;
+  width?: T;
+  rounded?: T;
+  align?: T;
+  caption?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpacerBlock_select".
+ */
+export interface SpacerBlockSelect<T extends boolean = true> {
+  size?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DividerBlock_select".
+ */
+export interface DividerBlockSelect<T extends boolean = true> {
+  style?: T;
+  width?: T;
+  align?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconBlock_select".
+ */
+export interface IconBlockSelect<T extends boolean = true> {
+  icon?: T;
+  size?: T;
+  color?: T;
+  align?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -2624,6 +8667,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
               appearance?: T;
             };
         id?: T;
@@ -2644,27 +8688,26 @@ export interface MediaBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock_select".
+ * via the `definition` "CallToActionBlock_select".
  */
-export interface ArchiveBlockSelect<T extends boolean = true> {
-  introContent?: T;
-  populateBy?: T;
-  relationTo?: T;
-  categories?: T;
-  limit?: T;
-  selectedDocs?: T;
-  cssClass?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock_select".
- */
-export interface FormBlockSelect<T extends boolean = true> {
-  form?: T;
-  enableIntro?: T;
-  introContent?: T;
+export interface CallToActionBlockSelect<T extends boolean = true> {
+  richText?: T;
+  links?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -2674,15 +8717,30 @@ export interface FormBlockSelect<T extends boolean = true> {
  * via the `definition` "FAQBlock_select".
  */
 export interface FAQBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
   heading?: T;
+  subheading?: T;
+  columns?: T;
   items?:
     | T
     | {
         question?: T;
+        icon?: T;
+        image?: T;
         answer?: T;
+        anchorId?: T;
         id?: T;
       };
   exclusive?: T;
+  openFirst?: T;
+  helpCard?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
+        email?: T;
+        phone?: T;
+      };
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -2701,8 +8759,12 @@ export interface GatewayCardsBlockSelect<T extends boolean = true> {
     | T
     | {
         icon?: T;
+        eyebrow?: T;
+        subtitle?: T;
         title?: T;
         description?: T;
+        accent?: T;
+        theme?: T;
         links?:
           | T
           | {
@@ -2714,6 +8776,7 @@ export interface GatewayCardsBlockSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    icon?: T;
                   };
               id?: T;
             };
@@ -2725,6 +8788,8 @@ export interface GatewayCardsBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
+              appearance?: T;
             };
         id?: T;
       };
@@ -2758,8 +8823,235 @@ export interface FeatureGridBlockSelect<T extends boolean = true> {
     | {
         icon?: T;
         title?: T;
+        titleSuffix?: T;
         description?: T;
+        bullets?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        detailsLabel?: T;
+        details?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
         id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProcessStepsBlock_select".
+ */
+export interface ProcessStepsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  columns?: T;
+  steps?:
+    | T
+    | {
+        icon?: T;
+        badge?: T;
+        title?: T;
+        description?: T;
+        bullets?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpecialtyGridBlock_select".
+ */
+export interface SpecialtyGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  source?: T;
+  taxonomy?: T;
+  variant?: T;
+  columns?: T;
+  defaultIcon?: T;
+  linkToDirectory?: T;
+  directoryPath?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PeopleGridBlock_select".
+ */
+export interface PeopleGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  source?: T;
+  onlyAdvertised?: T;
+  featuredOnly?: T;
+  specialty?: T;
+  location?: T;
+  department?: T;
+  groupByDepartment?: T;
+  people?: T;
+  layout?: T;
+  columns?: T;
+  limit?: T;
+  footerLinks?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
+  linkProfiles?: T;
+  carouselOptions?:
+    | T
+    | {
+        speed?: T;
+        direction?: T;
+        showArrows?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesGridBlock_select".
+ */
+export interface ServicesGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  source?: T;
+  category?: T;
+  serviceGroup?: T;
+  layout?: T;
+  services?: T;
+  columns?: T;
+  limit?: T;
+  linkToService?: T;
+  servicePathPrefix?: T;
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsGridBlock_select".
+ */
+export interface TestimonialsGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  source?: T;
+  featuredOnly?: T;
+  testimonials?: T;
+  layout?: T;
+  columns?: T;
+  limit?: T;
+  carouselOptions?:
+    | T
+    | {
+        visible?: T;
+        showArrows?: T;
       };
   cssClass?: T;
   elementClasses?:
@@ -2808,38 +9100,6 @@ export interface StatsBandBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ProcessStepsBlock_select".
- */
-export interface ProcessStepsBlockSelect<T extends boolean = true> {
-  eyebrow?: T;
-  heading?: T;
-  subheading?: T;
-  background?: T;
-  columns?: T;
-  steps?:
-    | T
-    | {
-        icon?: T;
-        title?: T;
-        description?: T;
-        id?: T;
-      };
-  cssClass?: T;
-  elementClasses?:
-    | T
-    | {
-        heading?: T;
-        card?: T;
-        button?: T;
-      };
-  containerWidth?: T;
-  motion?: T;
-  hoverEffect?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TabsBlockType_select".
  */
 export interface TabsBlockTypeSelect<T extends boolean = true> {
@@ -2851,7 +9111,32 @@ export interface TabsBlockTypeSelect<T extends boolean = true> {
     | T
     | {
         label?: T;
-        content?: T;
+        icon?: T;
+        content?:
+          | T
+          | {
+              heading?: T | HeadingBlockSelect<T>;
+              text?: T | TextBlockSelect<T>;
+              button?: T | ButtonBlockSelect<T>;
+              image?: T | ImageBlockSelect<T>;
+              spacer?: T | SpacerBlockSelect<T>;
+              divider?: T | DividerBlockSelect<T>;
+              iconBlock?: T | IconBlockSelect<T>;
+              content?: T | ContentBlockSelect<T>;
+              mediaBlock?: T | MediaBlockSelect<T>;
+              cta?: T | CallToActionBlockSelect<T>;
+              faq?: T | FAQBlockSelect<T>;
+              gatewayCards?: T | GatewayCardsBlockSelect<T>;
+              featureGrid?: T | FeatureGridBlockSelect<T>;
+              processSteps?: T | ProcessStepsBlockSelect<T>;
+              specialtyGrid?: T | SpecialtyGridBlockSelect<T>;
+              peopleGrid?: T | PeopleGridBlockSelect<T>;
+              servicesGrid?: T | ServicesGridBlockSelect<T>;
+              testimonialsGrid?: T | TestimonialsGridBlockSelect<T>;
+              statsBand?: T | StatsBandBlockSelect<T>;
+              splitFeature?: T | SplitFeatureBlockSelect<T>;
+              ctaBand?: T | CTABandBlockSelect<T>;
+            };
         id?: T;
       };
   tabStyle?: T;
@@ -2874,6 +9159,9 @@ export interface TabsBlockTypeSelect<T extends boolean = true> {
  * via the `definition` "SplitFeatureBlock_select".
  */
 export interface SplitFeatureBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
   background?: T;
   rows?:
     | T
@@ -2881,12 +9169,15 @@ export interface SplitFeatureBlockSelect<T extends boolean = true> {
         image?: T;
         imageSide?: T;
         eyebrow?: T;
+        icon?: T;
         title?: T;
         body?: T;
+        bulletsLabel?: T;
         bullets?:
           | T
           | {
               text?: T;
+              icon?: T;
               id?: T;
             };
         link?:
@@ -2897,7 +9188,9 @@ export interface SplitFeatureBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
             };
+        anchorId?: T;
         id?: T;
       };
   cssClass?: T;
@@ -2918,6 +9211,7 @@ export interface SplitFeatureBlockSelect<T extends boolean = true> {
  * via the `definition` "CTABandBlock_select".
  */
 export interface CTABandBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
   heading?: T;
   text?: T;
   links?:
@@ -2931,6 +9225,7 @@ export interface CTABandBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
               appearance?: T;
             };
         id?: T;
@@ -2950,23 +9245,17 @@ export interface CTABandBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "SpecialtyGridBlock_select".
+ * via the `definition` "CalloutBlock_select".
  */
-export interface SpecialtyGridBlockSelect<T extends boolean = true> {
-  eyebrow?: T;
+export interface CalloutBlockSelect<T extends boolean = true> {
+  style?: T;
+  icon?: T;
+  tag?: T;
   heading?: T;
-  subheading?: T;
-  background?: T;
-  source?: T;
-  columns?: T;
-  defaultIcon?: T;
-  linkToDirectory?: T;
-  directoryPath?: T;
-  items?:
+  body?: T;
+  links?:
     | T
     | {
-        icon?: T;
-        label?: T;
         link?:
           | T
           | {
@@ -2975,60 +9264,160 @@ export interface SpecialtyGridBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
+              appearance?: T;
             };
         id?: T;
       };
   cssClass?: T;
-  elementClasses?:
-    | T
-    | {
-        heading?: T;
-        card?: T;
-        button?: T;
-      };
-  containerWidth?: T;
-  motion?: T;
-  hoverEffect?: T;
   id?: T;
   blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "PeopleGridBlock_select".
+ * via the `definition` "ContactDetailsBlock_select".
  */
-export interface PeopleGridBlockSelect<T extends boolean = true> {
+export interface ContactDetailsBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
-  background?: T;
-  source?: T;
-  onlyAdvertised?: T;
-  featuredOnly?: T;
-  specialty?: T;
-  department?: T;
-  people?: T;
-  layout?: T;
-  columns?: T;
-  limit?: T;
-  linkProfiles?: T;
-  carouselOptions?:
+  useGlobal?: T;
+  items?:
     | T
     | {
-        speed?: T;
-        direction?: T;
-        showArrows?: T;
+        icon?: T;
+        label?: T;
+        value?: T;
+        href?: T;
+        note?: T;
+        id?: T;
       };
   cssClass?: T;
-  elementClasses?:
-    | T
-    | {
-        heading?: T;
-        card?: T;
-        button?: T;
-      };
   containerWidth?: T;
   motion?: T;
-  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconListBlock_select".
+ */
+export interface IconListBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  columns?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        text?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              icon?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MapEmbedBlock_select".
+ */
+export interface MapEmbedBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  kind?: T;
+  office?: T;
+  embedUrl?: T;
+  aspect?: T;
+  title?: T;
+  showOfficeInfo?: T;
+  actions?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArchiveBlock_select".
+ */
+export interface ArchiveBlockSelect<T extends boolean = true> {
+  background?: T;
+  introContent?: T;
+  populateBy?: T;
+  relationTo?: T;
+  view?: T;
+  categories?: T;
+  limit?: T;
+  selectedDocs?: T;
+  columns?: T;
+  viewAllLink?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+            };
+      };
+  cssClass?: T;
+  anchorId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock_select".
+ */
+export interface FormBlockSelect<T extends boolean = true> {
+  form?: T;
+  enableIntro?: T;
+  introContent?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AvailabilityBlock_select".
+ */
+export interface AvailabilityBlockSelect<T extends boolean = true> {
+  showCarousel?: T;
+  showLegend?: T;
+  cssClass?: T;
   id?: T;
   blockName?: T;
 }
@@ -3070,14 +9459,155 @@ export interface SlideCarouselBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpecialistDirectoryBlock_select".
+ */
+export interface SpecialistDirectoryBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  enableSearch?: T;
+  enableSpecialty?: T;
+  enableLocation?: T;
+  enableAccreditation?: T;
+  sortBy?: T;
+  searchPlaceholder?: T;
+  countTemplate?: T;
+  specialtyLabel?: T;
+  locationLabel?: T;
+  accreditationLabel?: T;
+  emptyHeading?: T;
+  emptyBody?: T;
+  cardCtaLabel?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SpecialtyDirectoryBlock_select".
+ */
+export interface SpecialtyDirectoryBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  showFilterBar?: T;
+  showRosters?: T;
+  showKeyAreas?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ResourcesGridBlock_select".
+ */
+export interface ResourcesGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  source?: T;
+  audience?: T;
+  resourceType?: T;
+  resources?: T;
+  columns?: T;
+  limit?: T;
+  cssClass?: T;
+  containerWidth?: T;
+  motion?: T;
+  hoverEffect?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AppointmentGuideBlock_select".
+ */
+export interface AppointmentGuideBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  types?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        sublabel?: T;
+        tabs?:
+          | T
+          | {
+              icon?: T;
+              label?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    heading?: T;
+                    body?: T;
+                    id?: T;
+                  };
+              highlightCards?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    bullets?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              callout?:
+                | T
+                | {
+                    style?: T;
+                    text?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
   heroImage?: T;
+  excerpt?: T;
+  readTime?: T;
+  author?:
+    | T
+    | {
+        source?: T;
+        name?: T;
+        role?: T;
+        photo?: T;
+        bio?: T;
+      };
   content?: T;
+  attachments?:
+    | T
+    | {
+        file?: T;
+        label?: T;
+        id?: T;
+      };
+  showToc?: T;
   relatedPosts?: T;
   categories?: T;
+  stream?: T;
+  featured?: T;
+  specialty?: T;
+  relatedSpecialist?: T;
   meta?:
     | T
     | {
@@ -3199,6 +9729,9 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
+  icon?: T;
+  color?: T;
+  description?: T;
   generateSlug?: T;
   slug?: T;
   parent?: T;
@@ -3242,6 +9775,28 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface SpecialtiesSelect<T extends boolean = true> {
   title?: T;
+  icon?: T;
+  category?: T;
+  description?: T;
+  keyAreas?:
+    | T
+    | {
+        area?: T;
+        id?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialty-categories_select".
+ */
+export interface SpecialtyCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  order?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -3253,6 +9808,7 @@ export interface SpecialtiesSelect<T extends boolean = true> {
  */
 export interface ClaimTypesSelect<T extends boolean = true> {
   title?: T;
+  description?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -3264,6 +9820,7 @@ export interface ClaimTypesSelect<T extends boolean = true> {
  */
 export interface AssessmentTypesSelect<T extends boolean = true> {
   title?: T;
+  description?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -3275,6 +9832,47 @@ export interface AssessmentTypesSelect<T extends boolean = true> {
  */
 export interface AreasOfExpertiseSelect<T extends boolean = true> {
   title?: T;
+  description?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accreditations_select".
+ */
+export interface AccreditationsSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  description?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locations_select".
+ */
+export interface LocationsSelect<T extends boolean = true> {
+  title?: T;
+  region?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "streams_select".
+ */
+export interface StreamsSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  description?: T;
+  order?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -3289,24 +9887,24 @@ export interface SpecialistsSelect<T extends boolean = true> {
   position?: T;
   photo?: T;
   bio?: T;
-  locations?:
-    | T
-    | {
-        location?: T;
-        id?: T;
-      };
+  locations?: T;
   qualifications?:
     | T
     | {
         qualification?: T;
+        icon?: T;
         id?: T;
       };
-  accreditations?:
+  accreditations?: T;
+  languages?:
     | T
     | {
-        accreditation?: T;
+        language?: T;
         id?: T;
       };
+  bookingUrl?: T;
+  cv?: T;
+  sampleReport?: T;
   meta?:
     | T
     | {
@@ -3322,6 +9920,7 @@ export interface SpecialistsSelect<T extends boolean = true> {
   advertise?: T;
   availabilityHighlight?: T;
   availabilityNote?: T;
+  firstName?: T;
   lastName?: T;
   publishedAt?: T;
   generateSlug?: T;
@@ -3343,6 +9942,13 @@ export interface TeamSelect<T extends boolean = true> {
     | T
     | {
         qualification?: T;
+        id?: T;
+      };
+  sections?:
+    | T
+    | {
+        heading?: T;
+        body?: T;
         id?: T;
       };
   meta?:
@@ -3372,6 +9978,11 @@ export interface EventsSelect<T extends boolean = true> {
   location?: T;
   host?: T;
   registrationUrl?: T;
+  registrationLabel?: T;
+  cpdEligible?: T;
+  cpdPoints?: T;
+  cost?: T;
+  locationRef?: T;
   image?: T;
   excerpt?: T;
   description?: T;
@@ -3406,6 +10017,105 @@ export interface AvailabilitySessionsSelect<T extends boolean = true> {
   status?: T;
   expiresAt?: T;
   title?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  serviceGroup?: T;
+  icon?: T;
+  photo?: T;
+  linkOverride?: T;
+  shortDescription?: T;
+  body?: T;
+  featured?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources_select".
+ */
+export interface ResourcesSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  resourceType?: T;
+  audience?: T;
+  description?: T;
+  file?: T;
+  externalUrl?: T;
+  ctaLabel?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "offices_select".
+ */
+export interface OfficesSelect<T extends boolean = true> {
+  title?: T;
+  address?: T;
+  phone?: T;
+  email?: T;
+  mapEmbedUrl?: T;
+  hours?:
+    | T
+    | {
+        days?: T;
+        time?: T;
+        id?: T;
+      };
+  hoursNote?: T;
+  transport?:
+    | T
+    | {
+        label?: T;
+        note?: T;
+        href?: T;
+        id?: T;
+      };
+  parking?:
+    | T
+    | {
+        name?: T;
+        address?: T;
+        walkTime?: T;
+        heightLimit?: T;
+        href?: T;
+        note?: T;
+        id?: T;
+      };
+  note?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  quote?: T;
+  authorRole?: T;
+  authorName?: T;
+  org?: T;
+  avatar?: T;
+  rating?: T;
+  order?: T;
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3693,7 +10403,7 @@ export interface Header {
   navItems?:
     | {
         link: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -3706,6 +10416,113 @@ export interface Header {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
         };
         /**
          * Optional dropdown shown when hovering this nav item.
@@ -3713,7 +10530,7 @@ export interface Header {
         subItems?:
           | {
               link: {
-                type?: ('reference' | 'custom') | null;
+                type?: ('reference' | 'custom' | 'enquiry') | null;
                 newTab?: boolean | null;
                 reference?:
                   | ({
@@ -3726,6 +10543,113 @@ export interface Header {
                     } | null);
                 url?: string | null;
                 label: string;
+                /**
+                 * Optional leading icon shown before the label.
+                 */
+                icon?:
+                  | (
+                      | 'activity'
+                      | 'arrow-down'
+                      | 'arrow-right'
+                      | 'arrows-out'
+                      | 'award'
+                      | 'bag-simple'
+                      | 'bell-ringing'
+                      | 'bone'
+                      | 'book-open'
+                      | 'brain'
+                      | 'briefcase'
+                      | 'building'
+                      | 'bus'
+                      | 'calendar'
+                      | 'calendar-blank'
+                      | 'calendar-check'
+                      | 'car'
+                      | 'caret-left'
+                      | 'caret-right'
+                      | 'cell-signal-full'
+                      | 'certificate'
+                      | 'chart-bar'
+                      | 'chat'
+                      | 'chat-circle-text'
+                      | 'chats'
+                      | 'chats-circle'
+                      | 'check'
+                      | 'check-circle'
+                      | 'check-square'
+                      | 'clipboard-check'
+                      | 'clipboard-text'
+                      | 'clock'
+                      | 'currency-dollar'
+                      | 'desktop'
+                      | 'download'
+                      | 'download-simple'
+                      | 'envelope'
+                      | 'envelope-simple'
+                      | 'file-magnifying-glass'
+                      | 'file-plus'
+                      | 'file-text'
+                      | 'files'
+                      | 'first-aid'
+                      | 'gavel'
+                      | 'globe'
+                      | 'graduation-cap'
+                      | 'handshake'
+                      | 'headset'
+                      | 'heart-pulse'
+                      | 'heartbeat'
+                      | 'home'
+                      | 'house'
+                      | 'identification-card'
+                      | 'info'
+                      | 'link'
+                      | 'list'
+                      | 'lock'
+                      | 'lock-simple'
+                      | 'magnifying-glass'
+                      | 'mail'
+                      | 'map-pin'
+                      | 'medal'
+                      | 'message'
+                      | 'monitor'
+                      | 'navigation-arrow'
+                      | 'paper-plane-tilt'
+                      | 'person-arms-spread'
+                      | 'phone'
+                      | 'question'
+                      | 'scale'
+                      | 'scales'
+                      | 'seal-check'
+                      | 'search'
+                      | 'send'
+                      | 'shield'
+                      | 'shield-check'
+                      | 'sign-in'
+                      | 'sliders'
+                      | 'sort-ascending'
+                      | 'squares-four'
+                      | 'star'
+                      | 'stethoscope'
+                      | 't-shirt'
+                      | 'target'
+                      | 'translate'
+                      | 'upload'
+                      | 'upload-simple'
+                      | 'user'
+                      | 'user-check'
+                      | 'user-circle'
+                      | 'user-plus'
+                      | 'users'
+                      | 'users-three'
+                      | 'video'
+                      | 'video-camera'
+                      | 'warning'
+                      | 'warning-circle'
+                      | 'wheelchair'
+                      | 'wifi-high'
+                      | 'wind'
+                    )
+                  | null;
               };
               /**
                * Optional third-level menu shown when hovering this item.
@@ -3733,7 +10657,7 @@ export interface Header {
               subSubItems?:
                 | {
                     link: {
-                      type?: ('reference' | 'custom') | null;
+                      type?: ('reference' | 'custom' | 'enquiry') | null;
                       newTab?: boolean | null;
                       reference?:
                         | ({
@@ -3746,6 +10670,113 @@ export interface Header {
                           } | null);
                       url?: string | null;
                       label: string;
+                      /**
+                       * Optional leading icon shown before the label.
+                       */
+                      icon?:
+                        | (
+                            | 'activity'
+                            | 'arrow-down'
+                            | 'arrow-right'
+                            | 'arrows-out'
+                            | 'award'
+                            | 'bag-simple'
+                            | 'bell-ringing'
+                            | 'bone'
+                            | 'book-open'
+                            | 'brain'
+                            | 'briefcase'
+                            | 'building'
+                            | 'bus'
+                            | 'calendar'
+                            | 'calendar-blank'
+                            | 'calendar-check'
+                            | 'car'
+                            | 'caret-left'
+                            | 'caret-right'
+                            | 'cell-signal-full'
+                            | 'certificate'
+                            | 'chart-bar'
+                            | 'chat'
+                            | 'chat-circle-text'
+                            | 'chats'
+                            | 'chats-circle'
+                            | 'check'
+                            | 'check-circle'
+                            | 'check-square'
+                            | 'clipboard-check'
+                            | 'clipboard-text'
+                            | 'clock'
+                            | 'currency-dollar'
+                            | 'desktop'
+                            | 'download'
+                            | 'download-simple'
+                            | 'envelope'
+                            | 'envelope-simple'
+                            | 'file-magnifying-glass'
+                            | 'file-plus'
+                            | 'file-text'
+                            | 'files'
+                            | 'first-aid'
+                            | 'gavel'
+                            | 'globe'
+                            | 'graduation-cap'
+                            | 'handshake'
+                            | 'headset'
+                            | 'heart-pulse'
+                            | 'heartbeat'
+                            | 'home'
+                            | 'house'
+                            | 'identification-card'
+                            | 'info'
+                            | 'link'
+                            | 'list'
+                            | 'lock'
+                            | 'lock-simple'
+                            | 'magnifying-glass'
+                            | 'mail'
+                            | 'map-pin'
+                            | 'medal'
+                            | 'message'
+                            | 'monitor'
+                            | 'navigation-arrow'
+                            | 'paper-plane-tilt'
+                            | 'person-arms-spread'
+                            | 'phone'
+                            | 'question'
+                            | 'scale'
+                            | 'scales'
+                            | 'seal-check'
+                            | 'search'
+                            | 'send'
+                            | 'shield'
+                            | 'shield-check'
+                            | 'sign-in'
+                            | 'sliders'
+                            | 'sort-ascending'
+                            | 'squares-four'
+                            | 'star'
+                            | 'stethoscope'
+                            | 't-shirt'
+                            | 'target'
+                            | 'translate'
+                            | 'upload'
+                            | 'upload-simple'
+                            | 'user'
+                            | 'user-check'
+                            | 'user-circle'
+                            | 'user-plus'
+                            | 'users'
+                            | 'users-three'
+                            | 'video'
+                            | 'video-camera'
+                            | 'warning'
+                            | 'warning-circle'
+                            | 'wheelchair'
+                            | 'wifi-high'
+                            | 'wind'
+                          )
+                        | null;
                     };
                     id?: string | null;
                   }[]
@@ -3762,7 +10793,7 @@ export interface Header {
   cta: {
     enabled?: boolean | null;
     link: {
-      type?: ('reference' | 'custom') | null;
+      type?: ('reference' | 'custom' | 'enquiry') | null;
       newTab?: boolean | null;
       reference?:
         | ({
@@ -3775,6 +10806,113 @@ export interface Header {
           } | null);
       url?: string | null;
       label: string;
+      /**
+       * Optional leading icon shown before the label.
+       */
+      icon?:
+        | (
+            | 'activity'
+            | 'arrow-down'
+            | 'arrow-right'
+            | 'arrows-out'
+            | 'award'
+            | 'bag-simple'
+            | 'bell-ringing'
+            | 'bone'
+            | 'book-open'
+            | 'brain'
+            | 'briefcase'
+            | 'building'
+            | 'bus'
+            | 'calendar'
+            | 'calendar-blank'
+            | 'calendar-check'
+            | 'car'
+            | 'caret-left'
+            | 'caret-right'
+            | 'cell-signal-full'
+            | 'certificate'
+            | 'chart-bar'
+            | 'chat'
+            | 'chat-circle-text'
+            | 'chats'
+            | 'chats-circle'
+            | 'check'
+            | 'check-circle'
+            | 'check-square'
+            | 'clipboard-check'
+            | 'clipboard-text'
+            | 'clock'
+            | 'currency-dollar'
+            | 'desktop'
+            | 'download'
+            | 'download-simple'
+            | 'envelope'
+            | 'envelope-simple'
+            | 'file-magnifying-glass'
+            | 'file-plus'
+            | 'file-text'
+            | 'files'
+            | 'first-aid'
+            | 'gavel'
+            | 'globe'
+            | 'graduation-cap'
+            | 'handshake'
+            | 'headset'
+            | 'heart-pulse'
+            | 'heartbeat'
+            | 'home'
+            | 'house'
+            | 'identification-card'
+            | 'info'
+            | 'link'
+            | 'list'
+            | 'lock'
+            | 'lock-simple'
+            | 'magnifying-glass'
+            | 'mail'
+            | 'map-pin'
+            | 'medal'
+            | 'message'
+            | 'monitor'
+            | 'navigation-arrow'
+            | 'paper-plane-tilt'
+            | 'person-arms-spread'
+            | 'phone'
+            | 'question'
+            | 'scale'
+            | 'scales'
+            | 'seal-check'
+            | 'search'
+            | 'send'
+            | 'shield'
+            | 'shield-check'
+            | 'sign-in'
+            | 'sliders'
+            | 'sort-ascending'
+            | 'squares-four'
+            | 'star'
+            | 'stethoscope'
+            | 't-shirt'
+            | 'target'
+            | 'translate'
+            | 'upload'
+            | 'upload-simple'
+            | 'user'
+            | 'user-check'
+            | 'user-circle'
+            | 'user-plus'
+            | 'users'
+            | 'users-three'
+            | 'video'
+            | 'video-camera'
+            | 'warning'
+            | 'warning-circle'
+            | 'wheelchair'
+            | 'wifi-high'
+            | 'wind'
+          )
+        | null;
     };
   };
   updatedAt?: string | null;
@@ -3793,7 +10931,7 @@ export interface Footer {
         links?:
           | {
               link: {
-                type?: ('reference' | 'custom') | null;
+                type?: ('reference' | 'custom' | 'enquiry') | null;
                 newTab?: boolean | null;
                 reference?:
                   | ({
@@ -3806,6 +10944,113 @@ export interface Footer {
                     } | null);
                 url?: string | null;
                 label: string;
+                /**
+                 * Optional leading icon shown before the label.
+                 */
+                icon?:
+                  | (
+                      | 'activity'
+                      | 'arrow-down'
+                      | 'arrow-right'
+                      | 'arrows-out'
+                      | 'award'
+                      | 'bag-simple'
+                      | 'bell-ringing'
+                      | 'bone'
+                      | 'book-open'
+                      | 'brain'
+                      | 'briefcase'
+                      | 'building'
+                      | 'bus'
+                      | 'calendar'
+                      | 'calendar-blank'
+                      | 'calendar-check'
+                      | 'car'
+                      | 'caret-left'
+                      | 'caret-right'
+                      | 'cell-signal-full'
+                      | 'certificate'
+                      | 'chart-bar'
+                      | 'chat'
+                      | 'chat-circle-text'
+                      | 'chats'
+                      | 'chats-circle'
+                      | 'check'
+                      | 'check-circle'
+                      | 'check-square'
+                      | 'clipboard-check'
+                      | 'clipboard-text'
+                      | 'clock'
+                      | 'currency-dollar'
+                      | 'desktop'
+                      | 'download'
+                      | 'download-simple'
+                      | 'envelope'
+                      | 'envelope-simple'
+                      | 'file-magnifying-glass'
+                      | 'file-plus'
+                      | 'file-text'
+                      | 'files'
+                      | 'first-aid'
+                      | 'gavel'
+                      | 'globe'
+                      | 'graduation-cap'
+                      | 'handshake'
+                      | 'headset'
+                      | 'heart-pulse'
+                      | 'heartbeat'
+                      | 'home'
+                      | 'house'
+                      | 'identification-card'
+                      | 'info'
+                      | 'link'
+                      | 'list'
+                      | 'lock'
+                      | 'lock-simple'
+                      | 'magnifying-glass'
+                      | 'mail'
+                      | 'map-pin'
+                      | 'medal'
+                      | 'message'
+                      | 'monitor'
+                      | 'navigation-arrow'
+                      | 'paper-plane-tilt'
+                      | 'person-arms-spread'
+                      | 'phone'
+                      | 'question'
+                      | 'scale'
+                      | 'scales'
+                      | 'seal-check'
+                      | 'search'
+                      | 'send'
+                      | 'shield'
+                      | 'shield-check'
+                      | 'sign-in'
+                      | 'sliders'
+                      | 'sort-ascending'
+                      | 'squares-four'
+                      | 'star'
+                      | 'stethoscope'
+                      | 't-shirt'
+                      | 'target'
+                      | 'translate'
+                      | 'upload'
+                      | 'upload-simple'
+                      | 'user'
+                      | 'user-check'
+                      | 'user-circle'
+                      | 'user-plus'
+                      | 'users'
+                      | 'users-three'
+                      | 'video'
+                      | 'video-camera'
+                      | 'warning'
+                      | 'warning-circle'
+                      | 'wheelchair'
+                      | 'wifi-high'
+                      | 'wind'
+                    )
+                  | null;
               };
               id?: string | null;
             }[]
@@ -3839,7 +11084,7 @@ export interface Footer {
   legalLinks?:
     | {
         link: {
-          type?: ('reference' | 'custom') | null;
+          type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
           reference?:
             | ({
@@ -3852,6 +11097,113 @@ export interface Footer {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
         };
         id?: string | null;
       }[]
@@ -3910,6 +11262,14 @@ export interface SiteSetting {
      * Hex, e.g. #c6c6c6. Leave empty to use the built-in default.
      */
     border?: string | null;
+    /**
+     * Hex, e.g. #93d0f7. Leave empty to use the built-in default.
+     */
+    accentLight?: string | null;
+    /**
+     * Hex, e.g. #1a3a5c. Leave empty to use the built-in default.
+     */
+    primaryDeep?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -3939,7 +11299,18 @@ export interface SpecialistAvailability {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Small label above the carousel heading.
+   */
+  carouselEyebrow?: string | null;
+  /**
+   * Wrap a word in [[brackets]] to highlight it in the accent colour.
+   */
   carouselTitle?: string | null;
+  /**
+   * Intro paragraph shown under the carousel heading.
+   */
+  carouselSubtitle?: string | null;
   /**
    * Where the prefilled enquiry email is sent.
    */
@@ -3947,6 +11318,445 @@ export interface SpecialistAvailability {
   enquirySubject?: string | null;
   enquiryBodyIntro?: string | null;
   enquiryBodyFooter?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Shared copy shown on every specialist profile (the booking-portal CTA + labels).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-profile".
+ */
+export interface SpecialistProfile {
+  id: number;
+  portalCta?: {
+    eyebrow?: string | null;
+    heading?: string | null;
+    subheading?: string | null;
+    tiles?:
+      | {
+          /**
+           * Icon shown with this item.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    enquiryLabel?: string | null;
+    /**
+     * Optional — defaults to the Site Settings / Footer contact email.
+     */
+    enquiryEmail?: string | null;
+  };
+  /**
+   * The fixed headings on the profile body (leave default unless rebranding).
+   */
+  labels?: {
+    biography?: string | null;
+    assessmentAreas?: string | null;
+    qualifications?: string | null;
+    accreditations?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Sidebar CTA cards + fixed labels shown on every In-the-Loop article.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-settings".
+ */
+export interface ArticleSetting {
+  id: number;
+  /**
+   * The fixed cards in the article right rail (e.g. "Have a Question?", "Make a Referral").
+   */
+  sidebarCards?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        heading: string;
+        body?: string | null;
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  labels?: {
+    related?: string | null;
+    toc?: string | null;
+    topics?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Host-specific boilerplate copy shown on event detail pages (AAMLE / VERIFY).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events-settings".
+ */
+export interface EventsSetting {
+  id: number;
+  aamle?: {
+    /**
+     * Intro paragraph shown on every event by this host.
+     */
+    blurb?: string | null;
+    /**
+     * e.g. "Run by AAMLE", "Hosted by VERIFY".
+     */
+    callout?: string | null;
+    attendHeading?: string | null;
+    recapHeading?: string | null;
+    attendBody?: string | null;
+    registerLabel?: string | null;
+    contactLabel?: string | null;
+  };
+  verify?: {
+    /**
+     * Intro paragraph shown on every event by this host.
+     */
+    blurb?: string | null;
+    /**
+     * e.g. "Run by AAMLE", "Hosted by VERIFY".
+     */
+    callout?: string | null;
+    attendHeading?: string | null;
+    recapHeading?: string | null;
+    attendBody?: string | null;
+    registerLabel?: string | null;
+    contactLabel?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3988,6 +11798,148 @@ export interface CustomStyle {
   createdAt?: string | null;
 }
 /**
+ * Edit what each spacing/size preset means. Changes apply across the whole site instantly. These set the values; pick a preset per block in the page editor.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "design-system".
+ */
+export interface DesignSystem {
+  id: number;
+  /**
+   * Font families used site-wide. Empty = the licensed brand font (MuseoSansRounded). To use a different font, first load it via Globals → Custom Styles → Global CSS (@font-face), then enter its family name here.
+   */
+  typography?: {
+    /**
+     * Default: MuseoSansRounded, sans-serif. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    headingFont?: string | null;
+    /**
+     * Default: MuseoSansRounded, sans-serif. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    bodyFont?: string | null;
+    /**
+     * Default: 1rem. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    baseSize?: string | null;
+  };
+  /**
+   * Vertical padding presets for sections (also drives Spacer atoms).
+   */
+  spacing?: {
+    /**
+     * Default: clamp(2rem, 4vw, 3rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    compact?: string | null;
+    /**
+     * Default: clamp(3.5rem, 8vw, 5.5rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    normal?: string | null;
+    /**
+     * Default: clamp(5rem, 10vw, 7.5rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    spacious?: string | null;
+    /**
+     * Default: clamp(7rem, 12vw, 10rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    xl?: string | null;
+  };
+  /**
+   * Space between columns in a Row.
+   */
+  gaps?: {
+    /**
+     * Default: 1rem. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    tight?: string | null;
+    /**
+     * Default: 2rem. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    normal?: string | null;
+    /**
+     * Default: 3.5rem. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    wide?: string | null;
+  };
+  /**
+   * Visual sizes for the Heading atom (independent of level).
+   */
+  headings?: {
+    /**
+     * Default: clamp(1.1rem, 2vw, 1.25rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    sm?: string | null;
+    /**
+     * Default: clamp(1.35rem, 2.5vw, 1.6rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    md?: string | null;
+    /**
+     * Default: clamp(1.75rem, 3.5vw, 2.4rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    lg?: string | null;
+    /**
+     * Default: clamp(2.25rem, 5vw, 3.25rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    xl?: string | null;
+    /**
+     * Default: clamp(2.75rem, 7vw, 4.5rem). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    display?: string | null;
+  };
+  /**
+   * Sizes for the Text atom.
+   */
+  text?: {
+    /**
+     * Default: 0.9rem. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    sm?: string | null;
+    /**
+     * Default: 1rem. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    base?: string | null;
+    /**
+     * Default: 1.2rem. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    lg?: string | null;
+  };
+  /**
+   * Rounding presets for the Image atom.
+   */
+  radius?: {
+    /**
+     * Default: 8px. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    sm?: string | null;
+    /**
+     * Default: 16px. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    md?: string | null;
+  };
+  /**
+   * Background colour/gradient for each section banding option.
+   */
+  bands?: {
+    /**
+     * Default: #f5f6f8. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    muted?: string | null;
+    /**
+     * Default: linear-gradient(135deg, #eef9ff, #e6f4ff, #d9efff). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    accent?: string | null;
+    /**
+     * Default: linear-gradient(135deg, #0d4f85, #1c75bc). Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    primary?: string | null;
+    /**
+     * Default: #414042. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    dark?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -4003,6 +11955,7 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
             };
         subItems?:
           | T
@@ -4015,6 +11968,7 @@ export interface HeaderSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    icon?: T;
                   };
               subSubItems?:
                 | T
@@ -4027,6 +11981,7 @@ export interface HeaderSelect<T extends boolean = true> {
                           reference?: T;
                           url?: T;
                           label?: T;
+                          icon?: T;
                         };
                     id?: T;
                   };
@@ -4046,6 +12001,7 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
             };
       };
   updatedAt?: T;
@@ -4073,6 +12029,7 @@ export interface FooterSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    icon?: T;
                   };
               id?: T;
             };
@@ -4111,6 +12068,7 @@ export interface FooterSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              icon?: T;
             };
         id?: T;
       };
@@ -4137,6 +12095,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         mutedText?: T;
         accent?: T;
         border?: T;
+        accentLight?: T;
+        primaryDeep?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -4149,11 +12109,111 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 export interface SpecialistAvailabilitySelect<T extends boolean = true> {
   heading?: T;
   intro?: T;
+  carouselEyebrow?: T;
   carouselTitle?: T;
+  carouselSubtitle?: T;
   enquiryEmail?: T;
   enquirySubject?: T;
   enquiryBodyIntro?: T;
   enquiryBodyFooter?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-profile_select".
+ */
+export interface SpecialistProfileSelect<T extends boolean = true> {
+  portalCta?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        subheading?: T;
+        tiles?:
+          | T
+          | {
+              icon?: T;
+              label?: T;
+              id?: T;
+            };
+        enquiryLabel?: T;
+        enquiryEmail?: T;
+      };
+  labels?:
+    | T
+    | {
+        biography?: T;
+        assessmentAreas?: T;
+        qualifications?: T;
+        accreditations?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-settings_select".
+ */
+export interface ArticleSettingsSelect<T extends boolean = true> {
+  sidebarCards?:
+    | T
+    | {
+        icon?: T;
+        heading?: T;
+        body?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+            };
+        id?: T;
+      };
+  labels?:
+    | T
+    | {
+        related?: T;
+        toc?: T;
+        topics?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events-settings_select".
+ */
+export interface EventsSettingsSelect<T extends boolean = true> {
+  aamle?:
+    | T
+    | {
+        blurb?: T;
+        callout?: T;
+        attendHeading?: T;
+        recapHeading?: T;
+        attendBody?: T;
+        registerLabel?: T;
+        contactLabel?: T;
+      };
+  verify?:
+    | T
+    | {
+        blurb?: T;
+        callout?: T;
+        attendHeading?: T;
+        recapHeading?: T;
+        attendBody?: T;
+        registerLabel?: T;
+        contactLabel?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -4173,6 +12233,67 @@ export interface CustomStylesSelect<T extends boolean = true> {
         id?: T;
       };
   globalCss?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "design-system_select".
+ */
+export interface DesignSystemSelect<T extends boolean = true> {
+  typography?:
+    | T
+    | {
+        headingFont?: T;
+        bodyFont?: T;
+        baseSize?: T;
+      };
+  spacing?:
+    | T
+    | {
+        compact?: T;
+        normal?: T;
+        spacious?: T;
+        xl?: T;
+      };
+  gaps?:
+    | T
+    | {
+        tight?: T;
+        normal?: T;
+        wide?: T;
+      };
+  headings?:
+    | T
+    | {
+        sm?: T;
+        md?: T;
+        lg?: T;
+        xl?: T;
+        display?: T;
+      };
+  text?:
+    | T
+    | {
+        sm?: T;
+        base?: T;
+        lg?: T;
+      };
+  radius?:
+    | T
+    | {
+        sm?: T;
+        md?: T;
+      };
+  bands?:
+    | T
+    | {
+        muted?: T;
+        accent?: T;
+        primary?: T;
+        dark?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

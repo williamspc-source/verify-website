@@ -21,6 +21,7 @@ export const FeatureGrid: Block = {
       type: 'select',
       defaultValue: '3',
       options: [
+        { label: '1 (vertical list)', value: '1' },
         { label: '2 columns', value: '2' },
         { label: '3 columns', value: '3' },
         { label: '4 columns', value: '4' },
@@ -43,7 +44,36 @@ export const FeatureGrid: Block = {
       fields: [
         iconField(),
         { name: 'title', type: 'text', required: true },
+        {
+          name: 'titleSuffix',
+          type: 'text',
+          admin: { description: 'Optional second-line / type label under the title (e.g. "In-Person").' },
+        },
         { name: 'description', type: 'textarea' },
+        {
+          name: 'bullets',
+          type: 'array',
+          labels: { singular: 'Bullet', plural: 'Bullets' },
+          admin: { description: 'Optional simple bulleted list.' },
+          fields: [{ name: 'text', type: 'text', required: true }],
+        },
+        {
+          name: 'detailsLabel',
+          type: 'text',
+          admin: { description: 'Optional label above a nested detail list (e.g. "What\'s Included").' },
+        },
+        {
+          name: 'details',
+          type: 'array',
+          label: 'Detail items',
+          labels: { singular: 'Detail', plural: 'Details' },
+          admin: { description: 'Nested icon + title + description sub-items (e.g. Assessment Format cards).' },
+          fields: [
+            iconField(),
+            { name: 'title', type: 'text', required: true },
+            { name: 'description', type: 'textarea' },
+          ],
+        },
       ],
     },
     cssClassField,

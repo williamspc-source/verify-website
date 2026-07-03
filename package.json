@@ -7,7 +7,7 @@
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev -H 0.0.0.0",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.85.0",
+    "@payloadcms/db-postgres": "3.85.0",
+    "@payloadcms/email-nodemailer": "^3.85.0",
     "@payloadcms/live-preview-react": "3.85.0",
     "@payloadcms/next": "3.85.0",
     "@payloadcms/plugin-form-builder": "3.85.0",
@@ -32,6 +34,7 @@
     "@payloadcms/plugin-seo": "3.85.0",
     "@payloadcms/richtext-lexical": "3.85.0",
     "@payloadcms/ui": "3.85.0",
+    "@phosphor-icons/react": "^2.1.10",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
@@ -51,8 +54,7 @@
     "react-dom": "19.2.6",
     "react-hook-form": "7.71.1",
     "sharp": "0.34.2",
-    "tailwind-merge": "^3.4.0",
-    "@payloadcms/db-postgres": "3.85.0"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

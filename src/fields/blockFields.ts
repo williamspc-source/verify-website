@@ -1,4 +1,4 @@
-import type { Field } from 'payload'
+import type { Block, Field } from 'payload'
 
 import { iconOptions } from '@/components/Icon'
 
@@ -14,6 +14,7 @@ export const backgroundField: Field = {
     { label: 'Light grey', value: 'muted' },
     { label: 'Light blue accent', value: 'accent' },
     { label: 'Primary (dark blue)', value: 'primary' },
+    { label: 'Dark (charcoal)', value: 'dark' },
   ],
   admin: { description: 'Section background colour.' },
 }
@@ -81,9 +82,32 @@ export const sectionHeaderFields: Field[] = [
     type: 'text',
     admin: { description: 'Small uppercase label above the heading (optional).' },
   },
-  { name: 'heading', type: 'text' },
+  {
+    name: 'heading',
+    type: 'text',
+    admin: {
+      description: 'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".',
+    },
+  },
   { name: 'subheading', type: 'textarea' },
 ]
+
+// Optional HTML id so a section/row/item can be targeted by in-page hash links
+// and the header nav sub-menu (e.g. #file-review, #surrogate). Slug-validated so
+// it produces a stable, valid anchor. Rendered as the element `id`.
+export const anchorIdField: Field = {
+  name: 'anchorId',
+  type: 'text',
+  label: 'Anchor ID',
+  admin: {
+    description:
+      'Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.',
+  },
+  validate: (val: string | null | undefined) =>
+    !val ||
+    /^[a-z][a-z0-9-]*$/.test(val) ||
+    'Use lowercase letters, numbers and hyphens; must start with a letter.',
+}
 
 export const iconField = (overrides: Partial<Field> = {}): Field =>
   ({
@@ -124,3 +148,261 @@ export const elementClassesField: Field = {
     presetClassField({ name: 'button', label: 'Buttons' }),
   ],
 }
+
+// ---------------------------------------------------------------------------
+// Layout-primitive field helpers (Section / Row / atom blocks).
+//
+// All are fixed-named PRESET selects. Their slugs map to `.vf-*--<slug>` modifier
+// classes in globals.css, and those classes resolve their actual values from CSS
+// custom properties (e.g. `--space-spacious`, `--gap-wide`, `--size-heading-lg`).
+// The VALUES are owner-editable site-wide via the Design System global, so a token
+// change re-themes every block that uses it — without touching these field defs.
+// ---------------------------------------------------------------------------
+
+// Spacing preset → `var(--space-<slug>)`. Used for section padding top/bottom.
+export const spacingField = (name: string, label: string, description?: string): Field =>
+  ({
+    name,
+    type: 'select',
+    label,
+    defaultValue: 'normal',
+    admin: description ? { description } : {},
+    options: [
+      { label: 'None', value: 'none' },
+      { label: 'Compact', value: 'compact' },
+      { label: 'Normal', value: 'normal' },
+      { label: 'Spacious', value: 'spacious' },
+      { label: 'Extra large', value: 'xl' },
+    ],
+  }) as Field
+
+export const paddingTopField = spacingField('paddingTop', 'Padding top', 'Space above the content.')
+export const paddingBottomField = spacingField(
+  'paddingBottom',
+  'Padding bottom',
+  'Space below the content.',
+)
+// Bundle appended to Section configs (presented as one admin row).
+export const spacingFields: Field[] = [
+  { type: 'row', fields: [paddingTopField, paddingBottomField] },
+]
+
+// Gap between columns → `var(--gap-<slug>)`.
+export const gapField: Field = {
+  name: 'gap',
+  type: 'select',
+  defaultValue: 'normal',
+  label: 'Gap',
+  admin: { description: 'Space between columns.' },
+  options: [
+    { label: 'None', value: 'none' },
+    { label: 'Tight', value: 'tight' },
+    { label: 'Normal', value: 'normal' },
+    { label: 'Wide', value: 'wide' },
+  ],
+}
+
+// Vertical alignment of columns within a Row → `.vf-row--alignY-<slug>`.
+export const alignYField: Field = {
+  name: 'alignY',
+  type: 'select',
+  defaultValue: 'stretch',
+  label: 'Vertical alignment',
+  admin: { description: 'How columns line up vertically.' },
+  options: [
+    { label: 'Top', value: 'top' },
+    { label: 'Center', value: 'center' },
+    { label: 'Bottom', value: 'bottom' },
+    { label: 'Stretch', value: 'stretch' },
+  ],
+}
+
+// Per-column grid span → `.vf-col--span-<slug>`.
+export const columnSpanField: Field = {
+  name: 'span',
+  type: 'select',
+  defaultValue: 'auto',
+  label: 'Column span',
+  admin: { description: 'How many grid columns this column occupies (Auto = equal share).' },
+  options: [
+    { label: 'Auto (equal)', value: 'auto' },
+    { label: 'Span 1', value: '1' },
+    { label: 'Span 2', value: '2' },
+    { label: 'Span 3', value: '3' },
+    { label: 'Span 4', value: '4' },
+  ],
+}
+
+// Text/content alignment for atoms → `.vf-align-<slug>`.
+export const textAlignField: Field = {
+  name: 'align',
+  type: 'select',
+  defaultValue: 'left',
+  label: 'Alignment',
+  options: [
+    { label: 'Left', value: 'left' },
+    { label: 'Center', value: 'center' },
+    { label: 'Right', value: 'right' },
+  ],
+}
+
+// Heading semantic level (HTML tag) — decoupled from visual size for a11y.
+export const headingLevelField: Field = {
+  name: 'level',
+  type: 'select',
+  defaultValue: 'h2',
+  label: 'Heading level',
+  admin: { description: 'HTML tag for SEO/accessibility. Visual size is set separately.' },
+  options: [
+    { label: 'H1', value: 'h1' },
+    { label: 'H2', value: 'h2' },
+    { label: 'H3', value: 'h3' },
+    { label: 'H4', value: 'h4' },
+  ],
+}
+
+// Heading visual size → `var(--size-heading-<slug>)`.
+export const headingSizeField: Field = {
+  name: 'size',
+  type: 'select',
+  defaultValue: 'lg',
+  label: 'Heading size',
+  admin: { description: 'Visual size, independent of the heading level.' },
+  options: [
+    { label: 'Small', value: 'sm' },
+    { label: 'Medium', value: 'md' },
+    { label: 'Large', value: 'lg' },
+    { label: 'Extra large', value: 'xl' },
+    { label: 'Display', value: 'display' },
+  ],
+}
+
+// Body text size → `var(--size-text-<slug>)`.
+export const textSizeField: Field = {
+  name: 'size',
+  type: 'select',
+  defaultValue: 'base',
+  label: 'Text size',
+  options: [
+    { label: 'Small', value: 'sm' },
+    { label: 'Base', value: 'base' },
+    { label: 'Large', value: 'lg' },
+  ],
+}
+
+export const buttonSizeField: Field = {
+  name: 'size',
+  type: 'select',
+  defaultValue: 'md',
+  label: 'Button size',
+  options: [
+    { label: 'Small', value: 'sm' },
+    { label: 'Medium', value: 'md' },
+    { label: 'Large', value: 'lg' },
+  ],
+}
+
+// Spacer height → `var(--space-<slug>)` (shares the spacing scale).
+export const spacerSizeField: Field = {
+  name: 'size',
+  type: 'select',
+  defaultValue: 'md',
+  label: 'Spacer height',
+  options: [
+    { label: 'Extra small', value: 'xs' },
+    { label: 'Small', value: 'sm' },
+    { label: 'Medium', value: 'md' },
+    { label: 'Large', value: 'lg' },
+    { label: 'Extra large', value: 'xl' },
+  ],
+}
+
+export const dividerStyleField: Field = {
+  name: 'style',
+  type: 'select',
+  defaultValue: 'line',
+  label: 'Divider style',
+  options: [
+    { label: 'Line', value: 'line' },
+    { label: 'Dots', value: 'dots' },
+    { label: 'Gradient', value: 'gradient' },
+  ],
+}
+
+export const dividerWidthField: Field = {
+  name: 'width',
+  type: 'select',
+  defaultValue: 'full',
+  label: 'Divider width',
+  options: [
+    { label: 'Full', value: 'full' },
+    { label: 'Narrow', value: 'narrow' },
+  ],
+}
+
+// Image display width → `.vf-image--<slug>`.
+export const imageWidthField: Field = {
+  name: 'width',
+  type: 'select',
+  defaultValue: 'full',
+  label: 'Image width',
+  options: [
+    { label: 'Full', value: 'full' },
+    { label: 'Wide', value: 'wide' },
+    { label: 'Normal', value: 'normal' },
+    { label: 'Narrow', value: 'narrow' },
+  ],
+}
+
+// Corner rounding → `var(--radius-<slug>)` (full = pill/circle).
+export const roundedField: Field = {
+  name: 'rounded',
+  type: 'select',
+  defaultValue: 'md',
+  label: 'Corner rounding',
+  options: [
+    { label: 'None', value: 'none' },
+    { label: 'Small', value: 'sm' },
+    { label: 'Medium', value: 'md' },
+    { label: 'Full (pill/circle)', value: 'full' },
+  ],
+}
+
+export const iconSizeField: Field = {
+  name: 'size',
+  type: 'select',
+  defaultValue: 'md',
+  label: 'Icon size',
+  options: [
+    { label: 'Small', value: 'sm' },
+    { label: 'Medium', value: 'md' },
+    { label: 'Large', value: 'lg' },
+  ],
+}
+
+// Icon colour → `.vf-icon--<slug>` (mapped to brand tokens).
+export const iconColorField: Field = {
+  name: 'color',
+  type: 'select',
+  defaultValue: 'primary',
+  label: 'Icon colour',
+  options: [
+    { label: 'Primary', value: 'primary' },
+    { label: 'Accent', value: 'accent' },
+    { label: 'Muted', value: 'muted' },
+    { label: 'Inherit (text colour)', value: 'inherit' },
+  ],
+}
+
+// The nested-blocks field that makes Section/Row containers recursive. The caller
+// passes the allowed child blocks (atoms + rich blocks) — kept generic here to
+// avoid a circular import between this file and the block configs.
+export const contentBlocksField = (blocks: Block[], overrides: Partial<Field> = {}): Field =>
+  ({
+    name: 'content',
+    type: 'blocks',
+    label: 'Content',
+    blocks,
+    admin: { initCollapsed: true },
+    ...overrides,
+  }) as Field

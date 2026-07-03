@@ -26,6 +26,10 @@ export const AreasOfExpertise: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'description',
+      type: 'textarea',
+    },
     slugField({
       position: undefined,
     }),

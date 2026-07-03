@@ -9,7 +9,7 @@ import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { TabsClient } from './TabsClient'
 
-export const TabsBlock: React.FC<Props> = ({
+export const TabsBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
@@ -21,6 +21,7 @@ export const TabsBlock: React.FC<Props> = ({
   containerWidth,
   tabStyle,
   defaultTab,
+  bare,
 }) => {
   if (!tabs || tabs.length === 0) return null
 
@@ -36,6 +37,7 @@ export const TabsBlock: React.FC<Props> = ({
       className={cn('vf-tabs', toClassName(cssClass))}
       motion={motion}
       containerWidth={containerWidth}
+      bare={bare}
     >
       <SectionHeader
         eyebrow={eyebrow}

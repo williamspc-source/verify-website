@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { cn } from '@/utilities/ui'
 import { GeistMono } from 'geist/font/mono'
-import { Montserrat, Open_Sans } from 'next/font/google'
+import localFont from 'next/font/local'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
@@ -19,19 +19,25 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import { brandColorStyle } from '@/utilities/brandColorStyle'
+import { designTokenStyle } from '@/utilities/designTokenStyle'
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-montserrat',
-  display: 'swap',
-})
-
-const openSans = Open_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '600'],
-  style: ['normal', 'italic'],
-  variable: '--font-open-sans',
+// VERIFY brand typeface (licensed). One family covers heading + body via its
+// full weight range (Museo weights: 100/300/500/700/900/1000). Loaded locally so
+// it ships with the build; the .woff files live under ./fonts/museo. Editors can
+// still override the font family site-wide via the Design System global.
+const museo = localFont({
+  src: [
+    { path: './fonts/museo/MuseoSansRounded100.woff', weight: '100', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded300.woff', weight: '300', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded500.woff', weight: '400', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded500.woff', weight: '500', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded700.woff', weight: '600', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded700.woff', weight: '700', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded900.woff', weight: '800', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded900.woff', weight: '900', style: 'normal' },
+    { path: './fonts/museo/MuseoSansRounded1000.woff', weight: '1000', style: 'normal' },
+  ],
+  variable: '--font-museo',
   display: 'swap',
 })
 
@@ -43,13 +49,15 @@ const asMedia = (value: unknown): MediaLike | null =>
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
   const settings = await getCachedGlobal('site-settings', 1)()
-  const brandStyle = brandColorStyle(settings?.colors)
+  const designTokens = await getCachedGlobal('design-system', 0)()
+  // Brand colours + editable design-system tokens become CSS vars on :root.
+  const rootStyle = { ...brandColorStyle(settings?.colors), ...designTokenStyle(designTokens) }
 
   return (
     <html
-      className={cn(montserrat.variable, openSans.variable, GeistMono.variable)}
+      className={cn(museo.variable, GeistMono.variable)}
       lang="en"
-      style={brandStyle}
+      style={rootStyle}
       suppressHydrationWarning
     >
       <body>

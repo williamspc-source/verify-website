@@ -12,9 +12,10 @@ type HomeHeroProps = Page['hero']
 /** Homepage hero using the ported `.hero` layout + definition panel. */
 export const HomeHero: React.FC<HomeHeroProps> = (props) => {
   const { eyebrow, heading, subtitle, links, media } = props
-  const definition = (props as { definition?: { term?: string | null; pronunciation?: string | null; text?: string | null } }).definition
+  const definition = (props as { definition?: { term?: string | null; pronunciation?: string | null; text?: string | null; definitionStyle?: string | null } }).definition
   const cssClass = (props as { cssClass?: string | string[] | null }).cssClass
   const hasDefinition = Boolean(definition?.term || definition?.text)
+  const definitionStyle = definition?.definitionStyle === 'frame' ? 'frame' : 'glow'
 
   return (
     <section
@@ -38,7 +39,7 @@ export const HomeHero: React.FC<HomeHeroProps> = (props) => {
 
           <div>
             {hasDefinition ? (
-              <div className="hero-panel hero-definition-panel vf-home-hero__definition">
+              <div className={cn('hero-panel hero-definition-panel', `hero-definition-panel--${definitionStyle}`, 'vf-home-hero__definition')}>
                 <div className="hero-definition-block">
                   {definition?.term ? <div className="hero-def-word">{definition.term}</div> : null}
                   {definition?.pronunciation ? <div className="hero-def-pos">{definition.pronunciation}</div> : null}

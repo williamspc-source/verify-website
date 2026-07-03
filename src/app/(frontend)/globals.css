@@ -44,8 +44,8 @@
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
   --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-open-sans);
-  --font-heading: var(--font-montserrat);
+  --font-sans: var(--font-museo);
+  --font-heading: var(--font-museo);
 }
 
 @layer utilities {
@@ -110,11 +110,53 @@
   --text-dark: #414042;
   --text-mid: #737373;
   --border-light: #c6c6c6;
-  --font-heading: var(--font-montserrat), 'Montserrat', sans-serif;
-  --font-body: var(--font-open-sans), 'Open Sans', sans-serif;
+  --font-heading: var(--font-museo), 'MuseoSansRounded', 'Montserrat', sans-serif;
+  --font-body: var(--font-museo), 'MuseoSansRounded', 'Open Sans', sans-serif;
   --shadow: 0 4px 24px #1c75bc1a;
   --shadow-lg: 0 8px 40px #1c75bc29;
   --transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Extended accent palette (used by ported component CSS) ── */
+  --accent-light: #93d0f7; /* light cyan accent (CTA / hero / blog) */
+  --primary-deep: #1a3a5c; /* darkest blue (gradient starts) */
+  --secondary-bright: #2d8fe8; /* bright blue */
+  /* ── Section band backgrounds (editable via Design System) ── */
+  --band-muted: #f5f6f8;
+  --band-accent: linear-gradient(135deg, #eef9ff 0%, #e6f4ff 48%, #d9efff 100%);
+  --band-primary: linear-gradient(135deg, #0d4f85 0%, #1c75bc 100%);
+  --band-dark: #414042; /* solid charcoal band (About "Our Values", cost sections) */
+  /* ── Extended blue ramp (design reference) ── */
+  --gradient-start: #14639e; /* lighter gradient origin used by hero bands */
+  --navy: #1a3a5c; /* deep navy (specialist profile, portal gradients) */
+  --accent-sky: #93d0f7; /* light-blue accent word on dark backgrounds */
+  --definition-blue: #5ba3d9; /* hero definition panel accent */
+
+  /* ── Editable design-system scale (layout primitives + atoms) ────────
+     These are the *values behind the presets*. Blocks reference them via
+     `.vf-*--<preset>` classes; the Design System global overrides these same
+     var names on <html> at runtime, so changing one re-themes the whole site.
+     The values below are the built-in fallbacks.                           */
+  --space-compact: clamp(2rem, 4vw, 3rem); /* 32–48px */
+  --space-normal: clamp(3.5rem, 8vw, 5.5rem); /* 56–88px (default section rhythm) */
+  --space-spacious: clamp(5rem, 10vw, 7.5rem); /* 80–120px */
+  --space-xl: clamp(7rem, 12vw, 10rem); /* 112–160px */
+
+  --gap-tight: 1rem; /* 16px */
+  --gap-normal: 2rem; /* 32px */
+  --gap-wide: 3.5rem; /* 56px */
+
+  --size-heading-sm: clamp(1.1rem, 2vw, 1.25rem);
+  --size-heading-md: clamp(1.35rem, 2.5vw, 1.6rem);
+  --size-heading-lg: clamp(1.75rem, 3.5vw, 2.4rem);
+  --size-heading-xl: clamp(2.25rem, 5vw, 3.25rem);
+  --size-heading-display: clamp(2.75rem, 7vw, 4.5rem);
+
+  --size-text-sm: 0.9rem;
+  --size-text-base: 1rem;
+  --size-text-lg: 1.2rem;
+
+  --vf-radius-sm: 8px;
+  --vf-radius-md: 16px;
 }
 
 @theme inline {
@@ -190,41 +232,10 @@
    ===================================================================== */
 @layer components {
   /* ── Buttons ─────────────────────────────────────────────────── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 0.92rem;
-    letter-spacing: 0.03em;
-    padding: 13px 28px;
-    border-radius: var(--radius);
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all var(--transition);
-  }
-  .btn-primary {
-    background: var(--primary);
-    color: var(--white);
-    border-color: var(--primary);
-  }
-  .btn-primary:hover {
-    background: var(--primary-strong);
-    border-color: var(--primary-strong);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(28, 117, 188, 0.3);
-  }
-  .btn-outline {
-    background: transparent;
-    color: var(--primary);
-    border-color: var(--primary);
-  }
-  .btn-outline:hover {
-    background: var(--primary);
-    color: var(--white);
-    transform: translateY(-1px);
-  }
+  /* Button styles (.btn / .btn-primary / .btn-outline / .btn-white) live once in
+     the unlayered "ported design-reference" section below — that copy is
+     authoritative (unlayered beats @layer) and a superset, so the duplicate that
+     used to sit here has been removed to de-duplicate. */
 
   /* ── Header / nav ────────────────────────────────────────────── */
   .site-nav {
@@ -509,11 +520,14 @@
     padding: 0 20px;
   }
   .footer-grid {
+    /* Reconciled to the design-reference fixed-px columns (was 1.4fr 1fr 1.2fr 0.9fr).
+       The unlayered port copy below is authoritative; kept here in sync to remove
+       the fr-vs-px divergence. */
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1.2fr 0.9fr;
+    grid-template-columns: 330px 250px 310px 210px;
     justify-content: space-between;
     align-items: start;
-    gap: 48px;
+    gap: 64px;
     margin-bottom: 48px;
   }
   .footer-brand {
@@ -739,26 +753,215 @@
    ===================================================================== */
 @layer components {
   .vf-section {
-    padding: clamp(56px, 8vw, 88px) 0;
+    padding: var(--space-normal) 0;
   }
   .vf-section--tight {
     padding: clamp(40px, 6vw, 56px) 0;
+  }
+
+  /* Per-section padding presets (override the default above). Longhand after the
+     shorthand so equal specificity resolves in our favour. */
+  .vf-section--pt-none {
+    padding-top: 0;
+  }
+  .vf-section--pt-compact {
+    padding-top: var(--space-compact);
+  }
+  .vf-section--pt-normal {
+    padding-top: var(--space-normal);
+  }
+  .vf-section--pt-spacious {
+    padding-top: var(--space-spacious);
+  }
+  .vf-section--pt-xl {
+    padding-top: var(--space-xl);
+  }
+  .vf-section--pb-none {
+    padding-bottom: 0;
+  }
+  .vf-section--pb-compact {
+    padding-bottom: var(--space-compact);
+  }
+  .vf-section--pb-normal {
+    padding-bottom: var(--space-normal);
+  }
+  .vf-section--pb-spacious {
+    padding-bottom: var(--space-spacious);
+  }
+  .vf-section--pb-xl {
+    padding-bottom: var(--space-xl);
+  }
+
+  /* Bare mode: a nested block inside a Section/Row — no banding/padding/container,
+     it inherits the parent's background, width and rhythm. */
+  .vf-section-bare {
+    display: block;
   }
   .vf-section--white {
     background: var(--white);
     color: var(--text-dark);
   }
   .vf-section--muted {
-    background: #f5f6f8;
+    background: var(--band-muted);
     color: var(--text-dark);
   }
   .vf-section--accent {
-    background: linear-gradient(135deg, #eef9ff 0%, #e6f4ff 48%, #d9efff 100%);
+    background: var(--band-accent);
     color: var(--text-dark);
   }
   .vf-section--primary {
-    background: linear-gradient(135deg, #0d4f85 0%, #1c75bc 100%);
+    background: var(--band-primary);
     color: #fff;
+  }
+  /* Solid charcoal band (editable via Design System → bands.dark). */
+  .vf-section--dark {
+    background: var(--band-dark);
+    color: #fff;
+  }
+  .vf-section--dark .section-title,
+  .vf-section--dark .section-subtitle,
+  .vf-section--dark .vf-section-header__title,
+  .vf-section--dark .vf-section-header__subtitle,
+  .vf-section--dark a {
+    color: #fff;
+  }
+  .vf-section--dark .section-label {
+    color: var(--accent-sky);
+  }
+  .vf-section--dark .vf-divider--line {
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  /* Accent word/phrase inside headings — editors mark it with [[brackets]]
+     (see src/utilities/accentText.tsx). Brand blue on light, sky on dark. */
+  .vf-accent {
+    color: var(--primary);
+  }
+  /* ── Specialist / Team profile templates ─────────────────────────── */
+  .vf-profile-hero {
+    background: linear-gradient(155deg, var(--navy) 0%, var(--primary) 100%);
+    color: #fff;
+    padding-block: clamp(2.5rem, 6vw, 4rem);
+  }
+  .vf-profile-hero__inner {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .vf-profile-hero__avatar {
+    width: 140px;
+    height: 140px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.12);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.25);
+  }
+  .vf-profile-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .vf-profile-hero__initials {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  .vf-profile-hero__name {
+    font-family: var(--font-heading);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 800;
+  }
+  .vf-profile-hero__position {
+    color: var(--accent-sky);
+    font-weight: 600;
+    margin-top: 0.25rem;
+  }
+  .vf-profile-hero__specialty {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .vf-profile-hero__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .vf-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  .vf-profile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  @media (min-width: 900px) {
+    .vf-profile-grid {
+      grid-template-columns: 1fr 300px;
+    }
+  }
+  .vf-profile-block {
+    margin-bottom: 2rem;
+  }
+  .vf-profile-block__title,
+  .vf-profile-card__title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  .vf-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+  }
+  .vf-tag {
+    background: var(--bg-light-1);
+    color: var(--primary);
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .vf-profile-card {
+    background: #f8fbfe;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .vf-profile-card ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .vf-profile-card__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+  }
+  .vf-profile-card__item svg {
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  .vf-section--primary .vf-accent,
+  .vf-section--dark .vf-accent {
+    color: var(--accent-sky);
   }
   .vf-section--primary .section-title,
   .vf-section--primary .section-subtitle,
@@ -768,6 +971,16 @@
   }
   .vf-section--primary .section-label {
     color: #cbe5fa;
+  }
+  /* Keep atoms/dividers/links readable on the dark band. */
+  .vf-section--primary a {
+    color: #fff;
+  }
+  .vf-section--primary .vf-divider--line {
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  .vf-section--primary .vf-divider--gradient {
+    background: linear-gradient(90deg, transparent, #fff, transparent);
   }
 }
 
@@ -825,8 +1038,8 @@
   border-color: var(--primary);
 }
 .btn-primary:hover {
-  background: #155fa0;
-  border-color: #155fa0;
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(28,117,188,0.3);
 }
@@ -2951,8 +3164,11 @@ nav {
 }
 
 
-/* Definition card redesign */
-.hero-definition-panel {
+/* Definition card — the "glow" variant (admin: hero → definitionStyle = glow).
+   Scoped to the --glow modifier so the original "frame" look (the unscoped
+   .hero-panel grey gradient + inner-border ::before below) remains available as
+   the --frame variant. Both are selectable from the CMS. */
+.hero-definition-panel--glow {
   justify-content: center;
   min-height: 390px;
   overflow: visible;
@@ -2962,7 +3178,7 @@ nav {
   box-shadow: 0 24px 60px rgba(43,74,98,0.13), inset 0 1px 0 rgba(255,255,255,0.95);
 }
 
-.hero-definition-panel::before {
+.hero-definition-panel--glow::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -3002,22 +3218,22 @@ nav {
   max-width: 58px;
 }
 
-.hero-def-word {
+.hero-definition-panel--glow .hero-def-word {
   font-size: clamp(3.4rem, 6.6vw, 4.9rem);
   color: #8bb9dd;
 }
 
-.hero-def-pos {
+.hero-definition-panel--glow .hero-def-pos {
   color: #8b98a3;
 }
 
-.hero-def-meaning {
+.hero-definition-panel--glow .hero-def-meaning {
   color: #6d767f;
   text-shadow: none;
 }
 
 @media (max-width: 480px) {
-  .hero-definition-panel {
+  .hero-definition-panel--glow {
     padding-top: clamp(30px, 4vw, 42px);
   }
 
@@ -3803,4 +4019,325 @@ nav {
   .events-offer-arrow { width: 36px; height: 36px; }
   .events-offer-arrow-prev { left: 8px; }
   .events-offer-arrow-next { right: 8px; }
+}
+
+/* =====================================================================
+   LAYOUT PRIMITIVES + ATOMS (admin-composable blocks)
+   Row/Column grid + the atomic blocks (Heading, Text, Button, Image,
+   Spacer, Divider, Icon). All sizes/spacing resolve from the editable
+   design-system scale (var(--space-*), --gap-*, --size-*, --vf-radius-*),
+   so the Design System global re-themes them site-wide.
+   Hook reference: src/Styles/HOOKS.md
+   ===================================================================== */
+@layer components {
+  /* ── Row / Column grid ───────────────────────────────────────── */
+  .vf-row {
+    display: grid;
+    grid-template-columns: repeat(var(--row-cols, 1), minmax(0, 1fr));
+    gap: var(--gap-normal);
+    align-items: stretch;
+  }
+  .vf-row--gap-none { gap: 0; }
+  .vf-row--gap-tight { gap: var(--gap-tight); }
+  .vf-row--gap-normal { gap: var(--gap-normal); }
+  .vf-row--gap-wide { gap: var(--gap-wide); }
+  .vf-row--alignY-top { align-items: start; }
+  .vf-row--alignY-center { align-items: center; }
+  .vf-row--alignY-bottom { align-items: end; }
+  .vf-row--alignY-stretch { align-items: stretch; }
+
+  .vf-col { min-width: 0; }
+  .vf-col--span-1 { grid-column: span 1; }
+  .vf-col--span-2 { grid-column: span 2; }
+  .vf-col--span-3 { grid-column: span 3; }
+  .vf-col--span-4 { grid-column: span 4; }
+
+  /* Columns stack on small screens. */
+  @media (max-width: 768px) {
+    .vf-row {
+      grid-template-columns: 1fr;
+    }
+    .vf-col[class*='vf-col--span'] {
+      grid-column: auto;
+    }
+  }
+
+  /* Vertical rhythm between stacked items in a Section's content or a column. */
+  .vf-section-block > .vf-section__inner > * + *,
+  .vf-col > * + * {
+    margin-top: var(--gap-normal);
+  }
+
+  /* ── Alignment utilities (atoms) ─────────────────────────────── */
+  .vf-align-left { text-align: left; }
+  .vf-align-center { text-align: center; }
+  .vf-align-right { text-align: right; }
+
+  /* ── Heading atom ────────────────────────────────────────────── */
+  .vf-heading {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+    color: inherit;
+  }
+  .vf-heading--sm { font-size: var(--size-heading-sm); }
+  .vf-heading--md { font-size: var(--size-heading-md); }
+  .vf-heading--lg { font-size: var(--size-heading-lg); }
+  .vf-heading--xl { font-size: var(--size-heading-xl); }
+  .vf-heading--display { font-size: var(--size-heading-display); line-height: 1.05; }
+
+  /* ── Text atom ───────────────────────────────────────────────── */
+  .vf-text {
+    font-family: var(--font-body);
+    line-height: 1.7;
+    color: inherit;
+  }
+  .vf-text--sm { font-size: var(--size-text-sm); }
+  .vf-text--base { font-size: var(--size-text-base); }
+  .vf-text--lg { font-size: var(--size-text-lg); }
+  .vf-text :where(p, ul, ol) + :where(p, ul, ol) { margin-top: 0.85em; }
+
+  /* ── Button atom (group) ─────────────────────────────────────── */
+  .vf-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+  .vf-align-center .vf-button-group,
+  .vf-button-group.vf-align-center { justify-content: center; }
+  .vf-align-right .vf-button-group,
+  .vf-button-group.vf-align-right { justify-content: flex-end; }
+  .vf-btn--sm { padding: 9px 18px; font-size: 0.85rem; }
+  .vf-btn--lg { padding: 16px 34px; font-size: 1.05rem; }
+
+  /* ── Image atom ──────────────────────────────────────────────── */
+  .vf-image {
+    margin: 0;
+    display: block;
+  }
+  .vf-image--full { width: 100%; }
+  .vf-image--wide { max-width: 960px; }
+  .vf-image--normal { max-width: 640px; }
+  .vf-image--narrow { max-width: 380px; }
+  .vf-image.vf-align-center { margin-inline: auto; }
+  .vf-image.vf-align-right { margin-left: auto; }
+  .vf-image img,
+  .vf-image .vf-image__img { width: 100%; height: auto; display: block; }
+  .vf-image--rounded-none img { border-radius: 0; }
+  .vf-image--rounded-sm img { border-radius: var(--vf-radius-sm); }
+  .vf-image--rounded-md img { border-radius: var(--vf-radius-md); }
+  .vf-image--rounded-full img { border-radius: 999px; }
+  .vf-image__caption {
+    margin-top: 10px;
+    font-size: var(--size-text-sm);
+    color: var(--text-mid);
+  }
+
+  /* ── Spacer atom ─────────────────────────────────────────────── */
+  .vf-spacer { width: 100%; }
+  .vf-spacer--xs { height: calc(var(--space-compact) * 0.5); }
+  .vf-spacer--sm { height: var(--space-compact); }
+  .vf-spacer--md { height: var(--space-normal); }
+  .vf-spacer--lg { height: var(--space-spacious); }
+  .vf-spacer--xl { height: var(--space-xl); }
+
+  /* ── Divider atom ────────────────────────────────────────────── */
+  .vf-divider-wrap { width: 100%; }
+  .vf-divider {
+    border: 0;
+    height: 0;
+    width: 100%;
+    margin: 0;
+  }
+  .vf-divider--narrow { width: 120px; }
+  .vf-divider-wrap.vf-align-center .vf-divider { margin-inline: auto; }
+  .vf-divider-wrap.vf-align-right .vf-divider { margin-left: auto; }
+  .vf-divider--line { border-top: 1px solid var(--border); }
+  .vf-divider--gradient {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  }
+  .vf-divider--dots {
+    height: 6px;
+    background-image: radial-gradient(currentColor 1.5px, transparent 1.6px);
+    background-size: 14px 6px;
+    background-repeat: repeat-x;
+    background-position: center;
+    color: var(--border);
+  }
+
+  /* ── Icon atom ───────────────────────────────────────────────── */
+  .vf-icon-wrap { width: 100%; }
+  .vf-icon { display: inline-flex; }
+  .vf-icon svg { width: var(--vf-icon-size, 28px); height: var(--vf-icon-size, 28px); }
+  .vf-icon--sm { --vf-icon-size: 20px; }
+  .vf-icon--md { --vf-icon-size: 28px; }
+  .vf-icon--lg { --vf-icon-size: 40px; }
+  .vf-icon--primary { color: var(--primary); }
+  .vf-icon--accent { color: var(--accent); }
+  .vf-icon--muted { color: var(--text-mid); }
+  .vf-icon--inherit { color: inherit; }
+  .vf-icon-wrap.vf-align-center { text-align: center; }
+  .vf-icon-wrap.vf-align-right { text-align: right; }
+}
+
+/* ── Specialist Availability (ported from the design reference) ─────────────── */
+:root {
+  --sa-inperson:  #2e9e6b;   /* green  — in person */
+  --sa-telehealth:#6b46c1;   /* purple — telehealth */
+  --sa-either:    #e6b033;   /* yellow — in person or telehealth */
+}
+
+/* Monogram avatar (used by the availability list; also shared with profiles) */
+.avatar-mono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary), var(--secondary-2));
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  border-radius: 50%;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  font-size: 1.8rem;
+  letter-spacing: 0.02em;
+}
+
+.vf-availability__intro { margin-bottom: 24px; }
+.sa { margin-top: 8px; }
+
+/* Legend / colour key */
+.sa-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  align-items: center;
+  background: var(--bg-light-1);
+  border: 1px solid rgba(28,117,188,0.14);
+  border-radius: var(--radius);
+  padding: 16px 24px;
+  margin-bottom: 8px;
+}
+.sa-legend-item { display: flex; align-items: center; gap: 9px; }
+.sa-legend-swatch { width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; }
+.sa-legend-swatch.sa-inperson  { background: var(--sa-inperson); }
+.sa-legend-swatch.sa-telehealth { background: var(--sa-telehealth); }
+.sa-legend-swatch.sa-either    { background: var(--sa-either); }
+.sa-legend-label { font-size: 0.88rem; color: var(--text-dark); font-weight: 600; }
+.sa-legend-hint { margin-left: auto; }
+.sa-legend-hint .sa-legend-label { color: var(--text-mid); }
+
+/* Availability rows */
+.sa-row {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 32px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.sa-row:last-child { border-bottom: none; }
+
+/* Left: specialist card */
+.sa-spec { text-align: left; }
+.sa-spec .avatar-mono { width: 84px; height: 84px; font-size: 1.6rem; margin-bottom: 14px; }
+.sa-spec-name { font-family: var(--font-heading); font-weight: 700; color: var(--text-dark); font-size: 1.08rem; line-height: 1.3; }
+.sa-spec-title { color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-top: 4px; }
+.sa-spec-accred { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; list-style: none; padding: 0; }
+.sa-spec-accred li {
+  background: var(--bg-light-1);
+  color: var(--primary);
+  font-family: var(--font-heading);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Right: grouped-by-date sessions */
+.sa-slots { min-width: 0; }
+.sa-date-group + .sa-date-group { margin-top: 16px; }
+.sa-date {
+  font-family: var(--font-heading);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin: 0 0 8px;
+}
+.sa-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.sa-note { color: var(--text-mid); font-size: 0.9rem; padding-top: 4px; }
+.sa-chip {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 7px 13px;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+  position: relative;
+  line-height: 1;
+}
+.sa-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow); filter: brightness(1.04); }
+.sa-chip:focus-visible { outline: 3px solid rgba(28,117,188,0.3); outline-offset: 2px; }
+.sa-chip.sa-inperson  { background: var(--sa-inperson); }
+.sa-chip.sa-telehealth{ background: var(--sa-telehealth); }
+.sa-chip.sa-either    { background: var(--sa-either); color: var(--text-dark); }
+.sa-chip.is-selected {
+  border-color: var(--text-dark);
+  box-shadow: 0 0 0 3px rgba(65,64,66,0.18);
+  padding-right: 28px;
+}
+.sa-chip.is-selected::after {
+  content: "\2713";
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+}
+
+/* Floating selection bar */
+.sa-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 160%);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--text-dark);
+  color: #fff;
+  padding: 14px 16px 14px 24px;
+  border-radius: 50px;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.32s cubic-bezier(.4,0,.2,1);
+  max-width: calc(100vw - 32px);
+}
+.sa-bar.active { transform: translate(-50%, 0); }
+.sa-bar-count { font-family: var(--font-heading); font-weight: 700; font-size: 0.95rem; white-space: nowrap; }
+.sa-bar-actions { display: flex; align-items: center; gap: 10px; }
+.sa-bar-clear {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sa-bar-clear:hover { color: #fff; text-decoration: underline; }
+
+@media (max-width: 760px) {
+  .sa-row { grid-template-columns: 1fr; gap: 18px; }
+  .sa-spec { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .sa-spec .avatar-mono { margin-bottom: 0; width: 64px; height: 64px; font-size: 1.3rem; }
+  .sa-spec-accred { width: 100%; }
 }

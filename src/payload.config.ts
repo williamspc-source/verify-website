@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -13,15 +14,27 @@ import { Specialties } from './collections/Specialties'
 import { ClaimTypes } from './collections/ClaimTypes'
 import { AssessmentTypes } from './collections/AssessmentTypes'
 import { AreasOfExpertise } from './collections/AreasOfExpertise'
+import { Accreditations } from './collections/Accreditations'
+import { SpecialtyCategories } from './collections/SpecialtyCategories'
+import { Streams } from './collections/Streams'
+import { Locations } from './collections/Locations'
 import { Specialists } from './collections/Specialists'
 import { Team } from './collections/Team'
 import { Events } from './collections/Events'
 import { AvailabilitySessions } from './collections/AvailabilitySessions'
+import { Services } from './collections/Services'
+import { Resources } from './collections/Resources'
+import { Offices } from './collections/Offices'
+import { Testimonials } from './collections/Testimonials'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { SiteSettings } from './SiteSettings/config'
 import { SpecialistAvailability } from './SpecialistAvailability/config'
+import { SpecialistProfile } from './SpecialistProfile/config'
+import { ArticleSettings } from './ArticleSettings/config'
+import { EventsSettings } from './EventsSettings/config'
 import { CustomStyles } from './Styles/config'
+import { DesignSystem } from './DesignSystem/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -68,6 +81,27 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
+  // Email: powers Form Builder notification emails (each form sets its own
+  // recipient via the "Emails" tab). Uses SMTP when SMTP_HOST is configured
+  // (production); otherwise Payload falls back to a console mock so local dev and
+  // migrations never depend on a mail server.
+  ...(process.env.SMTP_HOST
+    ? {
+        email: nodemailerAdapter({
+          defaultFromName: process.env.SMTP_FROM_NAME || 'VERIFY Medico-Legal Solutions',
+          defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'no-reply@vmls.com.au',
+          transportOptions: {
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT || 587),
+            secure: process.env.SMTP_SECURE === 'true',
+            auth:
+              process.env.SMTP_USER && process.env.SMTP_PASS
+                ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+                : undefined,
+          },
+        }),
+      }
+    : {}),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
@@ -81,17 +115,35 @@ export default buildConfig({
     Users,
     // Taxonomy lookups (registered before the content that references them)
     Specialties,
+    SpecialtyCategories,
     ClaimTypes,
     AssessmentTypes,
     AreasOfExpertise,
+    Accreditations,
+    Locations,
+    Streams,
     // People & content
     Specialists,
     Team,
     Events,
     AvailabilitySessions,
+    Services,
+    Resources,
+    Offices,
+    Testimonials,
   ],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer, SiteSettings, SpecialistAvailability, CustomStyles],
+  globals: [
+    Header,
+    Footer,
+    SiteSettings,
+    SpecialistAvailability,
+    SpecialistProfile,
+    ArticleSettings,
+    EventsSettings,
+    CustomStyles,
+    DesignSystem,
+  ],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

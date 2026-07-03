@@ -10,13 +10,14 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
-export const SplitFeatureBlock: React.FC<Props> = ({
+export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
   background,
   rows,
   cssClass,
   elementClasses,
   motion,
   containerWidth,
+  bare,
 }) => {
   if (!rows || rows.length === 0) return null
 
@@ -26,6 +27,7 @@ export const SplitFeatureBlock: React.FC<Props> = ({
       className={cn('vf-split-feature', toClassName(cssClass))}
       motion={motion}
       containerWidth={containerWidth}
+      bare={bare}
     >
       {rows.map((row, i) => {
         const side = row.imageSide === 'auto' || !row.imageSide ? (i % 2 === 0 ? 'left' : 'right') : row.imageSide

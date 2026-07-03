@@ -18,6 +18,9 @@ export const SiteSettings: GlobalConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    group: 'Site',
+  },
   fields: [
     {
       name: 'siteName',
@@ -84,6 +87,13 @@ export const SiteSettings: GlobalConfig = {
           fields: [
             colorField('accent', 'Light accent / hover background', '#cbe5fa'),
             colorField('border', 'Borders', '#c6c6c6'),
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            colorField('accentLight', 'Light cyan accent', '#93d0f7'),
+            colorField('primaryDeep', 'Deep primary (gradient starts)', '#1a3a5c'),
           ],
         },
       ],

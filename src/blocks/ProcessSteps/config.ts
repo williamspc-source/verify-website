@@ -22,9 +22,11 @@ export const ProcessSteps: Block = {
       defaultValue: '3',
       admin: { description: 'How many steps per row on desktop.' },
       options: [
+        { label: '1 (vertical list)', value: '1' },
         { label: '2 per row', value: '2' },
         { label: '3 per row', value: '3' },
         { label: '4 per row', value: '4' },
+        { label: '5 per row', value: '5' },
       ],
     },
     {
@@ -34,9 +36,30 @@ export const ProcessSteps: Block = {
       labels: { singular: 'Step', plural: 'Steps' },
       admin: { description: 'Steps are auto-numbered in order (01, 02, …).' },
       fields: [
-        iconField(),
-        { name: 'title', type: 'text', required: true },
+        {
+          type: 'row',
+          fields: [
+            iconField({ admin: { width: '50%' } }),
+            {
+              name: 'badge',
+              type: 'text',
+              admin: { width: '50%', description: 'Optional pill label, e.g. "Free to Join".' },
+            },
+          ],
+        },
+        {
+          name: 'title',
+          type: 'text',
+          admin: { description: 'Optional — leave empty for a number-only step.' },
+        },
         { name: 'description', type: 'textarea' },
+        {
+          name: 'bullets',
+          type: 'array',
+          labels: { singular: 'Bullet', plural: 'Bullets' },
+          admin: { description: 'Optional bulleted list under the description.' },
+          fields: [{ name: 'text', type: 'text', required: true }],
+        },
       ],
     },
     cssClassField,

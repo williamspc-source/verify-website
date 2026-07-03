@@ -6,16 +6,27 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { cssClassField } from '@/fields/blockFields'
+import {
+  anchorIdField,
+  cssClassField,
+  iconField,
+  sectionHeaderFields,
+} from '@/fields/blockFields'
 
 export const FAQ: Block = {
   slug: 'faq',
   interfaceName: 'FAQBlock',
   fields: [
+    ...sectionHeaderFields,
     {
-      name: 'heading',
-      type: 'text',
-      admin: { description: 'Optional heading shown above the questions.' },
+      name: 'columns',
+      type: 'select',
+      defaultValue: '1',
+      admin: { description: 'Lay the questions out in one or two columns.' },
+      options: [
+        { label: '1 column', value: '1' },
+        { label: '2 columns', value: '2' },
+      ],
     },
     {
       name: 'items',
@@ -24,9 +35,17 @@ export const FAQ: Block = {
       minRows: 1,
       fields: [
         {
-          name: 'question',
-          type: 'text',
-          required: true,
+          type: 'row',
+          fields: [
+            { name: 'question', type: 'text', required: true, admin: { width: '70%' } },
+            iconField({ admin: { width: '30%', description: 'Optional icon.' } }),
+          ],
+        },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          admin: { description: 'Optional image shown with this item (accordion-with-image layout).' },
         },
         {
           name: 'answer',
@@ -40,13 +59,42 @@ export const FAQ: Block = {
             ],
           }),
         },
+        anchorIdField,
       ],
     },
     {
-      name: 'exclusive',
-      type: 'checkbox',
-      label: 'Only one open at a time',
-      admin: { description: 'Opening one question closes the others.' },
+      type: 'row',
+      fields: [
+        {
+          name: 'exclusive',
+          type: 'checkbox',
+          label: 'Only one open at a time',
+          admin: { width: '50%', description: 'Opening one question closes the others.' },
+        },
+        {
+          name: 'openFirst',
+          type: 'checkbox',
+          label: 'Open the first item by default',
+          admin: { width: '50%' },
+        },
+      ],
+    },
+    {
+      name: 'helpCard',
+      type: 'group',
+      label: 'Help card (optional)',
+      admin: { description: 'A "still have questions?" card shown after the list.' },
+      fields: [
+        { name: 'heading', type: 'text' },
+        { name: 'body', type: 'textarea' },
+        {
+          type: 'row',
+          fields: [
+            { name: 'email', type: 'text', admin: { width: '50%' } },
+            { name: 'phone', type: 'text', admin: { width: '50%' } },
+          ],
+        },
+      ],
     },
     cssClassField,
   ],

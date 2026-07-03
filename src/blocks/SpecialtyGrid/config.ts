@@ -27,8 +27,36 @@ export const SpecialtyGrid: Block = {
       type: 'select',
       defaultValue: 'auto',
       options: [
-        { label: 'Auto — list the Specialties taxonomy', value: 'auto' },
+        { label: 'Auto — list a taxonomy', value: 'auto' },
         { label: 'Hand-picked', value: 'manual' },
+      ],
+    },
+    {
+      type: 'row',
+      admin: { condition: sourceIs('auto') },
+      fields: [
+        {
+          name: 'taxonomy',
+          type: 'select',
+          defaultValue: 'specialties',
+          admin: { width: '50%', description: 'Which taxonomy to list.' },
+          options: [
+            { label: 'Specialties', value: 'specialties' },
+            { label: 'Claim types', value: 'claim-types' },
+            { label: 'Areas of expertise', value: 'areas-of-expertise' },
+            { label: 'Assessment types', value: 'assessment-types' },
+          ],
+        },
+        {
+          name: 'variant',
+          type: 'select',
+          defaultValue: 'cards',
+          admin: { width: '50%', description: 'Icon cards, or an arrow checklist (e.g. "Claims We Support").' },
+          options: [
+            { label: 'Icon cards', value: 'cards' },
+            { label: 'Arrow checklist', value: 'checklist' },
+          ],
+        },
       ],
     },
     {

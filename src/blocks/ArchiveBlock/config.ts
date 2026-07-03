@@ -7,12 +7,14 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { cssClassField } from '@/fields/blockFields'
+import { link } from '@/fields/link'
+import { anchorIdField, backgroundField, cssClassField } from '@/fields/blockFields'
 
 export const Archive: Block = {
   slug: 'archive',
   interfaceName: 'ArchiveBlock',
   fields: [
+    backgroundField,
     {
       name: 'introContent',
       type: 'richText',
@@ -56,6 +58,23 @@ export const Archive: Block = {
           label: 'Posts',
           value: 'posts',
         },
+        {
+          label: 'Events',
+          value: 'events',
+        },
+      ],
+    },
+    {
+      name: 'view',
+      type: 'select',
+      defaultValue: 'upcoming',
+      admin: {
+        condition: (_, s) => s.populateBy === 'collection' && s.relationTo === 'events',
+        description: 'Upcoming vs past is derived from each event date.',
+      },
+      options: [
+        { label: 'Upcoming', value: 'upcoming' },
+        { label: 'Past', value: 'past' },
       ],
     },
     {
@@ -86,9 +105,26 @@ export const Archive: Block = {
       },
       hasMany: true,
       label: 'Selection',
-      relationTo: ['posts'],
+      relationTo: ['posts', 'events'],
+    },
+    {
+      name: 'columns',
+      type: 'select',
+      defaultValue: '3',
+      options: [
+        { label: '2', value: '2' },
+        { label: '3', value: '3' },
+        { label: '4', value: '4' },
+      ],
+    },
+    {
+      name: 'viewAllLink',
+      type: 'group',
+      label: 'View-all link (optional)',
+      fields: [link({ appearances: false })],
     },
     cssClassField,
+    anchorIdField,
   ],
   labels: {
     plural: 'Archives',

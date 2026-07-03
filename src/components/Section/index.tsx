@@ -1,15 +1,17 @@
 import { cn } from '@/utilities/ui'
 import React from 'react'
 
-export type SectionBackground = 'white' | 'muted' | 'accent' | 'primary'
+export type SectionBackground = 'white' | 'muted' | 'accent' | 'primary' | 'dark'
 
 // Background → design section banding (defined in globals.css as `.vf-section--*`).
-// Mirrors the design reference: white, grey, light-blue gradient, dark-blue gradient.
+// Mirrors the design reference: white, grey, light-blue gradient, dark-blue gradient,
+// solid charcoal.
 const bgClasses: Record<SectionBackground, string> = {
   white: 'vf-section--white',
   muted: 'vf-section--muted',
   accent: 'vf-section--accent',
   primary: 'vf-section--primary',
+  dark: 'vf-section--dark',
 }
 
 const widthClasses: Record<string, string> = {
@@ -36,6 +38,13 @@ type SectionProps = {
   className?: string
   innerClassName?: string
   id?: string
+  /**
+   * Nested/bare mode: the block is rendered inside another Section or Row, so it
+   * drops its own banding, vertical padding and container and inherits the
+   * parent's background, width and rhythm. The block's own class hook (passed via
+   * `className`) is preserved so its internal CSS still applies.
+   */
+  bare?: boolean
   children: React.ReactNode
 }
 
@@ -53,10 +62,16 @@ export const Section: React.FC<SectionProps> = ({
   className,
   innerClassName,
   id,
+  bare = false,
   children,
 }) => {
   const hasMotion = Boolean(motion && motion !== 'none')
   const hoverClass = hoverEffect && hoverEffect !== 'none' ? `vf-hover-${hoverEffect}` : undefined
+
+  // Nested inside a Section/Row: no <section> banding, no padding, no container.
+  if (bare) {
+    return <div className={cn('vf-section-bare', hoverClass, className)}>{children}</div>
+  }
 
   return (
     <section

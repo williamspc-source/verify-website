@@ -8,14 +8,14 @@ import { toClassName } from '@/utilities/cssClass'
 
 // Server-rendered accordion using native <details>/<summary> (no client JS).
 // `exclusive` uses the native [name] grouping so only one stays open.
-export const FAQBlock: React.FC<FAQBlockProps & { id?: string }> = (props) => {
-  const { heading, items, cssClass, exclusive, id } = props
+export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }> = (props) => {
+  const { heading, items, cssClass, exclusive, id, bare } = props
 
   if (!items || items.length === 0) return null
   const groupName = exclusive ? `faq-${id || 'group'}` : undefined
 
   return (
-    <div className={cn('vf-faq container content-narrow', toClassName(cssClass))}>
+    <div className={cn('vf-faq', bare ? '' : 'container content-narrow', toClassName(cssClass))}>
       {heading ? <h2 className="vf-faq__heading section-title" style={{ marginBottom: 24 }}>{heading}</h2> : null}
       <div className="vf-faq__list">
         {items.map((item, index) => (

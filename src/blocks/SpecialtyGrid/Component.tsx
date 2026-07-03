@@ -32,7 +32,7 @@ const Tile: React.FC<TileData> = ({ icon, label, href, className }) => {
   )
 }
 
-export const SpecialtyGridBlock: React.FC<Props> = async (props) => {
+export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
   const {
     eyebrow,
     heading,
@@ -48,6 +48,7 @@ export const SpecialtyGridBlock: React.FC<Props> = async (props) => {
     motion,
     containerWidth,
     hoverEffect,
+    bare,
   } = props
 
   let tiles: TileData[] = []
@@ -78,6 +79,7 @@ export const SpecialtyGridBlock: React.FC<Props> = async (props) => {
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      bare={bare}
     >
       <SectionHeader
         eyebrow={eyebrow}

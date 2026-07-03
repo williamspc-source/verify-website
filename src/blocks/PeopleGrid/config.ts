@@ -1,5 +1,6 @@
 import type { Block } from 'payload'
 
+import { linkGroup } from '@/fields/linkGroup'
 import {
   backgroundField,
   cssClassField,
@@ -50,13 +51,22 @@ export const PeopleGrid: Block = {
       ],
     },
     {
-      name: 'specialty',
-      type: 'relationship',
-      relationTo: 'specialties',
-      admin: {
-        condition: sourceIs('specialists'),
-        description: 'Optional — limit to one specialty.',
-      },
+      type: 'row',
+      admin: { condition: sourceIs('specialists') },
+      fields: [
+        {
+          name: 'specialty',
+          type: 'relationship',
+          relationTo: 'specialties',
+          admin: { width: '50%', description: 'Optional — limit to one specialty.' },
+        },
+        {
+          name: 'location',
+          type: 'relationship',
+          relationTo: 'locations',
+          admin: { width: '50%', description: 'Optional — limit to one location.' },
+        },
+      ],
     },
     // Team filter
     {
@@ -69,6 +79,15 @@ export const PeopleGrid: Block = {
         { label: 'Reception & Bookings', value: 'reception-bookings' },
         { label: 'Quality Assurance', value: 'quality-assurance' },
       ],
+    },
+    {
+      name: 'groupByDepartment',
+      type: 'checkbox',
+      label: 'Group by department',
+      admin: {
+        condition: sourceIs('team'),
+        description: 'Render each department as its own labelled group (Meet the Team layout).',
+      },
     },
     // Manual selection
     {
@@ -107,10 +126,18 @@ export const PeopleGrid: Block = {
           name: 'limit',
           type: 'number',
           defaultValue: 8,
-          admin: { width: '33%', description: 'Max people to show (collection sources).' },
+          admin: { width: '33%', description: 'Max people to show (0 = show all).' },
         },
       ],
     },
+    linkGroup({
+      overrides: {
+        name: 'footerLinks',
+        label: 'Footer buttons',
+        maxRows: 2,
+        admin: { description: 'Optional buttons shown below the grid (e.g. "View Full Panel").' },
+      },
+    }),
     {
       name: 'linkProfiles',
       type: 'checkbox',

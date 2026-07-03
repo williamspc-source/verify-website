@@ -1,6 +1,7 @@
 import type { Field, GroupField } from 'payload'
 
 import deepMerge from '@/utilities/deepMerge'
+import { iconOptions } from '@/components/Icon'
 
 export type LinkAppearances = 'default' | 'outline'
 
@@ -48,6 +49,10 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
               {
                 label: 'Custom URL',
                 value: 'custom',
+              },
+              {
+                label: 'Open enquiry form',
+                value: 'enquiry',
               },
             ],
           },
@@ -116,6 +121,15 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
   } else {
     linkResult.fields = [...linkResult.fields, ...linkTypes]
   }
+
+  linkResult.fields.push({
+    name: 'icon',
+    type: 'select',
+    options: iconOptions,
+    admin: {
+      description: 'Optional leading icon shown before the label.',
+    },
+  })
 
   if (appearances !== false) {
     let appearanceOptionsToUse = [appearanceOptions.default, appearanceOptions.outline]

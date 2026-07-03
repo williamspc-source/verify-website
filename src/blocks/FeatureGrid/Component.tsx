@@ -8,7 +8,7 @@ import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
-export const FeatureGridBlock: React.FC<Props> = ({
+export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
@@ -20,6 +20,7 @@ export const FeatureGridBlock: React.FC<Props> = ({
   motion,
   containerWidth,
   hoverEffect,
+  bare,
 }) => {
   if (!items || items.length === 0) return null
   const cols = Number(columns) || 3
@@ -31,6 +32,7 @@ export const FeatureGridBlock: React.FC<Props> = ({
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      bare={bare}
     >
       <SectionHeader
         eyebrow={eyebrow}

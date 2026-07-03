@@ -17,6 +17,7 @@ type Props = MediaBlockProps & {
   imgClassName?: string
   staticImage?: StaticImageData
   disableInnerContainer?: boolean
+  bare?: boolean
 }
 
 export const MediaBlock: React.FC<Props> = (props) => {
@@ -28,8 +29,12 @@ export const MediaBlock: React.FC<Props> = (props) => {
     media,
     staticImage,
     disableInnerContainer,
+    bare,
   } = props
   const cssClass = (props as { cssClass?: string | string[] | null }).cssClass
+
+  // Nested inside a Section/Row: drop the container so we inherit the parent width.
+  const gutter = bare ? false : enableGutter
 
   let caption
   if (media && typeof media === 'object') caption = media.caption
@@ -39,7 +44,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
       className={cn(
         '',
         {
-          container: enableGutter,
+          container: gutter,
         },
         className,
         toClassName(cssClass),

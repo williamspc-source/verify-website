@@ -44,10 +44,41 @@ variables so styles stay on-brand.
 - Heroes: `.vf-page-hero__panel`, `.vf-page-hero__title`, `.vf-home-hero__title`,
   `.vf-home-hero__definition`, `.vf-home-hero__definition-term`
 
+## Layout primitives + atoms (compose freeform layouts in the page editor)
+- **Section** (`.vf-section-block` on `.vf-section`) — container with background, width, padding,
+  motion; holds nested content. Padding presets: `.vf-section--pt-{none|compact|normal|spacious|xl}`
+  and `.vf-section--pb-*`.
+- **Row / Column** — `.vf-row` (grid; column count via `--row-cols`), gap
+  `.vf-row--gap-{none|tight|normal|wide}`, vertical align `.vf-row--alignY-{top|center|bottom|stretch}`;
+  columns `.vf-col`, span `.vf-col--span-{1..4}`.
+- **Heading atom** — `.vf-heading`, size `.vf-heading--{sm|md|lg|xl|display}`.
+- **Text atom** — `.vf-text`, size `.vf-text--{sm|base|lg}`.
+- **Button atom** — `.vf-button-group`, sizes `.vf-btn--{sm|lg}` (uses the `.btn` chrome).
+- **Image atom** — `.vf-image`, width `.vf-image--{full|wide|normal|narrow}`, rounding
+  `.vf-image--rounded-{none|sm|md|full}`, `.vf-image__caption`.
+- **Spacer atom** — `.vf-spacer--{xs|sm|md|lg|xl}`.
+- **Divider atom** — `.vf-divider`, `.vf-divider--{line|dots|gradient}`, `.vf-divider--{full|narrow}`.
+- **Icon atom** — `.vf-icon`, `.vf-icon--{sm|md|lg}`, `.vf-icon--{primary|accent|muted|inherit}`.
+- **Alignment** — `.vf-align-{left|center|right}` (applied by atoms / columns).
+- Nested rich blocks render in **bare mode** (`.vf-section-bare`): no banding/padding, inheriting the
+  parent Section's background and width.
+
+## Design System global — editable preset VALUES
+**Admin → Globals → Design System** sets what each preset *means*; values become CSS variables on
+`<html>` and re-theme the whole site. Variables (defaults live in `globals.css :root`):
+- Section spacing → `--space-{compact|normal|spacious|xl}`
+- Column gaps → `--gap-{tight|normal|wide}`
+- Heading sizes → `--size-heading-{sm|md|lg|xl|display}`
+- Body text sizes → `--size-text-{sm|base|lg}`
+- Corner rounding → `--vf-radius-{sm|md}`
+
+(You can still override any value with a Custom Styles preset targeting the hooks above.)
+
 ## Built-in options (no CSS needed)
 Each block also exposes: **Background**, **Container width**, **Motion** (scroll reveal),
 **Hover effect** (cards), plus block-specifics (carousel autoplay/loop/per-view/dots, tab style,
-FAQ single-open). Use presets for anything beyond these.
+FAQ single-open). Layout primitives add **padding**, **gap**, **columns/span**, **alignment** and
+per-atom **size** presets. Use presets for anything beyond these.
 
 ## Tips
 - Scope to the block: `.<your-class>.vf-section { … }` or `.<your-class> .vf-card { … }`.

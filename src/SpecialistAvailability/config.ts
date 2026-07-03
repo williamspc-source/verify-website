@@ -23,9 +23,12 @@ export const SpecialistAvailability: GlobalConfig = {
   },
   fields: [
     {
+      // Deprecated — the page H1 comes from the page hero, not this field.
+      // Hidden (not dropped) to avoid admin confusion; remove via a migration later.
       name: 'heading',
       type: 'text',
       defaultValue: 'Specialist Availability',
+      admin: { hidden: true },
     },
     {
       name: 'intro',
@@ -41,9 +44,24 @@ export const SpecialistAvailability: GlobalConfig = {
       admin: { description: 'Introductory copy shown above the availability list.' },
     },
     {
+      name: 'carouselEyebrow',
+      type: 'text',
+      defaultValue: 'Featured Specialists',
+      admin: { description: 'Small label above the carousel heading.' },
+    },
+    {
       name: 'carouselTitle',
       type: 'text',
-      defaultValue: 'Featured specialists',
+      label: 'Carousel heading',
+      defaultValue: 'Available This Month',
+      admin: {
+        description: 'Wrap a word in [[brackets]] to highlight it in the accent colour.',
+      },
+    },
+    {
+      name: 'carouselSubtitle',
+      type: 'textarea',
+      admin: { description: 'Intro paragraph shown under the carousel heading.' },
     },
     {
       type: 'collapsible',

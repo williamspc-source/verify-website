@@ -21,10 +21,15 @@ const DEPARTMENT_LABELS: Record<string, string> = {
 const mediaUrl = (m: unknown): string | null =>
   m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
 
+const firstLocationTitle = (locations: Specialist['locations']): string | null => {
+  const first = Array.isArray(locations) ? locations[0] : null
+  return first && typeof first === 'object' ? (first.title ?? null) : null
+}
+
 const specialistToCard = (s: Specialist, linkProfiles: boolean): PersonCardData => ({
   name: s.title,
   position: s.position,
-  location: s.locations?.[0]?.location ?? null,
+  location: firstLocationTitle(s.locations),
   badge: typeof s.specialty === 'object' && s.specialty ? s.specialty.title : null,
   photoUrl: mediaUrl(s.photo),
   href: linkProfiles && s.slug ? `/specialists/${s.slug}` : null,
@@ -43,7 +48,7 @@ const teamToCard = (t: Team, linkProfiles: boolean): PersonCardData => ({
   href: linkProfiles && t.slug ? `/about/meet-the-team/${t.slug}` : null,
 })
 
-export const PeopleGridBlock: React.FC<Props> = async (props) => {
+export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
   const {
     eyebrow,
     heading,
@@ -53,6 +58,7 @@ export const PeopleGridBlock: React.FC<Props> = async (props) => {
     onlyAdvertised,
     featuredOnly,
     specialty,
+    location,
     department,
     people,
     layout,
@@ -64,6 +70,7 @@ export const PeopleGridBlock: React.FC<Props> = async (props) => {
     containerWidth,
     hoverEffect,
     carouselOptions,
+    bare,
   } = props
   const cardClass = toClassName(elementClasses?.card)
   const co = carouselOptions || {}
@@ -96,6 +103,7 @@ export const PeopleGridBlock: React.FC<Props> = async (props) => {
     if (onlyAdvertised) and.push({ advertise: { equals: true } })
     if (featuredOnly) and.push({ featured: { equals: true } })
     if (specialty) and.push({ specialty: { equals: typeof specialty === 'object' ? specialty.id : specialty } })
+    if (location) and.push({ locations: { equals: typeof location === 'object' ? location.id : location } })
     const res = await payload.find({
       collection: 'specialists',
       depth: 1,
@@ -114,6 +122,7 @@ export const PeopleGridBlock: React.FC<Props> = async (props) => {
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      bare={bare}
     >
       <SectionHeader
         eyebrow={eyebrow}

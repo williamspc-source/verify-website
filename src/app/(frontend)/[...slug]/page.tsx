@@ -84,8 +84,11 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { hero, layout } = page
   const pageClass = toClassName((page as { cssClass?: string | string[] | null }).cssClass)
 
+  // No page-level vertical padding: the hero and every block render as full-bleed
+  // sections that own their own spacing, so the page sits flush under the header
+  // and above the footer (no white strip above the hero / gap before the footer).
   return (
-    <article className={['pt-16 pb-24', pageClass].filter(Boolean).join(' ')}>
+    <article className={pageClass || undefined}>
       <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={path} />

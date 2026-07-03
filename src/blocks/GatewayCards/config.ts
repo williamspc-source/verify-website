@@ -35,8 +35,41 @@ export const GatewayCards: Block = {
       labels: { singular: 'Card', plural: 'Cards' },
       fields: [
         iconField(),
+        {
+          type: 'row',
+          fields: [
+            { name: 'eyebrow', type: 'text', admin: { width: '50%', description: 'Small label above the title.' } },
+            { name: 'subtitle', type: 'text', admin: { width: '50%', description: 'Secondary line under the title (e.g. audience).' } },
+          ],
+        },
         { name: 'title', type: 'text', required: true },
         { name: 'description', type: 'textarea' },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'accent',
+              type: 'select',
+              defaultValue: 'blue',
+              admin: { width: '50%', description: 'Card accent colour theme.' },
+              options: [
+                { label: 'Blue', value: 'blue' },
+                { label: 'Steel', value: 'steel' },
+                { label: 'Charcoal', value: 'charcoal' },
+              ],
+            },
+            {
+              name: 'theme',
+              type: 'select',
+              defaultValue: 'light',
+              admin: { width: '50%', description: 'Light or dark card surface (for the split chooser).' },
+              options: [
+                { label: 'Light', value: 'light' },
+                { label: 'Dark', value: 'dark' },
+              ],
+            },
+          ],
+        },
         {
           name: 'links',
           type: 'array',
@@ -46,7 +79,7 @@ export const GatewayCards: Block = {
           admin: { description: 'Listed in the lower panel above the call-to-action button.' },
           fields: [link({ appearances: false })],
         },
-        link({ appearances: false }),
+        link(),
       ],
     },
     cssClassField,

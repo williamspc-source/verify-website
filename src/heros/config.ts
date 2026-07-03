@@ -8,7 +8,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@/fields/linkGroup'
-import { cssClassField } from '@/fields/blockFields'
+import { cssClassField, iconField } from '@/fields/blockFields'
 
 const isType =
   (...types: string[]) =>
@@ -63,6 +63,61 @@ export const hero: Field = {
       },
     },
     {
+      type: 'row',
+      admin: { condition: isType('pageHero') },
+      fields: [
+        {
+          name: 'theme',
+          type: 'select',
+          defaultValue: 'light',
+          admin: { width: '50%', description: 'Light interior hero, or a dark gradient band.' },
+          options: [
+            { label: 'Light', value: 'light' },
+            { label: 'Dark (gradient)', value: 'dark' },
+          ],
+        },
+        {
+          name: 'align',
+          type: 'select',
+          defaultValue: 'left',
+          admin: { width: '50%' },
+          options: [
+            { label: 'Left', value: 'left' },
+            { label: 'Center', value: 'center' },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'showShield',
+      type: 'checkbox',
+      label: 'Show VERIFY shield watermark',
+      admin: {
+        description: 'Decorative brand shield behind the hero (uses the Site Settings logo/shield).',
+        condition: isType('pageHero', 'homeHero'),
+      },
+    },
+    {
+      name: 'metaItems',
+      type: 'array',
+      label: 'Quick-facts row',
+      labels: { singular: 'Item', plural: 'Items' },
+      admin: {
+        condition: isType('pageHero'),
+        description: 'Optional icon + text row under the hero (e.g. phone / email / hours on Contact).',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            iconField({ admin: { width: '25%' } }),
+            { name: 'text', type: 'text', required: true, admin: { width: '45%' } },
+            { name: 'href', type: 'text', admin: { width: '30%' } },
+          ],
+        },
+      ],
+    },
+    {
       name: 'definition',
       type: 'group',
       label: 'Definition panel',
@@ -74,6 +129,17 @@ export const hero: Field = {
         { name: 'term', type: 'text', admin: { description: 'e.g. "verify"' } },
         { name: 'pronunciation', type: 'text', admin: { description: 'e.g. "/ˈvɛrɪfʌɪ/ · verb"' } },
         { name: 'text', type: 'textarea', label: 'Definition' },
+        {
+          name: 'definitionStyle',
+          type: 'select',
+          defaultValue: 'glow',
+          label: 'Panel style',
+          admin: { description: 'Visual treatment for the definition panel.' },
+          options: [
+            { label: 'Glow (light panel, radial glow)', value: 'glow' },
+            { label: 'Frame (grey gradient, inner frame)', value: 'frame' },
+          ],
+        },
       ],
     },
     // ── legacy richText heroes ──
@@ -103,8 +169,8 @@ export const hero: Field = {
       type: 'upload',
       relationTo: 'media',
       admin: {
-        description: 'Hero image.',
-        condition: isType('highImpact', 'mediumImpact', 'homeHero'),
+        description: 'Hero image (background for impact heroes; a side/decorative image on page heroes).',
+        condition: isType('highImpact', 'mediumImpact', 'homeHero', 'pageHero'),
       },
     },
     { ...cssClassField, admin: { ...cssClassField.admin, condition: isType('pageHero', 'homeHero') } } as Field,

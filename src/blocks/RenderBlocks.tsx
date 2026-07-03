@@ -1,7 +1,5 @@
 import React, { Fragment } from 'react'
 
-import type { Page } from '@/payload-types'
-
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
@@ -17,7 +15,20 @@ import { SplitFeatureBlock } from '@/blocks/SplitFeature/Component'
 import { CTABandBlock } from '@/blocks/CTABand/Component'
 import { SpecialtyGridBlock } from '@/blocks/SpecialtyGrid/Component'
 import { PeopleGridBlock } from '@/blocks/PeopleGrid/Component'
+import { ServicesGridBlock } from '@/blocks/ServicesGrid/Component'
+import { TestimonialsGridBlock } from '@/blocks/TestimonialsGrid/Component'
+import { AvailabilityBlock } from '@/blocks/Availability/Component'
 import { SlideCarouselBlock } from '@/blocks/SlideCarousel/Component'
+// Layout primitives + atoms
+import { SectionBlock } from '@/blocks/Section/Component'
+import { RowBlock } from '@/blocks/Row/Component'
+import { HeadingBlock } from '@/blocks/Heading/Component'
+import { TextBlock } from '@/blocks/Text/Component'
+import { ButtonBlock } from '@/blocks/Button/Component'
+import { ImageBlock } from '@/blocks/Image/Component'
+import { SpacerBlock } from '@/blocks/Spacer/Component'
+import { DividerBlock } from '@/blocks/Divider/Component'
+import { IconBlockComponent } from '@/blocks/IconBlock/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -35,11 +46,26 @@ const blockComponents = {
   ctaBand: CTABandBlock,
   specialtyGrid: SpecialtyGridBlock,
   peopleGrid: PeopleGridBlock,
+  servicesGrid: ServicesGridBlock,
+  testimonialsGrid: TestimonialsGridBlock,
+  availability: AvailabilityBlock,
   slideCarousel: SlideCarouselBlock,
+  // Layout primitives
+  section: SectionBlock,
+  row: RowBlock,
+  // Atoms (nestable-only)
+  heading: HeadingBlock,
+  text: TextBlock,
+  button: ButtonBlock,
+  image: ImageBlock,
+  spacer: SpacerBlock,
+  divider: DividerBlock,
+  iconBlock: IconBlockComponent,
 }
 
 // These blocks wrap themselves in <Section> (own padding + full-bleed
-// backgrounds), so they must NOT get the legacy `my-16` margin wrapper.
+// backgrounds), so at the top level they must NOT get the legacy `my-16` margin
+// wrapper. Atoms are nestable-only and never reach the top level.
 const selfSpaced = new Set([
   'gatewayCards',
   'featureGrid',
@@ -50,44 +76,60 @@ const selfSpaced = new Set([
   'ctaBand',
   'specialtyGrid',
   'peopleGrid',
+  'servicesGrid',
+  'testimonialsGrid',
+  'availability',
   'slideCarousel',
+  'section',
+  'row',
 ])
 
+type RenderContext = 'top' | 'nested'
+type BlockNode = { blockType?: string } & Record<string, unknown>
+
+/**
+ * Renders a blocks array. Recursive: the Section/Row components call this again
+ * with `context="nested"` for their children.
+ *
+ * - `top` (page layout): unchanged legacy behaviour — self-spaced blocks render
+ *   bare, others get the `my-16` wrapper.
+ * - `nested` (inside a Section/Row): never apply `my-16` or a container; rich
+ *   blocks render in `bare` mode so they inherit the parent's background/width
+ *   (rhythm comes from the parent Section padding, Row gap and Spacer atoms).
+ */
 export const RenderBlocks: React.FC<{
-  blocks: Page['layout'][0][]
-}> = (props) => {
-  const { blocks } = props
+  blocks?: unknown[] | null
+  context?: RenderContext
+}> = ({ blocks, context = 'top' }) => {
+  if (!Array.isArray(blocks) || blocks.length === 0) return null
+  const isNested = context === 'nested'
 
-  const hasBlocks = blocks && Array.isArray(blocks) && blocks.length > 0
+  return (
+    <Fragment>
+      {blocks.map((raw, index) => {
+        const block = raw as BlockNode
+        const { blockType } = block
 
-  if (hasBlocks) {
-    return (
-      <Fragment>
-        {blocks.map((block, index) => {
-          const { blockType } = block
+        if (!blockType || !(blockType in blockComponents)) return null
+        const Block = blockComponents[blockType as keyof typeof blockComponents]
+        if (!Block) return null
 
-          if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType]
+        const node = (
+          // @ts-expect-error there may be some mismatch between the expected types here
+          <Block {...block} bare={isNested} disableInnerContainer />
+        )
 
-            if (Block) {
-              const node = (
-                // @ts-expect-error there may be some mismatch between the expected types here
-                <Block {...block} disableInnerContainer />
-              )
-              return selfSpaced.has(blockType) ? (
-                <Fragment key={index}>{node}</Fragment>
-              ) : (
-                <div className="my-16" key={index}>
-                  {node}
-                </div>
-              )
-            }
-          }
-          return null
-        })}
-      </Fragment>
-    )
-  }
+        // Nested children never get the legacy margin wrapper (parent owns spacing).
+        if (isNested) return <Fragment key={index}>{node}</Fragment>
 
-  return null
+        return selfSpaced.has(blockType) ? (
+          <Fragment key={index}>{node}</Fragment>
+        ) : (
+          <div className="my-16" key={index}>
+            {node}
+          </div>
+        )
+      })}
+    </Fragment>
+  )
 }

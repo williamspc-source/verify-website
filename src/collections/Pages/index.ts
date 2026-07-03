@@ -17,7 +17,20 @@ import { SplitFeature } from '../../blocks/SplitFeature/config'
 import { CTABand } from '../../blocks/CTABand/config'
 import { SpecialtyGrid } from '../../blocks/SpecialtyGrid/config'
 import { PeopleGrid } from '../../blocks/PeopleGrid/config'
+import { ServicesGrid } from '../../blocks/ServicesGrid/config'
+import { TestimonialsGrid } from '../../blocks/TestimonialsGrid/config'
+import { Availability } from '../../blocks/Availability/config'
 import { SlideCarousel } from '../../blocks/SlideCarousel/config'
+import { Callout } from '../../blocks/Callout/config'
+import { ContactDetails } from '../../blocks/ContactDetails/config'
+import { IconList } from '../../blocks/IconList/config'
+import { MapEmbed } from '../../blocks/MapEmbed/config'
+import { ResourcesGrid } from '../../blocks/ResourcesGrid/config'
+import { SpecialistDirectory } from '../../blocks/SpecialistDirectory/config'
+import { SpecialtyDirectory } from '../../blocks/SpecialtyDirectory/config'
+import { AppointmentGuide } from '../../blocks/AppointmentGuide/config'
+import { Section } from '../../blocks/Section/config'
+import { Row } from '../../blocks/Row/config'
 import { hero } from '@/heros/config'
 import { cssClassField } from '@/fields/blockFields'
 import { slugField } from 'payload'
@@ -76,6 +89,7 @@ export const Pages: CollectionConfig<'pages'> = {
         req,
       }),
     useAsTitle: 'title',
+    group: 'Content',
   },
   fields: [
     {
@@ -96,6 +110,10 @@ export const Pages: CollectionConfig<'pages'> = {
               name: 'layout',
               type: 'blocks',
               blocks: [
+                // Layout primitives (compose freeform layouts; nest atoms inside)
+                Section,
+                Row,
+                // Rich blocks
                 CallToAction,
                 Content,
                 MediaBlock,
@@ -111,7 +129,19 @@ export const Pages: CollectionConfig<'pages'> = {
                 CTABand,
                 SpecialtyGrid,
                 PeopleGrid,
+                ServicesGrid,
+                TestimonialsGrid,
+                Availability,
                 SlideCarousel,
+                // New design-reference blocks
+                SpecialistDirectory,
+                SpecialtyDirectory,
+                ResourcesGrid,
+                AppointmentGuide,
+                MapEmbed,
+                ContactDetails,
+                IconList,
+                Callout,
               ],
               required: true,
               admin: {

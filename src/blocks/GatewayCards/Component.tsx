@@ -9,7 +9,7 @@ import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
-export const GatewayCardsBlock: React.FC<Props> = ({
+export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
@@ -20,6 +20,7 @@ export const GatewayCardsBlock: React.FC<Props> = ({
   elementClasses,
   motion,
   containerWidth,
+  bare,
 }) => {
   if (!cards || cards.length === 0) return null
   const cols = Number(columns) || 3
@@ -30,6 +31,7 @@ export const GatewayCardsBlock: React.FC<Props> = ({
       className={cn('vf-gateway-cards', toClassName(cssClass))}
       motion={motion}
       containerWidth={containerWidth}
+      bare={bare}
     >
       <SectionHeader
         eyebrow={eyebrow}

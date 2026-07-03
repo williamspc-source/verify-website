@@ -5,6 +5,7 @@ import path from 'path'
 import { seedDataLayer } from './seed/seedDataLayer'
 import { seedAvailability } from './seed/seedAvailability'
 import { seedShowcase } from './seed/seedShowcase'
+import { CONTACT_ROLE_OPTIONS, CONTACT_SERVICE_OPTIONS } from './seed/data/services'
 
 /* =====================================================================
    Non-destructive scaffold seed for the VERIFY site.
@@ -143,6 +144,36 @@ const heroFor = (title: string) => ({
   richText: richText([heading(title, 'h1')]),
 })
 
+// A standard page hero (eyebrow + heading + subtitle). Breadcrumb off — the
+// header nav already provides wayfinding, and the design reference has none.
+const pageHero = (eyebrow: string, headingText: string, subtitle: string) => ({
+  type: 'pageHero' as const,
+  eyebrow,
+  heading: headingText,
+  subtitle,
+  showBreadcrumb: false,
+})
+
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+
+const selectOptions = (labels: string[]) =>
+  labels.map((label) => ({ label, value: slugify(label) }))
+
+// True when a page still holds the generic scaffold placeholder layout.
+const isPlaceholderLayout = (layout: unknown): boolean => {
+  const arr = layout as { blockType?: string }[] | undefined
+  return (
+    Array.isArray(arr) &&
+    arr.length === 1 &&
+    arr[0]?.blockType === 'content' &&
+    JSON.stringify(arr[0]).includes('scaffolded and ready for content')
+  )
+}
+
 const placeholderLayout = (title: string) => [
   {
     blockType: 'content' as const,
@@ -177,7 +208,10 @@ const PAGE_TREE: PageNode[] = [
   { slug: 'admin-services', title: 'Administrative Services', parent: 'medico-legal' },
 
   { slug: 'specialists', title: 'Specialists' },
+  { slug: 'specialist-panel', title: 'Specialist Panel', parent: 'specialists' },
+  { slug: 'specialty-list', title: 'Specialty List', parent: 'specialists' },
   { slug: 'specialist-availability', title: 'Specialist Availability', parent: 'specialists' },
+  { slug: 'join-expert-panel', title: 'Join the Expert Panel', parent: 'specialists' },
 
   { slug: 'information-centre', title: 'Information Centre' },
   { slug: 'for-clients', title: 'For Clients', parent: 'information-centre' },
@@ -602,6 +636,145 @@ export const seedVerify = async ({
       payload.logger.info('— Populated For Claimants content (IME info + FAQ)')
     } else {
       payload.logger.info('— For Claimants already has content, skipping')
+    }
+  }
+
+  // ── Specialist Availability page: pageHero + the Availability block ──
+  // (Only while still the placeholder, so editor changes are preserved.)
+  {
+    const av = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: 'specialist-availability' } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    const page = av.docs[0]
+    if (page && isPlaceholderLayout(page.layout)) {
+      await payload.update({
+        collection: 'pages',
+        id: page.id,
+        depth: 0,
+        req,
+        context: { disableRevalidate: true },
+        data: {
+          hero: pageHero(
+            'Specialists',
+            'Specialist Availability',
+            'Need an appointment? Browse our specialists with availability below, select the sessions that suit, and send us an enquiry.',
+          ),
+          layout: [{ blockType: 'availability', showCarousel: true, showLegend: true }],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      })
+      payload.logger.info('— Built Specialist Availability page (pageHero + Availability block)')
+    } else {
+      payload.logger.info('— Specialist Availability page already built, skipping')
+    }
+  }
+
+  // ── Contact form (Form Builder) + place it on the Contact page ──
+  {
+    const existingForm = await payload.find({
+      collection: 'forms',
+      where: { title: { equals: 'Contact' } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+
+    let formId = existingForm.docs[0]?.id
+    if (!formId) {
+      const created = await payload.create({
+        collection: 'forms',
+        depth: 0,
+        req,
+        context: { disableRevalidate: true },
+        data: {
+          title: 'Contact',
+          fields: [
+            { blockType: 'text', name: 'firstName', label: 'First Name', width: 50, required: true },
+            { blockType: 'text', name: 'lastName', label: 'Last Name', width: 50, required: true },
+            { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true },
+            { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false },
+            { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: true },
+            {
+              blockType: 'select',
+              name: 'role',
+              label: 'Your Role',
+              width: 100,
+              required: false,
+              options: selectOptions(CONTACT_ROLE_OPTIONS),
+            },
+            {
+              blockType: 'select',
+              name: 'service',
+              label: 'Service Required',
+              width: 100,
+              required: true,
+              options: selectOptions(CONTACT_SERVICE_OPTIONS),
+            },
+            {
+              blockType: 'textarea',
+              name: 'message',
+              label: 'Matter Details / Message',
+              width: 100,
+              required: true,
+            },
+          ],
+          submitButtonLabel: 'Send Enquiry',
+          confirmationType: 'message',
+          confirmationMessage: richText([
+            paragraph('Thank you — your enquiry has been received. Our team will be in touch shortly.'),
+          ]),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      })
+      formId = created.id
+      payload.logger.info('— Created Contact form')
+    } else {
+      payload.logger.info('— Contact form already exists, skipping')
+    }
+
+    // Place the form on the Contact page (only while still the placeholder).
+    const contact = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: 'contact' } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    const contactPage = contact.docs[0]
+    if (contactPage && formId && isPlaceholderLayout(contactPage.layout)) {
+      await payload.update({
+        collection: 'pages',
+        id: contactPage.id,
+        depth: 0,
+        req,
+        context: { disableRevalidate: true },
+        data: {
+          hero: pageHero(
+            'Contact',
+            'Get in Touch',
+            'Refer a matter, book a service, or ask us anything — our team responds promptly.',
+          ),
+          layout: [
+            {
+              blockType: 'formBlock',
+              form: formId,
+              enableIntro: true,
+              introContent: richText([
+                heading('Send an Enquiry', 'h2'),
+                paragraph('Complete the form below and our team will respond promptly.'),
+              ]),
+            },
+          ],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      })
+      payload.logger.info('— Placed Contact form on the Contact page')
+    } else {
+      payload.logger.info('— Contact page already built, skipping')
     }
   }
 

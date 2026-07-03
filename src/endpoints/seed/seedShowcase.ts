@@ -242,6 +242,99 @@ const buildLayout = (mediaId?: number | string | null) => [
       },
     ],
   },
+  // ── Layout primitives demo: Section > Heading/Text > Row(3 cols of atoms) >
+  //    Divider > Spacer > Image. Shows freeform composition from atoms. ──
+  {
+    blockType: 'section' as const,
+    background: 'muted' as const,
+    paddingTop: 'spacious' as const,
+    paddingBottom: 'spacious' as const,
+    motion: 'fade-up' as const,
+    align: 'center' as const,
+    content: [
+      {
+        blockType: 'heading' as const,
+        text: 'Build anything — no code',
+        level: 'h2' as const,
+        size: 'xl' as const,
+        align: 'center' as const,
+      },
+      {
+        blockType: 'text' as const,
+        richText: richText([
+          paragraph(
+            'These layout primitives compose pages from Sections, Rows, Columns and atoms — all editable in the admin. Spacing and sizes come from the Design System global, so one change re-themes the site.',
+          ),
+        ]),
+        size: 'lg' as const,
+        align: 'center' as const,
+      },
+      { blockType: 'spacer' as const, size: 'sm' as const },
+      {
+        blockType: 'row' as const,
+        gap: 'normal' as const,
+        alignY: 'stretch' as const,
+        columns: [
+          {
+            span: 'auto' as const,
+            align: 'center' as const,
+            content: [
+              { blockType: 'iconBlock' as const, icon: 'clipboard-check', size: 'lg' as const, color: 'primary' as const, align: 'center' as const },
+              { blockType: 'heading' as const, text: 'Sections', level: 'h3' as const, size: 'md' as const, align: 'center' as const },
+              { blockType: 'text' as const, richText: richText([paragraph('Banded containers that own background, width and padding.')]), size: 'base' as const, align: 'center' as const },
+              { blockType: 'button' as const, size: 'sm' as const, align: 'center' as const, links: [{ link: customLink('Learn more') }] },
+            ],
+          },
+          {
+            span: 'auto' as const,
+            align: 'center' as const,
+            content: [
+              { blockType: 'iconBlock' as const, icon: 'users', size: 'lg' as const, color: 'primary' as const, align: 'center' as const },
+              { blockType: 'heading' as const, text: 'Rows & columns', level: 'h3' as const, size: 'md' as const, align: 'center' as const },
+              { blockType: 'text' as const, richText: richText([paragraph('Responsive grids that stack on mobile, with adjustable gaps.')]), size: 'base' as const, align: 'center' as const },
+              { blockType: 'button' as const, size: 'sm' as const, align: 'center' as const, links: [{ link: customLink('Learn more') }] },
+            ],
+          },
+          {
+            span: 'auto' as const,
+            align: 'center' as const,
+            content: [
+              { blockType: 'iconBlock' as const, icon: 'calendar', size: 'lg' as const, color: 'primary' as const, align: 'center' as const },
+              { blockType: 'heading' as const, text: 'Atoms', level: 'h3' as const, size: 'md' as const, align: 'center' as const },
+              { blockType: 'text' as const, richText: richText([paragraph('Heading, text, button, image, spacer, divider and icon pieces.')]), size: 'base' as const, align: 'center' as const },
+              { blockType: 'button' as const, size: 'sm' as const, align: 'center' as const, links: [{ link: customLink('Learn more') }] },
+            ],
+          },
+        ],
+      },
+      { blockType: 'spacer' as const, size: 'sm' as const },
+      { blockType: 'divider' as const, style: 'gradient' as const, width: 'narrow' as const, align: 'center' as const },
+      ...(mediaId
+        ? [
+            { blockType: 'spacer' as const, size: 'sm' as const },
+            { blockType: 'image' as const, media: mediaId, width: 'wide' as const, rounded: 'md' as const, align: 'center' as const, caption: 'An image atom — width, rounding and alignment are all presets.' },
+          ]
+        : []),
+    ],
+  },
+  // ── Nested rich-block demo: a rich block (FAQ) placed inside a Section renders
+  //    in "bare" mode, inheriting the Section's white background. ──
+  {
+    blockType: 'section' as const,
+    background: 'white' as const,
+    paddingTop: 'normal' as const,
+    paddingBottom: 'normal' as const,
+    content: [
+      { blockType: 'heading' as const, text: 'Rich blocks nest too', level: 'h2' as const, size: 'lg' as const, align: 'center' as const },
+      {
+        blockType: 'faq' as const,
+        items: [
+          { question: 'Can I drop existing blocks inside a Section or Row?', answer: richText([paragraph('Yes — rich blocks render in bare mode when nested, inheriting the parent Section background and width.')]) },
+          { question: 'Do the preset values stay editable?', answer: richText([paragraph('Always. Edit the Design System global and every block using that preset updates site-wide.')]) },
+        ],
+      },
+    ],
+  },
   {
     blockType: 'ctaBand' as const,
     heading: 'Ready to get started?',

@@ -1,4 +1,5 @@
 import { cn } from '@/utilities/ui'
+import { accentText } from '@/utilities/accentText'
 import React from 'react'
 
 type SectionHeaderProps = {
@@ -55,7 +56,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           className={cn('vf-section-header__title section-title', titleClassName)}
           style={onDark ? { color: '#fff' } : undefined}
         >
-          {title}
+          {accentText(title)}
         </Heading>
       ) : null}
 

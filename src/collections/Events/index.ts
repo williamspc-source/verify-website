@@ -87,10 +87,56 @@ export const Events: CollectionConfig<'events'> = {
               ],
             },
             {
-              name: 'registrationUrl',
-              type: 'text',
-              label: 'Registration URL',
-              admin: { description: 'External booking link (e.g. AAMLE).' },
+              type: 'row',
+              fields: [
+                {
+                  name: 'registrationUrl',
+                  type: 'text',
+                  label: 'Registration URL',
+                  admin: { width: '50%', description: 'External booking link (e.g. AAMLE).' },
+                },
+                {
+                  name: 'registrationLabel',
+                  type: 'text',
+                  label: 'Registration button label',
+                  admin: {
+                    width: '50%',
+                    description: 'e.g. "Register on AAMLE", "Register Your Interest". Optional.',
+                  },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'cpdEligible',
+                  type: 'checkbox',
+                  label: 'CPD eligible',
+                  admin: { width: '33%' },
+                },
+                {
+                  name: 'cpdPoints',
+                  type: 'number',
+                  label: 'CPD points',
+                  admin: { width: '33%' },
+                },
+                {
+                  name: 'cost',
+                  type: 'text',
+                  admin: { width: '34%', description: 'e.g. "Free", "$120". Defaults to Free if empty.' },
+                },
+              ],
+            },
+            {
+              name: 'locationRef',
+              type: 'relationship',
+              relationTo: 'locations',
+              label: 'Location (structured)',
+              admin: {
+                description:
+                  'Optional — link to a Location for structured filtering. The free-text "location" above is still shown if set.',
+              },
             },
             {
               name: 'image',

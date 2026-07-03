@@ -6,9 +6,11 @@ import { CMSLink } from '@/components/Link'
 import { Section } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { accentText } from '@/utilities/accentText'
 
 // Always a dark gradient band (mirrors the design reference's `.about-cta`).
-export const CTABandBlock: React.FC<Props> = ({
+export const CTABandBlock: React.FC<Props & { bare?: boolean }> = ({
+  eyebrow,
   heading,
   text,
   links,
@@ -16,6 +18,7 @@ export const CTABandBlock: React.FC<Props> = ({
   elementClasses,
   motion,
   containerWidth,
+  bare,
 }) => {
   if (!heading) return null
 
@@ -25,9 +28,13 @@ export const CTABandBlock: React.FC<Props> = ({
       className={cn('vf-cta-band', toClassName(cssClass))}
       motion={motion}
       containerWidth={containerWidth}
+      bare={bare}
     >
       <div className="vf-cta-band__content">
-        <h2 className={cn('vf-cta-band__heading', toClassName(elementClasses?.heading))}>{heading}</h2>
+        {eyebrow ? <p className="vf-cta-band__eyebrow section-label">{eyebrow}</p> : null}
+        <h2 className={cn('vf-cta-band__heading', toClassName(elementClasses?.heading))}>
+          {accentText(heading)}
+        </h2>
         {text ? <p className="vf-cta-band__text">{text}</p> : null}
 
         {Array.isArray(links) && links.length > 0 ? (

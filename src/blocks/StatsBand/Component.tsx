@@ -30,7 +30,7 @@ const CountUp: React.FC<{ value: number; play: boolean }> = ({ value, play }) =>
   return <>{n.toLocaleString()}</>
 }
 
-export const StatsBandBlock: React.FC<Props> = ({
+export const StatsBandBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
@@ -40,6 +40,7 @@ export const StatsBandBlock: React.FC<Props> = ({
   elementClasses,
   motion,
   containerWidth,
+  bare,
 }) => {
   const ref = useRef<HTMLDivElement>(null)
   const [play, setPlay] = useState(false)
@@ -69,6 +70,7 @@ export const StatsBandBlock: React.FC<Props> = ({
       className={cn('vf-stats-band', toClassName(cssClass))}
       motion={motion}
       containerWidth={containerWidth}
+      bare={bare}
     >
       <SectionHeader
         eyebrow={eyebrow}

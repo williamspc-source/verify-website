@@ -69,6 +69,20 @@ export const Team: CollectionConfig<'team'> = {
               type: 'array',
               fields: [{ name: 'qualification', type: 'text', required: true }],
             },
+            {
+              name: 'sections',
+              type: 'array',
+              label: 'Extra profile sections',
+              labels: { singular: 'Section', plural: 'Sections' },
+              admin: {
+                description:
+                  'Optional titled sections beyond the bio (e.g. Expertise, Affiliations).',
+              },
+              fields: [
+                { name: 'heading', type: 'text', required: true },
+                { name: 'body', type: 'richText' },
+              ],
+            },
           ],
         },
         {
@@ -96,6 +110,7 @@ export const Team: CollectionConfig<'team'> = {
       name: 'department',
       type: 'select',
       required: true,
+      defaultValue: 'operations',
       admin: { position: 'sidebar' },
       options: [
         { label: 'Operations', value: 'operations' },

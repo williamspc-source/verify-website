@@ -14,6 +14,8 @@ type BrandColors =
       mutedText?: string | null
       accent?: string | null
       border?: string | null
+      accentLight?: string | null
+      primaryDeep?: string | null
     }
   | null
   | undefined
@@ -34,6 +36,8 @@ export const brandColorStyle = (colors: BrandColors): CSSProperties => {
   set(['--muted-foreground', '--text-mid'], colors.mutedText)
   set(['--bg-light-1', '--accent'], colors.accent)
   set(['--border', '--border-light', '--input'], colors.border)
+  set(['--accent-light'], colors.accentLight)
+  set(['--primary-deep'], colors.primaryDeep)
 
   return style as CSSProperties
 }

@@ -1,19 +1,15 @@
 import type { Block } from 'payload'
 
 import {
-  FixedToolbarFeature,
-  HeadingFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-
-import {
   backgroundField,
+  contentBlocksField,
   cssClassField,
   displayFields,
   elementClassesField,
+  iconField,
   sectionHeaderFields,
 } from '@/fields/blockFields'
+import { TAB_CONTENT_BLOCKS } from '../tabContent'
 
 export const TabsBlock: Block = {
   slug: 'tabs',
@@ -28,20 +24,16 @@ export const TabsBlock: Block = {
       minRows: 1,
       labels: { singular: 'Tab', plural: 'Tabs' },
       fields: [
-        { name: 'label', type: 'text', required: true },
         {
-          name: 'content',
-          type: 'richText',
-          required: true,
-          editor: lexicalEditor({
-            features: ({ rootFeatures }) => [
-              ...rootFeatures,
-              HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
-              FixedToolbarFeature(),
-              InlineToolbarFeature(),
-            ],
-          }),
+          type: 'row',
+          fields: [
+            { name: 'label', type: 'text', required: true, admin: { width: '70%' } },
+            iconField({ admin: { width: '30%', description: 'Optional tab icon.' } }),
+          ],
         },
+        contentBlocksField(TAB_CONTENT_BLOCKS, {
+          admin: { description: 'Blocks shown when this tab is active (grids, steps, text, etc.).' },
+        }),
       ],
     },
     {
