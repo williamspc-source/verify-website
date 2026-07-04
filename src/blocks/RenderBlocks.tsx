@@ -19,6 +19,28 @@ import { ServicesGridBlock } from '@/blocks/ServicesGrid/Component'
 import { TestimonialsGridBlock } from '@/blocks/TestimonialsGrid/Component'
 import { AvailabilityBlock } from '@/blocks/Availability/Component'
 import { SlideCarouselBlock } from '@/blocks/SlideCarousel/Component'
+// New design-reference blocks
+import { CalloutBlock } from '@/blocks/Callout/Component'
+import { ContactDetailsBlock } from '@/blocks/ContactDetails/Component'
+import { IconListBlock } from '@/blocks/IconList/Component'
+import { MapEmbedBlock } from '@/blocks/MapEmbed/Component'
+import { ResourcesGridBlock } from '@/blocks/ResourcesGrid/Component'
+import { SpecialistDirectoryBlock } from '@/blocks/SpecialistDirectory/Component'
+import { SpecialtyDirectoryBlock } from '@/blocks/SpecialtyDirectory/Component'
+import { AppointmentGuideBlock } from '@/blocks/AppointmentGuide/Component'
+// Bespoke design-reference section blocks
+import { AamleEducationBlock } from '@/blocks/AamleEducation/Component'
+import { MissionPillarsBlock } from '@/blocks/MissionPillars/Component'
+import { ValueCardsBlock } from '@/blocks/ValueCards/Component'
+import { WhyVerifyBlock } from '@/blocks/WhyVerify/Component'
+import { LeadershipSpotlightBlock } from '@/blocks/LeadershipSpotlight/Component'
+import { AudiencePathwaysBlock } from '@/blocks/AudiencePathways/Component'
+import { BookingChooserBlock } from '@/blocks/BookingChooser/Component'
+import { CostGridBlock } from '@/blocks/CostGrid/Component'
+import { PortalCtaBlock } from '@/blocks/PortalCta/Component'
+import { NewsletterBlock } from '@/blocks/Newsletter/Component'
+import { VideoEmbedBlock } from '@/blocks/VideoEmbed/Component'
+import { SectionNavBlock } from '@/blocks/SectionNav/Component'
 // Layout primitives + atoms
 import { SectionBlock } from '@/blocks/Section/Component'
 import { RowBlock } from '@/blocks/Row/Component'
@@ -50,6 +72,28 @@ const blockComponents = {
   testimonialsGrid: TestimonialsGridBlock,
   availability: AvailabilityBlock,
   slideCarousel: SlideCarouselBlock,
+  // New design-reference blocks
+  callout: CalloutBlock,
+  contactDetails: ContactDetailsBlock,
+  iconList: IconListBlock,
+  mapEmbed: MapEmbedBlock,
+  resourcesGrid: ResourcesGridBlock,
+  specialistDirectory: SpecialistDirectoryBlock,
+  specialtyDirectory: SpecialtyDirectoryBlock,
+  appointmentGuide: AppointmentGuideBlock,
+  // Bespoke design-reference section blocks
+  aamleEducation: AamleEducationBlock,
+  missionPillars: MissionPillarsBlock,
+  valueCards: ValueCardsBlock,
+  whyVerify: WhyVerifyBlock,
+  leadershipSpotlight: LeadershipSpotlightBlock,
+  audiencePathways: AudiencePathwaysBlock,
+  bookingChooser: BookingChooserBlock,
+  costGrid: CostGridBlock,
+  portalCta: PortalCtaBlock,
+  newsletter: NewsletterBlock,
+  videoEmbed: VideoEmbedBlock,
+  sectionNav: SectionNavBlock,
   // Layout primitives
   section: SectionBlock,
   row: RowBlock,
@@ -80,6 +124,26 @@ const selfSpaced = new Set([
   'testimonialsGrid',
   'availability',
   'slideCarousel',
+  'callout',
+  'contactDetails',
+  'iconList',
+  'mapEmbed',
+  'resourcesGrid',
+  'specialistDirectory',
+  'specialtyDirectory',
+  'appointmentGuide',
+  'aamleEducation',
+  'missionPillars',
+  'valueCards',
+  'whyVerify',
+  'leadershipSpotlight',
+  'audiencePathways',
+  'bookingChooser',
+  'costGrid',
+  'portalCta',
+  'newsletter',
+  'videoEmbed',
+  'sectionNav',
   'section',
   'row',
 ])

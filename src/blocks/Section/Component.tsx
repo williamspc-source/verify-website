@@ -19,6 +19,7 @@ export const SectionBlock: React.FC<Props> = ({
   align,
   content,
   cssClass,
+  anchorId,
 }) => {
   if (!Array.isArray(content) || content.length === 0) return null
 
@@ -27,6 +28,7 @@ export const SectionBlock: React.FC<Props> = ({
       background={background as SectionBackground}
       containerWidth={containerWidth}
       motion={motion}
+      id={anchorId || undefined}
       className={cn(
         'vf-section-block',
         paddingTop ? `vf-section--pt-${paddingTop}` : undefined,

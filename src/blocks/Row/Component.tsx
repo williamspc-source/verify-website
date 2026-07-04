@@ -16,6 +16,7 @@ export const RowBlock: React.FC<Props & { bare?: boolean }> = ({
   gap,
   alignY,
   cssClass,
+  anchorId,
   bare,
 }) => {
   const cols = Array.isArray(columns) ? columns : []
@@ -23,6 +24,7 @@ export const RowBlock: React.FC<Props & { bare?: boolean }> = ({
 
   const grid = (
     <div
+      id={anchorId || undefined}
       className={cn(
         'vf-row',
         `vf-row--gap-${gap || 'normal'}`,

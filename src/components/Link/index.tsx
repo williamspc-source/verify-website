@@ -1,5 +1,6 @@
 import { Button, type ButtonProps } from '@/components/ui/button'
 import { cn } from '@/utilities/ui'
+import { Icon } from '@/components/Icon'
 import Link from 'next/link'
 import React from 'react'
 
@@ -9,6 +10,7 @@ type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']
   children?: React.ReactNode
   className?: string
+  icon?: string | null
   label?: string | null
   newTab?: boolean | null
   reference?: {
@@ -16,7 +18,7 @@ type CMSLinkType = {
     value: Page | Post | string | number
   } | null
   size?: ButtonProps['size'] | null
-  type?: 'custom' | 'reference' | null
+  type?: 'custom' | 'reference' | 'enquiry' | null
   url?: string | null
 }
 
@@ -26,12 +28,39 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     appearance = 'inline',
     children,
     className,
+    icon,
     label,
     newTab,
     reference,
     size: sizeFromProps,
     url,
   } = props
+
+  const iconEl = icon ? <Icon name={icon} className="size-4" /> : null
+
+  // "Open enquiry form" action: no navigation — a button carrying the
+  // data-enquiry-panel hook the site-wide enquiry drawer listens for.
+  if (type === 'enquiry') {
+    const content = (
+      <>
+        {iconEl}
+        {label}
+        {children}
+      </>
+    )
+    if (appearance === 'inline') {
+      return (
+        <button type="button" data-enquiry-panel className={cn(className)}>
+          {content}
+        </button>
+      )
+    }
+    return (
+      <Button className={className} size={sizeFromProps} variant={appearance} data-enquiry-panel>
+        {content}
+      </Button>
+    )
+  }
 
   let href = url
   if (type === 'reference' && typeof reference?.value === 'object' && reference.value.slug) {
@@ -59,6 +88,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   if (appearance === 'inline') {
     return (
       <Link className={cn(className)} href={href || url || ''} {...newTabProps}>
+        {iconEl}
         {label && label}
         {children && children}
       </Link>
@@ -68,6 +98,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   return (
     <Button asChild className={className} size={size} variant={appearance}>
       <Link className={cn(className)} href={href || url || ''} {...newTabProps}>
+        {iconEl}
         {label && label}
         {children && children}
       </Link>

@@ -137,8 +137,22 @@ const buildLayout = (mediaId?: number | string | null) => [
     heading: 'What we offer',
     background: 'muted' as const,
     tabs: [
-      { label: 'Medico-Legal', content: richText([heading('Medico-Legal Services'), paragraph('Independent examinations, joint examinations, file reviews and expert evidence.')]) },
-      { label: 'Educational', content: richText([heading('Educational Services'), paragraph('AAMLE seminars, workshops and training for the medico-legal sector.')]) },
+      {
+        label: 'Medico-Legal',
+        icon: 'first-aid' as const,
+        content: [
+          { blockType: 'heading' as const, text: 'Medico-Legal Services', level: 'h3' as const, size: 'md' as const, align: 'center' as const },
+          { blockType: 'text' as const, richText: richText([paragraph('Independent examinations, joint examinations, file reviews and expert evidence.')]), size: 'base' as const, align: 'center' as const },
+        ],
+      },
+      {
+        label: 'Educational',
+        icon: 'graduation-cap' as const,
+        content: [
+          { blockType: 'heading' as const, text: 'Educational Services', level: 'h3' as const, size: 'md' as const, align: 'center' as const },
+          { blockType: 'text' as const, richText: richText([paragraph('AAMLE seminars, workshops and training for the medico-legal sector.')]), size: 'base' as const, align: 'center' as const },
+        ],
+      },
     ],
   },
   {

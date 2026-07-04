@@ -1,4 +1,6 @@
 import type { CollectionSlug, Payload, PayloadRequest } from 'payload'
+import { readdirSync } from 'fs'
+import path from 'path'
 
 import { AREAS_OF_EXPERTISE, ASSESSMENT_TYPES, CLAIM_TYPES, SPECIALTIES, type Term } from './data/taxonomy'
 import { SPECIALISTS } from './data/specialists'
@@ -332,5 +334,130 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   })
   payload.logger.info('— Offices seeded')
 
+  // 9) Backfill specialist + team photos from the design-reference assets.
+  await backfillPhotos(ctx)
+
   payload.logger.info('Data layer seed complete.')
+}
+
+// Title-prefix tokens stripped when matching a person to their photo filename.
+const NAME_TOKENS = new Set([
+  'dr', 'drs', 'adj', 'adjunct', 'prof', 'professor', 'assoc', 'associate', 'a', 'aprof', 'ms',
+  'mr', 'mrs', 'mx',
+])
+const nameKey = (s: string): string =>
+  s
+    .toLowerCase()
+    .replace(/\.[a-z0-9]+$/i, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter((t) => t && !NAME_TOKENS.has(t))
+    .join(' ')
+
+// Uploads a Media doc from disk once; reuses an existing doc by matching alt.
+async function getOrCreateMedia(
+  { payload, req }: Ctx,
+  absPath: string,
+  alt: string,
+): Promise<number | string | null> {
+  const existing = await payload.find({
+    collection: 'media',
+    where: { alt: { equals: alt } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  if (existing.docs[0]) return existing.docs[0].id
+  try {
+    const created = await payload.create({
+      collection: 'media',
+      data: { alt } as any,
+      filePath: absPath,
+      req,
+      context: { disableRevalidate: true },
+    })
+    return created.id
+  } catch (e) {
+    payload.logger.warn(`  · media upload failed for ${alt}: ${(e as Error).message}`)
+    return null
+  }
+}
+
+async function backfillPhotos(ctx: Ctx): Promise<void> {
+  const { payload, req } = ctx
+  const imagesDir = path.join(process.cwd(), 'public', 'assets', 'images')
+  const isImg = (f: string) => /\.(png|jpe?g|webp)$/i.test(f)
+
+  // Specialists — filenames are display names ("Dr Andrew Renaut.png"); match by normalised name.
+  try {
+    const specDir = path.join(imagesDir, 'specialist')
+    const specByKey = new Map(
+      readdirSync(specDir)
+        .filter(isImg)
+        .map((f) => [nameKey(f), f] as const),
+    )
+    let sp = 0
+    for (const s of SPECIALISTS) {
+      const file = specByKey.get(nameKey(s.title))
+      if (!file) continue
+      const found = await payload.find({
+        collection: 'specialists',
+        where: { slug: { equals: s.slug } },
+        limit: 1,
+        depth: 0,
+        req,
+      })
+      const rec = found.docs[0] as { id: number | string; photo?: unknown } | undefined
+      if (!rec || rec.photo) continue
+      const mediaId = await getOrCreateMedia(ctx, path.join(specDir, file), s.title)
+      if (mediaId) {
+        await payload.update({
+          collection: 'specialists',
+          id: rec.id,
+          data: { photo: mediaId } as any,
+          req,
+          context: { disableRevalidate: true },
+        })
+        sp++
+      }
+    }
+    payload.logger.info(`— Specialist photos backfilled (${sp})`)
+  } catch (e) {
+    payload.logger.warn(`— Specialist photo backfill skipped: ${(e as Error).message}`)
+  }
+
+  // Team — filenames are slugs ("wes-lerch.png").
+  try {
+    const teamDir = path.join(imagesDir, 'team')
+    const teamFiles = new Set(readdirSync(teamDir).filter(isImg))
+    let tp = 0
+    for (const m of TEAM) {
+      const file = `${m.slug}.png`
+      if (!teamFiles.has(file)) continue
+      const found = await payload.find({
+        collection: 'team',
+        where: { slug: { equals: m.slug } },
+        limit: 1,
+        depth: 0,
+        req,
+      })
+      const rec = found.docs[0] as { id: number | string; photo?: unknown } | undefined
+      if (!rec || rec.photo) continue
+      const mediaId = await getOrCreateMedia(ctx, path.join(teamDir, file), m.title)
+      if (mediaId) {
+        await payload.update({
+          collection: 'team',
+          id: rec.id,
+          data: { photo: mediaId } as any,
+          req,
+          context: { disableRevalidate: true },
+        })
+        tp++
+      }
+    }
+    payload.logger.info(`— Team photos backfilled (${tp})`)
+  } catch (e) {
+    payload.logger.warn(`— Team photo backfill skipped: ${(e as Error).message}`)
+  }
 }

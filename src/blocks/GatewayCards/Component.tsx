@@ -48,12 +48,18 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
         {cards.map((card, i) => {
           const quickLinks = (card.links || []).filter((l) => l.link?.label)
           const hasBottom = quickLinks.length > 0 || Boolean(card.link?.label)
+          const accentClass = card.accent
+            ? { blue: 'card-accent-1', steel: 'card-accent-2', charcoal: 'card-accent-3' }[
+                card.accent
+              ]
+            : `card-accent-${(i % 3) + 1}`
           return (
             <div
               key={i}
               className={cn(
                 'audience-card vf-card',
-                `card-accent-${(i % 3) + 1}`,
+                accentClass,
+                card.theme === 'dark' && 'vf-gateway-card--dark',
                 toClassName(elementClasses?.card),
               )}
             >
@@ -63,7 +69,13 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
                     <Icon name={card.icon} className="size-6" />
                   </div>
                 ) : null}
+                {card.eyebrow ? (
+                  <div className="audience-card-eyebrow section-label">{card.eyebrow}</div>
+                ) : null}
                 <div className="audience-card-label vf-card__title">{card.title}</div>
+                {card.subtitle ? (
+                  <div className="audience-card-subtitle">{card.subtitle}</div>
+                ) : null}
                 {card.description ? <div className="audience-card-hook">{card.description}</div> : null}
               </div>
               {hasBottom ? (

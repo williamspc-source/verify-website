@@ -6,6 +6,7 @@ import type { PeopleGridBlock as Props, Specialist, Team } from '@/payload-types
 
 import { ExpertsCarousel } from '@/components/ExpertsCarousel'
 import { PersonCard, type PersonCardData } from '@/components/PersonCard'
+import { CMSLink } from '@/components/Link'
 import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
@@ -17,6 +18,12 @@ const DEPARTMENT_LABELS: Record<string, string> = {
   'reception-bookings': 'Reception & Bookings',
   'quality-assurance': 'Quality Assurance',
 }
+const DEPARTMENT_ORDER = [
+  'operations',
+  'business-development',
+  'reception-bookings',
+  'quality-assurance',
+]
 
 const mediaUrl = (m: unknown): string | null =>
   m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
@@ -45,7 +52,7 @@ const teamToCard = (t: Team, linkProfiles: boolean): PersonCardData => ({
   location: null,
   badge: t.department ? DEPARTMENT_LABELS[t.department] : null,
   photoUrl: mediaUrl(t.photo),
-  href: linkProfiles && t.slug ? `/about/meet-the-team/${t.slug}` : null,
+  href: linkProfiles && t.slug ? `/about/team/${t.slug}` : null,
 })
 
 export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
@@ -60,10 +67,12 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     specialty,
     location,
     department,
+    groupByDepartment,
     people,
     layout,
     limit,
     linkProfiles,
+    footerLinks,
     cssClass,
     elementClasses,
     motion,
@@ -74,9 +83,11 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
   } = props
   const cardClass = toClassName(elementClasses?.card)
   const co = carouselOptions || {}
+  const lim = limit === 0 ? 0 : limit || undefined
 
   const payload = await getPayload({ config: configPromise })
   const cards: PersonCardData[] = []
+  let groups: { label: string; cards: PersonCardData[] }[] | null = null
 
   if (source === 'manual') {
     for (const rel of people || []) {
@@ -93,11 +104,26 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     const res = await payload.find({
       collection: 'team',
       depth: 1,
-      limit: limit || 12,
+      limit: groupByDepartment ? 0 : (lim ?? 12),
       sort: 'order',
       where,
     })
-    res.docs.forEach((t) => cards.push(teamToCard(t, Boolean(linkProfiles))))
+    if (groupByDepartment) {
+      const byDept = new Map<string, PersonCardData[]>()
+      res.docs.forEach((t) => {
+        const d = t.department || 'operations'
+        const list = byDept.get(d) ?? []
+        list.push(teamToCard(t, Boolean(linkProfiles)))
+        byDept.set(d, list)
+      })
+      groups = DEPARTMENT_ORDER.filter((d) => byDept.has(d)).map((d) => ({
+        label: DEPARTMENT_LABELS[d] || d,
+        cards: byDept.get(d) as PersonCardData[],
+      }))
+      groups.forEach((g) => cards.push(...g.cards))
+    } else {
+      res.docs.forEach((t) => cards.push(teamToCard(t, Boolean(linkProfiles))))
+    }
   } else {
     const and: Where[] = []
     if (onlyAdvertised) and.push({ advertise: { equals: true } })
@@ -107,7 +133,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     const res = await payload.find({
       collection: 'specialists',
       depth: 1,
-      limit: limit || 8,
+      limit: lim ?? 8,
       ...(and.length ? { where: { and } } : {}),
     })
     res.docs.forEach((s) => cards.push(specialistToCard(s, Boolean(linkProfiles))))
@@ -132,7 +158,20 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
         titleClassName={toClassName(elementClasses?.heading)}
       />
 
-      {layout === 'carousel' ? (
+      {groups ? (
+        <div className="vf-people-grid__groups">
+          {groups.map((g) => (
+            <div key={g.label} className="vf-people-grid__group">
+              <div className="vf-people-grid__group-label divider-label">{g.label}</div>
+              <div className="spec-grid">
+                {g.cards.map((c, i) => (
+                  <PersonCard key={i} {...c} className={cardClass} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : layout === 'carousel' ? (
         <ExpertsCarousel
           cards={cards}
           speed={co.speed}
@@ -147,6 +186,14 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
           ))}
         </div>
       )}
+
+      {Array.isArray(footerLinks) && footerLinks.length > 0 ? (
+        <div className="vf-people-grid__footer experts-cta">
+          {footerLinks.map(({ link }, i) => (
+            <CMSLink key={i} {...link} className={cn('btn', i === 0 ? 'btn-primary' : 'btn-outline')} />
+          ))}
+        </div>
+      ) : null}
     </Section>
   )
 }

@@ -2,8 +2,9 @@
 import React, { useId, useState } from 'react'
 
 import { cn } from '@/utilities/ui'
+import { Icon } from '@/components/Icon'
 
-type TabItem = { label: string; panel: React.ReactNode }
+type TabItem = { label: string; icon?: string | null; panel: React.ReactNode }
 
 export const TabsClient: React.FC<{
   items: TabItem[]
@@ -51,6 +52,11 @@ export const TabsClient: React.FC<{
               selected && 'vf-tabs__tab--active',
             )}
           >
+            {item.icon ? (
+              <span className="tab-icon">
+                <Icon name={item.icon} className="size-5" />
+              </span>
+            ) : null}
             {item.label}
           </button>
         )

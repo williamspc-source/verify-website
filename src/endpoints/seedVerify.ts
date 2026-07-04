@@ -5,6 +5,7 @@ import path from 'path'
 import { seedDataLayer } from './seed/seedDataLayer'
 import { seedAvailability } from './seed/seedAvailability'
 import { seedShowcase } from './seed/seedShowcase'
+import { seedHomepage } from './seed/seedHomepage'
 import { CONTACT_ROLE_OPTIONS, CONTACT_SERVICE_OPTIONS } from './seed/data/services'
 
 /* =====================================================================
@@ -195,6 +196,7 @@ type PageNode = { slug: string; title: string; parent?: string }
 const PAGE_TREE: PageNode[] = [
   { slug: 'home', title: 'Home' },
   { slug: 'contact', title: 'Contact Us' },
+  { slug: 'make-a-booking', title: 'Make a Booking' },
 
   { slug: 'about', title: 'About VERIFY' },
   { slug: 'meet-the-team', title: 'Meet the Team', parent: 'about' },
@@ -493,8 +495,10 @@ export const seedVerify = async ({
         {
           ...pageLink('specialists', 'Specialists'),
           subItems: [
-            pageLink('specialists', 'Specialist Panel'),
+            pageLink('specialist-panel', 'Specialist Panel'),
+            pageLink('specialty-list', 'Specialty List'),
             pageLink('specialist-availability', 'Specialist Availability'),
+            pageLink('join-expert-panel', 'Join the Expert Panel'),
           ],
         },
         {
@@ -510,7 +514,7 @@ export const seedVerify = async ({
       ],
       cta: {
         enabled: true,
-        link: pageLink('specialist-availability', 'See Specialist Availability').link,
+        link: pageLink('make-a-booking', 'Make a Booking').link,
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
@@ -524,20 +528,26 @@ export const seedVerify = async ({
     req,
     context: { disableRevalidate: true },
     data: {
-      tagline: 'Ensuring Accuracy, Empowering Justice',
+      tagline:
+        'Independent medico-legal reporting and examination coordination, built on accuracy, responsiveness and clarity.',
       columns: [
+        {
+          title: 'Services',
+          links: [
+            pageLink('ime', 'Independent Medical Examination'),
+            pageLink('jme', 'Joint Medical Examination'),
+            pageLink('reporting-services', 'Reporting Services'),
+            pageLink('admin-services', 'Administrative Services'),
+          ],
+        },
         {
           title: 'Key Pages',
           links: [
             pageLink('home', 'Home'),
             pageLink('about', 'About VERIFY'),
-            pageLink('services', 'Our Services'),
-            pageLink('specialists', 'Specialists'),
-            pageLink('for-claimants', 'Information for Claimants'),
-            pageLink('for-clients', 'Information for Clients'),
-            pageLink('in-the-loop', 'In the Loop'),
+            pageLink('specialist-panel', 'Specialist Panel'),
+            pageLink('information-centre', 'Information Centre'),
             pageLink('events', 'Events & Seminars'),
-            pageLink('contact', 'Contact us'),
           ],
         },
       ],
@@ -848,6 +858,9 @@ export const seedVerify = async ({
 
   // ── Style Guide showcase page (every block, for review/handoff) ──
   await seedShowcase({ payload, req })
+
+  // ── Homepage layout (matches .design-reference/index.html) ──
+  await seedHomepage({ payload, req })
 
   payload.logger.info('VERIFY scaffold seed complete.')
 }

@@ -27,8 +27,10 @@ import { TestimonialsGrid } from './TestimonialsGrid/config'
 import { StatsBand } from './StatsBand/config'
 import { SplitFeature } from './SplitFeature/config'
 import { CTABand } from './CTABand/config'
+import { AamleEducation } from './AamleEducation/config'
 
 export const TAB_CONTENT_BLOCKS: Block[] = [
+  AamleEducation,
   Heading,
   Text,
   Button,

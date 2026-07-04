@@ -1,0 +1,89 @@
+import React from 'react'
+
+import type { AudiencePathwaysBlock as Props } from '@/payload-types'
+
+import { CMSLink } from '@/components/Link'
+import { Section, type SectionBackground } from '@/components/Section'
+import { cn } from '@/utilities/ui'
+import { accentText } from '@/utilities/accentText'
+import { toClassName } from '@/utilities/cssClass'
+
+export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
+  eyebrow,
+  heading,
+  subheading,
+  background,
+  pathways,
+  anchorId,
+  cssClass,
+  containerWidth,
+  motion,
+  bare,
+}) => {
+  const cards = Array.isArray(pathways) ? pathways : []
+  const hasHeader = Boolean(eyebrow || heading || subheading)
+  if (cards.length === 0 && !hasHeader) return null
+
+  return (
+    <Section
+      id={anchorId || undefined}
+      background={(background as SectionBackground) || 'muted'}
+      className={cn('ime-pathways', toClassName(cssClass))}
+      containerWidth={containerWidth}
+      motion={motion}
+      bare={bare}
+    >
+      {hasHeader ? (
+        <div className="ime-pathways-header">
+          {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
+          {heading ? <h2>{accentText(heading)}</h2> : null}
+          {subheading ? <p>{subheading}</p> : null}
+        </div>
+      ) : null}
+
+      {cards.length > 0 ? (
+        <div className="ime-pathways-grid">
+          {cards.map((card, i) => {
+            const steps = Array.isArray(card.steps) ? card.steps : []
+            const variantClass =
+              card.variant === 'claimant'
+                ? 'ime-pathway-card--claimant'
+                : 'ime-pathway-card--client'
+
+            return (
+              <div key={i} className={cn('ime-pathway-card', variantClass)}>
+                <div className="ime-pathway-card-top">
+                  {card.eyebrow ? (
+                    <div className="ime-pathway-audience">{card.eyebrow}</div>
+                  ) : null}
+                  {card.title ? <h3>{card.title}</h3> : null}
+                  {card.description ? <p>{card.description}</p> : null}
+                </div>
+
+                <div className="ime-pathway-card-body">
+                  {steps.length > 0 ? (
+                    <div className="ime-pathway-steps">
+                      {steps.map((step, j) => (
+                        <div key={j} className="ime-pathway-step">
+                          <div className="ime-pathway-step-num">{j + 1}</div>
+                          <div className="ime-pathway-step-text">
+                            {step.title ? <strong>{step.title}</strong> : null}
+                            {step.description ? <span>{step.description}</span> : null}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {card.link ? (
+                    <CMSLink {...card.link} className="ime-pathway-cta" />
+                  ) : null}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : null}
+    </Section>
+  )
+}

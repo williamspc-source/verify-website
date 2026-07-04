@@ -6,6 +6,7 @@ import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { accentText } from '@/utilities/accentText'
 
 type HomeHeroProps = Page['hero']
 
@@ -26,12 +27,17 @@ export const HomeHero: React.FC<HomeHeroProps> = (props) => {
         <div className="hero-layout">
           <div>
             {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-            {heading ? <h1 className="hero-heading vf-home-hero__title">{heading}</h1> : null}
+            {heading ? <h1 className="hero-heading vf-home-hero__title">{accentText(heading)}</h1> : null}
             {subtitle ? <p className="hero-subtext">{subtitle}</p> : null}
             {Array.isArray(links) && links.length > 0 ? (
               <div className="hero-cta-row">
                 {links.map(({ link }, i) => (
-                  <CMSLink key={i} {...link} appearance="inline" className={cn('btn', i === 0 ? 'btn-primary' : 'btn-outline')} />
+                  <CMSLink
+                    key={i}
+                    {...link}
+                    appearance="inline"
+                    className={i === 0 ? 'hero-cta-primary' : 'hero-cta-secondary'}
+                  />
                 ))}
               </div>
             ) : null}
@@ -40,6 +46,10 @@ export const HomeHero: React.FC<HomeHeroProps> = (props) => {
           <div>
             {hasDefinition ? (
               <div className={cn('hero-panel hero-definition-panel', `hero-definition-panel--${definitionStyle}`, 'vf-home-hero__definition')}>
+                <div className="definition-seal" aria-hidden>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/assets/images/VERIFY Shield.png" alt="" className="definition-seal-logo" />
+                </div>
                 <div className="hero-definition-block">
                   {definition?.term ? <div className="hero-def-word">{definition.term}</div> : null}
                   {definition?.pronunciation ? <div className="hero-def-pos">{definition.pronunciation}</div> : null}

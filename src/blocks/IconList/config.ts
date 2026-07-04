@@ -1,6 +1,5 @@
 import type { Block } from 'payload'
 
-import { link } from '@/fields/link'
 import {
   cssClassField,
   displayFields,
@@ -40,7 +39,18 @@ export const IconList: Block = {
             { name: 'text', type: 'text', required: true, admin: { width: '70%' } },
           ],
         },
-        link({ appearances: false, disableLabel: true }),
+        {
+          name: 'link',
+          type: 'group',
+          admin: { description: 'Optional link for this item.' },
+          fields: [
+            {
+              name: 'url',
+              type: 'text',
+              admin: { description: 'Optional URL (leave empty for no link).' },
+            },
+          ],
+        },
       ],
     },
     cssClassField,

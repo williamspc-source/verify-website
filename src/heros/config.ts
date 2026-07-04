@@ -70,10 +70,11 @@ export const hero: Field = {
           name: 'theme',
           type: 'select',
           defaultValue: 'light',
-          admin: { width: '50%', description: 'Light interior hero, or a dark gradient band.' },
+          admin: { width: '50%', description: 'Light interior hero, a dark gradient band, or a soft-blue service band.' },
           options: [
             { label: 'Light', value: 'light' },
             { label: 'Dark (gradient)', value: 'dark' },
+            { label: 'Service (soft blue)', value: 'service' },
           ],
         },
         {

@@ -29,6 +29,18 @@ import { ResourcesGrid } from '../../blocks/ResourcesGrid/config'
 import { SpecialistDirectory } from '../../blocks/SpecialistDirectory/config'
 import { SpecialtyDirectory } from '../../blocks/SpecialtyDirectory/config'
 import { AppointmentGuide } from '../../blocks/AppointmentGuide/config'
+import { AamleEducation } from '../../blocks/AamleEducation/config'
+import { MissionPillars } from '../../blocks/MissionPillars/config'
+import { ValueCards } from '../../blocks/ValueCards/config'
+import { WhyVerify } from '../../blocks/WhyVerify/config'
+import { LeadershipSpotlight } from '../../blocks/LeadershipSpotlight/config'
+import { AudiencePathways } from '../../blocks/AudiencePathways/config'
+import { BookingChooser } from '../../blocks/BookingChooser/config'
+import { CostGrid } from '../../blocks/CostGrid/config'
+import { PortalCta } from '../../blocks/PortalCta/config'
+import { Newsletter } from '../../blocks/Newsletter/config'
+import { VideoEmbed } from '../../blocks/VideoEmbed/config'
+import { SectionNav } from '../../blocks/SectionNav/config'
 import { Section } from '../../blocks/Section/config'
 import { Row } from '../../blocks/Row/config'
 import { hero } from '@/heros/config'
@@ -142,6 +154,19 @@ export const Pages: CollectionConfig<'pages'> = {
                 ContactDetails,
                 IconList,
                 Callout,
+                // Bespoke design-reference section blocks
+                AamleEducation,
+                MissionPillars,
+                ValueCards,
+                WhyVerify,
+                LeadershipSpotlight,
+                AudiencePathways,
+                BookingChooser,
+                CostGrid,
+                PortalCta,
+                Newsletter,
+                VideoEmbed,
+                SectionNav,
               ],
               required: true,
               admin: {

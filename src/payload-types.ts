@@ -217,9 +217,9 @@ export interface Page {
      */
     showBreadcrumb?: boolean | null;
     /**
-     * Light interior hero, or a dark gradient band.
+     * Light interior hero, a dark gradient band, or a soft-blue service band.
      */
-    theme?: ('light' | 'dark') | null;
+    theme?: ('light' | 'dark' | 'service') | null;
     align?: ('left' | 'center') | null;
     /**
      * Decorative brand shield behind the hero (uses the Site Settings logo/shield).
@@ -542,6 +542,18 @@ export interface Page {
     | ContactDetailsBlock
     | IconListBlock
     | CalloutBlock
+    | AamleEducationBlock
+    | MissionPillarsBlock
+    | ValueCardsBlock
+    | WhyVerifyBlock
+    | LeadershipSpotlightBlock
+    | AudiencePathwaysBlock
+    | BookingChooserBlock
+    | CostGridBlock
+    | PortalCtaBlock
+    | NewsletterBlock
+    | VideoEmbedBlock
+    | SectionNavBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1912,6 +1924,9 @@ export interface SectionBlock {
         | ContactDetailsBlock
         | IconListBlock
         | MapEmbedBlock
+        | LeadershipSpotlightBlock
+        | PortalCtaBlock
+        | VideoEmbedBlock
       )[]
     | null;
   /**
@@ -1977,6 +1992,9 @@ export interface RowBlock {
               | ContactDetailsBlock
               | IconListBlock
               | MapEmbedBlock
+              | LeadershipSpotlightBlock
+              | PortalCtaBlock
+              | VideoEmbedBlock
             )[]
           | null;
         id?: string | null;
@@ -5020,6 +5038,7 @@ export interface TabsBlockType {
          */
         content?:
           | (
+              | AamleEducationBlock
               | HeadingBlock
               | TextBlock
               | ButtonBlock
@@ -5083,6 +5102,448 @@ export interface TabsBlockType {
   id?: string | null;
   blockName?: string | null;
   blockType: 'tabs';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AamleEducationBlock".
+ */
+export interface AamleEducationBlock {
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  intro?: {
+    /**
+     * Small uppercase eyebrow above the heading (left column).
+     */
+    label?: string | null;
+    /**
+     * Wrap the accented phrase in [[brackets]] to colour it in the brand blue, e.g. "Complimentary Education [[for Industry Professionals]]".
+     */
+    heading?: string | null;
+    /**
+     * Right-column intro paragraph(s). Bold is supported.
+     */
+    description?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  panels?:
+    | {
+        /**
+         * Large faint step number, e.g. "01".
+         */
+        step?: string | null;
+        /**
+         * Icon shown in the left column.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        /**
+         * Small pill label, e.g. "Free to Join".
+         */
+        badge?: string | null;
+        title: string;
+        /**
+         * Use the brighter (accent) badge style.
+         */
+        badgeAccent?: boolean | null;
+        /**
+         * Right-column paragraph(s). Bold / italic supported.
+         */
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        /**
+         * Optional bullet list shown under the description.
+         */
+        list?:
+          | {
+              item: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  sponsor?: {
+    /**
+     * Icon shown with this item.
+     */
+    icon?:
+      | (
+          | 'activity'
+          | 'arrow-down'
+          | 'arrow-right'
+          | 'arrows-out'
+          | 'award'
+          | 'bag-simple'
+          | 'bell-ringing'
+          | 'bone'
+          | 'book-open'
+          | 'brain'
+          | 'briefcase'
+          | 'building'
+          | 'bus'
+          | 'calendar'
+          | 'calendar-blank'
+          | 'calendar-check'
+          | 'car'
+          | 'caret-left'
+          | 'caret-right'
+          | 'cell-signal-full'
+          | 'certificate'
+          | 'chart-bar'
+          | 'chat'
+          | 'chat-circle-text'
+          | 'chats'
+          | 'chats-circle'
+          | 'check'
+          | 'check-circle'
+          | 'check-square'
+          | 'clipboard-check'
+          | 'clipboard-text'
+          | 'clock'
+          | 'currency-dollar'
+          | 'desktop'
+          | 'download'
+          | 'download-simple'
+          | 'envelope'
+          | 'envelope-simple'
+          | 'file-magnifying-glass'
+          | 'file-plus'
+          | 'file-text'
+          | 'files'
+          | 'first-aid'
+          | 'gavel'
+          | 'globe'
+          | 'graduation-cap'
+          | 'handshake'
+          | 'headset'
+          | 'heart-pulse'
+          | 'heartbeat'
+          | 'home'
+          | 'house'
+          | 'identification-card'
+          | 'info'
+          | 'link'
+          | 'list'
+          | 'lock'
+          | 'lock-simple'
+          | 'magnifying-glass'
+          | 'mail'
+          | 'map-pin'
+          | 'medal'
+          | 'message'
+          | 'monitor'
+          | 'navigation-arrow'
+          | 'paper-plane-tilt'
+          | 'person-arms-spread'
+          | 'phone'
+          | 'question'
+          | 'scale'
+          | 'scales'
+          | 'seal-check'
+          | 'search'
+          | 'send'
+          | 'shield'
+          | 'shield-check'
+          | 'sign-in'
+          | 'sliders'
+          | 'sort-ascending'
+          | 'squares-four'
+          | 'star'
+          | 'stethoscope'
+          | 't-shirt'
+          | 'target'
+          | 'translate'
+          | 'upload'
+          | 'upload-simple'
+          | 'user'
+          | 'user-check'
+          | 'user-circle'
+          | 'user-plus'
+          | 'users'
+          | 'users-three'
+          | 'video'
+          | 'video-camera'
+          | 'warning'
+          | 'warning-circle'
+          | 'wheelchair'
+          | 'wifi-high'
+          | 'wind'
+        )
+      | null;
+    label?: string | null;
+    description?: string | null;
+  };
+  link: {
+    type?: ('reference' | 'custom' | 'enquiry') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Optional leading icon shown before the label.
+     */
+    icon?:
+      | (
+          | 'activity'
+          | 'arrow-down'
+          | 'arrow-right'
+          | 'arrows-out'
+          | 'award'
+          | 'bag-simple'
+          | 'bell-ringing'
+          | 'bone'
+          | 'book-open'
+          | 'brain'
+          | 'briefcase'
+          | 'building'
+          | 'bus'
+          | 'calendar'
+          | 'calendar-blank'
+          | 'calendar-check'
+          | 'car'
+          | 'caret-left'
+          | 'caret-right'
+          | 'cell-signal-full'
+          | 'certificate'
+          | 'chart-bar'
+          | 'chat'
+          | 'chat-circle-text'
+          | 'chats'
+          | 'chats-circle'
+          | 'check'
+          | 'check-circle'
+          | 'check-square'
+          | 'clipboard-check'
+          | 'clipboard-text'
+          | 'clock'
+          | 'currency-dollar'
+          | 'desktop'
+          | 'download'
+          | 'download-simple'
+          | 'envelope'
+          | 'envelope-simple'
+          | 'file-magnifying-glass'
+          | 'file-plus'
+          | 'file-text'
+          | 'files'
+          | 'first-aid'
+          | 'gavel'
+          | 'globe'
+          | 'graduation-cap'
+          | 'handshake'
+          | 'headset'
+          | 'heart-pulse'
+          | 'heartbeat'
+          | 'home'
+          | 'house'
+          | 'identification-card'
+          | 'info'
+          | 'link'
+          | 'list'
+          | 'lock'
+          | 'lock-simple'
+          | 'magnifying-glass'
+          | 'mail'
+          | 'map-pin'
+          | 'medal'
+          | 'message'
+          | 'monitor'
+          | 'navigation-arrow'
+          | 'paper-plane-tilt'
+          | 'person-arms-spread'
+          | 'phone'
+          | 'question'
+          | 'scale'
+          | 'scales'
+          | 'seal-check'
+          | 'search'
+          | 'send'
+          | 'shield'
+          | 'shield-check'
+          | 'sign-in'
+          | 'sliders'
+          | 'sort-ascending'
+          | 'squares-four'
+          | 'star'
+          | 'stethoscope'
+          | 't-shirt'
+          | 'target'
+          | 'translate'
+          | 'upload'
+          | 'upload-simple'
+          | 'user'
+          | 'user-check'
+          | 'user-circle'
+          | 'user-plus'
+          | 'users'
+          | 'users-three'
+          | 'video'
+          | 'video-camera'
+          | 'warning'
+          | 'warning-circle'
+          | 'wheelchair'
+          | 'wifi-high'
+          | 'wind'
+        )
+      | null;
+  };
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'aamleEducation';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6234,126 +6695,14 @@ export interface IconListBlock {
             )
           | null;
         text: string;
+        /**
+         * Optional link for this item.
+         */
         link?: {
-          type?: ('reference' | 'custom' | 'enquiry') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
           /**
-           * Optional leading icon shown before the label.
+           * Optional URL (leave empty for no link).
            */
-          icon?:
-            | (
-                | 'activity'
-                | 'arrow-down'
-                | 'arrow-right'
-                | 'arrows-out'
-                | 'award'
-                | 'bag-simple'
-                | 'bell-ringing'
-                | 'bone'
-                | 'book-open'
-                | 'brain'
-                | 'briefcase'
-                | 'building'
-                | 'bus'
-                | 'calendar'
-                | 'calendar-blank'
-                | 'calendar-check'
-                | 'car'
-                | 'caret-left'
-                | 'caret-right'
-                | 'cell-signal-full'
-                | 'certificate'
-                | 'chart-bar'
-                | 'chat'
-                | 'chat-circle-text'
-                | 'chats'
-                | 'chats-circle'
-                | 'check'
-                | 'check-circle'
-                | 'check-square'
-                | 'clipboard-check'
-                | 'clipboard-text'
-                | 'clock'
-                | 'currency-dollar'
-                | 'desktop'
-                | 'download'
-                | 'download-simple'
-                | 'envelope'
-                | 'envelope-simple'
-                | 'file-magnifying-glass'
-                | 'file-plus'
-                | 'file-text'
-                | 'files'
-                | 'first-aid'
-                | 'gavel'
-                | 'globe'
-                | 'graduation-cap'
-                | 'handshake'
-                | 'headset'
-                | 'heart-pulse'
-                | 'heartbeat'
-                | 'home'
-                | 'house'
-                | 'identification-card'
-                | 'info'
-                | 'link'
-                | 'list'
-                | 'lock'
-                | 'lock-simple'
-                | 'magnifying-glass'
-                | 'mail'
-                | 'map-pin'
-                | 'medal'
-                | 'message'
-                | 'monitor'
-                | 'navigation-arrow'
-                | 'paper-plane-tilt'
-                | 'person-arms-spread'
-                | 'phone'
-                | 'question'
-                | 'scale'
-                | 'scales'
-                | 'seal-check'
-                | 'search'
-                | 'send'
-                | 'shield'
-                | 'shield-check'
-                | 'sign-in'
-                | 'sliders'
-                | 'sort-ascending'
-                | 'squares-four'
-                | 'star'
-                | 'stethoscope'
-                | 't-shirt'
-                | 'target'
-                | 'translate'
-                | 'upload'
-                | 'upload-simple'
-                | 'user'
-                | 'user-check'
-                | 'user-circle'
-                | 'user-plus'
-                | 'users'
-                | 'users-three'
-                | 'video'
-                | 'video-camera'
-                | 'warning'
-                | 'warning-circle'
-                | 'wheelchair'
-                | 'wifi-high'
-                | 'wind'
-              )
-            | null;
+          url?: string | null;
         };
         id?: string | null;
       }[]
@@ -6618,6 +6967,668 @@ export interface Office {
   slug: string;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LeadershipSpotlightBlock".
+ */
+export interface LeadershipSpotlightBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Founder portrait. Falls back to a labelled placeholder when empty.
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Icon shown in the photo placeholder when no portrait is set.
+   */
+  placeholderIcon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  /**
+   * Name shown on the floating badge.
+   */
+  name?: string | null;
+  /**
+   * Role line beneath the name on the badge.
+   */
+  role?: string | null;
+  /**
+   * Optional small kicker above the name on the floating badge, e.g. "Founder".
+   */
+  badge?: string | null;
+  /**
+   * Short italic pull-quote shown above the body copy.
+   */
+  tagline?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Credential pills, e.g. "25+ Years — Personal Injury Law".
+   */
+  credentials?:
+    | {
+        cred: string;
+        id?: string | null;
+      }[]
+    | null;
+  link: {
+    type?: ('reference' | 'custom' | 'enquiry') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Optional leading icon shown before the label.
+     */
+    icon?:
+      | (
+          | 'activity'
+          | 'arrow-down'
+          | 'arrow-right'
+          | 'arrows-out'
+          | 'award'
+          | 'bag-simple'
+          | 'bell-ringing'
+          | 'bone'
+          | 'book-open'
+          | 'brain'
+          | 'briefcase'
+          | 'building'
+          | 'bus'
+          | 'calendar'
+          | 'calendar-blank'
+          | 'calendar-check'
+          | 'car'
+          | 'caret-left'
+          | 'caret-right'
+          | 'cell-signal-full'
+          | 'certificate'
+          | 'chart-bar'
+          | 'chat'
+          | 'chat-circle-text'
+          | 'chats'
+          | 'chats-circle'
+          | 'check'
+          | 'check-circle'
+          | 'check-square'
+          | 'clipboard-check'
+          | 'clipboard-text'
+          | 'clock'
+          | 'currency-dollar'
+          | 'desktop'
+          | 'download'
+          | 'download-simple'
+          | 'envelope'
+          | 'envelope-simple'
+          | 'file-magnifying-glass'
+          | 'file-plus'
+          | 'file-text'
+          | 'files'
+          | 'first-aid'
+          | 'gavel'
+          | 'globe'
+          | 'graduation-cap'
+          | 'handshake'
+          | 'headset'
+          | 'heart-pulse'
+          | 'heartbeat'
+          | 'home'
+          | 'house'
+          | 'identification-card'
+          | 'info'
+          | 'link'
+          | 'list'
+          | 'lock'
+          | 'lock-simple'
+          | 'magnifying-glass'
+          | 'mail'
+          | 'map-pin'
+          | 'medal'
+          | 'message'
+          | 'monitor'
+          | 'navigation-arrow'
+          | 'paper-plane-tilt'
+          | 'person-arms-spread'
+          | 'phone'
+          | 'question'
+          | 'scale'
+          | 'scales'
+          | 'seal-check'
+          | 'search'
+          | 'send'
+          | 'shield'
+          | 'shield-check'
+          | 'sign-in'
+          | 'sliders'
+          | 'sort-ascending'
+          | 'squares-four'
+          | 'star'
+          | 'stethoscope'
+          | 't-shirt'
+          | 'target'
+          | 'translate'
+          | 'upload'
+          | 'upload-simple'
+          | 'user'
+          | 'user-check'
+          | 'user-circle'
+          | 'user-plus'
+          | 'users'
+          | 'users-three'
+          | 'video'
+          | 'video-camera'
+          | 'warning'
+          | 'warning-circle'
+          | 'wheelchair'
+          | 'wifi-high'
+          | 'wind'
+        )
+      | null;
+  };
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Apply preset classes to specific parts of this block.
+   */
+  elementClasses?: {
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    heading?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    card?: string[] | null;
+    /**
+     * Pick styles defined in Globals → Custom Styles.
+     */
+    button?: string[] | null;
+  };
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'leadershipSpotlight';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PortalCtaBlock".
+ */
+export interface PortalCtaBlock {
+  /**
+   * Small uppercase label above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the accent colour.
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Feature tiles shown in the band (icon + label).
+   */
+  tiles?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Action buttons. The first renders solid white; the rest render outline-white.
+   */
+  links?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'portalCta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoEmbedBlock".
+ */
+export interface VideoEmbedBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Where the video is hosted.
+   */
+  provider: 'youtube' | 'vimeo' | 'url';
+  /**
+   * Frame proportions.
+   */
+  aspect?: ('16:9' | '4:3') | null;
+  /**
+   * The video ID only, e.g. "YCd7aoYTD3Q" for youtube.com/watch?v=YCd7aoYTD3Q, or "76979871" for a Vimeo URL.
+   */
+  videoId?: string | null;
+  /**
+   * Full iframe src URL for the embed.
+   */
+  url?: string | null;
+  /**
+   * Describes the video for screen readers (iframe title). Falls back to the heading.
+   */
+  videoTitle?: string | null;
+  /**
+   * Optional caption shown beneath the video.
+   */
+  caption?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'videoEmbed';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -7965,6 +8976,973 @@ export interface AppointmentGuideBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MissionPillarsBlock".
+ */
+export interface MissionPillarsBlock {
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  /**
+   * Intro paragraph shown under the heading (optional).
+   */
+  subheading?: string | null;
+  /**
+   * Each pillar is auto-numbered 01, 02, 03… in display order.
+   */
+  pillars?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'missionPillars';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ValueCardsBlock".
+ */
+export interface ValueCardsBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Value cards, rendered in a 3-column grid. Every second card (2nd, 4th, 6th) is tinted light blue automatically.
+   */
+  cards?:
+    | {
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'valueCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhyVerifyBlock".
+ */
+export interface WhyVerifyBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Each reason renders as a +/− disclosure row: the title is always visible and the body expands on click.
+   */
+  items?:
+    | {
+        /**
+         * Optional icon for this reason (kept in markup for structure; hidden in the current light design).
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        title: string;
+        /**
+         * Shown when the row is expanded.
+         */
+        body?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Company image shown beside the reasons. Falls back to a gradient placeholder when empty.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Text shown inside the image placeholder when no image is set.
+   */
+  placeholderLabel?: string | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'whyVerify';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AudiencePathwaysBlock".
+ */
+export interface AudiencePathwaysBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Two audience pathway cards shown side by side.
+   */
+  pathways?:
+    | {
+        /**
+         * Card treatment. "Client" = dark-blue header; "Claimant" = light-blue header.
+         */
+        variant?: ('client' | 'claimant') | null;
+        /**
+         * Small uppercase audience label, e.g. "For Clients".
+         */
+        eyebrow?: string | null;
+        /**
+         * Card heading (h3).
+         */
+        title?: string | null;
+        /**
+         * Short intro paragraph under the card heading.
+         */
+        description?: string | null;
+        /**
+         * Numbered steps (numbers are added automatically).
+         */
+        steps?:
+          | {
+              /**
+               * Bold step lead-in.
+               */
+              title: string;
+              /**
+               * Step detail text.
+               */
+              description?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'audiencePathways';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BookingChooserBlock".
+ */
+export interface BookingChooserBlock {
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Full-bleed 50/50 chooser — add two halves (typically one light-blue and one dark-navy side).
+   */
+  halves?:
+    | {
+        /**
+         * Large icon — also drawn as the oversized faint watermark for depth.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        /**
+         * Panel colour treatment.
+         */
+        accent?: ('blue' | 'dark') | null;
+        /**
+         * Small uppercase label above the title, e.g. "Already Registered?".
+         */
+        eyebrow?: string | null;
+        /**
+         * Panel heading. Wrap a word/phrase in [[brackets]] to accent it.
+         */
+        title?: string | null;
+        description?: string | null;
+        /**
+         * One or two CTA buttons. Choose "Outline" appearance for a secondary button; the button icon renders as a trailing arrow.
+         */
+        links?:
+          | {
+              link: {
+                type?: ('reference' | 'custom' | 'enquiry') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+                /**
+                 * Optional leading icon shown before the label.
+                 */
+                icon?:
+                  | (
+                      | 'activity'
+                      | 'arrow-down'
+                      | 'arrow-right'
+                      | 'arrows-out'
+                      | 'award'
+                      | 'bag-simple'
+                      | 'bell-ringing'
+                      | 'bone'
+                      | 'book-open'
+                      | 'brain'
+                      | 'briefcase'
+                      | 'building'
+                      | 'bus'
+                      | 'calendar'
+                      | 'calendar-blank'
+                      | 'calendar-check'
+                      | 'car'
+                      | 'caret-left'
+                      | 'caret-right'
+                      | 'cell-signal-full'
+                      | 'certificate'
+                      | 'chart-bar'
+                      | 'chat'
+                      | 'chat-circle-text'
+                      | 'chats'
+                      | 'chats-circle'
+                      | 'check'
+                      | 'check-circle'
+                      | 'check-square'
+                      | 'clipboard-check'
+                      | 'clipboard-text'
+                      | 'clock'
+                      | 'currency-dollar'
+                      | 'desktop'
+                      | 'download'
+                      | 'download-simple'
+                      | 'envelope'
+                      | 'envelope-simple'
+                      | 'file-magnifying-glass'
+                      | 'file-plus'
+                      | 'file-text'
+                      | 'files'
+                      | 'first-aid'
+                      | 'gavel'
+                      | 'globe'
+                      | 'graduation-cap'
+                      | 'handshake'
+                      | 'headset'
+                      | 'heart-pulse'
+                      | 'heartbeat'
+                      | 'home'
+                      | 'house'
+                      | 'identification-card'
+                      | 'info'
+                      | 'link'
+                      | 'list'
+                      | 'lock'
+                      | 'lock-simple'
+                      | 'magnifying-glass'
+                      | 'mail'
+                      | 'map-pin'
+                      | 'medal'
+                      | 'message'
+                      | 'monitor'
+                      | 'navigation-arrow'
+                      | 'paper-plane-tilt'
+                      | 'person-arms-spread'
+                      | 'phone'
+                      | 'question'
+                      | 'scale'
+                      | 'scales'
+                      | 'seal-check'
+                      | 'search'
+                      | 'send'
+                      | 'shield'
+                      | 'shield-check'
+                      | 'sign-in'
+                      | 'sliders'
+                      | 'sort-ascending'
+                      | 'squares-four'
+                      | 'star'
+                      | 'stethoscope'
+                      | 't-shirt'
+                      | 'target'
+                      | 'translate'
+                      | 'upload'
+                      | 'upload-simple'
+                      | 'user'
+                      | 'user-check'
+                      | 'user-circle'
+                      | 'user-plus'
+                      | 'users'
+                      | 'users-three'
+                      | 'video'
+                      | 'video-camera'
+                      | 'warning'
+                      | 'warning-circle'
+                      | 'wheelchair'
+                      | 'wifi-high'
+                      | 'wind'
+                    )
+                  | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'bookingChooser';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CostGridBlock".
+ */
+export interface CostGridBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Translucent cards on the dark band (e.g. cost-control tips or inclusions).
+   */
+  cards?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Trailing emphasis paragraph below the cards (supports links, e.g. terms & conditions).
+   */
+  note?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'costGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsletterBlock".
+ */
+export interface NewsletterBlock {
+  /**
+   * Small uppercase label above the heading.
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the accent colour, e.g. "Be the First to Know About [[VERIFY & AAMLE Updates]]".
+   */
+  heading?: string | null;
+  /**
+   * Supporting paragraph beneath the heading.
+   */
+  subheading?: string | null;
+  /**
+   * Placeholder text inside the email input.
+   */
+  placeholder?: string | null;
+  /**
+   * Submit button label.
+   */
+  buttonLabel?: string | null;
+  /**
+   * Small print shown below the form.
+   */
+  note?: string | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'newsletter';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SectionNavBlock".
+ */
+export interface SectionNavBlock {
+  /**
+   * Each item links to and highlights a section on this page. Order = display order.
+   */
+  items?:
+    | {
+        /**
+         * The nav pill text, e.g. "News & Updates".
+         */
+        label: string;
+        /**
+         * The anchor ID of the section this jumps to (without the #). Must match that section's Anchor ID. Lowercase letters, numbers and hyphens only.
+         */
+        anchorId: string;
+        id?: string | null;
+      }[]
+    | null;
+  sticky?: boolean | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'sectionNav';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "availability-sessions".
  */
 export interface AvailabilitySession {
@@ -8427,6 +10405,18 @@ export interface PagesSelect<T extends boolean = true> {
         contactDetails?: T | ContactDetailsBlockSelect<T>;
         iconList?: T | IconListBlockSelect<T>;
         callout?: T | CalloutBlockSelect<T>;
+        aamleEducation?: T | AamleEducationBlockSelect<T>;
+        missionPillars?: T | MissionPillarsBlockSelect<T>;
+        valueCards?: T | ValueCardsBlockSelect<T>;
+        whyVerify?: T | WhyVerifyBlockSelect<T>;
+        leadershipSpotlight?: T | LeadershipSpotlightBlockSelect<T>;
+        audiencePathways?: T | AudiencePathwaysBlockSelect<T>;
+        bookingChooser?: T | BookingChooserBlockSelect<T>;
+        costGrid?: T | CostGridBlockSelect<T>;
+        portalCta?: T | PortalCtaBlockSelect<T>;
+        newsletter?: T | NewsletterBlockSelect<T>;
+        videoEmbed?: T | VideoEmbedBlockSelect<T>;
+        sectionNav?: T | SectionNavBlockSelect<T>;
       };
   meta?:
     | T
@@ -8493,6 +10483,9 @@ export interface SectionBlockSelect<T extends boolean = true> {
         contactDetails?: T | ContactDetailsBlockSelect<T>;
         iconList?: T | IconListBlockSelect<T>;
         mapEmbed?: T | MapEmbedBlockSelect<T>;
+        leadershipSpotlight?: T | LeadershipSpotlightBlockSelect<T>;
+        portalCta?: T | PortalCtaBlockSelect<T>;
+        videoEmbed?: T | VideoEmbedBlockSelect<T>;
       };
   cssClass?: T;
   anchorId?: T;
@@ -8540,6 +10533,9 @@ export interface RowBlockSelect<T extends boolean = true> {
               contactDetails?: T | ContactDetailsBlockSelect<T>;
               iconList?: T | IconListBlockSelect<T>;
               mapEmbed?: T | MapEmbedBlockSelect<T>;
+              leadershipSpotlight?: T | LeadershipSpotlightBlockSelect<T>;
+              portalCta?: T | PortalCtaBlockSelect<T>;
+              videoEmbed?: T | VideoEmbedBlockSelect<T>;
             };
         id?: T;
       };
@@ -9115,6 +11111,7 @@ export interface TabsBlockTypeSelect<T extends boolean = true> {
         content?:
           | T
           | {
+              aamleEducation?: T | AamleEducationBlockSelect<T>;
               heading?: T | HeadingBlockSelect<T>;
               text?: T | TextBlockSelect<T>;
               button?: T | ButtonBlockSelect<T>;
@@ -9149,6 +11146,60 @@ export interface TabsBlockTypeSelect<T extends boolean = true> {
         card?: T;
         button?: T;
       };
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AamleEducationBlock_select".
+ */
+export interface AamleEducationBlockSelect<T extends boolean = true> {
+  background?: T;
+  intro?:
+    | T
+    | {
+        label?: T;
+        heading?: T;
+        description?: T;
+      };
+  panels?:
+    | T
+    | {
+        step?: T;
+        icon?: T;
+        badge?: T;
+        title?: T;
+        badgeAccent?: T;
+        description?: T;
+        list?:
+          | T
+          | {
+              item?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  sponsor?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        description?: T;
+      };
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        icon?: T;
+      };
+  anchorId?: T;
+  cssClass?: T;
   containerWidth?: T;
   motion?: T;
   id?: T;
@@ -9315,11 +11366,7 @@ export interface IconListBlockSelect<T extends boolean = true> {
         link?:
           | T
           | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
               url?: T;
-              icon?: T;
             };
         id?: T;
       };
@@ -9359,6 +11406,109 @@ export interface MapEmbedBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  cssClass?: T;
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LeadershipSpotlightBlock_select".
+ */
+export interface LeadershipSpotlightBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  photo?: T;
+  placeholderIcon?: T;
+  name?: T;
+  role?: T;
+  badge?: T;
+  tagline?: T;
+  body?: T;
+  credentials?:
+    | T
+    | {
+        cred?: T;
+        id?: T;
+      };
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        icon?: T;
+      };
+  cssClass?: T;
+  elementClasses?:
+    | T
+    | {
+        heading?: T;
+        card?: T;
+        button?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  anchorId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PortalCtaBlock_select".
+ */
+export interface PortalCtaBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  tiles?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        id?: T;
+      };
+  links?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+            };
+        id?: T;
+      };
+  anchorId?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoEmbedBlock_select".
+ */
+export interface VideoEmbedBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  provider?: T;
+  aspect?: T;
+  videoId?: T;
+  url?: T;
+  videoTitle?: T;
+  caption?: T;
+  background?: T;
+  anchorId?: T;
   cssClass?: T;
   containerWidth?: T;
   motion?: T;
@@ -9571,6 +11721,208 @@ export interface AppointmentGuideBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MissionPillarsBlock_select".
+ */
+export interface MissionPillarsBlockSelect<T extends boolean = true> {
+  background?: T;
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  pillars?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  containerWidth?: T;
+  motion?: T;
+  cssClass?: T;
+  anchorId?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ValueCardsBlock_select".
+ */
+export interface ValueCardsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  cssClass?: T;
+  anchorId?: T;
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WhyVerifyBlock_select".
+ */
+export interface WhyVerifyBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        body?: T;
+        id?: T;
+      };
+  image?: T;
+  placeholderLabel?: T;
+  anchorId?: T;
+  containerWidth?: T;
+  motion?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AudiencePathwaysBlock_select".
+ */
+export interface AudiencePathwaysBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  background?: T;
+  pathways?:
+    | T
+    | {
+        variant?: T;
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        steps?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+            };
+        id?: T;
+      };
+  anchorId?: T;
+  cssClass?: T;
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BookingChooserBlock_select".
+ */
+export interface BookingChooserBlockSelect<T extends boolean = true> {
+  anchorId?: T;
+  halves?:
+    | T
+    | {
+        icon?: T;
+        accent?: T;
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                    icon?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CostGridBlock_select".
+ */
+export interface CostGridBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  note?: T;
+  anchorId?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsletterBlock_select".
+ */
+export interface NewsletterBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  placeholder?: T;
+  buttonLabel?: T;
+  note?: T;
+  anchorId?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SectionNavBlock_select".
+ */
+export interface SectionNavBlockSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        label?: T;
+        anchorId?: T;
+        id?: T;
+      };
+  sticky?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;

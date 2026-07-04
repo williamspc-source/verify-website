@@ -30,6 +30,9 @@ import { Callout } from './Callout/config'
 import { ContactDetails } from './ContactDetails/config'
 import { IconList } from './IconList/config'
 import { MapEmbed } from './MapEmbed/config'
+import { LeadershipSpotlight } from './LeadershipSpotlight/config'
+import { PortalCta } from './PortalCta/config'
+import { VideoEmbed } from './VideoEmbed/config'
 
 export const ATOM_BLOCKS: Block[] = [Heading, Text, Button, Image, Spacer, Divider, IconBlock]
 
@@ -53,6 +56,9 @@ export const NESTABLE_RICH_BLOCKS: Block[] = [
   ContactDetails,
   IconList,
   MapEmbed,
+  LeadershipSpotlight,
+  PortalCta,
+  VideoEmbed,
 ]
 
 // Allowed inside a Row column (atoms + rich blocks; no Row/Section — depth is

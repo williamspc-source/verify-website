@@ -53,8 +53,38 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
                 <Icon name={item.icon} />
               </div>
             ) : null}
-            <h3 className="service-title vf-card__title">{item.title}</h3>
+            <h3 className="service-title vf-card__title">
+              {item.title}
+              {item.titleSuffix ? (
+                <span className="vf-card__title-suffix"> {item.titleSuffix}</span>
+              ) : null}
+            </h3>
             {item.description ? <p className="service-desc">{item.description}</p> : null}
+            {Array.isArray(item.bullets) && item.bullets.length > 0 ? (
+              <ul className="vf-feature-bullets">
+                {item.bullets.map((b, j) => (
+                  <li key={j}>{b.text}</li>
+                ))}
+              </ul>
+            ) : null}
+            {item.detailsLabel || (Array.isArray(item.details) && item.details.length > 0) ? (
+              <div className="vf-feature-details">
+                {item.detailsLabel ? (
+                  <div className="vf-feature-details__label">{item.detailsLabel}</div>
+                ) : null}
+                {Array.isArray(item.details)
+                  ? item.details.map((d, j) => (
+                      <div key={j} className="vf-feature-detail">
+                        {d.icon ? <Icon name={d.icon} className="size-5" /> : null}
+                        <div>
+                          <strong>{d.title}</strong>
+                          {d.description ? <p>{d.description}</p> : null}
+                        </div>
+                      </div>
+                    ))
+                  : null}
+              </div>
+            ) : null}
           </div>
         ))}
       </div>

@@ -5,50 +5,112 @@ import type { Page } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { accentText } from '@/utilities/accentText'
+import { CMSLink } from '@/components/Link'
+import { Icon } from '@/components/Icon'
 
 export type Crumb = { label?: string | null; url?: string | null }
+
+type MetaItem = { icon?: string | null; text?: string | null; href?: string | null }
+type HeroLink = { link?: Record<string, unknown> | null }
 
 type PageHeroProps = Page['hero'] & {
   breadcrumbs?: Crumb[] | null
   title?: string | null
 }
 
-/** Interior-page hero using the ported `.page-hero` gradient band. */
+/**
+ * Interior-page hero — ports the design-reference `.page-hero` band.
+ * theme: light | dark (blue gradient) | service (soft blue #cbe5fa).
+ */
 export const PageHero: React.FC<PageHeroProps> = (props) => {
-  const { eyebrow, heading, subtitle, showBreadcrumb, breadcrumbs, title } = props
+  const { eyebrow, heading, subtitle, showBreadcrumb, breadcrumbs, title, links } = props
   const cssClass = (props as { cssClass?: string | string[] | null }).cssClass
+  const theme = (props as { theme?: string | null }).theme || 'light'
+  const align = (props as { align?: string | null }).align || 'left'
+  const showShield = Boolean((props as { showShield?: boolean | null }).showShield)
+  const metaItems = ((props as { metaItems?: MetaItem[] | null }).metaItems || []).filter(
+    (m) => m?.text,
+  )
+  const heroLinks = ((links as HeroLink[] | null | undefined) || []).filter((l) => l?.link)
   const headingText = heading || title
   const crumbs: Crumb[] = [{ label: 'Home', url: '/' }, ...((breadcrumbs as Crumb[]) || [])]
 
   return (
-    <section className={cn('page-hero vf-page-hero', toClassName(cssClass))}>
+    <section
+      className={cn(
+        'page-hero',
+        `page-hero--${theme}`,
+        align === 'center' && 'page-hero--center',
+        toClassName(cssClass),
+      )}
+    >
       <div className="container">
-        {showBreadcrumb && crumbs.length > 1 ? (
-          <nav aria-label="Breadcrumb" style={{ marginBottom: 14 }}>
-            <ol style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 6, fontSize: '0.8rem', color: 'var(--text-mid)', listStyle: 'none' }}>
+        <div className="page-hero-inner">
+          {showBreadcrumb && crumbs.length > 1 ? (
+            <nav className="page-hero-breadcrumb" aria-label="Breadcrumb">
               {crumbs.map((c, i) => {
                 const isLast = i === crumbs.length - 1
                 return (
-                  <li key={i} style={{ display: 'flex', gap: 6 }}>
-                    {i > 0 ? <span aria-hidden style={{ opacity: 0.5 }}>›</span> : null}
+                  <React.Fragment key={i}>
+                    {i > 0 ? <span aria-hidden>›</span> : null}
                     {isLast || !c.url ? (
-                      <span style={{ color: 'var(--text-dark)', fontWeight: 600 }}>{c.label}</span>
+                      <strong>{c.label}</strong>
                     ) : (
-                      <Link href={c.url} style={{ color: 'var(--primary)' }}>
-                        {c.label}
-                      </Link>
+                      <Link href={c.url}>{c.label}</Link>
                     )}
-                  </li>
+                  </React.Fragment>
                 )
               })}
-            </ol>
-          </nav>
-        ) : null}
+            </nav>
+          ) : null}
 
-        {eyebrow ? <div className="section-label vf-page-hero__eyebrow">{eyebrow}</div> : null}
-        {headingText ? <h1 className="vf-page-hero__title">{headingText}</h1> : null}
-        {subtitle ? <p>{subtitle}</p> : null}
+          {eyebrow ? <div className="section-label page-hero-eyebrow">{eyebrow}</div> : null}
+          {headingText ? <h1>{accentText(headingText)}</h1> : null}
+          {subtitle ? <p className="page-hero-sub">{subtitle}</p> : null}
+
+          {heroLinks.length ? (
+            <div className="page-hero-actions">
+              {heroLinks.map(({ link }, i) => (
+                <CMSLink
+                  key={i}
+                  {...(link as Record<string, unknown>)}
+                  appearance="inline"
+                  className={i === 0 ? 'btn-hero-primary' : 'btn-hero-outline'}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {metaItems.length ? (
+            <div className="vf-page-hero__meta">
+              {metaItems.map((m, i) => {
+                const inner = (
+                  <>
+                    {m.icon ? <Icon name={m.icon} className="size-5" /> : null}
+                    <span>{m.text}</span>
+                  </>
+                )
+                return m.href ? (
+                  <a key={i} href={m.href} className="vf-page-hero__meta-item">
+                    {inner}
+                  </a>
+                ) : (
+                  <span key={i} className="vf-page-hero__meta-item">
+                    {inner}
+                  </span>
+                )
+              })}
+            </div>
+          ) : null}
+        </div>
       </div>
+
+      {showShield ? (
+        <div className="page-hero-deco" aria-hidden>
+          <span className="page-hero-shield" />
+        </div>
+      ) : null}
     </section>
   )
 }

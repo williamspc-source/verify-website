@@ -55,8 +55,16 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = ({
                 <Icon name={step.icon} />
               </div>
             ) : null}
-            <h4 className="vf-card__title">{step.title}</h4>
+            {step.badge ? <span className="vf-process-step-badge">{step.badge}</span> : null}
+            {step.title ? <h4 className="vf-card__title">{step.title}</h4> : null}
             {step.description ? <p>{step.description}</p> : null}
+            {Array.isArray(step.bullets) && step.bullets.length > 0 ? (
+              <ul className="vf-process-step-bullets">
+                {step.bullets.map((b, j) => (
+                  <li key={j}>{b.text}</li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         ))}
       </div>

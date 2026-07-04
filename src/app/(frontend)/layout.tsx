@@ -10,6 +10,7 @@ import { CustomCSS } from '@/components/CustomCSS'
 import { MotionObserver } from '@/components/Reveal'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
+import { EnquiryDrawer } from '@/components/EnquiryDrawer'
 import { Providers } from '@/providers'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
@@ -73,6 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
           {children}
           <Footer />
+          <EnquiryDrawer />
         </Providers>
       </body>
     </html>

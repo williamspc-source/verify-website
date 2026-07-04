@@ -8,6 +8,7 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { TestimonialsClient, type TestimonialCard } from './TestimonialsClient'
 
 const mediaUrl = (m: unknown): string | null =>
   m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
@@ -51,6 +52,8 @@ export const TestimonialsGridBlock: React.FC<Props & { bare?: boolean }> = async
     testimonials,
     columns,
     limit,
+    layout,
+    carouselOptions,
     cssClass,
     elementClasses,
     motion,
@@ -96,14 +99,31 @@ export const TestimonialsGridBlock: React.FC<Props & { bare?: boolean }> = async
         align="center"
         titleClassName={toClassName(elementClasses?.heading)}
       />
-      <div
-        className="testimonials-grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-      >
-        {docs.map((t, i) => (
-          <Card key={i} t={t} className={toClassName(elementClasses?.card)} />
-        ))}
-      </div>
+      {layout === 'carousel' ? (
+        <TestimonialsClient
+          cards={docs.map(
+            (t): TestimonialCard => ({
+              rating: Math.max(0, Math.min(5, t.rating ?? 5)),
+              quote: t.quote,
+              position: t.authorRole,
+              orgLoc: t.org || null,
+              name: t.authorName || null,
+              avatar: mediaUrl(t.avatar),
+            }),
+          )}
+          visible={(carouselOptions as { visible?: number } | undefined)?.visible || cols}
+          showArrows={(carouselOptions as { showArrows?: boolean } | undefined)?.showArrows ?? true}
+        />
+      ) : (
+        <div
+          className="testimonials-grid"
+          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        >
+          {docs.map((t, i) => (
+            <Card key={i} t={t} className={toClassName(elementClasses?.card)} />
+          ))}
+        </div>
+      )}
     </Section>
   )
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 import React from 'react'
 
+import type { CollectionSlug } from 'payload'
 import type { SpecialtyGridBlock as Props } from '@/payload-types'
 
 import { Icon } from '@/components/Icon'
@@ -39,6 +40,8 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     subheading,
     background,
     source = 'auto',
+    taxonomy,
+    variant,
     defaultIcon,
     linkToDirectory,
     directoryPath,
@@ -60,17 +63,23 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
       href: item.link?.url ?? null,
     }))
   } else {
+    const collection = (taxonomy || 'specialties') as CollectionSlug
     const payload = await getPayload({ config: configPromise })
-    const res = await payload.find({ collection: 'specialties', limit: 100, sort: 'title' })
-    tiles = res.docs.map((s) => ({
+    const res = await payload.find({ collection, limit: 100, sort: 'title' })
+    tiles = res.docs.map((s: { id: string | number; title: string; slug?: string | null; icon?: string | null }) => ({
       id: String(s.id),
-      icon: defaultIcon || 'stethoscope',
+      icon: s.icon || defaultIcon || 'stethoscope',
       label: s.title,
-      href: linkToDirectory && s.slug ? `${directoryPath || '/specialists'}?specialty=${s.slug}` : null,
+      href:
+        linkToDirectory && s.slug && collection === 'specialties'
+          ? `${directoryPath || '/specialists'}?specialty=${s.slug}`
+          : null,
     }))
   }
 
   if (tiles.length === 0) return null
+
+  const isChecklist = variant === 'checklist'
 
   return (
     <Section
@@ -88,11 +97,24 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
         align="center"
         titleClassName={toClassName(elementClasses?.heading)}
       />
-      <div className="specialty-grid">
-        {tiles.map((t) => (
-          <Tile key={t.id} {...t} className={toClassName(elementClasses?.card)} />
-        ))}
-      </div>
+      {isChecklist ? (
+        <ul className="claims-list vf-checklist">
+          {tiles.map((t) => (
+            <li key={t.id}>
+              <span className="claim-arrow" aria-hidden>
+                →
+              </span>
+              <span className="claim-name">{t.label}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="specialty-grid">
+          {tiles.map((t) => (
+            <Tile key={t.id} {...t} className={toClassName(elementClasses?.card)} />
+          ))}
+        </div>
+      )}
     </Section>
   )
 }

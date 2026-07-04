@@ -5,12 +5,17 @@ import type { SplitFeatureBlock as Props } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
+import { Icon } from '@/components/Icon'
 import RichText from '@/components/RichText'
 import { Section, type SectionBackground } from '@/components/Section'
+import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
 export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
+  eyebrow,
+  heading,
+  subheading,
   background,
   rows,
   cssClass,
@@ -29,6 +34,13 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
       containerWidth={containerWidth}
       bare={bare}
     >
+      <SectionHeader
+        eyebrow={eyebrow}
+        title={heading}
+        subtitle={subheading}
+        align="center"
+        titleClassName={toClassName(elementClasses?.heading)}
+      />
       {rows.map((row, i) => {
         const side = row.imageSide === 'auto' || !row.imageSide ? (i % 2 === 0 ? 'left' : 'right') : row.imageSide
         const imageLeft = side === 'left'
@@ -46,6 +58,11 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
             ) : null}
 
             <div className="vf-split__content">
+              {row.icon ? (
+                <div className="vf-split__icon vf-card__icon">
+                  <Icon name={row.icon} />
+                </div>
+              ) : null}
               {row.eyebrow ? <div className="section-label">{row.eyebrow}</div> : null}
               <h3 className={cn('section-title vf-split__title', toClassName(elementClasses?.heading))}>
                 {row.title}
@@ -56,11 +73,16 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
                 </div>
               ) : null}
 
+              {row.bulletsLabel ? <div className="vf-split__bullets-label">{row.bulletsLabel}</div> : null}
               {row.bullets && row.bullets.length > 0 ? (
                 <ul className="vf-split__list">
                   {row.bullets.map((b, j) => (
                     <li key={j}>
-                      <Check className="vf-split__check size-5" aria-hidden />
+                      {b.icon ? (
+                        <Icon name={b.icon} className="vf-split__check size-5" />
+                      ) : (
+                        <Check className="vf-split__check size-5" aria-hidden />
+                      )}
                       <span>{b.text}</span>
                     </li>
                   ))}

@@ -2,7 +2,7 @@ import React from 'react'
 
 import type { TabsBlockType as Props } from '@/payload-types'
 
-import RichText from '@/components/RichText'
+import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
@@ -25,10 +25,12 @@ export const TabsBlock: React.FC<Props & { bare?: boolean }> = ({
 }) => {
   if (!tabs || tabs.length === 0) return null
 
-  // RichText is rendered server-side here; the client component only switches.
+  // Tab panels are nested blocks, rendered server-side here; the client component
+  // only switches which panel is visible.
   const items = tabs.map((tab) => ({
     label: tab.label,
-    panel: <RichText data={tab.content} enableGutter={false} />,
+    icon: tab.icon ?? null,
+    panel: <RenderBlocks blocks={tab.content} context="nested" />,
   }))
 
   return (
