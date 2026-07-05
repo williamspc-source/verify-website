@@ -1,4 +1,4 @@
-import type { Block } from 'payload'
+import type { Block, Field } from 'payload'
 
 import {
   FixedToolbarFeature,
@@ -31,7 +31,7 @@ export const LeadershipSpotlight: Block = {
     // Wrap a word in [[brackets]] in the heading to accent it. `subheading` is an
     // optional lead paragraph.
     ...sectionHeaderFields,
-    { ...backgroundField, defaultValue: 'muted' },
+    { ...backgroundField, defaultValue: 'muted' } as Field,
     {
       name: 'photo',
       type: 'upload',

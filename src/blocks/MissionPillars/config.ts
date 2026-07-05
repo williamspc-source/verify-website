@@ -32,7 +32,7 @@ const missionHeaderFields: Field[] = sectionHeaderFields.map((field) => {
     }
   }
   return field
-})
+}) as Field[]
 
 export const MissionPillars: Block = {
   slug: 'missionPillars',
@@ -41,7 +41,7 @@ export const MissionPillars: Block = {
   fields: [
     // Dark blue gradient panel by default — the .mv-mission-panel class supplies
     // its own gradient; this drives the section banding / text treatment.
-    { ...backgroundField, defaultValue: 'dark' },
+    { ...backgroundField, defaultValue: 'dark' } as Field,
     ...missionHeaderFields,
     {
       name: 'pillars',

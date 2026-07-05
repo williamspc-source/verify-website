@@ -12,7 +12,7 @@ const richBody = {
   name: 'body',
   type: 'richText' as const,
   editor: lexicalEditor({
-    features: ({ rootFeatures }: { rootFeatures: unknown[] }) => [
+    features: ({ rootFeatures }) => [
       ...rootFeatures,
       FixedToolbarFeature(),
       InlineToolbarFeature(),

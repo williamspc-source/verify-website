@@ -23,7 +23,7 @@ const whyHeaderFields: Field[] = sectionHeaderFields.map((f) =>
   'name' in f && typeof f.name === 'string' && f.name in headerDefaults
     ? { ...f, defaultValue: headerDefaults[f.name] }
     : f,
-)
+) as Field[]
 
 // The six "what sets us apart" reasons from the about-verify reference, provided
 // as defaults so a fresh block renders the full accordion out of the box. Every

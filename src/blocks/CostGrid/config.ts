@@ -21,7 +21,7 @@ const headerDefaults: Record<string, string> = {
 const costHeaderFields: Field[] = sectionHeaderFields.map((field) => {
   const name = 'name' in field ? (field.name as string) : ''
   return name in headerDefaults ? { ...field, defaultValue: headerDefaults[name] } : field
-})
+}) as Field[]
 
 // Cost / inclusions grid on a dark band: translucent white cards, each with an
 // icon, title and description, plus a trailing emphasis note. Mirrors the

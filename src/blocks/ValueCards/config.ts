@@ -1,4 +1,4 @@
-import type { Block } from 'payload'
+import type { Block, Field } from 'payload'
 
 import {
   anchorIdField,
@@ -20,7 +20,7 @@ export const ValueCards: Block = {
   labels: { singular: 'Value Cards', plural: 'Value Cards' },
   fields: [
     ...sectionHeaderFields,
-    { ...backgroundField, defaultValue: 'dark' },
+    { ...backgroundField, defaultValue: 'dark' } as Field,
     {
       name: 'cards',
       type: 'array',
