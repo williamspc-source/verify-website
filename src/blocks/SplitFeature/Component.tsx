@@ -11,6 +11,7 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { accentText } from '@/utilities/accentText'
 
 export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
@@ -45,15 +46,29 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
         const side = row.imageSide === 'auto' || !row.imageSide ? (i % 2 === 0 ? 'left' : 'right') : row.imageSide
         const imageLeft = side === 'left'
         const hasImage = row.image && typeof row.image === 'object'
+        const placeholder = Boolean((row as { imagePlaceholder?: boolean }).imagePlaceholder)
+        const placeholderLabel = (row as { placeholderLabel?: string | null }).placeholderLabel
+        // A placeholder keeps the two-column layout (reference grey box) even with
+        // no real image; only rows with neither image nor placeholder go full-width.
+        const twoColumn = hasImage || placeholder
 
         return (
           <div
             key={i}
-            className={cn('vf-split', !hasImage && 'vf-split--solo', hasImage && !imageLeft && 'vf-split--reverse')}
+            className={cn('vf-split', !twoColumn && 'vf-split--solo', twoColumn && !imageLeft && 'vf-split--reverse')}
           >
             {hasImage ? (
               <div className="vf-split__media">
                 <Media resource={row.image} imgClassName="w-full h-full object-cover" />
+              </div>
+            ) : placeholder ? (
+              <div className="vf-split__media vf-split__media--placeholder" aria-hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="3" y="4" width="18" height="16" rx="2" />
+                  <circle cx="8.5" cy="9.5" r="1.5" />
+                  <path d="M21 16l-5-5L5 20" />
+                </svg>
+                {placeholderLabel ? <span>{placeholderLabel}</span> : null}
               </div>
             ) : null}
 
@@ -65,7 +80,7 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
               ) : null}
               {row.eyebrow ? <div className="section-label">{row.eyebrow}</div> : null}
               <h3 className={cn('section-title vf-split__title', toClassName(elementClasses?.heading))}>
-                {row.title}
+                {accentText(row.title)}
               </h3>
               {row.body ? (
                 <div className="vf-split__body">

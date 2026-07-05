@@ -6,6 +6,7 @@ import { AREAS_OF_EXPERTISE, ASSESSMENT_TYPES, CLAIM_TYPES, SPECIALTIES, type Te
 import { SPECIALISTS } from './data/specialists'
 import { TEAM } from './data/team'
 import { EVENTS } from './data/events'
+import { POSTS } from './data/posts'
 import { SERVICES } from './data/services'
 import { TESTIMONIALS } from './data/testimonials'
 import { plainTextToLexical } from './data/richText'
@@ -22,6 +23,19 @@ const BLOG_CATEGORIES: { title: string; slug: string; color: string }[] = [
   { title: 'Resources', slug: 'resources', color: '#1c75bc' },
   { title: 'Q&A Insights', slug: 'qa-insights', color: '#1c75bc' },
   { title: 'Staff Narratives', slug: 'staff-narratives', color: '#1c75bc' },
+  // Per-article topic chips (design reference shows a specific tag per card).
+  { title: 'Company News', slug: 'company-news', color: '#1c75bc' },
+  { title: 'Industry News', slug: 'industry-news', color: '#2d8fe8' },
+  { title: 'Practice Guide', slug: 'practice-guide', color: '#1c75bc' },
+  { title: 'Legal Framework', slug: 'legal-framework', color: '#414042' },
+  { title: 'Clinical', slug: 'clinical', color: '#2d8fe8' },
+  { title: 'Orthopaedics', slug: 'orthopaedics', color: '#1c75bc' },
+  { title: 'Psychiatry', slug: 'psychiatry', color: '#414042' },
+  { title: 'Pain Medicine', slug: 'pain-medicine', color: '#2d8fe8' },
+  { title: 'Coordination', slug: 'coordination', color: '#1c75bc' },
+  { title: 'Quality Assurance', slug: 'quality-assurance', color: '#1c75bc' },
+  { title: 'Client Experience', slug: 'client-experience', color: '#2d8fe8' },
+  { title: 'Clinical Insights', slug: 'clinical-insights', color: '#414042' },
 ]
 
 // "In the Loop" streams — the section an article belongs to (drives its URL folder
@@ -38,8 +52,8 @@ const STREAMS: { title: string; slug: string; icon: string; order: number }[] = 
 
 // Specialty groups for the Specialty List filter bar / accordion.
 const SPECIALTY_CATEGORIES: { title: string; slug: string; icon: string; order: number }[] = [
-  { title: 'Surgery', slug: 'surgery', icon: 'first-aid', order: 0 },
-  { title: 'Psychiatry & Psychology', slug: 'psychiatry-psychology', icon: 'brain', order: 1 },
+  { title: 'Surgery', slug: 'surgery', icon: 'bone', order: 0 },
+  { title: 'Psychiatry & Psychology', slug: 'psychiatry-psychology', icon: 'chats', order: 1 },
   { title: 'Medicine', slug: 'medicine', icon: 'stethoscope', order: 2 },
   { title: 'Allied Health', slug: 'allied-health', icon: 'handshake', order: 3 },
 ]
@@ -176,7 +190,7 @@ async function createIfNew(
 }
 
 export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
-  const { payload } = ctx
+  const { payload, req } = ctx
   payload.logger.info('Seeding data layer (taxonomy + specialists/team/events)…')
 
   // 1) Taxonomy lookups first.
@@ -193,6 +207,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
     Array.from(new Set(SPECIALISTS.flatMap((s) => s.accreditations))),
   )
   // Specialty categories + In-the-Loop streams (new taxonomies).
+  const specialtyCategoryMap = new Map<string, number | string>()
   for (const c of SPECIALTY_CATEGORIES) {
     await createIfNew(ctx, 'specialty-categories', c.slug, {
       title: c.title,
@@ -200,7 +215,16 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       icon: c.icon,
       order: c.order,
     })
+    const cat = await payload.find({
+      collection: 'specialty-categories',
+      where: { slug: { equals: c.slug } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    if (cat.docs[0]) specialtyCategoryMap.set(c.slug, cat.docs[0].id)
   }
+  const streamMap = new Map<string, number | string>()
   for (const st of STREAMS) {
     await createIfNew(ctx, 'streams', st.slug, {
       title: st.title,
@@ -208,8 +232,71 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       icon: st.icon,
       order: st.order,
     })
+    const found = await payload.find({
+      collection: 'streams',
+      where: { slug: { equals: st.slug } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    if (found.docs[0]) streamMap.set(st.slug, found.docs[0].id)
   }
   payload.logger.info('— Taxonomy seeded')
+
+  // Enrich Specialty docs with category + keyAreas + description (upsertTerms
+  // only writes title/slug). Idempotent: updates the existing doc each run.
+  for (const sp of SPECIALTIES) {
+    const id = specialtyMap.get(sp.slug)
+    const categoryId = sp.category ? specialtyCategoryMap.get(sp.category) : undefined
+    if (!id) continue
+    await payload.update({
+      collection: 'specialties',
+      id,
+      req,
+      context: { disableRevalidate: true },
+      data: {
+        ...(categoryId ? { category: categoryId } : {}),
+        ...(sp.description ? { description: sp.description } : {}),
+        ...(sp.keyAreas?.length ? { keyAreas: sp.keyAreas.map((area) => ({ area })) } : {}),
+        ...(sp.order != null ? { order: sp.order } : {}),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
+    })
+  }
+  payload.logger.info('— Specialty categories + key areas enriched')
+
+  // Enrich Claim-type docs with description + display order (drives the
+  // "Claims We Support" checklist order + copy). Idempotent.
+  for (const ct of CLAIM_TYPES) {
+    const id = claimMap.get(ct.slug)
+    if (!id) continue
+    await payload.update({
+      collection: 'claim-types',
+      id,
+      req,
+      context: { disableRevalidate: true },
+      data: {
+        ...(ct.description ? { description: ct.description } : {}),
+        ...(ct.order != null ? { order: ct.order } : {}),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
+    })
+  }
+
+  // Enrich Assessment-type docs with reference descriptions. Idempotent.
+  for (const at of ASSESSMENT_TYPES) {
+    const id = assessmentMap.get(at.slug)
+    if (!id || !at.description) continue
+    await payload.update({
+      collection: 'assessment-types',
+      id,
+      req,
+      context: { disableRevalidate: true },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: { description: at.description } as any,
+    })
+  }
+  payload.logger.info('— Claim + assessment type descriptions enriched')
 
   // 2) Specialists.
   let specialistCount = 0
@@ -265,6 +352,8 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       host: e.host,
       registrationUrl: e.registrationUrl || undefined,
       excerpt: e.excerpt,
+      // AAMLE-hosted events show a "CPD Eligible · Free" badge on compact cards.
+      ...((e as { cpdEligible?: boolean }).cpdEligible ? { cpdEligible: true } : {}),
       _status: 'published',
     })
     if (created) eventCount++
@@ -273,6 +362,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
 
   // 5) Blog categories ("In the Loop").
   let categoryCount = 0
+  const categoryMap = new Map<string, number | string>()
   for (const c of BLOG_CATEGORIES) {
     const created = await createIfNew(ctx, 'categories', c.slug, {
       title: c.title,
@@ -280,8 +370,39 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       color: c.color,
     })
     if (created) categoryCount++
+    const found = await payload.find({
+      collection: 'categories',
+      where: { slug: { equals: c.slug } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    if (found.docs[0]) categoryMap.set(c.slug, found.docs[0].id)
   }
   payload.logger.info(`— Blog categories seeded (${categoryCount} new)`)
+
+  // 5b) In-the-Loop article posts (grouped by stream). Each post's topic
+  // categories drive the per-card reference chip (Company News, Practice Guide…).
+  let postCount = 0
+  for (const p of POSTS) {
+    const catIds = ((p as { categories?: string[] }).categories || [])
+      .map((slug) => categoryMap.get(slug))
+      .filter((id): id is number | string => id != null)
+    const created = await createIfNew(ctx, 'posts', p.slug, {
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt,
+      author: { name: p.author.name, role: p.author.role },
+      stream: streamMap.get(p.stream),
+      ...(catIds.length ? { categories: catIds } : {}),
+      featured: p.featured ?? false,
+      publishedAt: new Date(p.publishedAt).toISOString(),
+      content: plainTextToLexical(p.body),
+      _status: 'published',
+    })
+    if (created) postCount++
+  }
+  payload.logger.info(`— Posts seeded (${postCount} new)`)
 
   // 6) Services.
   let serviceCount = 0
@@ -327,9 +448,44 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
     address: 'Level 18, 127 Creek Street\nBrisbane QLD 4000',
     phone: '07 3356 0469',
     email: 'admin@vmls.com.au',
-    hours: [{ days: 'Monday – Friday', time: '08:30 – 17:00' }],
+    hours: [{ days: 'Monday to Friday', time: '8:30am – 5:00pm' }],
     hoursNote:
       'For 7:45am appointments, please be advised that our office is not staffed until 7:30am.',
+    mapEmbedUrl:
+      'https://www.google.com/maps?q=127+Creek+Street+Brisbane+QLD+4000&output=embed',
+    // Recommended Public Transport (reference: contact.html / for-claimants.html).
+    transport: [
+      {
+        label: 'Brisbane Central Train Station',
+        note: '2 min walk',
+        href: 'https://jp.translink.com.au/plan-your-journey/stops/central-station',
+      },
+      {
+        label: 'Brisbane CBD Bus Stops',
+        note: '1–5 min walk',
+        href: 'https://translink.widen.net/s/wr6k8pwj5d/250630-brisbane-city-bus-stop-map',
+      },
+    ],
+    // Nearby Car Parks (reference).
+    parking: [
+      {
+        name: 'Wickham Terrace Car Park',
+        address: '136 Wickham Tce',
+        walkTime: '5 min walk',
+        heightLimit: 'Vehicle height limit: 1.93m',
+        href: 'https://www.brisbane.qld.gov.au/transport-and-parking/parking/council-car-parks#wickham',
+        note: null,
+      },
+      {
+        name: 'First Parking',
+        address: '67 Astor Tce',
+        walkTime: '7 min walk',
+        heightLimit: 'Vehicle height limit: 2.05m',
+        href: 'https://www.firstparking.com.au/locations/67-astor-tce/',
+        note: null,
+      },
+    ],
+    note: 'During peak hours, CBD parking options may be limited. Additionally, parking availability, rates, & vehicle height restrictions vary from car park to car park.',
     order: 0,
   })
   payload.logger.info('— Offices seeded')

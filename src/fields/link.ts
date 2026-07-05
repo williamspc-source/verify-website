@@ -19,10 +19,19 @@ export const appearanceOptions: Record<LinkAppearances, { label: string; value: 
 type LinkType = (options?: {
   appearances?: LinkAppearances[] | false
   disableLabel?: boolean
+  // When true, the whole link is optional — reference/url/label are not required,
+  // so a row/card can render no CTA at all (reference pages with no button).
+  optional?: boolean
   overrides?: Partial<GroupField>
 }) => Field
 
-export const link: LinkType = ({ appearances, disableLabel = false, overrides = {} } = {}) => {
+export const link: LinkType = ({
+  appearances,
+  disableLabel = false,
+  optional = false,
+  overrides = {},
+} = {}) => {
+  const req = !optional
   const linkResult: GroupField = {
     name: 'link',
     type: 'group',
@@ -81,7 +90,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       },
       label: 'Document to link to',
       relationTo: ['pages', 'posts'],
-      required: true,
+      required: req,
     },
     {
       name: 'url',
@@ -90,7 +99,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
         condition: (_, siblingData) => siblingData?.type === 'custom',
       },
       label: 'Custom URL',
-      required: true,
+      required: req,
     },
   ]
 
@@ -114,7 +123,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
             width: '50%',
           },
           label: 'Label',
-          required: true,
+          required: req,
         },
       ],
     })

@@ -1,33 +1,62 @@
 import React from 'react'
 
-import type { AamleEducationBlock as Props } from '@/payload-types'
+import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
+
+import type {
+  AamleEducationBlock as GeneratedProps,
+  Media as MediaType,
+} from '@/payload-types'
 
 import RichText from '@/components/RichText'
 import { CMSLink } from '@/components/Link'
 import { Icon } from '@/components/Icon'
+import { Media } from '@/components/Media'
 import { Section, type SectionBackground } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
+
+// Loosely typed against the generated block interface (regenerated on deploy) so
+// the component keeps compiling against either the old or new field shape.
+type Props = Omit<GeneratedProps, 'description' | 'image'> & {
+  eyebrow?: string | null
+  wordmark?: string | null
+  subheading?: string | null
+  badge?: { icon?: string | null; text?: string | null } | null
+  description?: DefaultTypedEditorState | null
+  items?: { icon?: string | null; label?: string | null }[] | null
+  image?: MediaType | string | number | null
+  imagePlaceholder?: boolean | null
+  placeholderLabel?: string | null
+}
 
 export const AamleEducationBlock: React.FC<Props & { bare?: boolean }> = ({
   background,
-  intro,
-  panels,
-  sponsor,
+  eyebrow,
+  wordmark,
+  subheading,
+  badge,
+  description,
+  items,
   link,
+  image,
+  imagePlaceholder,
+  placeholderLabel,
   anchorId,
   cssClass,
   containerWidth,
   motion,
   bare,
 }) => {
-  const hasIntro = Boolean(intro?.label || intro?.heading || intro?.description)
-  const hasPanels = Array.isArray(panels) && panels.length > 0
-  const hasSponsor = Boolean(sponsor?.label || sponsor?.description || sponsor?.icon)
+  const list = Array.isArray(items) ? items.filter((it) => it?.label) : []
+  const hasImage = Boolean(image && typeof image === 'object')
+  const showPlaceholder = !hasImage && Boolean(imagePlaceholder)
+  const twoColumn = hasImage || showPlaceholder
   const hasCta = Boolean(link?.label)
+  const hasContent = Boolean(
+    eyebrow || wordmark || subheading || badge?.text || description || list.length || hasCta,
+  )
 
-  if (!hasIntro && !hasPanels && !hasSponsor && !hasCta) return null
+  if (!hasContent && !twoColumn) return null
 
   return (
     <Section
@@ -38,104 +67,74 @@ export const AamleEducationBlock: React.FC<Props & { bare?: boolean }> = ({
       bare={bare}
       id={anchorId || undefined}
     >
-      {hasIntro ? (
-        <div className="aamle-edu-intro">
-          <div className="aamle-edu-intro-left">
-            {intro?.label ? <span className="aamle-edu-intro-label">{intro.label}</span> : null}
-            {intro?.heading ? (
-              <h3 className="aamle-edu-intro-heading">{accentText(intro.heading)}</h3>
-            ) : null}
-          </div>
-          <div className="aamle-edu-intro-right">
-            {intro?.description ? (
-              <RichText
-                className="aamle-rich aamle-edu-intro-rich"
-                data={intro.description}
-                enableGutter={false}
-                enableProse={false}
-              />
-            ) : null}
-          </div>
-        </div>
-      ) : null}
+      <div className={cn('aamle-inner', !twoColumn && 'aamle-inner--solo')}>
+        <div className="aamle-left">
+          {eyebrow ? <div className="section-label aamle-label">{eyebrow}</div> : null}
+          {wordmark ? <div className="aamle-wordmark">{wordmark}</div> : null}
+          {subheading ? <div className="aamle-wordmark-sub">{subheading}</div> : null}
 
-      {hasPanels ? (
-        <div className="aamle-feature-panels">
-          {panels!.map((panel, i) => {
-            const list = Array.isArray(panel.list) ? panel.list : []
-            return (
-              <div key={i} className="aamle-feature-panel">
-                <div className="aamle-feature-panel-left">
-                  {panel.step ? (
-                    <span className="aamle-feature-panel-step">{panel.step}</span>
-                  ) : null}
-                  {panel.icon ? (
-                    <div className="aamle-feature-panel-icon">
-                      <Icon name={panel.icon} />
+          {badge?.text ? (
+            <div className="aamle-cpd-badge">
+              {badge.icon ? <Icon name={badge.icon} className="aamle-cpd-badge-icon" /> : null}
+              <span>{badge.text}</span>
+            </div>
+          ) : null}
+
+          {description ? (
+            <RichText
+              className="aamle-rich aamle-left-rich"
+              data={description}
+              enableGutter={false}
+              enableProse={false}
+            />
+          ) : null}
+
+          {list.length > 0 ? (
+            <div className="aamle-offerings">
+              {list.map((it, i) => (
+                <div key={i} className="aamle-offering-row">
+                  {it.icon ? (
+                    <div className="aamle-offering-icon">
+                      <Icon name={it.icon} />
                     </div>
                   ) : null}
-                  {panel.title ? (
-                    <h4 className="aamle-feature-panel-title">{panel.title}</h4>
-                  ) : null}
-                  {panel.badge ? (
-                    <span
-                      className={cn(
-                        'aamle-feature-panel-badge',
-                        panel.badgeAccent && 'aamle-feature-panel-badge--accent',
-                      )}
-                    >
-                      {panel.badge}
-                    </span>
-                  ) : null}
+                  <strong>{it.label}</strong>
                 </div>
-                <div className="aamle-feature-panel-right">
-                  {panel.description ? (
-                    <RichText
-                      className="aamle-rich aamle-feature-panel-rich"
-                      data={panel.description}
-                      enableGutter={false}
-                      enableProse={false}
-                    />
-                  ) : null}
-                  {list.length > 0 ? (
-                    <ul className="aamle-feature-panel-list">
-                      {list.map((li, j) => (
-                        <li key={j}>{li.item}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      ) : null}
-
-      {hasSponsor ? (
-        <div className="aamle-sponsor-soft">
-          <div className="aamle-sponsor-soft-left">
-            {sponsor?.icon ? (
-              <div className="aamle-sponsor-soft-icon-wrap">
-                <Icon name={sponsor.icon} />
-              </div>
-            ) : null}
-            <div className="aamle-sponsor-soft-body">
-              {sponsor?.label ? (
-                <span className="aamle-sponsor-soft-label">{sponsor.label}</span>
-              ) : null}
-              {sponsor?.description ? (
-                <p className="aamle-sponsor-soft-desc">{sponsor.description}</p>
-              ) : null}
+              ))}
             </div>
-          </div>
-        </div>
-      ) : null}
+          ) : null}
 
-      {hasCta ? (
-        <div className="services-cta edu-cta-row">
-          <CMSLink {...link} appearance="inline" className="btn btn-primary" />
+          {hasCta ? (
+            <CMSLink {...link} appearance="inline" className="btn btn-primary aamle-cta" />
+          ) : null}
         </div>
-      ) : null}
+
+        {twoColumn ? (
+          <div className="aamle-right">
+            {hasImage ? (
+              <Media resource={image} fill imgClassName="aamle-img" />
+            ) : (
+              <div className="aamle-img-placeholder" aria-hidden>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                {placeholderLabel ? (
+                  <span className="aamle-img-label">{placeholderLabel}</span>
+                ) : null}
+              </div>
+            )}
+          </div>
+        ) : null}
+      </div>
     </Section>
   )
 }

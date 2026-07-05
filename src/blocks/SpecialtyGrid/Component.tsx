@@ -65,7 +65,10 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
   } else {
     const collection = (taxonomy || 'specialties') as CollectionSlug
     const payload = await getPayload({ config: configPromise })
-    const res = await payload.find({ collection, limit: 100, sort: 'title' })
+    // claim-types & specialties carry an explicit display `order`; other
+    // taxonomies fall back to alphabetical.
+    const sort = collection === 'claim-types' || collection === 'specialties' ? 'order' : 'title'
+    const res = await payload.find({ collection, limit: 100, sort })
     tiles = res.docs.map((s: { id: string | number; title: string; slug?: string | null; icon?: string | null }) => ({
       id: String(s.id),
       icon: s.icon || defaultIcon || 'stethoscope',

@@ -1,5 +1,11 @@
 // Events & seminars, transcribed from the design reference (events-data.js).
-// `date` is ISO (YYYY-MM-DD); the seed converts it to a Date.
+// `date` is ISO (YYYY-MM-DD); the seed converts it to a Date. Upcoming vs past is
+// derived from the date at view time, so the same list drives both dedicated
+// pages (/upcoming-events, /past-events) and the In-the-Loop AAMLE hub.
+//
+// `cpdEligible`: the reference marks only AAMLE-hosted events "CPD Eligible · Free"
+// on the compact In-the-Loop cards (events.js formatLine: host === 'aamle'). We
+// mirror that here so the ArchiveBlock compact card renders the same status line.
 
 export type EventSeed = {
   slug: string
@@ -17,6 +23,7 @@ export type EventSeed = {
   timeLabel: string
   location: string
   host: 'aamle' | 'verify'
+  cpdEligible?: boolean
   registrationUrl: string
   excerpt: string
 }
@@ -52,6 +59,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '12:30 pm – 1:30 pm',
     location: 'Online briefing',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/past-events/',
     excerpt: 'A concise industry briefing covering current WorkCover claim trends, medical evidence considerations, and practical updates for legal and insurance teams.',
   },
@@ -63,6 +71,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '9:30 am – 11:30 am',
     location: 'Brisbane CBD',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
     excerpt: 'A workshop for practitioners managing psychiatric injury claims, focused on diagnosis, causation, pre-existing history, and practical IME preparation.',
   },
@@ -74,6 +83,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '1:00 pm – 2:00 pm',
     location: 'Online webinar',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
     excerpt: 'A client training session unpacking the brief preparation issues that most often delay appointments, create report gaps, or trigger avoidable supplementary questions.',
   },
@@ -85,6 +95,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '7:30 am – 9:30 am',
     location: 'The Grove Rooftop',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/past-events/',
     excerpt: 'A specialist breakfast seminar covering chronic pain assessment, causation questions, treatment histories, and the role of functional reporting in personal injury matters.',
   },
@@ -107,6 +118,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '9:00 am – 12:00 pm',
     location: 'Brisbane CBD',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
     excerpt: 'A practical masterclass for specialists and legal teams focused on clear reasoning, defensible conclusions, report structure, and common medico-legal drafting pitfalls.',
   },
@@ -118,6 +130,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '7:30 am – 9:30 am',
     location: 'The Grove Rooftop',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/events/breakfast-seminar-with-dr-ashwani-garg/',
     excerpt: "A psychiatrist's practical guide to mediation preparation, presented by Dr Ashwani Garg, Consultant Psychiatrist. This breakfast seminar will focus on report interpretation, preparation strategy, and the questions legal teams should clarify before mediation.",
   },
@@ -129,6 +142,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '12:00 pm – 1:00 pm',
     location: 'Online webinar',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
     excerpt: 'A focused refresher covering how the AMA Guides are applied in Queensland medico-legal practice, with worked examples from recent impairment assessment scenarios.',
   },
@@ -140,6 +154,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '8:30 am – 10:30 am',
     location: 'VERIFY Brisbane Boardroom',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/events/',
     excerpt: 'An expert-led workshop examining practical implications of the July 2026 CTP reforms for solicitors, case managers, and insurers operating in Queensland.',
   },
@@ -151,6 +166,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '1:00 pm – 2:00 pm',
     location: 'Online webinar',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
     excerpt: 'A practical guide for solicitors and claims teams on what to look for when reviewing an IME report, identifying gaps, and preparing targeted supplementary questions.',
   },
@@ -162,6 +178,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '12:30 pm – 1:30 pm',
     location: 'Online webinar',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
     excerpt: 'A specialist-led session covering psychiatric independent medical examinations, including referral questions, contested diagnoses, secondary gain, and report limitations.',
   },
@@ -173,6 +190,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '4:00 pm – 6:00 pm',
     location: 'Brisbane CBD',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/events/',
     excerpt: 'A networking and education event for litigation teams covering expert engagement, report defensibility, conference preparation, and evidence readiness.',
   },
@@ -184,6 +202,7 @@ export const EVENTS: EventSeed[] = [
     timeLabel: '12:00 pm – 1:00 pm',
     location: 'Online webinar',
     host: 'aamle',
+    cpdEligible: true,
     registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
     excerpt: 'A concise orthopaedic update for legal and insurance teams, covering common impairment assessment issues and how to brief specialists more effectively.',
   },

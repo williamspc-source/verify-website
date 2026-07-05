@@ -3,10 +3,12 @@ import type { Metadata } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
+import Link from 'next/link'
 import React, { cache } from 'react'
 
 import RichText from '@/components/RichText'
 import { Media } from '@/components/Media'
+import { Icon } from '@/components/Icon'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -22,6 +24,14 @@ const initials = (name: string): string =>
     .map((w) => w[0])
     .join('')
     .toUpperCase()
+
+// Human labels for the Team `department` select (see src/collections/Team).
+const departmentLabels: Record<string, string> = {
+  operations: 'Operations',
+  'business-development': 'Business Development',
+  'client-support': 'Client Support',
+  'quality-assurance': 'Quality Assurance',
+}
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -52,6 +62,8 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
   const qualifications = Array.isArray(m.qualifications)
     ? (m.qualifications as { qualification?: string }[])
     : []
+  const departmentLabel =
+    typeof m.department === 'string' ? (departmentLabels[m.department] ?? m.department) : ''
 
   return (
     <article>
@@ -59,17 +71,28 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
       <PayloadRedirects disableNotFound url={`/about/team/${decodedSlug}`} />
 
       <section className="vf-profile-hero">
-        <div className="container vf-profile-hero__inner">
-          <div className="vf-profile-hero__avatar">
-            {photo ? (
-              <Media resource={photo} imgClassName="vf-profile-hero__img" />
-            ) : (
-              <span className="vf-profile-hero__initials">{initials(m.title)}</span>
-            )}
-          </div>
-          <div className="vf-profile-hero__body">
-            <h1 className="vf-profile-hero__name">{m.title}</h1>
-            {m.role ? <p className="vf-profile-hero__position">{m.role}</p> : null}
+        <div className="container">
+          <nav className="vf-profile-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span aria-hidden>›</span>
+            <Link href="/about">About</Link>
+            <span aria-hidden>›</span>
+            <Link href="/about/team">Meet the Team</Link>
+            <span aria-hidden>›</span>
+            <strong>{m.title}</strong>
+          </nav>
+          <div className="vf-profile-hero__inner">
+            <div className="vf-profile-hero__avatar">
+              {photo ? (
+                <Media resource={photo} imgClassName="vf-profile-hero__img" />
+              ) : (
+                <span className="vf-profile-hero__initials">{initials(m.title)}</span>
+              )}
+            </div>
+            <div className="vf-profile-hero__body">
+              <h1 className="vf-profile-hero__name">{m.title}</h1>
+              {m.role ? <p className="vf-profile-hero__position">{m.role}</p> : null}
+            </div>
           </div>
         </div>
       </section>
@@ -91,6 +114,34 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
             ))}
           </div>
           <aside className="vf-profile-sidebar">
+            {m.role || departmentLabel ? (
+              <div className="vf-profile-card">
+                <ul className="vf-profile-meta">
+                  {m.role ? (
+                    <li className="vf-profile-meta__row">
+                      <span className="vf-profile-meta__icon">
+                        <Icon name="briefcase" className="size-5" />
+                      </span>
+                      <span className="vf-profile-meta__body">
+                        <span className="vf-profile-meta__label">Role</span>
+                        <span className="vf-profile-meta__value">{m.role}</span>
+                      </span>
+                    </li>
+                  ) : null}
+                  {departmentLabel ? (
+                    <li className="vf-profile-meta__row">
+                      <span className="vf-profile-meta__icon">
+                        <Icon name="users-three" className="size-5" />
+                      </span>
+                      <span className="vf-profile-meta__body">
+                        <span className="vf-profile-meta__label">Department</span>
+                        <span className="vf-profile-meta__value">{departmentLabel}</span>
+                      </span>
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : null}
             {qualifications.length ? (
               <div className="vf-profile-card">
                 <h3 className="vf-profile-card__title">Qualifications</h3>

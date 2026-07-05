@@ -6,6 +6,7 @@ import type { SlideCarouselBlock as Props } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { accentText, stripAccent } from '@/utilities/accentText'
 
 const mediaUrl = (m: unknown): string | null =>
   m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
@@ -126,7 +127,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
 
   return (
     <section
-      aria-label={heading || 'Carousel'}
+      aria-label={stripAccent(heading) || 'Carousel'}
       className={cn('events-offer-stage vf-slide-carousel', toClassName(cssClass))}
       data-offer-carousel
     >
@@ -134,7 +135,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
         <div className="events-offer-toolbar vf-slide-carousel__toolbar">
           <div>
             {eyebrow ? <div className="events-offer-eyebrow">{eyebrow}</div> : null}
-            {heading ? <h2>{heading}</h2> : null}
+            {heading ? <h2>{accentText(heading)}</h2> : null}
           </div>
           {autoplay && count > 1 ? (
             <button

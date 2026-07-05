@@ -21,31 +21,33 @@ const calloutIcon: Record<string, string> = {
 }
 
 // One tab's content, rendered entirely server-side (rich text included) so the
-// client toggle only has to show/hide the finished markup.
+// client toggle only has to show/hide the finished markup. Markup mirrors the
+// design reference: an icon-led `.ag-item-list`, an optional 3-up
+// `.ag-highlight-grid`, and an optional `.ag-note` callout.
 const TabPanel: React.FC<{ tab: ApptTab }> = ({ tab }) => {
   const items = tab.items || []
   const cards = tab.highlightCards || []
   const callout = tab.callout
 
   return (
-    <div className="vf-appt__panel-inner">
+    <>
       {items.length > 0 ? (
-        <div className="vf-appt__items">
+        <div className="vf-ag-item-list">
           {items.map((item, i) => (
-            <div key={item.id || i} className="vf-appt__item vf-card">
+            <div key={item.id || i} className="vf-ag-item">
               {item.icon ? (
-                <div className="vf-appt__item-icon vf-card__icon">
+                <div className="vf-ag-item-icon">
                   <Icon name={item.icon} />
                 </div>
               ) : null}
-              <div className="vf-appt__item-body">
-                <h4 className="vf-appt__item-heading">{item.heading}</h4>
+              <div className="vf-ag-item-body">
+                <h3 className="vf-ag-item-heading">{item.heading}</h3>
                 {item.body ? (
                   <RichText
                     data={item.body}
                     enableGutter={false}
                     enableProse={false}
-                    className="vf-appt__item-rt"
+                    className="vf-ag-item-rt"
                   />
                 ) : null}
               </div>
@@ -55,19 +57,13 @@ const TabPanel: React.FC<{ tab: ApptTab }> = ({ tab }) => {
       ) : null}
 
       {cards.length > 0 ? (
-        <div className="vf-appt__cards">
+        <div className="vf-ag-highlight-grid">
           {cards.map((card, i) => (
-            <div key={card.id || i} className="vf-appt__card vf-card">
-              <div className="vf-appt__card-head">
-                {card.icon ? (
-                  <span className="vf-appt__card-icon">
-                    <Icon name={card.icon} />
-                  </span>
-                ) : null}
-                <h4 className="vf-appt__card-title">{card.title}</h4>
-              </div>
+            <div key={card.id || i} className="vf-ag-highlight-card">
+              {card.icon ? <Icon name={card.icon} className="vf-ag-highlight-card-icon" /> : null}
+              <h4>{card.title}</h4>
               {card.bullets && card.bullets.length > 0 ? (
-                <ul className="vf-appt__bullets">
+                <ul>
                   {card.bullets.map((b, j) => (
                     <li key={b.id || j}>{b.text}</li>
                   ))}
@@ -79,17 +75,15 @@ const TabPanel: React.FC<{ tab: ApptTab }> = ({ tab }) => {
       ) : null}
 
       {callout?.text ? (
-        <div
-          className={cn('vf-appt__callout', `vf-appt__callout--${callout.style || 'info'}`)}
-          role="note"
-        >
-          <span className="vf-appt__callout-icon">
-            <Icon name={calloutIcon[callout.style || 'info'] || 'info'} />
-          </span>
-          <p className="vf-appt__callout-text">{callout.text}</p>
+        <div className={cn('vf-ag-note', `vf-ag-note--${callout.style || 'info'}`)} role="note">
+          <Icon
+            name={calloutIcon[callout.style || 'info'] || 'info'}
+            className="vf-ag-note-icon"
+          />
+          <p>{callout.text}</p>
         </div>
       ) : null}
-    </div>
+    </>
   )
 }
 
@@ -97,6 +91,7 @@ export const AppointmentGuideBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  selectLabel,
   types,
   cssClass,
   bare,
@@ -109,7 +104,7 @@ export const AppointmentGuideBlock: React.FC<Props & { bare?: boolean }> = ({
     iconNode: type.icon ? <Icon name={type.icon} /> : null,
     tabs: (type.tabs || []).map((tab) => ({
       label: tab.label,
-      iconNode: tab.icon ? <Icon name={tab.icon} className="size-5" /> : null,
+      iconNode: tab.icon ? <Icon name={tab.icon} /> : null,
       panel: <TabPanel tab={tab} />,
     })),
   }))
@@ -121,7 +116,7 @@ export const AppointmentGuideBlock: React.FC<Props & { bare?: boolean }> = ({
       bare={bare}
     >
       <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
-      <GuideClient types={clientTypes} />
+      <GuideClient types={clientTypes} selectLabel={selectLabel} />
     </Section>
   )
 }

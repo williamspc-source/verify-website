@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
+import Link from 'next/link'
 import React, { cache } from 'react'
 
 import RichText from '@/components/RichText'
@@ -60,6 +61,15 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   const portal = (settings as { portalCta?: Record<string, unknown> })?.portalCta ?? {}
   const labels = (settings as { labels?: Record<string, string> })?.labels ?? {}
 
+  const portalTiles = Array.isArray(portal.tiles)
+    ? (portal.tiles as { icon?: string | null; label?: string | null }[]).filter((t) => t?.label)
+    : []
+  const enquiryLabel = (portal.enquiryLabel as string) || 'Send Enquiry'
+  const enquiryEmail = (portal.enquiryEmail as string) || ''
+  const enquiryHref = enquiryEmail
+    ? `mailto:${enquiryEmail}?subject=${encodeURIComponent('VERIFY Booking Portal Access Request')}`
+    : undefined
+
   const s = specialist as Specialist & Record<string, unknown>
   const photo = typeof s.photo === 'object' ? s.photo : null
   const specialtyTitle =
@@ -79,6 +89,17 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
     <article>
       {draft && <LivePreviewListener />}
       <PayloadRedirects disableNotFound url={`/specialists/${decodedSlug}`} />
+
+      {/* Breadcrumb */}
+      <div className="container" style={{ paddingTop: '1.5rem' }}>
+        <nav className="profile-breadcrumb" aria-label="Breadcrumb">
+          <Link href="/">Home</Link>
+          <span aria-hidden>›</span>
+          <Link href="/specialists">Specialists</Link>
+          <span aria-hidden>›</span>
+          <strong>{s.title}</strong>
+        </nav>
+      </div>
 
       {/* Hero */}
       <section className="vf-profile-hero">
@@ -186,13 +207,41 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
 
       {/* Shared booking-portal CTA (from the Specialist Profile global) */}
       {portal.heading ? (
-        <section className="vf-section--primary" style={{ paddingBlock: 'var(--space-normal)' }}>
-          <div className="container" style={{ textAlign: 'center' }}>
-            {portal.eyebrow ? <p className="section-label">{portal.eyebrow as string}</p> : null}
-            <h2 className="vf-cta-band__heading">{portal.heading as string}</h2>
-            {portal.subheading ? (
-              <p className="vf-cta-band__text">{portal.subheading as string}</p>
-            ) : null}
+        <section className="portal-opt4">
+          <div className="container">
+            <div className="portal-opt4-inner">
+              <div className="portal-opt4-header">
+                {portal.eyebrow ? (
+                  <div className="portal-opt4-eyebrow">{portal.eyebrow as string}</div>
+                ) : null}
+                <h2 className="opt-heading">{portal.heading as string}</h2>
+              </div>
+              {portal.subheading ? (
+                <p className="opt-sub">{portal.subheading as string}</p>
+              ) : null}
+              {portalTiles.length ? (
+                <div className="portal-opt4-tiles">
+                  {portalTiles.map((tile, i) => (
+                    <div key={i} className="portal-opt4-tile">
+                      {tile.icon ? (
+                        <Icon name={tile.icon} className="portal-opt4-tile-icon" />
+                      ) : null}
+                      <div className="portal-opt4-tile-label">{tile.label}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              <div className="opt-actions">
+                <a
+                  className="opt-btn-white"
+                  data-enquiry-panel
+                  data-enquiry-type="Register for Online Booking Portal"
+                  {...(enquiryHref ? { href: enquiryHref } : { role: 'button', tabIndex: 0 })}
+                >
+                  {enquiryLabel}
+                </a>
+              </div>
+            </div>
           </div>
         </section>
       ) : null}

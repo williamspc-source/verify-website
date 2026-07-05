@@ -15,7 +15,7 @@ export const Footer: GlobalConfig = {
     {
       name: 'tagline',
       type: 'text',
-      defaultValue: 'Ensuring Accuracy, Empowering Justice',
+      admin: { description: 'Optional line under the footer logo. Blank by default (reference footer has none).' },
     },
     {
       name: 'columns',

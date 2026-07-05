@@ -188,9 +188,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
                 {p.address ? <span style={{ opacity: 0.75 }}> — {p.address}</span> : null}
                 {p.walkTime || p.heightLimit ? (
                   <span style={{ display: 'block', opacity: 0.7, fontSize: '.875rem' }}>
-                    {[p.walkTime, p.heightLimit && `Height ${p.heightLimit}`]
-                      .filter(Boolean)
-                      .join(' · ')}
+                    {[p.walkTime, p.heightLimit].filter(Boolean).join(' · ')}
                   </span>
                 ) : null}
                 {p.note ? (
@@ -245,7 +243,6 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
                 appearance="inline"
                 className={cn('btn', outline ? 'btn-outline' : 'btn-primary')}
               >
-                {link.icon ? <Icon name={link.icon} /> : null}
                 <span>{link.label}</span>
               </CMSLink>
             )

@@ -30,6 +30,11 @@ export const ClaimTypes: CollectionConfig = {
       name: 'description',
       type: 'textarea',
     },
+    {
+      name: 'order',
+      type: 'number',
+      admin: { description: 'Display order in the "Claims We Support" list (ascending).' },
+    },
     slugField({
       position: undefined,
     }),

@@ -6,6 +6,13 @@ import { seedDataLayer } from './seed/seedDataLayer'
 import { seedAvailability } from './seed/seedAvailability'
 import { seedShowcase } from './seed/seedShowcase'
 import { seedHomepage } from './seed/seedHomepage'
+import { seedContentGlobals } from './seed/seedContentGlobals'
+import { seedAbout } from './seed/seedAbout'
+import { seedServices } from './seed/seedServices'
+import { seedSpecialists } from './seed/seedSpecialists'
+import { seedInfoBooking } from './seed/seedInfoBooking'
+import { seedHubs } from './seed/seedHubs'
+import { seedLegal } from './seed/seedLegal'
 import { CONTACT_ROLE_OPTIONS, CONTACT_SERVICE_OPTIONS } from './seed/data/services'
 
 /* =====================================================================
@@ -201,7 +208,7 @@ const PAGE_TREE: PageNode[] = [
   { slug: 'about', title: 'About VERIFY' },
   { slug: 'meet-the-team', title: 'Meet the Team', parent: 'about' },
 
-  { slug: 'services', title: 'Our Services' },
+  { slug: 'services', title: 'Services' },
   { slug: 'educational-services', title: 'Educational Services', parent: 'services' },
   { slug: 'medico-legal', title: 'Medico-Legal Services', parent: 'services' },
   { slug: 'ime', title: 'Independent Medical Examination (IME)', parent: 'medico-legal' },
@@ -213,7 +220,7 @@ const PAGE_TREE: PageNode[] = [
   { slug: 'specialist-panel', title: 'Specialist Panel', parent: 'specialists' },
   { slug: 'specialty-list', title: 'Specialty List', parent: 'specialists' },
   { slug: 'specialist-availability', title: 'Specialist Availability', parent: 'specialists' },
-  { slug: 'join-expert-panel', title: 'Join the Expert Panel', parent: 'specialists' },
+  { slug: 'join-expert-panel', title: 'Join Expert Panel', parent: 'specialists' },
 
   { slug: 'information-centre', title: 'Information Centre' },
   { slug: 'for-clients', title: 'For Clients', parent: 'information-centre' },
@@ -221,6 +228,8 @@ const PAGE_TREE: PageNode[] = [
 
   { slug: 'in-the-loop', title: 'In the Loop' },
   { slug: 'events', title: 'Events & Seminars' },
+  { slug: 'upcoming-events', title: 'Upcoming Events', parent: 'events' },
+  { slug: 'past-events', title: 'Past Events', parent: 'events' },
 
   // Legal pages are standalone (no "Legal" landing page).
   { slug: 'privacy-policy', title: 'Privacy Policy' },
@@ -493,12 +502,12 @@ export const seedVerify = async ({
           ],
         },
         {
+          // Availability now lives on the Make a Booking page (no standalone nav item).
           ...pageLink('specialists', 'Specialists'),
           subItems: [
             pageLink('specialist-panel', 'Specialist Panel'),
             pageLink('specialty-list', 'Specialty List'),
-            pageLink('specialist-availability', 'Specialist Availability'),
-            pageLink('join-expert-panel', 'Join the Expert Panel'),
+            pageLink('join-expert-panel', 'Join our Expert Panel'),
           ],
         },
         {
@@ -528,8 +537,8 @@ export const seedVerify = async ({
     req,
     context: { disableRevalidate: true },
     data: {
-      tagline:
-        'Independent medico-legal reporting and examination coordination, built on accuracy, responsiveness and clarity.',
+      // Reference footer goes straight from the logo to the socials (no tagline).
+      tagline: '',
       columns: [
         {
           title: 'Services',
@@ -584,7 +593,10 @@ export const seedVerify = async ({
           'Browse current availability for our featured specialists. Select the sessions that suit your matter and send us an enquiry — our team will confirm the booking with you.',
         ),
       ]),
-      carouselTitle: 'Featured specialists',
+      carouselEyebrow: 'Featured Specialists',
+      carouselTitle: 'Available This Month',
+      carouselSubtitle:
+        'A selection of our expert panel with current appointment availability across in-person and telehealth sessions.',
       enquiryEmail: 'admin@vmls.com.au',
       enquirySubject: 'Specialist Availability Enquiry',
       enquiryBodyIntro:
@@ -702,37 +714,31 @@ export const seedVerify = async ({
         context: { disableRevalidate: true },
         data: {
           title: 'Contact',
+          // Reference field-set (contact.html): no "Your Role"; "Type of Enquiry"
+          // dropdown; Company optional; Message/Enquiry required.
           fields: [
             { blockType: 'text', name: 'firstName', label: 'First Name', width: 50, required: true },
             { blockType: 'text', name: 'lastName', label: 'Last Name', width: 50, required: true },
             { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true },
             { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false },
-            { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: true },
+            { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: false },
             {
               blockType: 'select',
-              name: 'role',
-              label: 'Your Role',
+              name: 'enquiry_type',
+              label: 'Type of Enquiry',
               width: 100,
               required: false,
-              options: selectOptions(CONTACT_ROLE_OPTIONS),
-            },
-            {
-              blockType: 'select',
-              name: 'service',
-              label: 'Service Required',
-              width: 100,
-              required: true,
               options: selectOptions(CONTACT_SERVICE_OPTIONS),
             },
             {
               blockType: 'textarea',
               name: 'message',
-              label: 'Matter Details / Message',
+              label: 'Message / Enquiry',
               width: 100,
               required: true,
             },
           ],
-          submitButtonLabel: 'Send Enquiry',
+          submitButtonLabel: 'SEND ENQUIRY',
           confirmationType: 'message',
           confirmationMessage: richText([
             paragraph('Thank you — your enquiry has been received. Our team will be in touch shortly.'),
@@ -787,6 +793,109 @@ export const seedVerify = async ({
       payload.logger.info('— Contact page already built, skipping')
     }
   }
+
+  // ── Enquiry drawer form + Join-panel EOI form (per-form recipient email) ──
+  {
+    const RECIPIENT = 'admin@vmls.com.au'
+    const ensureForm = async (
+      title: string,
+      fields: unknown[],
+      submitButtonLabel: string,
+      subject: string,
+    ): Promise<void> => {
+      const existing = await payload.find({
+        collection: 'forms',
+        where: { title: { equals: title } },
+        limit: 1,
+        depth: 0,
+        req,
+      })
+      if (existing.docs[0]) {
+        payload.logger.info(`— ${title} form already exists, skipping`)
+        return
+      }
+      await payload.create({
+        collection: 'forms',
+        depth: 0,
+        req,
+        context: { disableRevalidate: true },
+        data: {
+          title,
+          fields,
+          submitButtonLabel,
+          confirmationType: 'message',
+          confirmationMessage: richText([
+            paragraph('Thank you — your enquiry has been received. Our team will be in touch shortly.'),
+          ]),
+          emails: [
+            {
+              emailTo: RECIPIENT,
+              subject,
+              message: richText([paragraph(`A new submission was received via the ${title} form.`)]),
+            },
+          ],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      })
+      payload.logger.info(`— Created ${title} form (recipient ${RECIPIENT})`)
+    }
+
+    // The site-wide slide-out drawer looks this up by title "Enquiry" — field
+    // names must match the drawer inputs.
+    await ensureForm(
+      'Enquiry',
+      [
+        { blockType: 'text', name: 'first_name', label: 'First Name', width: 50, required: true },
+        { blockType: 'text', name: 'last_name', label: 'Last Name', width: 50, required: true },
+        { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true },
+        { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false },
+        { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: false },
+        {
+          blockType: 'select',
+          name: 'enquiry_type',
+          label: 'Type of Enquiry',
+          width: 100,
+          required: false,
+          options: selectOptions([
+            'Medico-Legal Services',
+            'Educational Services (AAMLE)',
+            'Specialist Panel Information',
+            'Register for Online Booking Portal',
+            'Join Our Expert Panel',
+            'General Enquiry',
+          ]),
+        },
+        { blockType: 'textarea', name: 'message', label: 'Message / Enquiry', width: 100, required: true },
+      ],
+      'Send Enquiry',
+      'New website enquiry',
+    )
+
+    await ensureForm(
+      'Expression of Interest',
+      // Reference field-set (join-expert-panel.html): Medical Specialty optional,
+      // no Qualifications, plain Message, submit "Send Enquiry".
+      [
+        { blockType: 'text', name: 'firstName', label: 'First Name', width: 50, required: true },
+        { blockType: 'text', name: 'lastName', label: 'Last Name', width: 50, required: true },
+        { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true },
+        { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false },
+        { blockType: 'text', name: 'specialty', label: 'Medical Specialty', width: 100, required: false },
+        {
+          blockType: 'textarea',
+          name: 'message',
+          label: 'Message',
+          width: 100,
+          required: true,
+        },
+      ],
+      'Send Enquiry',
+      'New expert-panel expression of interest',
+    )
+  }
+
+  // ── Content globals: Specialist Profile CTA, Article sidebar, Events host copy ──
+  await seedContentGlobals({ payload, req })
 
   // ── Branding: upload logo + favicon to Media, populate Site Settings ──
   try {
@@ -861,6 +970,25 @@ export const seedVerify = async ({
 
   // ── Homepage layout (matches .design-reference/index.html) ──
   await seedHomepage({ payload, req })
+
+  // ── About + Meet-the-Team page layouts ──
+  await seedAbout({ payload, req })
+
+  // ── Remaining page groups (isolated so one bad layout can't block the rest) ──
+  const pageGroups: [string, (c: { payload: typeof payload; req: typeof req }) => Promise<void>][] = [
+    ['seedServices', seedServices],
+    ['seedSpecialists', seedSpecialists],
+    ['seedInfoBooking', seedInfoBooking],
+    ['seedHubs', seedHubs],
+    ['seedLegal', seedLegal],
+  ]
+  for (const [name, fn] of pageGroups) {
+    try {
+      await fn({ payload, req })
+    } catch (e) {
+      payload.logger.error({ err: e, message: `Page group ${name} failed — skipping` })
+    }
+  }
 
   payload.logger.info('VERIFY scaffold seed complete.')
 }

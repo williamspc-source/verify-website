@@ -6,7 +6,8 @@ import { cn } from '@/utilities/ui'
 // Icons and rich-text panels are pre-rendered on the server and handed down as
 // opaque React nodes (same pattern as TabsClient). This client only owns the
 // selected-type + selected-tab state and toggles visibility — no data or
-// rich-text rendering happens here.
+// rich-text rendering happens here. Markup + classes mirror the design
+// reference's `.ag-*` appointment-guide structure (namespaced `vf-ag-*`).
 export type ClientTab = { label: string; iconNode: React.ReactNode; panel: React.ReactNode }
 export type ClientType = {
   label: string
@@ -15,14 +16,18 @@ export type ClientType = {
   tabs: ClientTab[]
 }
 
-export const GuideClient: React.FC<{ types: ClientType[] }> = ({ types }) => {
+export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: string | null }> = ({
+  types,
+  selectLabel,
+}) => {
   const [typeIdx, setTypeIdx] = useState(0)
   const [tabIdx, setTabIdx] = useState(0)
   const baseId = useId()
 
   if (!types || types.length === 0) return null
 
-  const activeType = types[Math.min(typeIdx, types.length - 1)]
+  const activeTypeIdx = Math.min(typeIdx, types.length - 1)
+  const activeType = types[activeTypeIdx]
   const tabs = activeType?.tabs || []
   const activeTab = Math.min(Math.max(tabIdx, 0), Math.max(tabs.length - 1, 0))
 
@@ -32,39 +37,41 @@ export const GuideClient: React.FC<{ types: ClientType[] }> = ({ types }) => {
   }
 
   return (
-    <div className="vf-appt">
+    <div className="vf-ag">
       {types.length > 1 ? (
-        <div className="vf-appt__types" role="tablist" aria-label="Appointment type">
-          {types.map((t, i) => {
-            const selected = i === Math.min(typeIdx, types.length - 1)
-            return (
-              <button
-                key={i}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                aria-controls={`${baseId}-type-${i}`}
-                onClick={() => selectType(i)}
-                className={cn('vf-appt__type', selected && 'vf-appt__type--active')}
-              >
-                {t.iconNode ? <span className="vf-appt__type-icon">{t.iconNode}</span> : null}
-                <span className="vf-appt__type-text">
-                  <span className="vf-appt__type-label">{t.label}</span>
-                  {t.sublabel ? <span className="vf-appt__type-sub">{t.sublabel}</span> : null}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+        <>
+          <p className="vf-ag-select-label">{selectLabel || 'Select your appointment type'}</p>
+          <div className="vf-ag-type-toggle" role="tablist" aria-label="Appointment type">
+            {types.map((t, i) => {
+              const selected = i === activeTypeIdx
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => selectType(i)}
+                  className={cn('vf-ag-type-btn', selected && 'active')}
+                >
+                  {t.iconNode ? (
+                    <span className="vf-ag-type-icon-wrap">{t.iconNode}</span>
+                  ) : null}
+                  <span className="vf-ag-type-text">
+                    <span className="vf-ag-type-btn-label">{t.label}</span>
+                    {t.sublabel ? (
+                      <span className="vf-ag-type-btn-sub">{t.sublabel}</span>
+                    ) : null}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </>
       ) : null}
 
-      {tabs.length > 1 ? (
-        <div className="vf-appt__tabbar" style={{ textAlign: 'center' }}>
-          <div
-            className="services-tabs vf-appt__tablist"
-            role="tablist"
-            aria-label="Sections"
-          >
+      <div className="vf-ag-panel">
+        {tabs.length > 1 ? (
+          <div className="vf-ag-tabs" role="tablist" aria-label="Sections">
             {tabs.map((tab, i) => {
               const selected = i === activeTab
               return (
@@ -75,25 +82,25 @@ export const GuideClient: React.FC<{ types: ClientType[] }> = ({ types }) => {
                   aria-selected={selected}
                   aria-controls={`${baseId}-panel-${i}`}
                   onClick={() => setTabIdx(i)}
-                  className={cn('tab-btn', selected && 'active')}
+                  className={cn('vf-ag-tab', selected && 'active')}
                 >
-                  {tab.iconNode ? <span className="tab-icon">{tab.iconNode}</span> : null}
-                  {tab.label}
+                  {tab.iconNode ? (
+                    <span className="vf-ag-tab-icon">{tab.iconNode}</span>
+                  ) : null}
+                  <span className="vf-ag-tab-label">{tab.label}</span>
                 </button>
               )
             })}
           </div>
-        </div>
-      ) : null}
+        ) : null}
 
-      <div className="vf-appt__panels">
         {tabs.map((tab, i) => (
           <div
             key={i}
             id={`${baseId}-panel-${i}`}
             role="tabpanel"
             hidden={i !== activeTab}
-            className="vf-appt__panel"
+            className="vf-ag-content"
           >
             {tab.panel}
           </div>

@@ -47,6 +47,11 @@ export const Specialties: CollectionConfig = {
       admin: { description: 'Short tags shown under the specialty (e.g. Hip & knee, Trauma).' },
       fields: [{ name: 'area', type: 'text', required: true }],
     },
+    {
+      name: 'order',
+      type: 'number',
+      admin: { description: 'Display order in the Specialty List (ascending).' },
+    },
     slugField({
       position: undefined,
     }),

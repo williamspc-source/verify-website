@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import React, { useMemo, useState } from 'react'
 
+import { Icon } from '@/components/Icon'
 import { initialsOf } from '@/components/PersonCard'
+import { accentText } from '@/utilities/accentText'
 
 // Plain, serialisable shape passed down from the server component.
 export type DirectorySpecialist = {
@@ -19,6 +21,8 @@ export type DirectorySpecialist = {
 
 type Props = {
   specialists: DirectorySpecialist[]
+  kicker: string
+  heading: string
   enableSearch: boolean
   enableSpecialty: boolean
   enableLocation: boolean
@@ -31,75 +35,73 @@ type Props = {
   emptyHeading: string
   emptyBody: string
   cardCtaLabel: string
+  secondaryCtaLabel: string
+  secondaryCtaHref: string
+  resetLabel: string
+  locationsLabel: string
 }
 
 const uniqueSorted = (values: string[]): string[] =>
   Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b))
 
-const controlStyle: React.CSSProperties = {
-  padding: '10px 14px',
-  borderRadius: 8,
-  border: '1px solid var(--border-light)',
-  background: 'var(--white)',
-  color: 'var(--text-dark)',
-  fontSize: '0.9rem',
-  fontFamily: 'inherit',
-  minWidth: 160,
-}
+// Horizontal reference card: a 150×170 rectangular photo (or initials fallback)
+// in a left column beside a left-aligned text column, with a two-button action
+// row (ghost "View Profile" + solid secondary CTA) as a footer.
+const Card: React.FC<{
+  data: DirectorySpecialist
+  ctaLabel: string
+  secondaryCtaLabel: string
+  secondaryCtaHref: string
+  locationsLabel: string
+}> = ({ data, ctaLabel, secondaryCtaLabel, secondaryCtaHref, locationsLabel }) => {
+  const profileHref = data.slug ? `/specialists/${data.slug}` : null
 
-const Card: React.FC<{ data: DirectorySpecialist; ctaLabel: string }> = ({ data, ctaLabel }) => {
-  const href = data.slug ? `/specialists/${data.slug}` : null
-
-  const inner = (
-    <>
-      <div
-        className="vf-directory-card__avatar"
-        style={{ width: 96, height: 96, borderRadius: '50%', overflow: 'hidden', marginBottom: 16 }}
-      >
-        {data.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={data.photoUrl}
-            alt={data.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <div className="avatar-mono">{initialsOf(data.name)}</div>
-        )}
+  return (
+    <div className="spec-card">
+      <div className="spec-card-top">
+        <div className="spec-avatar">
+          <div className="spec-avatar-inner">
+            {data.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="spec-photo-img" src={data.photoUrl} alt={data.name} loading="lazy" />
+            ) : (
+              <div className="avatar-mono">{initialsOf(data.name)}</div>
+            )}
+          </div>
+        </div>
+        <div className="spec-content">
+          <div className="spec-name">{data.name}</div>
+          {data.position ? <div className="spec-title">{data.position}</div> : null}
+          {data.accreditations.length > 0 ? (
+            <div className="spec-accred">{data.accreditations.join('; ')}</div>
+          ) : null}
+          {data.locations.length > 0 ? (
+            <>
+              <hr className="spec-divider" />
+              <div className="spec-loc-label">{locationsLabel}</div>
+              <div className="spec-loc">{data.locations.join(' | ')}</div>
+            </>
+          ) : null}
+        </div>
       </div>
-
-      <div className="spec-name vf-card__title">{data.name}</div>
-      {data.position ? <div className="spec-title">{data.position}</div> : null}
-      {data.specialty ? (
-        <div className="vf-directory-card__specialty" style={{ marginTop: 6, fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-mid)' }}>
-          {data.specialty}
-        </div>
-      ) : null}
-      {data.locations.length > 0 ? <div className="spec-loc">{data.locations.join(' · ')}</div> : null}
-      {data.accreditations.length > 0 ? (
-        <div className="expert-tags" style={{ justifyContent: 'center', marginTop: 12 }}>
-          {data.accreditations.map((a, i) => (
-            <span key={i} className="expert-tag">
-              {a}
-            </span>
-          ))}
-        </div>
-      ) : null}
-      {href ? <span className="spec-more">{ctaLabel} &rarr;</span> : null}
-    </>
-  )
-
-  return href ? (
-    <Link href={href} className="spec-card vf-card">
-      {inner}
-    </Link>
-  ) : (
-    <div className="spec-card vf-card">{inner}</div>
+      <div className="spec-card-actions">
+        {profileHref ? (
+          <Link href={profileHref} className="spec-btn-ghost">
+            {ctaLabel}
+          </Link>
+        ) : null}
+        <Link href={secondaryCtaHref} className="spec-btn-solid">
+          {secondaryCtaLabel}
+        </Link>
+      </div>
+    </div>
   )
 }
 
 export const DirectoryClient: React.FC<Props> = ({
   specialists,
+  kicker,
+  heading,
   enableSearch,
   enableSpecialty,
   enableLocation,
@@ -112,22 +114,26 @@ export const DirectoryClient: React.FC<Props> = ({
   emptyHeading,
   emptyBody,
   cardCtaLabel,
+  secondaryCtaLabel,
+  secondaryCtaHref,
+  resetLabel,
+  locationsLabel,
 }) => {
   const [search, setSearch] = useState('')
   const [specialty, setSpecialty] = useState('')
-  const [location, setLocation] = useState('')
   const [accreditation, setAccreditation] = useState('')
+  const [location, setLocation] = useState('')
 
   const specialtyOptions = useMemo(
     () => uniqueSorted(specialists.map((s) => s.specialty ?? '')),
     [specialists],
   )
-  const locationOptions = useMemo(
-    () => uniqueSorted(specialists.flatMap((s) => s.locations)),
-    [specialists],
-  )
   const accreditationOptions = useMemo(
     () => uniqueSorted(specialists.flatMap((s) => s.accreditations)),
+    [specialists],
+  )
+  const locationOptions = useMemo(
+    () => uniqueSorted(specialists.flatMap((s) => s.locations)),
     [specialists],
   )
 
@@ -135,114 +141,163 @@ export const DirectoryClient: React.FC<Props> = ({
     const q = search.trim().toLowerCase()
     return specialists.filter((s) => {
       if (q) {
-        const hay = `${s.name} ${s.position ?? ''} ${s.specialty ?? ''}`.toLowerCase()
+        // Specialty stays in the search index even though it is no longer
+        // printed on the card.
+        const hay =
+          `${s.name} ${s.position ?? ''} ${s.specialty ?? ''} ${s.accreditations.join(' ')} ${s.locations.join(' ')}`.toLowerCase()
         if (!hay.includes(q)) return false
       }
       if (specialty && s.specialty !== specialty) return false
-      if (location && !s.locations.includes(location)) return false
       if (accreditation && !s.accreditations.includes(accreditation)) return false
+      if (location && !s.locations.includes(location)) return false
       return true
     })
-  }, [specialists, search, specialty, location, accreditation])
+  }, [specialists, search, specialty, accreditation, location])
 
-  const countLabel = countTemplate.includes('{count}')
-    ? countTemplate.replace('{count}', String(filtered.length))
-    : `${filtered.length} ${countTemplate}`.trim()
+  const isFiltering = Boolean(search || specialty || accreditation || location)
+
+  const total = specialists.length
+  const countLabel = (() => {
+    const t = countTemplate || ''
+    if (t.includes('{count}') || t.includes('{total}')) {
+      return t.replace(/\{count\}/g, String(filtered.length)).replace(/\{total\}/g, String(total))
+    }
+    return `${filtered.length} ${t}`.trim()
+  })()
+
+  const resetFilters = () => {
+    setSearch('')
+    setSpecialty('')
+    setAccreditation('')
+    setLocation('')
+  }
 
   const showSpecialty = enableSpecialty && specialtyOptions.length > 0
-  const showLocation = enableLocation && locationOptions.length > 0
   const showAccreditation = enableAccreditation && accreditationOptions.length > 0
+  const showLocation = enableLocation && locationOptions.length > 0
 
   return (
-    <div className="vf-directory">
-      <div
-        className="vf-directory__filters flex flex-wrap items-center justify-center gap-3"
-        style={{ margin: '8px 0 4px' }}
-      >
-        {enableSearch ? (
-          <input
-            type="search"
-            className="vf-directory__control vf-directory__search"
-            placeholder={searchPlaceholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label={searchPlaceholder}
-            style={{ ...controlStyle, flex: '1 1 220px', maxWidth: 340 }}
-          />
-        ) : null}
+    <div className="vf-directory specialist-directory">
+      <div className="specialist-filter-panel" aria-label="Specialist directory filters">
+        <div className="specialist-filter-head">
+          <div>
+            <div className="specialist-filter-kicker">{kicker}</div>
+            <h2>{accentText(heading)}</h2>
+          </div>
+          {isFiltering ? (
+            <div className="specialist-filter-count" aria-live="polite">
+              {countLabel}
+            </div>
+          ) : null}
+        </div>
 
-        {showSpecialty ? (
-          <select
-            className="vf-directory__control"
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
-            aria-label={specialtyLabel}
-            style={controlStyle}
-          >
-            <option value="">{specialtyLabel}</option>
-            {specialtyOptions.map((o) => (
-              <option key={o} value={o}>
-                {o}
-              </option>
-            ))}
-          </select>
-        ) : null}
+        <form className="specialist-filter-form" onSubmit={(e) => e.preventDefault()}>
+          {enableSearch ? (
+            <label className="specialist-search-field" htmlFor="specialist-search">
+              <span>Search</span>
+              <span className="specialist-input-shell">
+                <span className="specialist-field-icon" aria-hidden>
+                  <Icon name="magnifying-glass" />
+                </span>
+                <input
+                  id="specialist-search"
+                  type="search"
+                  placeholder={searchPlaceholder}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  autoComplete="off"
+                />
+              </span>
+            </label>
+          ) : null}
 
-        {showLocation ? (
-          <select
-            className="vf-directory__control"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            aria-label={locationLabel}
-            style={controlStyle}
-          >
-            <option value="">{locationLabel}</option>
-            {locationOptions.map((o) => (
-              <option key={o} value={o}>
-                {o}
-              </option>
-            ))}
-          </select>
-        ) : null}
+          {showSpecialty ? (
+            <label className="specialist-select-field" htmlFor="specialist-specialty">
+              <span>Filter by specialty</span>
+              <span className="specialist-select-shell">
+                <select
+                  id="specialist-specialty"
+                  value={specialty}
+                  onChange={(e) => setSpecialty(e.target.value)}
+                >
+                  <option value="">{specialtyLabel}</option>
+                  {specialtyOptions.map((o) => (
+                    <option key={o} value={o}>
+                      {o}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+          ) : null}
 
-        {showAccreditation ? (
-          <select
-            className="vf-directory__control"
-            value={accreditation}
-            onChange={(e) => setAccreditation(e.target.value)}
-            aria-label={accreditationLabel}
-            style={controlStyle}
+          {showAccreditation ? (
+            <label className="specialist-select-field" htmlFor="specialist-accreditation">
+              <span>Filter by accreditation</span>
+              <span className="specialist-select-shell">
+                <select
+                  id="specialist-accreditation"
+                  value={accreditation}
+                  onChange={(e) => setAccreditation(e.target.value)}
+                >
+                  <option value="">{accreditationLabel}</option>
+                  {accreditationOptions.map((o) => (
+                    <option key={o} value={o}>
+                      {o}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+          ) : null}
+
+          {showLocation ? (
+            <label className="specialist-select-field" htmlFor="specialist-location">
+              <span>Filter by location</span>
+              <span className="specialist-select-shell">
+                <select
+                  id="specialist-location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                >
+                  <option value="">{locationLabel}</option>
+                  {locationOptions.map((o) => (
+                    <option key={o} value={o}>
+                      {o}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+          ) : null}
+
+          <button
+            type="button"
+            className={`specialist-filter-reset${isFiltering ? ' is-active' : ''}`}
+            onClick={resetFilters}
           >
-            <option value="">{accreditationLabel}</option>
-            {accreditationOptions.map((o) => (
-              <option key={o} value={o}>
-                {o}
-              </option>
-            ))}
-          </select>
-        ) : null}
+            {resetLabel}
+          </button>
+        </form>
       </div>
-
-      <p
-        className="vf-directory__count"
-        style={{ textAlign: 'center', color: 'var(--text-mid)', fontWeight: 600, margin: '18px 0 26px' }}
-        aria-live="polite"
-      >
-        {countLabel}
-      </p>
 
       {filtered.length > 0 ? (
         <div className="spec-grid">
           {filtered.map((s) => (
-            <Card key={s.id} data={s} ctaLabel={cardCtaLabel} />
+            <Card
+              key={s.id}
+              data={s}
+              ctaLabel={cardCtaLabel}
+              secondaryCtaLabel={secondaryCtaLabel}
+              secondaryCtaHref={secondaryCtaHref}
+              locationsLabel={locationsLabel}
+            />
           ))}
         </div>
       ) : (
-        <div className="vf-directory__empty" style={{ textAlign: 'center', padding: '40px 20px' }}>
-          <h3 className="vf-card__title" style={{ marginBottom: 8 }}>
-            {emptyHeading}
-          </h3>
-          <p style={{ color: 'var(--text-mid)' }}>{emptyBody}</p>
+        <div className="specialist-filter-empty">
+          <h3>{emptyHeading}</h3>
+          <p>{emptyBody}</p>
         </div>
       )}
     </div>

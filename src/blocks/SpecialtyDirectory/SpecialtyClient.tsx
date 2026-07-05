@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
+import { Icon } from '@/components/Icon'
 import { cn } from '@/utilities/ui'
 
 export type RosterPerson = {
@@ -11,6 +12,7 @@ export type RosterPerson = {
   position: string | null
   slug: string | null
   locations: string[]
+  photoUrl: string | null
 }
 export type SpecialtyEntry = {
   id: string
@@ -20,7 +22,32 @@ export type SpecialtyEntry = {
   keyAreas: string[]
   specialists: RosterPerson[]
 }
-export type Category = { id: string; title: string }
+export type Category = { id: string; title: string; icon?: string | null }
+
+// Fallback filter-bar icons by category title, used when a Specialty Category
+// has no `icon` set in the CMS. Category-driven icons take precedence so the
+// bar stays fully admin-editable.
+const CATEGORY_ICON_FALLBACK: Record<string, string> = {
+  Surgery: 'bone',
+  'Psychiatry & Psychology': 'chats',
+  Medicine: 'stethoscope',
+  'Allied Health': 'handshake',
+}
+
+// Leading honorific/title tokens skipped when building an initials avatar so
+// "Dr Andrew Ryan" → "AR" and "Associate Professor Iulian Nusem" → "IN".
+const TITLE_TOKENS = new Set([
+  'dr', 'mr', 'mrs', 'ms', 'miss', 'prof', 'professor', 'associate', 'assoc',
+  'adjunct', 'adj', 'clinical', 'a/prof', 'sir', 'dame', 'honorary', 'the',
+])
+const initialsOf = (name: string): string => {
+  const words = name.replace(/\./g, '').split(/\s+/).filter(Boolean)
+  const significant = words.filter((w) => !TITLE_TOKENS.has(w.toLowerCase()))
+  const pool = significant.length ? significant : words
+  if (pool.length === 0) return '?'
+  if (pool.length === 1) return pool[0].slice(0, 2).toUpperCase()
+  return (pool[0][0] + pool[pool.length - 1][0]).toUpperCase()
+}
 
 export const SpecialtyClient: React.FC<{
   categories: Category[]
@@ -30,79 +57,126 @@ export const SpecialtyClient: React.FC<{
   showKeyAreas: boolean
 }> = ({ categories, entries, showFilterBar, showRosters, showKeyAreas }) => {
   const [cat, setCat] = useState<string>('all')
-  const [open, setOpen] = useState<string | null>(null)
+  // Open the first (visible) card by default; multiple cards may be open at once.
+  const [openIds, setOpenIds] = useState<Set<string>>(() =>
+    entries[0] ? new Set([entries[0].id]) : new Set(),
+  )
 
-  const visible = cat === 'all' ? entries : entries.filter((e) => e.categoryId === cat)
+  const filterFor = (next: string) =>
+    next === 'all' ? entries : entries.filter((e) => e.categoryId === next)
+  const visible = filterFor(cat)
+
+  const handleFilter = (next: string) => {
+    setCat(next)
+    // Match the reference: switching filter opens the first visible card, closing the rest.
+    const first = filterFor(next)[0]
+    setOpenIds(first ? new Set([first.id]) : new Set())
+  }
+
+  const toggle = (id: string) =>
+    setOpenIds((prev) => {
+      const nextSet = new Set(prev)
+      if (nextSet.has(id)) nextSet.delete(id)
+      else nextSet.add(id)
+      return nextSet
+    })
 
   return (
     <div className="vf-specialty-directory">
       {showFilterBar && categories.length ? (
-        <div className="vf-specialty-filter">
+        <div className="vf-specialty-filterbar" role="group" aria-label="Filter specialties by category">
           <button
             type="button"
-            className={cn('tab-btn', cat === 'all' && 'active')}
-            onClick={() => setCat('all')}
+            className={cn('vf-specialty-filter-tile', cat === 'all' && 'is-active')}
+            aria-pressed={cat === 'all'}
+            onClick={() => handleFilter('all')}
           >
-            All
+            <Icon name="squares-four" className="vf-specialty-filter-tile__icon" />
+            All Specialties
           </button>
           {categories.map((c) => (
             <button
               key={c.id}
               type="button"
-              className={cn('tab-btn', cat === c.id && 'active')}
-              onClick={() => setCat(c.id)}
+              className={cn('vf-specialty-filter-tile', cat === c.id && 'is-active')}
+              aria-pressed={cat === c.id}
+              onClick={() => handleFilter(c.id)}
             >
+              <Icon
+                name={c.icon || CATEGORY_ICON_FALLBACK[c.title]}
+                className="vf-specialty-filter-tile__icon"
+              />
               {c.title}
             </button>
           ))}
         </div>
       ) : null}
 
-      <div className="vf-specialty-accordion">
+      <div className="vf-specialty-cards">
         {visible.map((e) => {
-          const isOpen = open === e.id
+          const isOpen = openIds.has(e.id)
+          const panelId = `vf-specialty-panel-${e.id}`
+          const hasRoster = showRosters && e.specialists.length > 0
           return (
-            <div key={e.id} className={cn('vf-specialty-item', isOpen && 'is-open')}>
-              <button
-                type="button"
-                className="vf-specialty-item__head"
-                aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : e.id)}
-              >
-                <span className="vf-specialty-item__title">{e.title}</span>
-                {showRosters ? (
-                  <span className="vf-specialty-item__count">{e.specialists.length}</span>
+            <div key={e.id} className={cn('vf-specialty-card', isOpen && 'is-open')}>
+              <div className="vf-specialty-summary">
+                <div className="vf-specialty-namerow">
+                  <h3>{e.title}</h3>
+                </div>
+                {e.description ? <p className="vf-specialty-copy">{e.description}</p> : null}
+                {showKeyAreas && e.keyAreas.length ? (
+                  <div className="vf-specialty-tags">
+                    {e.keyAreas.map((k) => (
+                      <span key={k}>{k}</span>
+                    ))}
+                  </div>
                 ) : null}
-                <span className="vf-specialty-item__chevron" aria-hidden>
-                  {isOpen ? '−' : '+'}
-                </span>
-              </button>
-              {isOpen ? (
-                <div className="vf-specialty-item__body">
-                  {e.description ? <p>{e.description}</p> : null}
-                  {showKeyAreas && e.keyAreas.length ? (
-                    <ul className="vf-tag-list">
-                      {e.keyAreas.map((k) => (
-                        <li key={k} className="vf-tag">
-                          {k}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  {showRosters && e.specialists.length ? (
-                    <ul className="vf-specialty-roster">
-                      {e.specialists.map((p) => (
-                        <li key={p.id}>
-                          {p.slug ? (
-                            <Link href={`/specialists/${p.slug}`}>{p.name}</Link>
+                {hasRoster ? (
+                  <button
+                    type="button"
+                    className="vf-specialty-toggle"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => toggle(e.id)}
+                  >
+                    <span>{isOpen ? 'Hide specialists' : 'View specialists'}</span>
+                    <span className="vf-specialty-toggle__chevron" aria-hidden />
+                  </button>
+                ) : null}
+              </div>
+
+              {hasRoster && isOpen ? (
+                <div className="vf-specialty-panel" id={panelId}>
+                  <div className="vf-specialty-people">
+                    {e.specialists.map((p) => (
+                      <div key={p.id} className="vf-specialty-person">
+                        <span className="vf-specialty-avatar">
+                          {p.photoUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.photoUrl} alt="" loading="lazy" />
                           ) : (
-                            <span>{p.name}</span>
+                            initialsOf(p.name)
                           )}
-                          {p.position ? <span className="vf-specialty-roster__role"> — {p.position}</span> : null}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
+                        </span>
+                        <span>
+                          <span className="vf-specialty-person__name">{p.name}</span>
+                          {p.position ? (
+                            <span className="vf-specialty-person__title">{p.position}</span>
+                          ) : null}
+                          {p.locations.length ? (
+                            <span className="vf-specialty-person__loc">{p.locations.join(' | ')}</span>
+                          ) : null}
+                        </span>
+                        <span className="vf-specialty-person__actions">
+                          {p.slug ? (
+                            <Link className="vf-specialty-profile-link" href={`/specialists/${p.slug}`}>
+                              View Profile
+                            </Link>
+                          ) : null}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : null}
             </div>

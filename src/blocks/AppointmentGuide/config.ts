@@ -34,6 +34,15 @@ export const AppointmentGuide: Block = {
   fields: [
     ...sectionHeaderFields,
     {
+      name: 'selectLabel',
+      type: 'text',
+      label: 'Type selector label',
+      admin: {
+        description:
+          'Small uppercase label shown above the appointment-type toggle. Defaults to "Select your appointment type".',
+      },
+    },
+    {
       name: 'types',
       type: 'array',
       minRows: 1,

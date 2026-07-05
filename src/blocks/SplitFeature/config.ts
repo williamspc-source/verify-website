@@ -33,6 +33,23 @@ export const SplitFeature: Block = {
       fields: [
         { name: 'image', type: 'upload', relationTo: 'media' },
         {
+          name: 'imagePlaceholder',
+          type: 'checkbox',
+          label: 'Show a grey image placeholder when no image is set',
+          admin: {
+            description:
+              'Keeps the two-column layout (reference grey box) until a real image is uploaded.',
+          },
+        },
+        {
+          name: 'placeholderLabel',
+          type: 'text',
+          admin: {
+            condition: (_, sib) => Boolean((sib as { imagePlaceholder?: boolean })?.imagePlaceholder),
+            description: 'Optional caption inside the placeholder (e.g. "COMPANY PHOTO PLACEHOLDER").',
+          },
+        },
+        {
           name: 'imageSide',
           type: 'select',
           defaultValue: 'auto',
@@ -75,7 +92,7 @@ export const SplitFeature: Block = {
             iconField({ admin: { description: 'Optional per-bullet icon.' } }),
           ],
         },
-        link({ appearances: false }),
+        link({ appearances: false, optional: true }),
         anchorIdField,
       ],
     },

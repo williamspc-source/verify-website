@@ -11,6 +11,7 @@ import RichText from '@/components/RichText'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { accentText } from '@/utilities/accentText'
 
 import { AvailabilityClient, type AvailabilityRow, type EnquiryConfig } from './AvailabilityClient'
 
@@ -86,7 +87,9 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
         { expiresAt: { greater_than_equal: now } },
       ],
     },
-    depth: 1,
+    // depth 3 so each session's specialist has its OWN relations populated
+    // (photo + accreditation TITLES live two levels below the session).
+    depth: 3,
     limit: 500,
     sort: ['date', 'startTime'],
   })
@@ -126,8 +129,11 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
         name: sp.title,
         position: sp.position ?? null,
         initials: initialsOf(sp.title),
+        photoUrl: mediaUrl(sp.photo),
+        // Populated Accreditation docs use `title` (e.g. "CIME (ABIME)"); bare
+        // IDs (depth too shallow) are skipped.
         accreditations: (sp.accreditations || [])
-          .map((a) => a.accreditation)
+          .map((a) => (a && typeof a === 'object' ? a.title : null))
           .filter((a): a is string => Boolean(a)),
         dates: Array.from(dateMap.values()),
       }
@@ -145,7 +151,7 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
     photoUrl: mediaUrl(sp.photo),
     href: null,
     tags: (sp.accreditations || [])
-      .map((a) => a.accreditation)
+      .map((a) => (a && typeof a === 'object' ? a.title : null))
       .filter((a): a is string => Boolean(a))
       .slice(0, 3),
   }))
@@ -157,20 +163,32 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
     bodyFooter: global.enquiryBodyFooter || 'Thank you.',
   }
 
+  // The Make a Booking page's "View availability below" link targets #availability.
+  const hasCarousel = showCarousel && featured.length > 0
+
   return (
     <>
-      {showCarousel && featured.length > 0 ? (
-        <Section background="accent" className="vf-availability-carousel">
-          {global.carouselTitle ? (
-            <h2 className="section-title" style={{ textAlign: 'center', marginBottom: 36 }}>
-              {global.carouselTitle}
-            </h2>
+      {hasCarousel ? (
+        <Section id="availability" background="accent" className="vf-availability-carousel">
+          {global.carouselEyebrow || global.carouselTitle || global.carouselSubtitle ? (
+            <div className="vf-availability-carousel__header">
+              {global.carouselEyebrow ? (
+                <div className="section-label">{global.carouselEyebrow}</div>
+              ) : null}
+              {global.carouselTitle ? (
+                <h2 className="section-title">{accentText(global.carouselTitle)}</h2>
+              ) : null}
+              {global.carouselSubtitle ? (
+                <p className="section-subtitle">{global.carouselSubtitle}</p>
+              ) : null}
+            </div>
           ) : null}
           <ExpertsCarousel cards={featured} />
         </Section>
       ) : null}
 
       <Section
+        id={hasCarousel ? undefined : 'availability'}
         background="white"
         className={cn('vf-availability', 'vf-section--pb-compact', toClassName(cssClass))}
       >

@@ -92,9 +92,7 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
                     </div>
                   ) : null}
                   {card.link?.label ? (
-                    <CMSLink {...card.link} appearance="inline" className="btn-gateway-cta">
-                      <span aria-hidden> →</span>
-                    </CMSLink>
+                    <CMSLink {...card.link} appearance="inline" className="btn-gateway-cta" />
                   ) : null}
                 </div>
               ) : null}

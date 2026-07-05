@@ -70,7 +70,21 @@ export const SpecialistDirectory: Block = {
             { name: 'emptyBody', type: 'text', defaultValue: 'Try adjusting your filters.', admin: { width: '50%' } },
           ],
         },
-        { name: 'cardCtaLabel', type: 'text', defaultValue: 'View Profile', admin: { description: 'Primary card button label.' } },
+        {
+          type: 'row',
+          fields: [
+            { name: 'cardCtaLabel', type: 'text', defaultValue: 'View Profile', admin: { width: '50%', description: 'Ghost card button (links to the specialist profile).' } },
+            { name: 'secondaryCtaLabel', type: 'text', defaultValue: 'Request Availability', admin: { width: '50%', description: 'Solid card button label.' } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'secondaryCtaHref', type: 'text', defaultValue: '/contact', admin: { width: '50%', description: 'Solid card button link (e.g. /contact).' } },
+            { name: 'resetLabel', type: 'text', defaultValue: 'Clear Filters', admin: { width: '50%', description: 'Filter reset button label.' } },
+          ],
+        },
+        { name: 'locationsLabel', type: 'text', defaultValue: 'Consulting Locations', admin: { description: 'Eyebrow label shown above each card’s consulting locations.' } },
       ],
     },
     cssClassField,

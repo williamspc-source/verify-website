@@ -6,6 +6,12 @@ import React from 'react'
 // "Meet Our [[Expert Panel]]". At render each marked run becomes a
 // <span class="vf-accent"> (see .vf-accent in globals.css), so the two-tone
 // heading treatment is fully authorable without code.
+// Plain-text version (drops the [[ ]] markers) — for attributes like aria-label
+// / title / alt where React nodes can't be used.
+export function stripAccent(input?: string | null): string {
+  return (input ?? '').replace(/\[\[([^\]]*)\]\]/g, '$1')
+}
+
 export function accentText(input?: string | null): React.ReactNode {
   if (!input) return input ?? null
   if (!input.includes('[[')) return input

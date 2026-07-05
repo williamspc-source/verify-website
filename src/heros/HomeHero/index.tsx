@@ -21,7 +21,7 @@ export const HomeHero: React.FC<HomeHeroProps> = (props) => {
   return (
     <section
       className={cn('vf-home-hero', toClassName(cssClass))}
-      style={{ background: 'linear-gradient(135deg,#eef9ff 0%,#e6f4ff 48%,#d9efff 100%)', padding: '80px 0' }}
+      style={{ background: '#cbe5fa', padding: '80px 0' }}
     >
       <div className="container">
         <div className="hero-layout">

@@ -5,7 +5,6 @@ import React from 'react'
 import type { SpecialistDirectoryBlock as Props, Specialist } from '@/payload-types'
 
 import { Section, type SectionBackground } from '@/components/Section'
-import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
@@ -32,7 +31,6 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
   const {
     eyebrow,
     heading,
-    subheading,
     background,
     enableSearch,
     enableSpecialty,
@@ -50,6 +48,20 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
     cssClass,
     bare,
   } = props
+
+  // Newer config fields — read defensively so a not-yet-regenerated
+  // `payload-types` (the orchestrator regenerates on reseed) doesn't fail typecheck.
+  const {
+    secondaryCtaLabel,
+    secondaryCtaHref,
+    resetLabel,
+    locationsLabel,
+  } = props as Props & {
+    secondaryCtaLabel?: string | null
+    secondaryCtaHref?: string | null
+    resetLabel?: string | null
+    locationsLabel?: string | null
+  }
 
   const payload = await getPayload({ config: configPromise })
   const { docs } = await payload.find({
@@ -77,9 +89,12 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
       className={cn('vf-specialist-directory', toClassName(cssClass))}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
-
+      {/* The reference has no centered section header — the kicker + heading live
+          inside the filter panel (rendered by DirectoryClient), and there is no
+          subheading. */}
       <DirectoryClient
+        kicker={eyebrow ?? 'Find a specialist'}
+        heading={heading ?? 'Search the directory'}
         specialists={specialists}
         enableSearch={enableSearch ?? true}
         enableSpecialty={enableSpecialty ?? true}
@@ -87,12 +102,16 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
         enableAccreditation={enableAccreditation ?? true}
         searchPlaceholder={searchPlaceholder ?? 'Search by name…'}
         countTemplate={countTemplate ?? '{count} specialists'}
-        specialtyLabel={specialtyLabel ?? 'Specialty'}
-        locationLabel={locationLabel ?? 'Location'}
-        accreditationLabel={accreditationLabel ?? 'Accreditation'}
+        specialtyLabel={specialtyLabel ?? 'All specialties'}
+        locationLabel={locationLabel ?? 'All locations'}
+        accreditationLabel={accreditationLabel ?? 'All accreditations'}
         emptyHeading={emptyHeading ?? 'No specialists found'}
         emptyBody={emptyBody ?? 'Try adjusting your filters.'}
         cardCtaLabel={cardCtaLabel ?? 'View Profile'}
+        secondaryCtaLabel={secondaryCtaLabel ?? 'Request Availability'}
+        secondaryCtaHref={secondaryCtaHref ?? '/contact'}
+        resetLabel={resetLabel ?? 'Clear Filters'}
+        locationsLabel={locationsLabel ?? 'Consulting Locations'}
       />
     </Section>
   )

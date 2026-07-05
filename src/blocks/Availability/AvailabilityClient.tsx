@@ -17,6 +17,7 @@ export type AvailabilityRow = {
   name: string
   position?: string | null
   initials: string
+  photoUrl?: string | null
   accreditations: string[]
   dates: { date: string; chips: AvailabilityChip[] }[]
 }
@@ -107,44 +108,59 @@ export const AvailabilityClient: React.FC<{
 
       <div className="sa-list">
       {rows.map((row) => (
-        <div className="sa-row" key={row.id}>
-          <div className="sa-spec">
-            <div className="avatar-mono" aria-hidden="true">
-              {row.initials}
-            </div>
-            <div className="sa-spec-name">{row.name}</div>
-            {row.position ? <div className="sa-spec-title">{row.position}</div> : null}
-            {row.accreditations.length > 0 ? (
-              <ul className="sa-spec-accred">
-                {row.accreditations.map((a, i) => (
-                  <li key={i}>{a}</li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-
-          <div className="sa-slots">
-            {row.dates.map((d) => (
-              <div className="sa-date-group" key={d.date}>
-                <div className="sa-date">{d.date}</div>
-                <div className="sa-chips">
-                  {d.chips.map((chip) => {
-                    const isSel = selected.has(chip.id)
-                    return (
-                      <button
-                        type="button"
-                        key={chip.id}
-                        className={cn('sa-chip', chip.modeClass, isSel && 'is-selected')}
-                        aria-pressed={isSel}
-                        onClick={() => toggle(chip, row.name, d.date)}
-                      >
-                        {chip.time} – {chip.end}
-                      </button>
-                    )
-                  })}
-                </div>
+        <div className="sa-card" key={row.id}>
+          <div className="sa-card-top">
+            <div className="sa-avatar">
+              <div className="sa-avatar-inner">
+                {row.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    className="sa-photo-img"
+                    src={row.photoUrl}
+                    alt={row.name}
+                    loading="lazy"
+                    width={150}
+                    height={170}
+                  />
+                ) : (
+                  <span className="sa-avatar-initials" aria-hidden="true">
+                    {row.initials}
+                  </span>
+                )}
               </div>
-            ))}
+            </div>
+
+            <div className="sa-content">
+              <div className="sa-name">{row.name}</div>
+              {row.position ? <div className="sa-title">{row.position}</div> : null}
+              {row.accreditations.length > 0 ? (
+                <div className="sa-accred">{row.accreditations.join('; ')}</div>
+              ) : null}
+            </div>
+
+            <div className="sa-slots">
+              {row.dates.map((d) => (
+                <div className="sa-date-group" key={d.date}>
+                  <div className="sa-date">{d.date}</div>
+                  <div className="sa-chips">
+                    {d.chips.map((chip) => {
+                      const isSel = selected.has(chip.id)
+                      return (
+                        <button
+                          type="button"
+                          key={chip.id}
+                          className={cn('sa-chip', chip.modeClass, isSel && 'is-selected')}
+                          aria-pressed={isSel}
+                          onClick={() => toggle(chip, row.name, d.date)}
+                        >
+                          {chip.time} – {chip.end}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ))}

@@ -1,19 +1,13 @@
 import type { Metadata } from 'next'
 
-import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
+import { permanentRedirect } from 'next/navigation'
 import React, { cache } from 'react'
-import RichText from '@/components/RichText'
 
-import type { Post } from '@/payload-types'
-
-import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
-import PageClient from './page.client'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -28,11 +22,7 @@ export async function generateStaticParams() {
     },
   })
 
-  const params = posts.docs.map(({ slug }) => {
-    return { slug }
-  })
-
-  return params
+  return posts.docs.map(({ slug }) => ({ slug }))
 }
 
 type Args = {
@@ -41,39 +31,18 @@ type Args = {
   }>
 }
 
+// Posts now live at /in-the-loop/{stream}/{slug}. Legacy /posts/{slug} URLs
+// permanently (301/308) redirect to the canonical In-the-Loop route.
 export default async function Post({ params: paramsPromise }: Args) {
-  const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
-  // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const url = '/posts/' + decodedSlug
   const post = await queryPostBySlug({ slug: decodedSlug })
 
-  if (!post) return <PayloadRedirects url={url} />
+  if (!post) return <PayloadRedirects url={'/posts/' + decodedSlug} />
 
-  return (
-    <article className="pt-16 pb-16">
-      <PageClient />
-
-      {/* Allows redirects for valid pages too */}
-      <PayloadRedirects disableNotFound url={url} />
-
-      {draft && <LivePreviewListener />}
-
-      <PostHero post={post} />
-
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="max-w-[48rem] mx-auto" data={post.content} enableGutter={false} />
-          {post.relatedPosts && post.relatedPosts.length > 0 && (
-            <RelatedPosts
-              className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
-              docs={post.relatedPosts.filter((post) => typeof post === 'object')}
-            />
-          )}
-        </div>
-      </div>
-    </article>
+  const stream = typeof post.stream === 'object' && post.stream ? post.stream : null
+  permanentRedirect(
+    stream?.slug ? `/in-the-loop/${stream.slug}/${post.slug}` : `/in-the-loop/${post.slug}`,
   )
 }
 
@@ -94,6 +63,7 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
   const result = await payload.find({
     collection: 'posts',
     draft,
+    depth: 1,
     limit: 1,
     overrideAccess: draft,
     pagination: false,

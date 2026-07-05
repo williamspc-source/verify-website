@@ -882,7 +882,7 @@ export interface Team {
     image?: (number | null) | Media;
     description?: string | null;
   };
-  department: 'operations' | 'business-development' | 'reception-bookings' | 'quality-assurance';
+  department: 'operations' | 'business-development' | 'client-support' | 'quality-assurance';
   /**
    * Sort order within the department (lower shows first).
    */
@@ -1393,6 +1393,10 @@ export interface Specialty {
       }[]
     | null;
   /**
+   * Display order in the Specialty List (ascending).
+   */
+  order?: number | null;
+  /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
@@ -1537,6 +1541,10 @@ export interface ClaimType {
   id: number;
   title: string;
   description?: string | null;
+  /**
+   * Display order in the "Claims We Support" list (ascending).
+   */
+  order?: number | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -1927,6 +1935,7 @@ export interface SectionBlock {
         | LeadershipSpotlightBlock
         | PortalCtaBlock
         | VideoEmbedBlock
+        | FormBlock
       )[]
     | null;
   /**
@@ -1995,6 +2004,7 @@ export interface RowBlock {
               | LeadershipSpotlightBlock
               | PortalCtaBlock
               | VideoEmbedBlock
+              | FormBlock
             )[]
           | null;
         id?: string | null;
@@ -4268,7 +4278,7 @@ export interface PeopleGridBlock {
   /**
    * Optional — limit to one department.
    */
-  department?: ('operations' | 'business-development' | 'reception-bookings' | 'quality-assurance') | null;
+  department?: ('operations' | 'business-development' | 'client-support' | 'quality-assurance') | null;
   /**
    * Render each department as its own labelled group (Meet the Team layout).
    */
@@ -4519,9 +4529,147 @@ export interface ServicesGridBlock {
    */
   linkToService?: boolean | null;
   /**
+   * Adds an enquiry-drawer link at the bottom of every card (reference: Reports & Opinions / Administrative Services cards).
+   */
+  showEnquire?: boolean | null;
+  /**
+   * Reference home-page style: a tidy icon + title grid with no blurb.
+   */
+  hideDescription?: boolean | null;
+  /**
    * Links become <prefix>/<slug>.
    */
   servicePathPrefix?: string | null;
+  /**
+   * Optional CTAs under the grid (e.g. "View Medico-Legal Services").
+   */
+  footerLinks?:
+    | {
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -5112,189 +5260,21 @@ export interface AamleEducationBlock {
    * Section background colour.
    */
   background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
-  intro?: {
+  /**
+   * Small uppercase label above the wordmark.
+   */
+  eyebrow?: string | null;
+  /**
+   * Large wordmark heading, e.g. "AAMLE".
+   */
+  wordmark?: string | null;
+  /**
+   * Uppercase subheading under the wordmark.
+   */
+  subheading?: string | null;
+  badge?: {
     /**
-     * Small uppercase eyebrow above the heading (left column).
-     */
-    label?: string | null;
-    /**
-     * Wrap the accented phrase in [[brackets]] to colour it in the brand blue, e.g. "Complimentary Education [[for Industry Professionals]]".
-     */
-    heading?: string | null;
-    /**
-     * Right-column intro paragraph(s). Bold is supported.
-     */
-    description?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-  };
-  panels?:
-    | {
-        /**
-         * Large faint step number, e.g. "01".
-         */
-        step?: string | null;
-        /**
-         * Icon shown in the left column.
-         */
-        icon?:
-          | (
-              | 'activity'
-              | 'arrow-down'
-              | 'arrow-right'
-              | 'arrows-out'
-              | 'award'
-              | 'bag-simple'
-              | 'bell-ringing'
-              | 'bone'
-              | 'book-open'
-              | 'brain'
-              | 'briefcase'
-              | 'building'
-              | 'bus'
-              | 'calendar'
-              | 'calendar-blank'
-              | 'calendar-check'
-              | 'car'
-              | 'caret-left'
-              | 'caret-right'
-              | 'cell-signal-full'
-              | 'certificate'
-              | 'chart-bar'
-              | 'chat'
-              | 'chat-circle-text'
-              | 'chats'
-              | 'chats-circle'
-              | 'check'
-              | 'check-circle'
-              | 'check-square'
-              | 'clipboard-check'
-              | 'clipboard-text'
-              | 'clock'
-              | 'currency-dollar'
-              | 'desktop'
-              | 'download'
-              | 'download-simple'
-              | 'envelope'
-              | 'envelope-simple'
-              | 'file-magnifying-glass'
-              | 'file-plus'
-              | 'file-text'
-              | 'files'
-              | 'first-aid'
-              | 'gavel'
-              | 'globe'
-              | 'graduation-cap'
-              | 'handshake'
-              | 'headset'
-              | 'heart-pulse'
-              | 'heartbeat'
-              | 'home'
-              | 'house'
-              | 'identification-card'
-              | 'info'
-              | 'link'
-              | 'list'
-              | 'lock'
-              | 'lock-simple'
-              | 'magnifying-glass'
-              | 'mail'
-              | 'map-pin'
-              | 'medal'
-              | 'message'
-              | 'monitor'
-              | 'navigation-arrow'
-              | 'paper-plane-tilt'
-              | 'person-arms-spread'
-              | 'phone'
-              | 'question'
-              | 'scale'
-              | 'scales'
-              | 'seal-check'
-              | 'search'
-              | 'send'
-              | 'shield'
-              | 'shield-check'
-              | 'sign-in'
-              | 'sliders'
-              | 'sort-ascending'
-              | 'squares-four'
-              | 'star'
-              | 'stethoscope'
-              | 't-shirt'
-              | 'target'
-              | 'translate'
-              | 'upload'
-              | 'upload-simple'
-              | 'user'
-              | 'user-check'
-              | 'user-circle'
-              | 'user-plus'
-              | 'users'
-              | 'users-three'
-              | 'video'
-              | 'video-camera'
-              | 'warning'
-              | 'warning-circle'
-              | 'wheelchair'
-              | 'wifi-high'
-              | 'wind'
-            )
-          | null;
-        /**
-         * Small pill label, e.g. "Free to Join".
-         */
-        badge?: string | null;
-        title: string;
-        /**
-         * Use the brighter (accent) badge style.
-         */
-        badgeAccent?: boolean | null;
-        /**
-         * Right-column paragraph(s). Bold / italic supported.
-         */
-        description?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        /**
-         * Optional bullet list shown under the description.
-         */
-        list?:
-          | {
-              item: string;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  sponsor?: {
-    /**
-     * Icon shown with this item.
+     * Icon inside the pill badge.
      */
     icon?:
       | (
@@ -5400,9 +5380,145 @@ export interface AamleEducationBlock {
           | 'wind'
         )
       | null;
-    label?: string | null;
-    description?: string | null;
+    /**
+     * Pill badge text near the top.
+     */
+    text?: string | null;
   };
+  /**
+   * Short intro paragraph under the badge. Bold is supported.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Compact icon + label rows shown under the intro.
+   */
+  items?:
+    | {
+        /**
+         * Small icon for this row.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
   link: {
     type?: ('reference' | 'custom' | 'enquiry') | null;
     newTab?: boolean | null;
@@ -5526,6 +5642,18 @@ export interface AamleEducationBlock {
       | null;
   };
   /**
+   * Right-column image. Leave empty to show a placeholder.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Keeps the two-column layout (reference placeholder box) until a real image is uploaded.
+   */
+  imagePlaceholder?: boolean | null;
+  /**
+   * Caption shown inside the placeholder box.
+   */
+  placeholderLabel?: string | null;
+  /**
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
   anchorId?: string | null;
@@ -5569,6 +5697,14 @@ export interface SplitFeatureBlock {
   rows?:
     | {
         image?: (number | null) | Media;
+        /**
+         * Keeps the two-column layout (reference grey box) until a real image is uploaded.
+         */
+        imagePlaceholder?: boolean | null;
+        /**
+         * Optional caption inside the placeholder (e.g. "COMPANY PHOTO PLACEHOLDER").
+         */
+        placeholderLabel?: string | null;
         imageSide?: ('auto' | 'left' | 'right') | null;
         eyebrow?: string | null;
         /**
@@ -5811,7 +5947,7 @@ export interface SplitFeatureBlock {
               id?: string | null;
             }[]
           | null;
-        link: {
+        link?: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
           reference?:
@@ -5824,7 +5960,7 @@ export interface SplitFeatureBlock {
                 value: number | Post;
               } | null);
           url?: string | null;
-          label: string;
+          label?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -7632,6 +7768,210 @@ export interface VideoEmbedBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock".
+ */
+export interface FormBlock {
+  form: number | Form;
+  enableIntro?: boolean | null;
+  introContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'formBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  title: string;
+  fields?:
+    | (
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            defaultValue?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'checkbox';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'country';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'email';
+          }
+        | {
+            message?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'message';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'number';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: string | null;
+            placeholder?: string | null;
+            options?:
+              | {
+                  label: string;
+                  value: string;
+                  id?: string | null;
+                }[]
+              | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'select';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'state';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: string | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'text';
+          }
+        | {
+            name: string;
+            label?: string | null;
+            width?: number | null;
+            defaultValue?: string | null;
+            required?: boolean | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'textarea';
+          }
+      )[]
+    | null;
+  submitButtonLabel?: string | null;
+  /**
+   * Choose whether to display an on-page message or redirect to a different page after they submit the form.
+   */
+  confirmationType?: ('message' | 'redirect') | null;
+  confirmationMessage?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  redirect?: {
+    url: string;
+  };
+  /**
+   * Send custom emails when the form submits. Use comma separated lists to send the same email to multiple recipients. To reference a value from this form, wrap that field's name with double curly brackets, i.e. {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
+   */
+  emails?:
+    | {
+        emailTo?: string | null;
+        cc?: string | null;
+        bcc?: string | null;
+        replyTo?: string | null;
+        emailFrom?: string | null;
+        subject: string;
+        /**
+         * Enter the message that should be sent in this email.
+         */
+        message?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ArchiveBlock".
  */
 export interface ArchiveBlock {
@@ -7661,6 +8001,22 @@ export interface ArchiveBlock {
    */
   view?: ('upcoming' | 'past') | null;
   categories?: (number | Category)[] | null;
+  /**
+   * Only show posts in this In-the-Loop stream.
+   */
+  stream?: (number | null) | Stream;
+  /**
+   * Only show posts flagged as featured.
+   */
+  featured?: boolean | null;
+  /**
+   * Article cards, or Staff-Narrative cards that show the author photo, name and role.
+   */
+  postStyle?: ('card' | 'narrative') | null;
+  /**
+   * Full event cards (Events list pages) or compact date-badge cards with CPD / cost status (In-the-Loop hub).
+   */
+  eventStyle?: ('card' | 'compact') | null;
   limit?: number | null;
   selectedDocs?:
     | (
@@ -7675,8 +8031,8 @@ export interface ArchiveBlock {
       )[]
     | null;
   columns?: ('2' | '3' | '4') | null;
-  viewAllLink: {
-    link: {
+  viewAllLink?: {
+    link?: {
       type?: ('reference' | 'custom' | 'enquiry') | null;
       newTab?: boolean | null;
       reference?:
@@ -7689,7 +8045,7 @@ export interface ArchiveBlock {
             value: number | Post;
           } | null);
       url?: string | null;
-      label: string;
+      label?: string | null;
       /**
        * Optional leading icon shown before the label.
        */
@@ -7927,210 +8283,6 @@ export interface Event {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock".
- */
-export interface FormBlock {
-  form: number | Form;
-  enableIntro?: boolean | null;
-  introContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Pick styles defined in Globals → Custom Styles.
-   */
-  cssClass?: string[] | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'formBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "forms".
- */
-export interface Form {
-  id: number;
-  title: string;
-  fields?:
-    | (
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            required?: boolean | null;
-            defaultValue?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'checkbox';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'country';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'email';
-          }
-        | {
-            message?: {
-              root: {
-                type: string;
-                children: {
-                  type: any;
-                  version: number;
-                  [k: string]: unknown;
-                }[];
-                direction: ('ltr' | 'rtl') | null;
-                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                indent: number;
-                version: number;
-              };
-              [k: string]: unknown;
-            } | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'message';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: number | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'number';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: string | null;
-            placeholder?: string | null;
-            options?:
-              | {
-                  label: string;
-                  value: string;
-                  id?: string | null;
-                }[]
-              | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'select';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'state';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: string | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'text';
-          }
-        | {
-            name: string;
-            label?: string | null;
-            width?: number | null;
-            defaultValue?: string | null;
-            required?: boolean | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'textarea';
-          }
-      )[]
-    | null;
-  submitButtonLabel?: string | null;
-  /**
-   * Choose whether to display an on-page message or redirect to a different page after they submit the form.
-   */
-  confirmationType?: ('message' | 'redirect') | null;
-  confirmationMessage?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  redirect?: {
-    url: string;
-  };
-  /**
-   * Send custom emails when the form submits. Use comma separated lists to send the same email to multiple recipients. To reference a value from this form, wrap that field's name with double curly brackets, i.e. {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
-   */
-  emails?:
-    | {
-        emailTo?: string | null;
-        cc?: string | null;
-        bcc?: string | null;
-        replyTo?: string | null;
-        emailFrom?: string | null;
-        subject: string;
-        /**
-         * Enter the message that should be sent in this email.
-         */
-        message?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "AvailabilityBlock".
  */
 export interface AvailabilityBlock {
@@ -8240,9 +8392,25 @@ export interface SpecialistDirectoryBlock {
   emptyHeading?: string | null;
   emptyBody?: string | null;
   /**
-   * Primary card button label.
+   * Ghost card button (links to the specialist profile).
    */
   cardCtaLabel?: string | null;
+  /**
+   * Solid card button label.
+   */
+  secondaryCtaLabel?: string | null;
+  /**
+   * Solid card button link (e.g. /contact).
+   */
+  secondaryCtaHref?: string | null;
+  /**
+   * Filter reset button label.
+   */
+  resetLabel?: string | null;
+  /**
+   * Eyebrow label shown above each card’s consulting locations.
+   */
+  locationsLabel?: string | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -8491,6 +8659,10 @@ export interface AppointmentGuideBlock {
    */
   heading?: string | null;
   subheading?: string | null;
+  /**
+   * Small uppercase label shown above the appointment-type toggle. Defaults to "Select your appointment type".
+   */
+  selectLabel?: string | null;
   /**
    * The top-level toggle (e.g. In-Person, Videolink).
    */
@@ -10486,6 +10658,7 @@ export interface SectionBlockSelect<T extends boolean = true> {
         leadershipSpotlight?: T | LeadershipSpotlightBlockSelect<T>;
         portalCta?: T | PortalCtaBlockSelect<T>;
         videoEmbed?: T | VideoEmbedBlockSelect<T>;
+        formBlock?: T | FormBlockSelect<T>;
       };
   cssClass?: T;
   anchorId?: T;
@@ -10536,6 +10709,7 @@ export interface RowBlockSelect<T extends boolean = true> {
               leadershipSpotlight?: T | LeadershipSpotlightBlockSelect<T>;
               portalCta?: T | PortalCtaBlockSelect<T>;
               videoEmbed?: T | VideoEmbedBlockSelect<T>;
+              formBlock?: T | FormBlockSelect<T>;
             };
         id?: T;
       };
@@ -11013,7 +11187,24 @@ export interface ServicesGridBlockSelect<T extends boolean = true> {
   columns?: T;
   limit?: T;
   linkToService?: T;
+  showEnquire?: T;
+  hideDescription?: T;
   servicePathPrefix?: T;
+  footerLinks?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              icon?: T;
+            };
+        id?: T;
+      };
   cssClass?: T;
   elementClasses?:
     | T
@@ -11157,36 +11348,22 @@ export interface TabsBlockTypeSelect<T extends boolean = true> {
  */
 export interface AamleEducationBlockSelect<T extends boolean = true> {
   background?: T;
-  intro?:
+  eyebrow?: T;
+  wordmark?: T;
+  subheading?: T;
+  badge?:
     | T
     | {
-        label?: T;
-        heading?: T;
-        description?: T;
-      };
-  panels?:
-    | T
-    | {
-        step?: T;
         icon?: T;
-        badge?: T;
-        title?: T;
-        badgeAccent?: T;
-        description?: T;
-        list?:
-          | T
-          | {
-              item?: T;
-              id?: T;
-            };
+        text?: T;
+      };
+  description?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
         id?: T;
-      };
-  sponsor?:
-    | T
-    | {
-        icon?: T;
-        label?: T;
-        description?: T;
       };
   link?:
     | T
@@ -11198,6 +11375,9 @@ export interface AamleEducationBlockSelect<T extends boolean = true> {
         label?: T;
         icon?: T;
       };
+  image?: T;
+  imagePlaceholder?: T;
+  placeholderLabel?: T;
   anchorId?: T;
   cssClass?: T;
   containerWidth?: T;
@@ -11218,6 +11398,8 @@ export interface SplitFeatureBlockSelect<T extends boolean = true> {
     | T
     | {
         image?: T;
+        imagePlaceholder?: T;
+        placeholderLabel?: T;
         imageSide?: T;
         eyebrow?: T;
         icon?: T;
@@ -11517,6 +11699,18 @@ export interface VideoEmbedBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock_select".
+ */
+export interface FormBlockSelect<T extends boolean = true> {
+  form?: T;
+  enableIntro?: T;
+  introContent?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ArchiveBlock_select".
  */
 export interface ArchiveBlockSelect<T extends boolean = true> {
@@ -11526,6 +11720,10 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   relationTo?: T;
   view?: T;
   categories?: T;
+  stream?: T;
+  featured?: T;
+  postStyle?: T;
+  eventStyle?: T;
   limit?: T;
   selectedDocs?: T;
   columns?: T;
@@ -11545,18 +11743,6 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
       };
   cssClass?: T;
   anchorId?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock_select".
- */
-export interface FormBlockSelect<T extends boolean = true> {
-  form?: T;
-  enableIntro?: T;
-  introContent?: T;
-  cssClass?: T;
   id?: T;
   blockName?: T;
 }
@@ -11629,6 +11815,10 @@ export interface SpecialistDirectoryBlockSelect<T extends boolean = true> {
   emptyHeading?: T;
   emptyBody?: T;
   cardCtaLabel?: T;
+  secondaryCtaLabel?: T;
+  secondaryCtaHref?: T;
+  resetLabel?: T;
+  locationsLabel?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -11679,6 +11869,7 @@ export interface AppointmentGuideBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  selectLabel?: T;
   types?:
     | T
     | {
@@ -12136,6 +12327,7 @@ export interface SpecialtiesSelect<T extends boolean = true> {
         area?: T;
         id?: T;
       };
+  order?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -12161,6 +12353,7 @@ export interface SpecialtyCategoriesSelect<T extends boolean = true> {
 export interface ClaimTypesSelect<T extends boolean = true> {
   title?: T;
   description?: T;
+  order?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -13276,6 +13469,9 @@ export interface Header {
  */
 export interface Footer {
   id: number;
+  /**
+   * Optional line under the footer logo. Blank by default (reference footer has none).
+   */
   tagline?: string | null;
   columns?:
     | {

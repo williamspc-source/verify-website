@@ -33,6 +33,7 @@ import { MapEmbed } from './MapEmbed/config'
 import { LeadershipSpotlight } from './LeadershipSpotlight/config'
 import { PortalCta } from './PortalCta/config'
 import { VideoEmbed } from './VideoEmbed/config'
+import { FormBlock } from './Form/config'
 
 export const ATOM_BLOCKS: Block[] = [Heading, Text, Button, Image, Spacer, Divider, IconBlock]
 
@@ -59,6 +60,9 @@ export const NESTABLE_RICH_BLOCKS: Block[] = [
   LeadershipSpotlight,
   PortalCta,
   VideoEmbed,
+  // FormBlock is a simple relationship block (fields live in the forms
+  // collection), so it nests cleanly in a Row column for two-column form layouts.
+  FormBlock,
 ]
 
 // Allowed inside a Row column (atoms + rich blocks; no Row/Section — depth is

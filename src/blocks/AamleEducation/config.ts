@@ -16,10 +16,12 @@ import {
   motionField,
 } from '@/fields/blockFields'
 
-// AAMLE educational-services showcase (homepage "Educational Services" tab).
-// Reproduces the design's 2-col intro, the numbered gradient feature panels, the
-// soft sponsorship note and the closing CTA — every label, icon, badge, paragraph,
-// bullet and link is editable.
+// AAMLE educational-services section (Services page "Educational Services").
+// Reproduces the design reference's simple two-column layout: a large AAMLE
+// wordmark + subheading, a CPD-eligible pill badge, a short intro paragraph, a
+// compact icon checklist and a CTA on the left; an image (or grey placeholder)
+// on the right. Every label, icon, checklist item, paragraph, badge and link is
+// editable. Rendered standalone and nested inside a Tabs panel (bare mode).
 export const AamleEducation: Block = {
   slug: 'aamleEducation',
   interfaceName: 'AamleEducationBlock',
@@ -27,115 +29,85 @@ export const AamleEducation: Block = {
   fields: [
     backgroundField,
 
-    // ── Intro (2-column: label + heading on the left, description on the right) ──
+    // ── Left column: heading block ──
     {
-      name: 'intro',
-      type: 'group',
-      label: 'Intro',
-      fields: [
-        {
-          name: 'label',
-          type: 'text',
-          defaultValue: 'What AAMLE Offers',
-          admin: { description: 'Small uppercase eyebrow above the heading (left column).' },
-        },
-        {
-          name: 'heading',
-          type: 'text',
-          defaultValue: 'Complimentary Education [[for Industry Professionals]]',
-          admin: {
-            description:
-              'Wrap the accented phrase in [[brackets]] to colour it in the brand blue, e.g. "Complimentary Education [[for Industry Professionals]]".',
-          },
-        },
-        {
-          name: 'description',
-          type: 'richText',
-          admin: { description: 'Right-column intro paragraph(s). Bold is supported.' },
-          editor: lexicalEditor({
-            features: ({ rootFeatures }) => [
-              ...rootFeatures,
-              FixedToolbarFeature(),
-              InlineToolbarFeature(),
-            ],
-          }),
-        },
-      ],
+      name: 'eyebrow',
+      type: 'text',
+      defaultValue: 'Educational Services',
+      admin: { description: 'Small uppercase label above the wordmark.' },
+    },
+    {
+      name: 'wordmark',
+      type: 'text',
+      defaultValue: 'AAMLE',
+      admin: { description: 'Large wordmark heading, e.g. "AAMLE".' },
+    },
+    {
+      name: 'subheading',
+      type: 'text',
+      defaultValue: 'Australian Academy of Medico-Legal Education',
+      admin: { description: 'Uppercase subheading under the wordmark.' },
     },
 
-    // ── Feature panels (numbered gradient rows) ──
+    // ── CPD pill badge ──
     {
-      name: 'panels',
-      type: 'array',
-      label: 'Feature panels',
-      labels: { singular: 'Panel', plural: 'Panels' },
-      minRows: 1,
-      admin: { initCollapsed: true },
+      name: 'badge',
+      type: 'group',
+      label: 'CPD badge',
       fields: [
         {
           type: 'row',
           fields: [
+            iconField({
+              defaultValue: 'graduation-cap',
+              admin: { width: '50%', description: 'Icon inside the pill badge.' },
+            }),
             {
-              name: 'step',
+              name: 'text',
               type: 'text',
-              defaultValue: '01',
-              admin: { width: '33%', description: 'Large faint step number, e.g. "01".' },
-            },
-            iconField({ admin: { width: '33%', description: 'Icon shown in the left column.' } }),
-            {
-              name: 'badge',
-              type: 'text',
-              admin: { width: '34%', description: 'Small pill label, e.g. "Free to Join".' },
+              defaultValue: 'CPD-Eligible Programs',
+              admin: { width: '50%', description: 'Pill badge text near the top.' },
             },
           ],
-        },
-        { name: 'title', type: 'text', required: true },
-        {
-          name: 'badgeAccent',
-          type: 'checkbox',
-          label: 'Brighter badge',
-          admin: { description: 'Use the brighter (accent) badge style.' },
-        },
-        {
-          name: 'description',
-          type: 'richText',
-          admin: { description: 'Right-column paragraph(s). Bold / italic supported.' },
-          editor: lexicalEditor({
-            features: ({ rootFeatures }) => [
-              ...rootFeatures,
-              FixedToolbarFeature(),
-              InlineToolbarFeature(),
-            ],
-          }),
-        },
-        {
-          name: 'list',
-          type: 'array',
-          label: 'Bulleted list',
-          labels: { singular: 'Item', plural: 'Items' },
-          admin: { description: 'Optional bullet list shown under the description.' },
-          fields: [{ name: 'item', type: 'text', required: true }],
         },
       ],
     },
 
-    // ── Sponsorship soft note ──
+    // ── Intro paragraph ──
     {
-      name: 'sponsor',
-      type: 'group',
-      label: 'Sponsorship note',
+      name: 'description',
+      type: 'richText',
+      admin: { description: 'Short intro paragraph under the badge. Bold is supported.' },
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => [
+          ...rootFeatures,
+          FixedToolbarFeature(),
+          InlineToolbarFeature(),
+        ],
+      }),
+    },
+
+    // ── Offering checklist (icon + label rows) ──
+    {
+      name: 'items',
+      type: 'array',
+      label: 'Checklist items',
+      labels: { singular: 'Item', plural: 'Items' },
+      minRows: 1,
+      admin: { description: 'Compact icon + label rows shown under the intro.' },
+      defaultValue: [
+        { icon: 'video-camera', label: 'CPD-Eligible Webinars' },
+        { icon: 'graduation-cap', label: 'Specialist Training Events' },
+        { icon: 'book-open', label: 'Discounted AMA Guides Access' },
+        { icon: 'globe', label: 'Open to All — Nationally' },
+      ],
       fields: [
-        iconField({ defaultValue: 'handshake' }),
         {
-          name: 'label',
-          type: 'text',
-          defaultValue: 'Sponsorship Opportunities',
-        },
-        {
-          name: 'description',
-          type: 'textarea',
-          defaultValue:
-            'Industry partners may sponsor AAMLE educational events and initiatives to support professional development across the medico-legal sector.',
+          type: 'row',
+          fields: [
+            iconField({ admin: { width: '40%', description: 'Small icon for this row.' } }),
+            { name: 'label', type: 'text', required: true, admin: { width: '60%' } },
+          ],
         },
       ],
     },
@@ -143,6 +115,32 @@ export const AamleEducation: Block = {
     // ── Closing CTA ── (appearances off: keeps nested-in-Tabs enum names under
     // Postgres' 63-char limit)
     link({ appearances: false, overrides: { label: 'Call-to-action button' } }),
+
+    // ── Right column: image / placeholder ──
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      admin: { description: 'Right-column image. Leave empty to show a placeholder.' },
+    },
+    {
+      name: 'imagePlaceholder',
+      type: 'checkbox',
+      defaultValue: true,
+      label: 'Show a grey image placeholder when no image is set',
+      admin: {
+        description: 'Keeps the two-column layout (reference placeholder box) until a real image is uploaded.',
+      },
+    },
+    {
+      name: 'placeholderLabel',
+      type: 'text',
+      defaultValue: 'Image Placeholder',
+      admin: {
+        condition: (_, sib) => Boolean((sib as { imagePlaceholder?: boolean })?.imagePlaceholder),
+        description: 'Caption shown inside the placeholder box.',
+      },
+    },
 
     anchorIdField,
     cssClassField,

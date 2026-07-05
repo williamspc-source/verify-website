@@ -6,14 +6,25 @@ import React from 'react'
 import type { ServicesGridBlock as Props, Service } from '@/payload-types'
 
 import { Icon } from '@/components/Icon'
+import { CMSLink } from '@/components/Link'
+import { Media } from '@/components/Media'
+import RichText from '@/components/RichText'
 import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { ServicesAccordionItem } from './ServicesAccordionClient'
 
 type CardData = { id: string; icon?: string | null; title: string; description?: string | null; href?: string | null }
 
-const Card: React.FC<CardData & { className?: string }> = ({ icon, title, description, href, className }) => {
+const Card: React.FC<CardData & { className?: string; enquire?: boolean }> = ({
+  icon,
+  title,
+  description,
+  href,
+  className,
+  enquire,
+}) => {
   const inner = (
     <>
       {icon ? (
@@ -23,9 +34,16 @@ const Card: React.FC<CardData & { className?: string }> = ({ icon, title, descri
       ) : null}
       <h3 className="service-title vf-card__title">{title}</h3>
       {description ? <p className="service-desc">{description}</p> : null}
+      {enquire ? (
+        <button type="button" className="service-enquire" data-enquiry-panel>
+          Enquire →
+        </button>
+      ) : null}
     </>
   )
-  return href ? (
+  // A card with an enquiry action can't itself be a link (button-in-anchor is
+  // invalid), so the Enquire link takes precedence over card linking.
+  return href && !enquire ? (
     <Link href={href} className={cn('service-card vf-card', className)}>
       {inner}
     </Link>
@@ -42,10 +60,15 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
     background,
     source = 'auto',
     category,
+    serviceGroup,
+    layout,
     services,
     columns,
     limit,
     linkToService,
+    showEnquire,
+    hideDescription,
+    footerLinks,
     servicePathPrefix,
     cssClass,
     elementClasses,
@@ -57,34 +80,96 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
 
   const cols = Number(columns) || 3
   const prefix = (servicePathPrefix || '/services').replace(/\/$/, '')
-  const hrefFor = (s: Service) => (linkToService && s.slug ? `${prefix}/${s.slug}` : null)
+  // Prefer an explicit per-service link override; otherwise fall back to the
+  // auto-generated service page path (only when linking is enabled).
+  const hrefFor = (s: Service): string | null => {
+    if (s.linkOverride) return s.linkOverride
+    return linkToService && s.slug ? `${prefix}/${s.slug}` : null
+  }
 
-  let cards: CardData[] = []
+  const isAccordion = layout === 'accordion'
+
+  // Collect the full service docs so the accordion can reach photo + body.
+  let items: Service[] = []
   if (source === 'manual') {
-    cards = (services || [])
-      .filter((s): s is Service => typeof s === 'object')
-      .map((s) => ({ id: String(s.id), icon: s.icon, title: s.title, description: s.shortDescription, href: hrefFor(s) }))
+    items = (services || []).filter((s): s is Service => typeof s === 'object')
   } else {
     const payload = await getPayload({ config: configPromise })
     const where: Where = {}
     if (category) where.category = { equals: category }
+    if (serviceGroup) where.serviceGroup = { equals: serviceGroup }
     const res = await payload.find({
       collection: 'services',
-      depth: 0,
+      // Accordion rows render each service's photo, which needs depth 1.
+      depth: isAccordion ? 1 : 0,
       limit: limit || 12,
       sort: 'order',
-      ...(category ? { where } : {}),
+      ...(Object.keys(where).length ? { where } : {}),
     })
-    cards = res.docs.map((s) => ({
-      id: String(s.id),
-      icon: s.icon,
-      title: s.title,
-      description: s.shortDescription,
-      href: hrefFor(s),
-    }))
+    items = res.docs
   }
 
-  if (cards.length === 0) return null
+  if (items.length === 0) return null
+
+  const header = (
+    <SectionHeader
+      eyebrow={eyebrow}
+      title={heading}
+      subtitle={subheading}
+      align="center"
+      titleClassName={toClassName(elementClasses?.heading)}
+    />
+  )
+
+  if (isAccordion) {
+    const rows = items.map((s) => {
+      const photo = s.photo && typeof s.photo === 'object' ? s.photo : null
+      // Always-visible 16:9 tile above the trigger (mirrors the reference
+      // `.as-accordion-img`): a real photo when one is uploaded, otherwise the
+      // blue-gradient placeholder with the service icon + "Image Placeholder".
+      const media = photo ? (
+        <div className="as-accordion-img as-accordion-img--photo">
+          <Media resource={photo} htmlElement={null} fill imgClassName="as-accordion-img__img" />
+        </div>
+      ) : (
+        <div className="as-accordion-img">
+          {s.icon ? <Icon name={s.icon} /> : null}
+          <span className="as-accordion-img-label">Image Placeholder</span>
+        </div>
+      )
+      const body = s.body ? (
+        <RichText
+          data={s.body}
+          enableGutter={false}
+          enableProse={false}
+          className="as-accordion-richtext"
+        />
+      ) : null
+      return <ServicesAccordionItem key={s.id} title={s.title} media={media} body={body} />
+    })
+
+    // Two balanced columns, matching the reference's `.as-accordion-grid`.
+    const mid = Math.ceil(rows.length / 2)
+    const left = rows.slice(0, mid)
+    const right = rows.slice(mid)
+
+    return (
+      <Section
+        background={background as SectionBackground}
+        className={cn('vf-services-grid vf-services-accordion', toClassName(cssClass))}
+        motion={motion}
+        containerWidth={containerWidth}
+        hoverEffect={hoverEffect}
+        bare={bare}
+      >
+        {header}
+        <div className="as-accordion-grid">
+          <div className="as-accordion-col">{left}</div>
+          {right.length > 0 ? <div className="as-accordion-col">{right}</div> : null}
+        </div>
+      </Section>
+    )
+  }
 
   return (
     <Section
@@ -95,18 +180,35 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
       hoverEffect={hoverEffect}
       bare={bare}
     >
-      <SectionHeader
-        eyebrow={eyebrow}
-        title={heading}
-        subtitle={subheading}
-        align="center"
-        titleClassName={toClassName(elementClasses?.heading)}
-      />
+      {header}
       <div className="services-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
-        {cards.map((c) => (
-          <Card key={c.id} {...c} className={toClassName(elementClasses?.card)} />
+        {items.map((s) => (
+          <Card
+            key={s.id}
+            id={String(s.id)}
+            icon={s.icon}
+            title={s.title}
+            description={hideDescription ? null : s.shortDescription}
+            href={hrefFor(s)}
+            enquire={Boolean(showEnquire)}
+            className={toClassName(elementClasses?.card)}
+          />
         ))}
       </div>
+      {Array.isArray(footerLinks) && footerLinks.length > 0 ? (
+        <div className="services-grid-actions">
+          {footerLinks.map((f, i) =>
+            f?.link ? (
+              <CMSLink
+                key={i}
+                {...f.link}
+                appearance="inline"
+                className={i === 0 ? 'btn btn-primary' : 'btn btn-outline'}
+              />
+            ) : null,
+          )}
+        </div>
+      ) : null}
     </Section>
   )
 }

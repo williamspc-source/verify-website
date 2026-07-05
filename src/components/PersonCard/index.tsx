@@ -12,6 +12,13 @@ export type PersonCardData = {
   href?: string | null
   /** Qualification pills shown on the expert (marquee) card. */
   tags?: string[] | null
+  /**
+   * Card treatment. `'default'` is the centred spec-card (circular monogram
+   * avatar) used by the specialist panel. `'rect'` is the team-card treatment:
+   * a full-bleed rectangular headshot filling the top of the card with the
+   * name/role beneath (design reference `about/meet-the-team.html`).
+   */
+  variant?: 'default' | 'rect' | null
   className?: string
 }
 
@@ -23,16 +30,70 @@ export const initialsOf = (name: string) =>
     .map((w) => w.charAt(0).toUpperCase())
     .join('')
 
+// Faithful port of the design `.team-card` used on the "Meet the Team" page:
+// a full-bleed rectangular headshot fills the top of the card (gradient +
+// monogram fallback behind, so it shows when there is no photo), then the
+// name, role and profile link beneath. Namespaced `.vf-team-card*`.
+export const TeamCard: React.FC<PersonCardData> = ({
+  name,
+  position,
+  photoUrl,
+  href,
+  className,
+}) => {
+  const inner = (
+    <>
+      <div className="vf-team-card__photo">
+        <div className="avatar-mono vf-team-card__mono" aria-hidden>
+          {initialsOf(name)}
+        </div>
+        {photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="vf-team-card__image" src={photoUrl} alt={name} loading="lazy" />
+        ) : null}
+      </div>
+      <div className="vf-team-card__body">
+        <div className="vf-team-card__name vf-card__title">{name}</div>
+        {position ? <div className="vf-team-card__role">{position}</div> : null}
+        {href ? <span className="vf-team-card__link">View profile →</span> : null}
+      </div>
+    </>
+  )
+
+  if (href) {
+    return (
+      <Link href={href} className={cn('vf-team-card vf-card', className)}>
+        {inner}
+      </Link>
+    )
+  }
+  return <div className={cn('vf-team-card vf-card', className)}>{inner}</div>
+}
+
 // Uses the ported design `.spec-card` treatment (accent bar, monogram avatar,
-// hover lift + arrow).
+// hover lift + arrow). When `variant === 'rect'` it delegates to the
+// rectangular `TeamCard` treatment (used for team members).
 export const PersonCard: React.FC<PersonCardData> = ({
   name,
   position,
   location,
   photoUrl,
   href,
+  variant,
   className,
 }) => {
+  if (variant === 'rect') {
+    return (
+      <TeamCard
+        name={name}
+        position={position}
+        photoUrl={photoUrl}
+        href={href}
+        className={className}
+      />
+    )
+  }
+
   const inner = (
     <>
       <div

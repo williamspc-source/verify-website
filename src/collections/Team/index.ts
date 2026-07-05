@@ -115,7 +115,7 @@ export const Team: CollectionConfig<'team'> = {
       options: [
         { label: 'Operations', value: 'operations' },
         { label: 'Business Development', value: 'business-development' },
-        { label: 'Reception & Bookings', value: 'reception-bookings' },
+        { label: 'Client Support', value: 'client-support' },
         { label: 'Quality Assurance', value: 'quality-assurance' },
       ],
     },

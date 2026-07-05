@@ -17,6 +17,9 @@ const relId = (v: unknown): string | null => {
   if (typeof v === 'number' || typeof v === 'string') return String(v)
   return null
 }
+// url of an upload relationship (populated media object) or null.
+const mediaUrl = (m: unknown): string | null =>
+  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
 const relTitles = (rels: unknown): string[] =>
   Array.isArray(rels)
     ? rels
@@ -30,7 +33,7 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
 
   const payload = await getPayload({ config: configPromise })
   const [specialtiesRes, specialistsRes, categoriesRes] = await Promise.all([
-    payload.find({ collection: 'specialties', depth: 1, limit: 200 }),
+    payload.find({ collection: 'specialties', depth: 1, limit: 200, sort: 'order' }),
     payload.find({
       collection: 'specialists',
       depth: 1,
@@ -51,6 +54,7 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
       position: s.position ?? null,
       slug: s.slug ?? null,
       locations: relTitles(s.locations),
+      photoUrl: mediaUrl(s.photo),
     }
     const list = bySpecialty.get(specId) ?? []
     list.push(person)
@@ -68,7 +72,11 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
     specialists: bySpecialty.get(String(sp.id)) ?? [],
   }))
 
-  const categories: Category[] = categoriesRes.docs.map((c) => ({ id: String(c.id), title: c.title }))
+  const categories: Category[] = categoriesRes.docs.map((c) => ({
+    id: String(c.id),
+    title: c.title,
+    icon: (c as { icon?: string | null }).icon ?? null,
+  }))
 
   return (
     <Section

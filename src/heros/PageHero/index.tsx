@@ -34,7 +34,14 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
   )
   const heroLinks = ((links as HeroLink[] | null | undefined) || []).filter((l) => l?.link)
   const headingText = heading || title
-  const crumbs: Crumb[] = [{ label: 'Home', url: '/' }, ...((breadcrumbs as Crumb[]) || [])]
+  const fullCrumbs: Crumb[] = [{ label: 'Home', url: '/' }, ...((breadcrumbs as Crumb[]) || [])]
+  // The reference shows a shallow trail — Home › [top section] › [current] — so
+  // collapse any deeper ancestor chain (e.g. Home › Services › Medico-Legal › IME)
+  // by dropping the middle crumbs. URLs stay fully nested; only the display shortens.
+  const crumbs: Crumb[] =
+    fullCrumbs.length > 3
+      ? [fullCrumbs[0], fullCrumbs[1], fullCrumbs[fullCrumbs.length - 1]]
+      : fullCrumbs
 
   return (
     <section
@@ -42,6 +49,7 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
         'page-hero',
         `page-hero--${theme}`,
         align === 'center' && 'page-hero--center',
+        showShield && 'page-hero--has-shield',
         toClassName(cssClass),
       )}
     >

@@ -15,13 +15,13 @@ import { toClassName } from '@/utilities/cssClass'
 const DEPARTMENT_LABELS: Record<string, string> = {
   operations: 'Operations',
   'business-development': 'Business Development',
-  'reception-bookings': 'Reception & Bookings',
+  'client-support': 'Client Support',
   'quality-assurance': 'Quality Assurance',
 }
 const DEPARTMENT_ORDER = [
   'operations',
   'business-development',
-  'reception-bookings',
+  'client-support',
   'quality-assurance',
 ]
 
@@ -33,26 +33,26 @@ const firstLocationTitle = (locations: Specialist['locations']): string | null =
   return first && typeof first === 'object' ? (first.title ?? null) : null
 }
 
+// Reference expert cards are deliberately simple: photo, name, specialty role.
+// No specialty badge overlay on the photo and no qualification/degree pills
+// (those live on the full specialist profile, not the panel card).
 const specialistToCard = (s: Specialist, linkProfiles: boolean): PersonCardData => ({
   name: s.title,
   position: s.position,
   location: firstLocationTitle(s.locations),
-  badge: typeof s.specialty === 'object' && s.specialty ? s.specialty.title : null,
   photoUrl: mediaUrl(s.photo),
   href: linkProfiles && s.slug ? `/specialists/${s.slug}` : null,
-  tags: (s.qualifications || [])
-    .map((q) => q.qualification)
-    .filter((q): q is string => Boolean(q))
-    .slice(0, 3),
 })
 
+// Team members render as rectangular photo cards (full-bleed headshot on top,
+// name + role beneath) — the design-reference "Meet the Team" treatment.
 const teamToCard = (t: Team, linkProfiles: boolean): PersonCardData => ({
   name: t.title,
   position: t.role,
   location: null,
-  badge: t.department ? DEPARTMENT_LABELS[t.department] : null,
   photoUrl: mediaUrl(t.photo),
   href: linkProfiles && t.slug ? `/about/team/${t.slug}` : null,
+  variant: 'rect',
 })
 
 export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (props) => {

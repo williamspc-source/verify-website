@@ -1,5 +1,6 @@
 import type { Block } from 'payload'
 
+import { link } from '@/fields/link'
 import {
   backgroundField,
   cssClassField,
@@ -102,6 +103,18 @@ export const ServicesGrid: Block = {
       admin: { description: 'Enable once service pages exist.' },
     },
     {
+      name: 'showEnquire',
+      type: 'checkbox',
+      label: 'Show an “Enquire →” link on each card',
+      admin: { description: 'Adds an enquiry-drawer link at the bottom of every card (reference: Reports & Opinions / Administrative Services cards).' },
+    },
+    {
+      name: 'hideDescription',
+      type: 'checkbox',
+      label: 'Hide card descriptions (icon + title only)',
+      admin: { description: 'Reference home-page style: a tidy icon + title grid with no blurb.' },
+    },
+    {
       name: 'servicePathPrefix',
       type: 'text',
       defaultValue: '/services',
@@ -109,6 +122,15 @@ export const ServicesGrid: Block = {
         condition: (_, d) => Boolean((d as { linkToService?: boolean })?.linkToService),
         description: 'Links become <prefix>/<slug>.',
       },
+    },
+    {
+      name: 'footerLinks',
+      type: 'array',
+      label: 'Buttons below the grid',
+      labels: { singular: 'Button', plural: 'Buttons' },
+      maxRows: 3,
+      admin: { description: 'Optional CTAs under the grid (e.g. "View Medico-Legal Services").' },
+      fields: [link({ appearances: false })],
     },
     cssClassField,
     elementClassesField,
