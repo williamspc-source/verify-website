@@ -12,11 +12,26 @@ import { getCachedGlobal } from '@/utilities/getGlobals'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { accentText } from '@/utilities/accentText'
+import { mediaFocal } from '@/utilities/focalPoint'
 
-import { AvailabilityClient, type AvailabilityRow, type EnquiryConfig } from './AvailabilityClient'
+import {
+  AvailabilityClient,
+  type AvailabilityLabels,
+  type AvailabilityRow,
+  type EnquiryConfig,
+} from './AvailabilityClient'
 
-const mediaUrl = (m: unknown): string | null =>
-  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
+// Editable UI copy for the availability grid, sourced from the global's `labels`
+// group. Typed locally and read defensively until types are regenerated on deploy.
+type GlobalLabels = {
+  modeInPersonLabel?: string | null
+  modeTelehealthLabel?: string | null
+  modeEitherLabel?: string | null
+  selectionHint?: string | null
+  clearLabel?: string | null
+  sendEnquiryLabel?: string | null
+  sessionsSelectedTemplate?: string | null
+}
 
 const HONORIFICS = new Set([
   'dr',
@@ -48,12 +63,6 @@ const dateLabel = (iso: string): string =>
     .toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' })
     .replace(',', '')
 
-const MODE_META: Record<string, { cls: string; label: string }> = {
-  'in-person': { cls: 'sa-inperson', label: 'In-person' },
-  telehealth: { cls: 'sa-telehealth', label: 'Telehealth' },
-  either: { cls: 'sa-either', label: 'In-person or Telehealth' },
-}
-
 const startOfToday = (): string => {
   const d = new Date()
   d.setHours(0, 0, 0, 0)
@@ -61,10 +70,40 @@ const startOfToday = (): string => {
 }
 
 export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
-  const { showCarousel = true, showLegend = true, cssClass } = props
+  const {
+    showCarousel = true,
+    showLegend = true,
+    cssClass,
+  } = props
+  // New field (regenerate types on deploy); read defensively until then.
+  const showSpecialtyBadge = (props as { showSpecialtyBadge?: boolean | null }).showSpecialtyBadge === true
 
   const payload = await getPayload({ config: configPromise })
   const global = await getCachedGlobal('specialist-availability', 0)()
+
+  // Editable labels (defensive read — the `labels` group isn't in the generated
+  // types yet). The mode labels are shared with the client legend for consistency.
+  const globalLabels = ((global as { labels?: GlobalLabels }).labels ?? {}) as GlobalLabels
+  const modeInPerson = globalLabels.modeInPersonLabel || 'In-person'
+  const modeTelehealth = globalLabels.modeTelehealthLabel || 'Telehealth'
+  const modeEither = globalLabels.modeEitherLabel || 'In-person / Telehealth'
+
+  const MODE_META: Record<string, { cls: string; label: string }> = {
+    'in-person': { cls: 'sa-inperson', label: modeInPerson },
+    telehealth: { cls: 'sa-telehealth', label: modeTelehealth },
+    either: { cls: 'sa-either', label: modeEither },
+  }
+
+  const labels: AvailabilityLabels = {
+    inPerson: modeInPerson,
+    telehealth: modeTelehealth,
+    either: modeEither,
+    selectionHint:
+      globalLabels.selectionHint || 'Tap sessions to select, then send us an enquiry.',
+    clear: globalLabels.clearLabel || 'Clear',
+    sendEnquiry: globalLabels.sendEnquiryLabel || 'Send enquiry',
+    sessionsSelectedTemplate: globalLabels.sessionsSelectedTemplate || '{count} {noun} selected',
+  }
 
   // Advertised specialists → the featured carousel only.
   const specialistsRes = await payload.find({
@@ -72,7 +111,7 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
     where: { advertise: { equals: true } },
     depth: 1,
     limit: 100,
-    sort: 'lastName',
+    sort: '_order',
   })
   const specialists = specialistsRes.docs
 
@@ -108,7 +147,13 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
   }
 
   const rows: AvailabilityRow[] = Array.from(bySpecialist.values())
-    .sort((a, b) => (a.sp.lastName || a.sp.title).localeCompare(b.sp.lastName || b.sp.title))
+    .sort((a, b) => {
+      // Honour the admin drag order (`_order`) when present; fall back to surname.
+      const ao = (a.sp as { _order?: string })._order
+      const bo = (b.sp as { _order?: string })._order
+      if (ao && bo) return ao.localeCompare(bo)
+      return (a.sp.lastName || a.sp.title).localeCompare(b.sp.lastName || b.sp.title)
+    })
     .map(({ sp, sessions }) => {
       const dateMap = new Map<string, AvailabilityRow['dates'][number]>()
       for (const sess of sessions) {
@@ -124,12 +169,15 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
           modeClass: meta.cls,
         })
       }
+      const photo = mediaFocal(sp.photo)
       return {
         id: String(sp.id),
         name: sp.title,
         position: sp.position ?? null,
         initials: initialsOf(sp.title),
-        photoUrl: mediaUrl(sp.photo),
+        photoUrl: photo.url,
+        photoFocus: photo.focus,
+        photoZoom: photo.zoom,
         // Populated Accreditation docs use `title` (e.g. "CIME (ABIME)"); bare
         // IDs (depth too shallow) are skipped.
         accreditations: (sp.accreditations || [])
@@ -140,21 +188,29 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
     })
 
   // ── Featured carousel: driven by the "Advertise availability" toggle ──
-  const featured: PersonCardData[] = specialists.map((sp: Specialist) => ({
+  const featured: PersonCardData[] = specialists.map((sp: Specialist) => {
+    const photo = mediaFocal(sp.photo)
+    return {
     name: sp.title,
     position: sp.position ?? null,
     location:
       Array.isArray(sp.locations) && sp.locations[0] && typeof sp.locations[0] === 'object'
         ? (sp.locations[0].title ?? null)
         : null,
-    badge: typeof sp.specialty === 'object' && sp.specialty ? sp.specialty.title : null,
-    photoUrl: mediaUrl(sp.photo),
+    badge:
+      showSpecialtyBadge && typeof sp.specialty === 'object' && sp.specialty
+        ? sp.specialty.title
+        : null,
+    photoUrl: photo.url,
+    photoFocus: photo.focus,
+    photoZoom: photo.zoom,
     href: null,
     tags: (sp.accreditations || [])
       .map((a) => (a && typeof a === 'object' ? a.title : null))
       .filter((a): a is string => Boolean(a))
       .slice(0, 3),
-  }))
+    }
+  })
 
   const enquiry: EnquiryConfig = {
     email: global.enquiryEmail || 'admin@vmls.com.au',
@@ -183,7 +239,8 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
               ) : null}
             </div>
           ) : null}
-          <ExpertsCarousel cards={featured} />
+          {/* Specialist marquee auto-scrolls; no direction arrows (per design). */}
+          <ExpertsCarousel cards={featured} showArrows={false} />
         </Section>
       ) : null}
 
@@ -197,7 +254,12 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
             <RichText data={global.intro} enableGutter={false} enableProse={false} />
           </div>
         ) : null}
-        <AvailabilityClient rows={rows} enquiry={enquiry} showLegend={Boolean(showLegend)} />
+        <AvailabilityClient
+          rows={rows}
+          enquiry={enquiry}
+          showLegend={Boolean(showLegend)}
+          labels={labels}
+        />
       </Section>
     </>
   )

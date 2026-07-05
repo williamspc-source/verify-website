@@ -41,6 +41,8 @@ import { PortalCtaBlock } from '@/blocks/PortalCta/Component'
 import { NewsletterBlock } from '@/blocks/Newsletter/Component'
 import { VideoEmbedBlock } from '@/blocks/VideoEmbed/Component'
 import { SectionNavBlock } from '@/blocks/SectionNav/Component'
+import { FeaturedArticlesBlock } from '@/blocks/FeaturedArticles/Component'
+import { EventsExplorerBlock } from '@/blocks/EventsExplorer/Component'
 // Layout primitives + atoms
 import { SectionBlock } from '@/blocks/Section/Component'
 import { RowBlock } from '@/blocks/Row/Component'
@@ -94,6 +96,8 @@ const blockComponents = {
   newsletter: NewsletterBlock,
   videoEmbed: VideoEmbedBlock,
   sectionNav: SectionNavBlock,
+  featuredArticles: FeaturedArticlesBlock,
+  eventsExplorer: EventsExplorerBlock,
   // Layout primitives
   section: SectionBlock,
   row: RowBlock,

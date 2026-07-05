@@ -298,9 +298,12 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   }
   payload.logger.info('— Claim + assessment type descriptions enriched')
 
-  // 2) Specialists.
+  // 2) Specialists. Created in surname order so the admin drag-order (`_order`,
+  // from `orderable: true`) starts alphabetical; editors can then rearrange.
   let specialistCount = 0
-  for (const s of SPECIALISTS) {
+  for (const s of [...SPECIALISTS].sort((a, b) =>
+    (a.lastName || a.title).localeCompare(b.lastName || b.title),
+  )) {
     const created = await createIfNew(ctx, 'specialists', s.slug, {
       title: s.title,
       slug: s.slug,
@@ -325,6 +328,9 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
 
   // 3) Team.
   let teamCount = 0
+  // Title → id, so a post whose byline names a team member auto-links to their
+  // profile (which supplies the author-card photo — see the posts loop below).
+  const teamByName = new Map<string, number | string>()
   for (const m of TEAM) {
     const created = await createIfNew(ctx, 'team', m.slug, {
       title: m.title,
@@ -336,6 +342,14 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       _status: 'published',
     })
     if (created) teamCount++
+    const foundTeam = await payload.find({
+      collection: 'team',
+      where: { slug: { equals: m.slug } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    if (foundTeam.docs[0]) teamByName.set(m.title, foundTeam.docs[0].id)
   }
   payload.logger.info(`— Team seeded (${teamCount} new)`)
 
@@ -388,11 +402,18 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
     const catIds = ((p as { categories?: string[] }).categories || [])
       .map((slug) => categoryMap.get(slug))
       .filter((id): id is number | string => id != null)
+    // Byline names a team member → link their profile so the author card shows
+    // their photo (a per-post upload still overrides it at render time).
+    const authorTeamId = teamByName.get(p.author.name)
     const created = await createIfNew(ctx, 'posts', p.slug, {
       title: p.title,
       slug: p.slug,
       excerpt: p.excerpt,
-      author: { name: p.author.name, role: p.author.role },
+      author: {
+        name: p.author.name,
+        role: p.author.role,
+        ...(authorTeamId ? { source: { relationTo: 'team' as const, value: authorTeamId } } : {}),
+      },
       stream: streamMap.get(p.stream),
       ...(catIds.length ? { categories: catIds } : {}),
       featured: p.featured ?? false,
@@ -528,7 +549,12 @@ async function getOrCreateMedia(
   try {
     const created = await payload.create({
       collection: 'media',
-      data: { alt } as any,
+      // Headshots: seed the focal point at (near) top-centre to match the design
+      // reference's `object-position: top center` on the carousel/avatar images.
+      // NB: Payload coerces a falsy `focalY: 0` back to the 50 default, so we use
+      // 1 (`50% 1%` ≈ top, visually identical). Editors fine-tune per image via
+      // the focal-point picker + zoom in the Media library.
+      data: { alt, focalX: 50, focalY: 1 } as any,
       filePath: absPath,
       req,
       context: { disableRevalidate: true },

@@ -1,6 +1,7 @@
 import type { Block } from 'payload'
 
 import {
+  anchorIdField,
   backgroundField,
   cssClassField,
   gridDisplayFields,
@@ -28,6 +29,19 @@ export const ResourcesGrid: Block = {
       options: [
         { label: 'Auto — list the Resources collection', value: 'auto' },
         { label: 'Hand-picked', value: 'manual' },
+      ],
+    },
+    {
+      name: 'variant',
+      type: 'select',
+      defaultValue: 'card',
+      admin: {
+        description:
+          '"Standard card" or "Resource card" (design-reference In-the-Loop .ni-resource-card — coloured header panel + body).',
+      },
+      options: [
+        { label: 'Standard card', value: 'card' },
+        { label: 'Resource card (In-the-Loop)', value: 'ni-resource' },
       ],
     },
     {
@@ -86,6 +100,7 @@ export const ResourcesGrid: Block = {
         },
       ],
     },
+    anchorIdField,
     cssClassField,
     ...gridDisplayFields,
   ],

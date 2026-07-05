@@ -151,6 +151,33 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     .map((s) => idBySlug.get(s))
     .filter((id): id is NonNullable<typeof id> => id != null)
 
+  // Make each "What We Do" tile clickable to its canonical destination (there are
+  // no standalone /services/<slug> pages — the reference links each card to its
+  // parent service page + section anchor). Setting `linkOverride` on the service
+  // doc keeps it editable in the admin and is honoured by the grid even with
+  // `linkToService` off. Mirrors `.design-reference/index.html` service cards.
+  const tileLinkOverrides: Record<string, string> = {
+    'independent-medical-examination': '/ime',
+    'joint-medical-examination': '/jme',
+    'file-review': '/reporting-services#file-review',
+    'supplementary-report': '/reporting-services#supplementary-report',
+    'teleconference-expert-evidence': '/reporting-services#teleconference',
+    'expert-evidence': '/reporting-services#expert-evidence',
+    'surrogate-assessment-interpreter-booking': '/admin-services#surrogate-assessment',
+    'brief-reduction-loi-review': '/admin-services#brief-reduction',
+  }
+  for (const [slug, href] of Object.entries(tileLinkOverrides)) {
+    const id = idBySlug.get(slug)
+    if (!id) continue
+    await payload.update({
+      collection: 'services',
+      id,
+      data: { linkOverride: href } as never,
+      req,
+      context: { disableRevalidate: true },
+    })
+  }
+
   // Medico-Legal Services grid: hand-picked (icon + title only). Falls back to the
   // medico-legal category if the service docs aren't seeded yet.
   const servicesGrid =
@@ -254,7 +281,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
             custom('/services', 'Our Services'),
             custom('/specialist-panel', 'Specialist Panel'),
             custom('/about', 'Why Refer to Us'),
-            custom('/for-clients', 'Frequently Asked Questions'),
+            custom('/for-clients#faqs', 'Frequently Asked Questions'),
           ],
           ...custom('/for-clients', 'Learn More'),
         },
@@ -267,8 +294,8 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
           accent: 'steel',
           links: [
             custom('/for-claimants#process-overview', 'Process Overview'),
-            custom('/for-claimants#in-person-appointment', 'In-Person Appointment Guide'),
-            custom('/for-claimants#videolink-appointment', 'Videolink Appointment Guide'),
+            custom('/for-claimants#appointment-guide', 'In-Person Appointment Guide'),
+            custom('/for-claimants#video-guide', 'Videolink Appointment Guide'),
             custom('/for-claimants#claimant-faqs', 'Frequently Asked Questions'),
           ],
           ...custom('/for-claimants', 'Learn More'),
@@ -311,6 +338,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     // ── What we do (tabbed, light-blue band) ──
     {
       blockType: 'tabs',
+      anchorId: 'services',
       eyebrow: 'What We Do',
       heading: 'Comprehensive [[Medico-Legal]] Services',
       subheading:
@@ -334,13 +362,12 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
           content: [
             {
               blockType: 'processSteps',
+              variant: 'edu-panels',
               background: 'white',
               eyebrow: 'What AAMLE Offers',
               heading: 'Complimentary Education [[for Industry Professionals]]',
               subheading:
                 'In 2025, VERIFY expanded its commitment to education with the creation of the Australian Academy of Medico-Legal Education (AAMLE). Under the banner of AAMLE, VERIFY provides a range of complimentary educational offerings across the medico-legal industry.',
-              columns: '1',
-              cssClass: ['vf-home-edu-panels'],
               steps: [
                 {
                   icon: 'users',
@@ -430,7 +457,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
                 },
                 {
                   blockType: 'button',
-                  links: [custom('/services/medico-legal/ime#claim-types', 'Learn More')],
+                  links: [custom('/ime#claim-types', 'Learn More')],
                 },
               ],
             },

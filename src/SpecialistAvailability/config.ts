@@ -107,6 +107,74 @@ export const SpecialistAvailability: GlobalConfig = {
         },
       ],
     },
+    {
+      name: 'labels',
+      type: 'group',
+      label: 'Availability grid labels',
+      admin: {
+        description: 'Short UI labels for the interactive availability grid (legend, action bar).',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'modeInPersonLabel',
+              type: 'text',
+              defaultValue: 'In-person',
+              admin: { width: '33%', description: 'Label for in-person sessions (legend + chips).' },
+            },
+            {
+              name: 'modeTelehealthLabel',
+              type: 'text',
+              defaultValue: 'Telehealth',
+              admin: { width: '33%', description: 'Label for telehealth sessions (legend + chips).' },
+            },
+            {
+              name: 'modeEitherLabel',
+              type: 'text',
+              defaultValue: 'In-person / Telehealth',
+              admin: {
+                width: '34%',
+                description: 'Label for sessions offered either way (legend + chips).',
+              },
+            },
+          ],
+        },
+        {
+          name: 'selectionHint',
+          type: 'text',
+          defaultValue: 'Tap sessions to select, then send us an enquiry.',
+          admin: { description: 'Hint shown in the legend when sessions are available to select.' },
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'clearLabel',
+              type: 'text',
+              defaultValue: 'Clear',
+              admin: { width: '50%', description: 'Button that clears the current selection.' },
+            },
+            {
+              name: 'sendEnquiryLabel',
+              type: 'text',
+              defaultValue: 'Send enquiry',
+              admin: { width: '50%', description: 'Button that opens the prefilled enquiry email.' },
+            },
+          ],
+        },
+        {
+          name: 'sessionsSelectedTemplate',
+          type: 'text',
+          defaultValue: '{count} {noun} selected',
+          admin: {
+            description:
+              'Selection count in the action bar. Use {count} for the number and {noun} for session/sessions.',
+          },
+        },
+      ],
+    },
   ],
   hooks: {
     afterChange: [revalidateSpecialistAvailability],

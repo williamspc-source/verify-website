@@ -21,6 +21,9 @@ import {
 export const Specialists: CollectionConfig<'specialists'> = {
   slug: 'specialists',
   labels: { singular: 'Specialist', plural: 'Specialists' },
+  // Drag-to-reorder in the admin list view (adds an internal `_order` field).
+  // The directory/carousel/rosters sort by `_order` so editors control the panel order.
+  orderable: true,
   access: {
     create: authenticated,
     delete: authenticated,

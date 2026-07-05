@@ -1,5 +1,5 @@
 import type { StaticImageData } from 'next/image'
-import type { ElementType, Ref } from 'react'
+import type { CSSProperties, ElementType, Ref } from 'react'
 
 import type { Media as MediaType } from '@/payload-types'
 
@@ -10,6 +10,7 @@ export interface Props {
   htmlElement?: ElementType | null
   pictureClassName?: string
   imgClassName?: string
+  imgStyle?: CSSProperties // inline style merged onto the <img>/NextImage
   onClick?: () => void
   onLoad?: () => void
   loading?: 'lazy' | 'eager' // for NextImage only

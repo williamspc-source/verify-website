@@ -7,11 +7,9 @@ import type { SpecialistDirectoryBlock as Props, Specialist } from '@/payload-ty
 import { Section, type SectionBackground } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { mediaFocal } from '@/utilities/focalPoint'
 
 import { DirectoryClient, type DirectorySpecialist } from './DirectoryClient'
-
-const mediaUrl = (m: unknown): string | null =>
-  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
 
 // depth 1 populates relationships to objects; guard for the un-populated
 // number/string form just in case.
@@ -56,32 +54,47 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
     secondaryCtaHref,
     resetLabel,
     locationsLabel,
+    searchGroupLabel,
+    specialtyGroupLabel,
+    accreditationGroupLabel,
+    locationGroupLabel,
   } = props as Props & {
     secondaryCtaLabel?: string | null
     secondaryCtaHref?: string | null
     resetLabel?: string | null
     locationsLabel?: string | null
+    searchGroupLabel?: string | null
+    specialtyGroupLabel?: string | null
+    accreditationGroupLabel?: string | null
+    locationGroupLabel?: string | null
   }
 
   const payload = await getPayload({ config: configPromise })
+  // 'order' → the admin drag-to-reorder order (collection `orderable: true` → `_order`).
+  const sortKey = sortBy === 'firstName' ? 'firstName' : sortBy === 'lastName' ? 'lastName' : '_order'
   const { docs } = await payload.find({
     collection: 'specialists',
     depth: 1,
     limit: 500,
-    sort: sortBy === 'firstName' ? 'firstName' : 'lastName',
+    sort: sortKey,
     where: { _status: { equals: 'published' } },
   })
 
-  const specialists: DirectorySpecialist[] = docs.map((s) => ({
-    id: String(s.id),
-    name: s.title,
-    position: s.position ?? null,
-    slug: s.slug ?? null,
-    photoUrl: mediaUrl(s.photo),
-    specialty: specialtyTitle(s.specialty),
-    locations: relTitles(s.locations),
-    accreditations: relTitles(s.accreditations),
-  }))
+  const specialists: DirectorySpecialist[] = docs.map((s) => {
+    const photo = mediaFocal(s.photo)
+    return {
+      id: String(s.id),
+      name: s.title,
+      position: s.position ?? null,
+      slug: s.slug ?? null,
+      photoUrl: photo.url,
+      photoFocus: photo.focus,
+      photoZoom: photo.zoom,
+      specialty: specialtyTitle(s.specialty),
+      locations: relTitles(s.locations),
+      accreditations: relTitles(s.accreditations),
+    }
+  })
 
   return (
     <Section
@@ -112,6 +125,10 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
         secondaryCtaHref={secondaryCtaHref ?? '/contact'}
         resetLabel={resetLabel ?? 'Clear Filters'}
         locationsLabel={locationsLabel ?? 'Consulting Locations'}
+        searchGroupLabel={searchGroupLabel ?? 'Search'}
+        specialtyGroupLabel={specialtyGroupLabel ?? 'Filter by specialty'}
+        accreditationGroupLabel={accreditationGroupLabel ?? 'Filter by accreditation'}
+        locationGroupLabel={locationGroupLabel ?? 'Filter by location'}
       />
     </Section>
   )

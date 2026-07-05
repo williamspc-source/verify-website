@@ -470,6 +470,10 @@ export const seedVerify = async ({
       newTab: false,
     },
   })
+  // Custom URL link (used for the on-page anchor submenu items under Services).
+  const customLink = (url: string, label: string) => ({
+    link: { type: 'custom' as const, url, label, reference: null, newTab: false },
+  })
 
   // ── Header global ──
   await payload.updateGlobal({
@@ -489,16 +493,26 @@ export const seedVerify = async ({
         {
           ...pageLink('services', 'Services'),
           subItems: [
+            pageLink('ime', 'Independent Medical Examination (IME)'),
+            pageLink('jme', 'Joint Medical Examination (JME)'),
             {
-              ...pageLink('medico-legal', 'Medico-Legal Services'),
+              ...pageLink('reporting-services', 'Other Reporting Services'),
               subSubItems: [
-                pageLink('ime', 'Independent Medical Examination (IME)'),
-                pageLink('jme', 'Joint Medical Examination (JME)'),
-                pageLink('reporting-services', 'Other Reporting Services'),
-                pageLink('admin-services', 'Administrative Services'),
+                customLink('/reporting-services#file-review', 'File Review'),
+                customLink('/reporting-services#supplementary-report', 'Supplementary Report'),
+                customLink('/reporting-services#teleconference', 'Teleconference'),
+                customLink('/reporting-services#expert-evidence', 'Expert Evidence'),
               ],
             },
-            pageLink('educational-services', 'Educational Services'),
+            {
+              ...pageLink('admin-services', 'Administrative Services'),
+              subSubItems: [
+                customLink('/admin-services#surrogate-assessment', 'Surrogate Assessment Service'),
+                customLink('/admin-services#interpreter-booking', 'Interpreter Booking Service'),
+                customLink('/admin-services#brief-reduction', 'Brief Reduction Service'),
+                customLink('/admin-services#letter-of-instruction-review', 'Letter of Instruction Review'),
+              ],
+            },
           ],
         },
         {
@@ -518,7 +532,13 @@ export const seedVerify = async ({
           ],
         },
         pageLink('in-the-loop', 'In the Loop'),
-        pageLink('events', 'Events & Seminars'),
+        {
+          ...pageLink('events', 'Events & Seminars'),
+          subItems: [
+            pageLink('upcoming-events', 'Upcoming Events'),
+            pageLink('past-events', 'Past Events'),
+          ],
+        },
         pageLink('contact', 'Contact Us'),
       ],
       cta: {

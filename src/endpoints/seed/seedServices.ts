@@ -20,7 +20,7 @@ const closingCta = () => ({
   eyebrow: 'Get Started',
   heading: 'Ready to Refer Your [[Next Matter to VERIFY?]]',
   text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
-  links: [enquiry('Make an Enquiry'), custom('/specialists/specialist-panel', 'View Specialist Panel')],
+  links: [enquiry('Make an Enquiry'), custom('/specialist-panel', 'View Specialist Panel')],
 })
 
 async function authorPage(
@@ -257,7 +257,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             body: plainTextToLexical(
               'Impartial assessments delivered nationally by accredited specialists, supported by full end-to-end coordination and a mandatory quality assurance review on every report.',
             ),
-            ...custom('/services/medico-legal/ime', 'Learn more →'),
+            ...custom('/ime', 'Learn more →'),
           },
           {
             imagePlaceholder: true,
@@ -267,7 +267,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             body: plainTextToLexical(
               'A single specialist agreed upon by both parties — delivering a shared, independent medical opinion that reduces duplication, cost, and resolution time across WorkCover, CTP, and TPD matters.',
             ),
-            ...custom('/services/medico-legal/jme', 'Learn more →'),
+            ...custom('/jme', 'Learn more →'),
           },
         ],
       },
@@ -397,6 +397,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
       // ── Claim types accordion (first item open) ──
       {
         blockType: 'faq',
+        anchorId: 'claim-types',
         eyebrow: 'Areas of Expertise',
         heading: 'IMEs Across All [[Major Claim Types]]',
         subheading:
@@ -628,7 +629,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
                   "The finalised report passes through VERIFY's Quality Assurance review before being delivered to your office.",
               },
             ],
-            ...custom('/information-centre/for-clients', 'View Client Process'),
+            ...custom('/for-clients', 'View Client Process'),
           },
           {
             variant: 'claimant',
@@ -658,7 +659,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
                   'The specialist prepares a report for the referring party. VERIFY does not share the report directly with claimants.',
               },
             ],
-            ...custom('/information-centre/for-claimants', 'View Claimant Guide'),
+            ...custom('/for-claimants', 'View Claimant Guide'),
           },
         ],
       },
@@ -797,7 +798,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
         linkProfiles: true,
         carouselOptions: { speed: 34, direction: 'left', showArrows: true },
         footerLinks: [
-          custom('/specialists/specialist-panel', 'View Full Panel'),
+          custom('/specialist-panel', 'View Full Panel'),
           enquiry('Make an Enquiry'),
         ],
       },
@@ -916,6 +917,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             imageSide: 'left',
+            anchorId: 'file-review',
             title: 'File Review',
             body: plainTextToLexical(
               'A specialist reviews the available medical records, imaging, and documentation and provides a written or verbal opinion on the clinical issues in dispute — without directly examining the claimant.',
@@ -932,6 +934,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             imageSide: 'right',
+            anchorId: 'supplementary-report',
             title: 'Supplementary Report',
             body: plainTextToLexical(
               'A follow-up to an existing specialist report, addressing additional documents or materials received after the original report was finalised. May require a further examination if the new material is clinically significant.',
@@ -948,6 +951,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             imageSide: 'left',
+            anchorId: 'medical-negligence',
             title: 'Medical Negligence',
             body: plainTextToLexical(
               "A specialist with expertise in the relevant field provides an independent opinion on whether medical treatment fell below the accepted standard of care, and whether any such departure caused the claimant's injury or loss.",
@@ -964,6 +968,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             imageSide: 'right',
+            anchorId: 'teleconference',
             title: 'Teleconference',
             body: plainTextToLexical(
               'A direct discussion between the specialist and instructing lawyers — by telephone or secure videolink — to seek preliminary clinical opinions, clarify findings from an existing report, or obtain specialist input without commissioning a formal written report.',
@@ -980,6 +985,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             imageSide: 'left',
+            anchorId: 'expert-evidence',
             title: 'Expert Evidence',
             body: plainTextToLexical(
               'When a matter proceeds to hearing or trial, VERIFY arranges for the specialist to attend and provide expert evidence — in person or via secure videolink — including sworn testimony, cross-examination, and expert conclave attendance.',

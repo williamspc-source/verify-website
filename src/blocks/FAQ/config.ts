@@ -96,6 +96,9 @@ export const FAQ: Block = {
         },
       ],
     },
+    // Block-level anchor id (distinct from the per-item anchorId inside `items`)
+    // so header/deep links like `/ime#claim-types` can target the whole block.
+    anchorIdField,
     cssClassField,
   ],
   labels: {

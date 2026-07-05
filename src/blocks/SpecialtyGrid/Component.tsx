@@ -14,14 +14,14 @@ import { toClassName } from '@/utilities/cssClass'
 
 type TileData = { id: string; icon?: string | null; label: string; href?: string | null; className?: string }
 
-const Tile: React.FC<TileData> = ({ icon, label, href, className }) => {
+const Tile: React.FC<TileData & { ctaLabel?: string | null }> = ({ icon, label, href, className, ctaLabel }) => {
   const inner = (
     <>
       <div className="specialty-card-icon vf-card__icon">
         <Icon name={icon} className="size-6" />
       </div>
       <span className="specialty-card-name vf-card__title">{label}</span>
-      {href ? <span className="specialty-card-link">View experts →</span> : null}
+      {href ? <span className="specialty-card-link">{ctaLabel || 'View experts →'}</span> : null}
     </>
   )
   return href ? (
@@ -53,6 +53,10 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     hoverEffect,
     bare,
   } = props
+
+  // Newer config field — read defensively so a not-yet-regenerated
+  // `payload-types` doesn't fail typecheck.
+  const { ctaLabel } = props as Props & { ctaLabel?: string | null }
 
   let tiles: TileData[] = []
   if (source === 'manual') {
@@ -114,7 +118,7 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
       ) : (
         <div className="specialty-grid">
           {tiles.map((t) => (
-            <Tile key={t.id} {...t} className={toClassName(elementClasses?.card)} />
+            <Tile key={t.id} {...t} ctaLabel={ctaLabel} className={toClassName(elementClasses?.card)} />
           ))}
         </div>
       )}

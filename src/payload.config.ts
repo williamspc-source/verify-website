@@ -33,6 +33,7 @@ import { SpecialistAvailability } from './SpecialistAvailability/config'
 import { SpecialistProfile } from './SpecialistProfile/config'
 import { ArticleSettings } from './ArticleSettings/config'
 import { EventsSettings } from './EventsSettings/config'
+import { TeamSettings } from './TeamSettings/config'
 import { CustomStyles } from './Styles/config'
 import { DesignSystem } from './DesignSystem/config'
 import { plugins } from './plugins'
@@ -141,6 +142,7 @@ export default buildConfig({
     SpecialistProfile,
     ArticleSettings,
     EventsSettings,
+    TeamSettings,
     CustomStyles,
     DesignSystem,
   ],

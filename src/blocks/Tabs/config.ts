@@ -1,6 +1,7 @@
 import type { Block } from 'payload'
 
 import {
+  anchorIdField,
   backgroundField,
   contentBlocksField,
   cssClassField,
@@ -57,6 +58,7 @@ export const TabsBlock: Block = {
         },
       ],
     },
+    anchorIdField,
     cssClassField,
     elementClassesField,
     ...displayFields,

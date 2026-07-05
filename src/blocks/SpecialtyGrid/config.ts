@@ -99,6 +99,12 @@ export const SpecialtyGrid: Block = {
       admin: { condition: sourceIs('manual') },
       fields: [iconField(), { name: 'label', type: 'text', required: true }, link({ appearances: false })],
     },
+    {
+      name: 'ctaLabel',
+      type: 'text',
+      defaultValue: 'View experts →',
+      admin: { description: 'Call-to-action shown on each linked card (only appears when the tile links somewhere).' },
+    },
     cssClassField,
     elementClassesField,
     ...gridDisplayFields,

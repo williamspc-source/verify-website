@@ -60,6 +60,29 @@ export const SpecialistProfile: GlobalConfig = {
       ],
     },
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'portalEnquirySubject',
+          type: 'text',
+          defaultValue: 'VERIFY Booking Portal Access Request',
+          admin: {
+            width: '50%',
+            description: 'Subject line of the booking-portal enquiry email (mailto).',
+          },
+        },
+        {
+          name: 'portalEnquiryType',
+          type: 'text',
+          defaultValue: 'Register for Online Booking Portal',
+          admin: {
+            width: '50%',
+            description: 'Enquiry-type tag sent with the booking-portal CTA.',
+          },
+        },
+      ],
+    },
+    {
       name: 'labels',
       type: 'group',
       label: 'Section labels',
@@ -91,6 +114,42 @@ export const SpecialistProfile: GlobalConfig = {
               type: 'text',
               defaultValue: 'Accreditations',
               admin: { width: '50%' },
+            },
+          ],
+        },
+        {
+          name: 'assessmentTypes',
+          type: 'text',
+          defaultValue: 'Assessment Types',
+        },
+      ],
+    },
+    {
+      name: 'breadcrumb',
+      type: 'group',
+      label: 'Breadcrumb',
+      admin: { description: 'The breadcrumb trail shown at the top of every profile.' },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'breadcrumbParentLabel',
+              type: 'text',
+              defaultValue: 'Specialist Panel',
+              admin: { width: '33%' },
+            },
+            {
+              name: 'breadcrumbParentHref',
+              type: 'text',
+              defaultValue: '/specialist-panel',
+              admin: { width: '33%' },
+            },
+            {
+              name: 'breadcrumbCurrentLabel',
+              type: 'text',
+              defaultValue: 'Specialist Profile',
+              admin: { width: '34%' },
             },
           ],
         },

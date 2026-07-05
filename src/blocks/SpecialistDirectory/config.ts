@@ -34,9 +34,13 @@ export const SpecialistDirectory: Block = {
         {
           name: 'sortBy',
           type: 'select',
-          defaultValue: 'lastName',
-          admin: { description: 'Directory sort order.' },
+          defaultValue: 'order',
+          admin: {
+            description:
+              'Directory sort order. "Custom" uses the drag-to-reorder order set on the Specialists list.',
+          },
           options: [
+            { label: 'Custom (admin order)', value: 'order' },
             { label: 'Surname', value: 'lastName' },
             { label: 'Given name', value: 'firstName' },
           ],
@@ -53,6 +57,20 @@ export const SpecialistDirectory: Block = {
           fields: [
             { name: 'searchPlaceholder', type: 'text', defaultValue: 'Search by name…', admin: { width: '50%' } },
             { name: 'countTemplate', type: 'text', defaultValue: '{count} specialists', admin: { width: '50%', description: 'Use {count}.' } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'searchGroupLabel', type: 'text', defaultValue: 'Search', admin: { width: '50%', description: 'Field label above the search box.' } },
+            { name: 'specialtyGroupLabel', type: 'text', defaultValue: 'Filter by specialty', admin: { width: '50%', description: 'Field label above the specialty filter.' } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'accreditationGroupLabel', type: 'text', defaultValue: 'Filter by accreditation', admin: { width: '50%', description: 'Field label above the accreditation filter.' } },
+            { name: 'locationGroupLabel', type: 'text', defaultValue: 'Filter by location', admin: { width: '50%', description: 'Field label above the location filter.' } },
           ],
         },
         {

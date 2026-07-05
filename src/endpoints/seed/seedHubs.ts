@@ -225,8 +225,8 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
     audience: 'clients',
     description:
       'A step-by-step checklist for solicitors and case managers preparing referral briefs for independent medical examinations — covering documentation, claimant history, and referral-question structure.',
-    ctaLabel: 'Download Checklist',
-    externalUrl: '/information-centre',
+    ctaLabel: 'Read Guide',
+    externalUrl: '/in-the-loop/resources/brief-preparation-checklist-for-ime-referrals',
     order: 1,
   })
   await ensureResource(ctx, {
@@ -238,7 +238,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
     description:
       'A plain-language guide explaining how IME report timelines work, what affects turnaround, and how to plan your matter around realistic delivery expectations.',
     ctaLabel: 'Read Guide',
-    externalUrl: '/information-centre',
+    externalUrl: '/in-the-loop/resources/understanding-ime-report-turnaround-times',
     order: 2,
   })
   await ensureResource(ctx, {
@@ -250,7 +250,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
     description:
       'A clear, reassuring guide for claimants attending an IME — covering what to bring, what happens during the examination, and answers to the most common questions.',
     ctaLabel: 'Read Guide',
-    externalUrl: '/for-claimants',
+    externalUrl: '/in-the-loop/resources/what-to-expect-at-your-independent-medical-examination',
     order: 3,
   })
 
@@ -273,6 +273,9 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       align: 'left',
       showBreadcrumb: true,
       showShield: false,
+      imagePanel: true,
+      imagePanelLabel: 'Company Image Placeholder',
+      scrollHint: 'Scroll to explore',
       heading: 'Your Source for [[Medico-Legal]] Intelligence',
       subtitle:
         'Industry updates, expert perspectives, AAMLE events, and practical resources — everything you need to stay informed and ahead.',
@@ -297,46 +300,16 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       // Featured — a single rotating featured-article carousel (design ref
       // `.ni-featured` carousel), NOT a 3-card grid. Authored from the three
       // `featured` posts; the SlideCarousel gives the arrows + dots + autoplay.
-      // RESIDUAL GAP (block-owned, not seed-fixable): the sticky nav's #featured
-      // anchor cannot be resolved from the seed — SlideCarousel/config.ts has no
-      // anchorId field (passing `anchorId:'featured'` here would be stripped), and
-      // its `heading` is `required`, so the extra "This Month's Featured Reading"
-      // heading can't be dropped to leave only the 'Featured' eyebrow. To match
-      // the reference `.ni-featured`/`.ni-carousel` (image placeholder + 'Featured'
-      // badge + category tag + 'By: … · date' byline + 'Read Full Article →'),
-      // SlideCarousel needs a featured-article mode + anchorId + optional heading.
+      // Featured-article carousel (design-reference .ni-featured/.ni-carousel).
+      // Auto-pulls posts in the "featured" stream (or flagged featured); the block
+      // renders the #featured anchor so the sticky category nav resolves.
       {
-        blockType: 'slideCarousel',
+        blockType: 'featuredArticles',
+        anchorId: 'featured',
         eyebrow: 'Featured',
-        heading: "This Month's [[Featured Reading]]",
-        autoplay: true,
-        interval: 5000,
-        slides: [
-          {
-            title:
-              "Understanding Queensland's Updated WorkCover Guidelines: What Every Legal Practitioner Needs to Know",
-            body: "The recent amendments to Queensland WorkCover guidelines introduce significant changes to how independent medical examinations are requested, coordinated, and reported. We break down what's changed and what it means for your practice.",
-            accent: 'insights',
-            visualLabel: 'Industry Insights',
-            pills: [{ text: 'VERIFY Editorial Team' }, { text: '12 May 2026' }],
-          },
-          {
-            title:
-              "AAMLE 2026 Annual Conference: Registration Now Open for Australia's Premier Medico-Legal Education Event",
-            body: 'The AAMLE Annual Conference brings together medico-legal professionals, legal practitioners, and healthcare specialists for two days of expert-led sessions, workshops, and networking opportunities across Australia.',
-            accent: 'seminars',
-            visualLabel: 'AAMLE Events',
-            pills: [{ text: 'AAMLE Secretariat' }, { text: '5 May 2026' }],
-          },
-          {
-            title:
-              'The IME Referral Brief: Why Quality Documentation Determines Report Quality',
-            body: 'A well-prepared referral brief is the single greatest factor in the quality of an independent medical examination report. Our senior coordinators outline what information specialists need — and what is most often missing from the briefs they receive.',
-            accent: 'sponsorships',
-            visualLabel: 'Expert Guidance',
-            pills: [{ text: 'VERIFY Senior Coordination Team' }, { text: '28 Apr 2026' }],
-          },
-        ],
+        source: 'auto',
+        limit: 6,
+        background: 'white',
       },
       // News & Updates — per-article "Company News" / "Industry News" chips.
       postsArchive({
@@ -385,6 +358,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       {
         blockType: 'resourcesGrid',
         anchorId: 'resources',
+        variant: 'ni-resource',
         eyebrow: 'Resources',
         heading: 'Guides, Checklists & [[Templates]]',
         subheading:
@@ -450,33 +424,19 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         'Practical education, industry briefings, and specialist-led seminars from VERIFY and AAMLE — browse what is coming up or revisit recent programs.',
     },
     [
+      // All events on one page — Upcoming/Past split computed from the browser
+      // date (client-side, so a cached page never goes stale) + a search/filter
+      // toolbar, full-width list rows, and pagination (reference events pages).
       {
-        blockType: 'gatewayCards',
+        blockType: 'eventsExplorer',
+        mode: 'all',
+        showSearch: true,
+        pageSize: 8,
+        background: 'white',
         eyebrow: 'Events & Seminars',
         heading: 'Explore VERIFY & [[AAMLE Events]]',
-        subheading: 'Choose upcoming events to register, or browse our recent programs.',
-        background: 'white',
-        columns: '2',
-        cards: [
-          {
-            icon: 'calendar-check',
-            eyebrow: 'Register Now',
-            title: 'Upcoming Events',
-            description:
-              'Register for upcoming breakfast seminars, webinars, and specialist-led medico-legal education sessions from VERIFY and AAMLE.',
-            accent: 'blue',
-            ...custom('/upcoming-events', 'Explore Upcoming Events'),
-          },
-          {
-            icon: 'clock',
-            eyebrow: 'Recent Programs',
-            title: 'Past Events',
-            description:
-              'Browse recent seminars, training sessions, and industry events delivered for the medico-legal community.',
-            accent: 'steel',
-            ...custom('/past-events', 'Explore Past Events'),
-          },
-        ],
+        subheading:
+          'Everything coming up and every recent program in one place — upcoming and past are sorted automatically by date.',
       },
     ],
   )
@@ -496,20 +456,14 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       heading: 'Explore Upcoming Medico-Legal [[Education Events]]',
     },
     [
-      // NOTE: the reference also shows a search/filter toolbar above the list,
-      // and renders the events as full-width list ROWS (`event-list-row`) with a
-      // bordered CTA, meta-icon row, and pagination. No CMS toolbar/search block
-      // and no ArchiveBlock list-row mode exist yet, so this uses the closest
-      // available `card` layout (flagged as residual gaps). No section header.
+      // Full-width list rows + search/filter toolbar + pagination (reference
+      // upcoming-events page). Browser-date filtered to upcoming only.
       {
-        blockType: 'archive',
-        populateBy: 'collection',
-        relationTo: 'events',
-        view: 'upcoming',
-        eventStyle: 'card',
-        limit: 12,
-        columns: '3',
-        cssClass: ['ni-section', 'bg-white'],
+        blockType: 'eventsExplorer',
+        mode: 'upcoming-only',
+        showSearch: true,
+        pageSize: 8,
+        background: 'white',
       },
     ],
     {
@@ -533,18 +487,14 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       heading: 'Explore Past Medico-Legal [[Education Events]]',
     },
     [
-      // Reference `.events-list-shell` sits on a WHITE background (same as
-      // upcoming-events), not grey. See the upcoming-events note re: the residual
-      // list-row / filter-toolbar / pagination gaps that apply here too.
+      // Full-width list rows + search/filter toolbar + pagination (reference
+      // past-events page). Browser-date filtered to past only.
       {
-        blockType: 'archive',
-        populateBy: 'collection',
-        relationTo: 'events',
-        view: 'past',
-        eventStyle: 'card',
-        limit: 8,
-        columns: '3',
-        cssClass: ['ni-section', 'bg-white'],
+        blockType: 'eventsExplorer',
+        mode: 'past-only',
+        showSearch: true,
+        pageSize: 8,
+        background: 'white',
       },
     ],
     {

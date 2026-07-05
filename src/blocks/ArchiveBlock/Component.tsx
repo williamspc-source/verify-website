@@ -115,7 +115,7 @@ const postTagLabel = (post: Post, stream: Stream | null): string | null => {
 }
 
 // ── Staff-narrative card (In-the-Loop → Staff Narratives) ───
-const NarrativeCard: React.FC<{ post: Post }> = ({ post }) => {
+const NarrativeCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, readMoreLabel }) => {
   if (!post) return null
 
   const stream = typeof post.stream === 'object' && post.stream ? (post.stream as Stream) : null
@@ -152,7 +152,7 @@ const NarrativeCard: React.FC<{ post: Post }> = ({ post }) => {
           {dateLabel && <span className="ni-narrative-date">{dateLabel}</span>}
         </div>
         <a className="ni-narrative-link" href={href}>
-          Read More →
+          {readMoreLabel}
         </a>
       </div>
     </div>
@@ -160,7 +160,7 @@ const NarrativeCard: React.FC<{ post: Post }> = ({ post }) => {
 }
 
 // ── Post card (In-the-Loop hub) ─────────────────────────────
-const PostCard: React.FC<{ post: Post }> = ({ post }) => {
+const PostCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, readMoreLabel }) => {
   if (!post) return null
 
   const stream = typeof post.stream === 'object' && post.stream ? (post.stream as Stream) : null
@@ -194,7 +194,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
         </div>
         <div className="ni-card-title">{post.title}</div>
         {post.excerpt && <p className="ni-card-excerpt">{post.excerpt}</p>}
-        <span className="ni-card-link">Read More →</span>
+        <span className="ni-card-link">{readMoreLabel}</span>
       </div>
     </a>
   )
@@ -305,11 +305,15 @@ export const ArchiveBlock: React.FC<
     cssClass,
     postStyle,
     eventStyle,
+    anchorId,
   } = props as {
     cssClass?: string | string[] | null
     postStyle?: 'card' | 'narrative' | null
     eventStyle?: 'card' | 'compact' | null
+    anchorId?: string | null
   }
+  const readMoreLabel =
+    (props as { readMoreLabel?: string | null }).readMoreLabel || 'Read More →'
 
   const limit = limitFromProps || 3
   const now = new Date()
@@ -384,7 +388,7 @@ export const ArchiveBlock: React.FC<
   const eventColumnClass = `ni-grid-${columns || '2'}`
 
   return (
-    <div className={cn(toClassName(cssClass))} id={`block-${id}`}>
+    <div className={cn(toClassName(cssClass))} id={anchorId || `block-${id}`}>
       {introContent && (
         <div className="container mb-16">
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
@@ -396,9 +400,9 @@ export const ArchiveBlock: React.FC<
           <div className={isNarrative ? 'ni-narrative-grid' : columnClass}>
             {posts.map((post, index) =>
               isNarrative ? (
-                <NarrativeCard key={post?.id ?? index} post={post} />
+                <NarrativeCard key={post?.id ?? index} post={post} readMoreLabel={readMoreLabel} />
               ) : (
-                <PostCard key={post?.id ?? index} post={post} />
+                <PostCard key={post?.id ?? index} post={post} readMoreLabel={readMoreLabel} />
               ),
             )}
           </div>

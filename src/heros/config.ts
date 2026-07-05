@@ -99,6 +99,40 @@ export const hero: Field = {
       },
     },
     {
+      name: 'imagePanel',
+      type: 'checkbox',
+      label: 'Show image placeholder panel (right side)',
+      admin: {
+        description:
+          'Two-column hero with a large image placeholder on the right (design-reference In-the-Loop hero).',
+        condition: isType('pageHero'),
+      },
+    },
+    {
+      type: 'row',
+      admin: { condition: isType('pageHero') },
+      fields: [
+        {
+          name: 'imagePanelLabel',
+          type: 'text',
+          admin: {
+            width: '50%',
+            description: 'Caption inside the image placeholder, e.g. "Company Image Placeholder".',
+            condition: (_: unknown, s: { imagePanel?: boolean } = {}) => Boolean(s?.imagePanel),
+          },
+        },
+        {
+          name: 'scrollHint',
+          type: 'text',
+          admin: {
+            width: '50%',
+            description: 'Optional bobbing "Scroll to explore" hint under the image panel.',
+            condition: (_: unknown, s: { imagePanel?: boolean } = {}) => Boolean(s?.imagePanel),
+          },
+        },
+      ],
+    },
+    {
       name: 'metaItems',
       type: 'array',
       label: 'Quick-facts row',

@@ -149,6 +149,7 @@ export interface Config {
     'specialist-profile': SpecialistProfile;
     'article-settings': ArticleSetting;
     'events-settings': EventsSetting;
+    'team-settings': TeamSetting;
     'custom-styles': CustomStyle;
     'design-system': DesignSystem;
   };
@@ -160,6 +161,7 @@ export interface Config {
     'specialist-profile': SpecialistProfileSelect<false> | SpecialistProfileSelect<true>;
     'article-settings': ArticleSettingsSelect<false> | ArticleSettingsSelect<true>;
     'events-settings': EventsSettingsSelect<false> | EventsSettingsSelect<true>;
+    'team-settings': TeamSettingsSelect<false> | TeamSettingsSelect<true>;
     'custom-styles': CustomStylesSelect<false> | CustomStylesSelect<true>;
     'design-system': DesignSystemSelect<false> | DesignSystemSelect<true>;
   };
@@ -225,6 +227,18 @@ export interface Page {
      * Decorative brand shield behind the hero (uses the Site Settings logo/shield).
      */
     showShield?: boolean | null;
+    /**
+     * Two-column hero with a large image placeholder on the right (design-reference In-the-Loop hero).
+     */
+    imagePanel?: boolean | null;
+    /**
+     * Caption inside the image placeholder, e.g. "Company Image Placeholder".
+     */
+    imagePanelLabel?: string | null;
+    /**
+     * Optional bobbing "Scroll to explore" hint under the image panel.
+     */
+    scrollHint?: string | null;
     /**
      * Optional icon + text row under the hero (e.g. phone / email / hours on Contact).
      */
@@ -554,6 +568,8 @@ export interface Page {
     | NewsletterBlock
     | VideoEmbedBlock
     | SectionNavBlock
+    | FeaturedArticlesBlock
+    | EventsExplorerBlock
   )[];
   meta?: {
     title?: string | null;
@@ -720,6 +736,10 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Optional zoom for cropped avatars/headshots (100 = fit, 150 = 1.5× into the focal point). Set the focal point above to choose which part of the image stays centred; increase zoom to fill more of the frame.
+   */
+  zoom?: number | null;
   folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
@@ -903,6 +923,7 @@ export interface Team {
  */
 export interface Specialist {
   id: number;
+  _order?: string | null;
   /**
    * Full display name including honorific, e.g. "Dr Adam Parr".
    */
@@ -2891,6 +2912,10 @@ export interface FAQBlock {
     phone?: string | null;
   };
   /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
@@ -3664,7 +3689,11 @@ export interface ProcessStepsBlock {
    */
   background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
   /**
-   * How many steps per row on desktop.
+   * Layout. "Cards" = numbered card grid. "Two-row process" = connected numbered rows (01–03 blue, 04+ dark) matching the reference Our Process. "Claimant step list" = left intro + a compact numbered list on the right (reference Your Examination Step by Step).
+   */
+  variant?: ('cards' | 'two-row' | 'claimant' | 'edu-panels') | null;
+  /**
+   * How many steps per row on desktop (Cards + Two-row variants).
    */
   columns?: ('1' | '2' | '3' | '4' | '5') | null;
   /**
@@ -3797,6 +3826,10 @@ export interface ProcessStepsBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -4209,6 +4242,10 @@ export interface SpecialtyGridBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Call-to-action shown on each linked card (only appears when the tile links somewhere).
+   */
+  ctaLabel?: string | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -5218,6 +5255,10 @@ export interface TabsBlockType {
    * Index of the tab open by default (0 = first).
    */
   defaultTab?: number | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -6292,7 +6333,7 @@ export interface CTABandBlock {
  * via the `definition` "CalloutBlock".
  */
 export interface CalloutBlock {
-  style?: ('info' | 'note' | 'success' | 'warning') | null;
+  style?: ('info' | 'note' | 'good-to-know' | 'reassurance' | 'success' | 'warning') | null;
   icon?:
     | (
         | 'activity'
@@ -6888,6 +6929,18 @@ export interface MapEmbedBlock {
    */
   title?: string | null;
   showOfficeInfo?: boolean | null;
+  /**
+   * Info-panel heading above the office hours. Defaults to "Office Hours".
+   */
+  officeHoursHeading?: string | null;
+  /**
+   * Info-panel heading above the transport list. Defaults to "Recommended Public Transport".
+   */
+  transportHeading?: string | null;
+  /**
+   * Info-panel heading above the parking list. Defaults to "Nearby Car Parks".
+   */
+  parkingHeading?: string | null;
   /**
    * e.g. Get directions / Call / Email.
    */
@@ -8031,6 +8084,10 @@ export interface ArchiveBlock {
       )[]
     | null;
   columns?: ('2' | '3' | '4') | null;
+  /**
+   * Text for the per-card link (article & staff-narrative cards). Defaults to "Read More →".
+   */
+  readMoreLabel?: string | null;
   viewAllLink?: {
     link?: {
       type?: ('reference' | 'custom' | 'enquiry') | null;
@@ -8292,6 +8349,10 @@ export interface AvailabilityBlock {
   showCarousel?: boolean | null;
   showLegend?: boolean | null;
   /**
+   * Overlays each specialist’s specialty as a pill on their carousel photo. Off by default — the specialty already appears beneath the photo.
+   */
+  showSpecialtyBadge?: boolean | null;
+  /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
@@ -8378,14 +8439,30 @@ export interface SpecialistDirectoryBlock {
   enableLocation?: boolean | null;
   enableAccreditation?: boolean | null;
   /**
-   * Directory sort order.
+   * Directory sort order. "Custom" uses the drag-to-reorder order set on the Specialists list.
    */
-  sortBy?: ('lastName' | 'firstName') | null;
+  sortBy?: ('order' | 'lastName' | 'firstName') | null;
   searchPlaceholder?: string | null;
   /**
    * Use {count}.
    */
   countTemplate?: string | null;
+  /**
+   * Field label above the search box.
+   */
+  searchGroupLabel?: string | null;
+  /**
+   * Field label above the specialty filter.
+   */
+  specialtyGroupLabel?: string | null;
+  /**
+   * Field label above the accreditation filter.
+   */
+  accreditationGroupLabel?: string | null;
+  /**
+   * Field label above the location filter.
+   */
+  locationGroupLabel?: string | null;
   specialtyLabel?: string | null;
   locationLabel?: string | null;
   accreditationLabel?: string | null;
@@ -8444,6 +8521,14 @@ export interface SpecialtyDirectoryBlock {
   showRosters?: boolean | null;
   showKeyAreas?: boolean | null;
   /**
+   * Label for the “all categories” filter tab.
+   */
+  allTabLabel?: string | null;
+  /**
+   * Message shown when a category has no specialties.
+   */
+  emptyLabel?: string | null;
+  /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
@@ -8471,6 +8556,10 @@ export interface ResourcesGridBlock {
   background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   /**
+   * "Standard card" or "Resource card" (design-reference In-the-Loop .ni-resource-card — coloured header panel + body).
+   */
+  variant?: ('card' | 'ni-resource') | null;
+  /**
    * Optional — limit to one audience.
    */
   audience?: ('clients' | 'claimants' | 'all') | null;
@@ -8484,6 +8573,10 @@ export interface ResourcesGridBlock {
    * Max resources (auto source).
    */
   limit?: number | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -10115,6 +10208,147 @@ export interface SectionNavBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeaturedArticlesBlock".
+ */
+export interface FeaturedArticlesBlock {
+  /**
+   * Small uppercase label above the carousel (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Auto: newest featured posts (checkbox "Featured" or the Featured stream). Manual: hand-pick posts below.
+   */
+  source?: ('auto' | 'manual') | null;
+  /**
+   * The posts to show in the carousel, in order.
+   */
+  posts?: (number | Post)[] | null;
+  /**
+   * Max number of posts to show (automatic mode).
+   */
+  limit?: number | null;
+  /**
+   * Text of the small badge shown on each slide (defaults to "Featured").
+   */
+  badgeLabel?: string | null;
+  /**
+   * Prefix shown before the author/date byline on each slide (defaults to "By:").
+   */
+  bylinePrefix?: string | null;
+  /**
+   * Text of the "read more" call-to-action link on each slide (defaults to "Read Full Article →").
+   */
+  ctaLabel?: string | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featuredArticles';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsExplorerBlock".
+ */
+export interface EventsExplorerBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: string | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   */
+  heading?: string | null;
+  subheading?: string | null;
+  /**
+   * Show upcoming and past, or restrict to one. The split uses the visitor’s current date.
+   */
+  mode?: ('all' | 'upcoming-only' | 'past-only') | null;
+  /**
+   * How many events show before pagination.
+   */
+  pageSize?: number | null;
+  showSearch?: boolean | null;
+  /**
+   * Editable UI text for this block — buttons, group headings, the search bar and empty-state messages. Leave a field blank to use its default.
+   */
+  labels?: {
+    /**
+     * Button on each upcoming event. Default: “More Info”.
+     */
+    moreInfoLabel?: string | null;
+    /**
+     * Button on each past event. Default: “View Recap”.
+     */
+    viewRecapLabel?: string | null;
+    /**
+     * Heading above the upcoming list (shown only in “Upcoming & Past” mode). Default: “Upcoming Events”.
+     */
+    upcomingHeading?: string | null;
+    /**
+     * Heading above the past list (shown only in “Upcoming & Past” mode). Default: “Past Events”.
+     */
+    pastHeading?: string | null;
+    /**
+     * Message when there are no upcoming events. Default: “No upcoming events are listed right now — please check back soon.”.
+     */
+    emptyUpcoming?: string | null;
+    /**
+     * Message when a search matches no upcoming events. Default: “No upcoming events match your search.”.
+     */
+    emptyUpcomingSearch?: string | null;
+    /**
+     * Message when there are no past events. Default: “No past events to show yet.”.
+     */
+    emptyPast?: string | null;
+    /**
+     * Message when a search matches no past events. Default: “No past events match your search.”.
+     */
+    emptyPastSearch?: string | null;
+    /**
+     * Shown briefly while events load in the browser. Default: “Loading events…”.
+     */
+    loadingLabel?: string | null;
+    /**
+     * Placeholder in the search box. Default: “Search”.
+     */
+    searchPlaceholder?: string | null;
+    /**
+     * Label on the (decorative) dates control in the filter bar. Default: “Dates”.
+     */
+    datesLabel?: string | null;
+    /**
+     * Text on the filter bar’s submit button. Default: “Search”.
+     */
+    searchButtonLabel?: string | null;
+  };
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'eventsExplorer';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "availability-sessions".
  */
 export interface AvailabilitySession {
@@ -10509,6 +10743,9 @@ export interface PagesSelect<T extends boolean = true> {
         theme?: T;
         align?: T;
         showShield?: T;
+        imagePanel?: T;
+        imagePanelLabel?: T;
+        scrollHint?: T;
         metaItems?:
           | T
           | {
@@ -10589,6 +10826,8 @@ export interface PagesSelect<T extends boolean = true> {
         newsletter?: T | NewsletterBlockSelect<T>;
         videoEmbed?: T | VideoEmbedBlockSelect<T>;
         sectionNav?: T | SectionNavBlockSelect<T>;
+        featuredArticles?: T | FeaturedArticlesBlockSelect<T>;
+        eventsExplorer?: T | EventsExplorerBlockSelect<T>;
       };
   meta?:
     | T
@@ -10911,6 +11150,7 @@ export interface FAQBlockSelect<T extends boolean = true> {
         email?: T;
         phone?: T;
       };
+  anchorId?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -11035,6 +11275,7 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
   heading?: T;
   subheading?: T;
   background?: T;
+  variant?: T;
   columns?: T;
   steps?:
     | T
@@ -11051,6 +11292,7 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  anchorId?: T;
   cssClass?: T;
   elementClasses?:
     | T
@@ -11098,6 +11340,7 @@ export interface SpecialtyGridBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  ctaLabel?: T;
   cssClass?: T;
   elementClasses?:
     | T
@@ -11329,6 +11572,7 @@ export interface TabsBlockTypeSelect<T extends boolean = true> {
       };
   tabStyle?: T;
   defaultTab?: T;
+  anchorId?: T;
   cssClass?: T;
   elementClasses?:
     | T
@@ -11572,6 +11816,9 @@ export interface MapEmbedBlockSelect<T extends boolean = true> {
   aspect?: T;
   title?: T;
   showOfficeInfo?: T;
+  officeHoursHeading?: T;
+  transportHeading?: T;
+  parkingHeading?: T;
   actions?:
     | T
     | {
@@ -11727,6 +11974,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   limit?: T;
   selectedDocs?: T;
   columns?: T;
+  readMoreLabel?: T;
   viewAllLink?:
     | T
     | {
@@ -11753,6 +12001,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
 export interface AvailabilityBlockSelect<T extends boolean = true> {
   showCarousel?: T;
   showLegend?: T;
+  showSpecialtyBadge?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -11809,6 +12058,10 @@ export interface SpecialistDirectoryBlockSelect<T extends boolean = true> {
   sortBy?: T;
   searchPlaceholder?: T;
   countTemplate?: T;
+  searchGroupLabel?: T;
+  specialtyGroupLabel?: T;
+  accreditationGroupLabel?: T;
+  locationGroupLabel?: T;
   specialtyLabel?: T;
   locationLabel?: T;
   accreditationLabel?: T;
@@ -11835,6 +12088,8 @@ export interface SpecialtyDirectoryBlockSelect<T extends boolean = true> {
   showFilterBar?: T;
   showRosters?: T;
   showKeyAreas?: T;
+  allTabLabel?: T;
+  emptyLabel?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -11849,11 +12104,13 @@ export interface ResourcesGridBlockSelect<T extends boolean = true> {
   subheading?: T;
   background?: T;
   source?: T;
+  variant?: T;
   audience?: T;
   resourceType?: T;
   resources?: T;
   columns?: T;
   limit?: T;
+  anchorId?: T;
   cssClass?: T;
   containerWidth?: T;
   motion?: T;
@@ -12120,6 +12377,57 @@ export interface SectionNavBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeaturedArticlesBlock_select".
+ */
+export interface FeaturedArticlesBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  source?: T;
+  posts?: T;
+  limit?: T;
+  badgeLabel?: T;
+  bylinePrefix?: T;
+  ctaLabel?: T;
+  anchorId?: T;
+  background?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsExplorerBlock_select".
+ */
+export interface EventsExplorerBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  mode?: T;
+  pageSize?: T;
+  showSearch?: T;
+  labels?:
+    | T
+    | {
+        moreInfoLabel?: T;
+        viewRecapLabel?: T;
+        upcomingHeading?: T;
+        pastHeading?: T;
+        emptyUpcoming?: T;
+        emptyUpcomingSearch?: T;
+        emptyPast?: T;
+        emptyPastSearch?: T;
+        loadingLabel?: T;
+        searchPlaceholder?: T;
+        datesLabel?: T;
+        searchButtonLabel?: T;
+      };
+  anchorId?: T;
+  background?: T;
+  cssClass?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -12179,6 +12487,7 @@ export interface PostsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  zoom?: T;
   folder?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -12428,6 +12737,7 @@ export interface StreamsSelect<T extends boolean = true> {
  * via the `definition` "specialists_select".
  */
 export interface SpecialistsSelect<T extends boolean = true> {
+  _order?: T;
   title?: T;
   position?: T;
   photo?: T;
@@ -13866,6 +14176,39 @@ export interface SpecialistAvailability {
   enquirySubject?: string | null;
   enquiryBodyIntro?: string | null;
   enquiryBodyFooter?: string | null;
+  /**
+   * Short UI labels for the interactive availability grid (legend, action bar).
+   */
+  labels?: {
+    /**
+     * Label for in-person sessions (legend + chips).
+     */
+    modeInPersonLabel?: string | null;
+    /**
+     * Label for telehealth sessions (legend + chips).
+     */
+    modeTelehealthLabel?: string | null;
+    /**
+     * Label for sessions offered either way (legend + chips).
+     */
+    modeEitherLabel?: string | null;
+    /**
+     * Hint shown in the legend when sessions are available to select.
+     */
+    selectionHint?: string | null;
+    /**
+     * Button that clears the current selection.
+     */
+    clearLabel?: string | null;
+    /**
+     * Button that opens the prefilled enquiry email.
+     */
+    sendEnquiryLabel?: string | null;
+    /**
+     * Selection count in the action bar. Use {count} for the number and {noun} for session/sessions.
+     */
+    sessionsSelectedTemplate?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -14001,6 +14344,14 @@ export interface SpecialistProfile {
     enquiryEmail?: string | null;
   };
   /**
+   * Subject line of the booking-portal enquiry email (mailto).
+   */
+  portalEnquirySubject?: string | null;
+  /**
+   * Enquiry-type tag sent with the booking-portal CTA.
+   */
+  portalEnquiryType?: string | null;
+  /**
    * The fixed headings on the profile body (leave default unless rebranding).
    */
   labels?: {
@@ -14008,6 +14359,15 @@ export interface SpecialistProfile {
     assessmentAreas?: string | null;
     qualifications?: string | null;
     accreditations?: string | null;
+    assessmentTypes?: string | null;
+  };
+  /**
+   * The breadcrumb trail shown at the top of every profile.
+   */
+  breadcrumb?: {
+    breadcrumbParentLabel?: string | null;
+    breadcrumbParentHref?: string | null;
+    breadcrumbCurrentLabel?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -14263,6 +14623,12 @@ export interface ArticleSetting {
     related?: string | null;
     toc?: string | null;
     topics?: string | null;
+    breadcrumbHomeLabel?: string | null;
+    breadcrumbSectionLabel?: string | null;
+    bylinePrefix?: string | null;
+    minReadSuffix?: string | null;
+    shareLinkedinLabel?: string | null;
+    shareCopyLabel?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -14304,6 +14670,72 @@ export interface EventsSetting {
     attendBody?: string | null;
     registerLabel?: string | null;
     contactLabel?: string | null;
+  };
+  /**
+   * Generic UI labels shown on every event detail page, regardless of host.
+   */
+  labels?: {
+    /**
+     * Status pill for events still to come.
+     */
+    statusUpcomingLabel?: string | null;
+    /**
+     * Status pill for events whose date has passed.
+     */
+    statusPastLabel?: string | null;
+    /**
+     * Cost shown when an event has no cost set.
+     */
+    freeLabel?: string | null;
+    /**
+     * CPD line when points are set. Use {points} for the number.
+     */
+    cpdPointsTemplate?: string | null;
+    /**
+     * CPD line when eligible but no point count is set.
+     */
+    cpdEligibleLabel?: string | null;
+    /**
+     * Shown under a past event that has no recap content.
+     */
+    concludedFallback?: string | null;
+    /**
+     * Link back to the events listing at the bottom of the page.
+     */
+    backToEventsLabel?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Breadcrumb + fixed labels shown on every team member profile page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team-settings".
+ */
+export interface TeamSetting {
+  id: number;
+  labels?: {
+    /**
+     * First breadcrumb link (site home).
+     */
+    breadcrumbHomeLabel?: string | null;
+    /**
+     * Second breadcrumb link (team index).
+     */
+    breadcrumbSectionLabel?: string | null;
+    /**
+     * Sidebar label above the member’s role.
+     */
+    roleLabel?: string | null;
+    /**
+     * Sidebar label above each qualification.
+     */
+    qualificationLabel?: string | null;
+    /**
+     * Prefix for the bio heading, e.g. “About” in “About Wes”.
+     */
+    aboutPrefix?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -14664,6 +15096,17 @@ export interface SpecialistAvailabilitySelect<T extends boolean = true> {
   enquirySubject?: T;
   enquiryBodyIntro?: T;
   enquiryBodyFooter?: T;
+  labels?:
+    | T
+    | {
+        modeInPersonLabel?: T;
+        modeTelehealthLabel?: T;
+        modeEitherLabel?: T;
+        selectionHint?: T;
+        clearLabel?: T;
+        sendEnquiryLabel?: T;
+        sessionsSelectedTemplate?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -14689,6 +15132,8 @@ export interface SpecialistProfileSelect<T extends boolean = true> {
         enquiryLabel?: T;
         enquiryEmail?: T;
       };
+  portalEnquirySubject?: T;
+  portalEnquiryType?: T;
   labels?:
     | T
     | {
@@ -14696,6 +15141,14 @@ export interface SpecialistProfileSelect<T extends boolean = true> {
         assessmentAreas?: T;
         qualifications?: T;
         accreditations?: T;
+        assessmentTypes?: T;
+      };
+  breadcrumb?:
+    | T
+    | {
+        breadcrumbParentLabel?: T;
+        breadcrumbParentHref?: T;
+        breadcrumbCurrentLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -14730,6 +15183,12 @@ export interface ArticleSettingsSelect<T extends boolean = true> {
         related?: T;
         toc?: T;
         topics?: T;
+        breadcrumbHomeLabel?: T;
+        breadcrumbSectionLabel?: T;
+        bylinePrefix?: T;
+        minReadSuffix?: T;
+        shareLinkedinLabel?: T;
+        shareCopyLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -14761,6 +15220,35 @@ export interface EventsSettingsSelect<T extends boolean = true> {
         attendBody?: T;
         registerLabel?: T;
         contactLabel?: T;
+      };
+  labels?:
+    | T
+    | {
+        statusUpcomingLabel?: T;
+        statusPastLabel?: T;
+        freeLabel?: T;
+        cpdPointsTemplate?: T;
+        cpdEligibleLabel?: T;
+        concludedFallback?: T;
+        backToEventsLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team-settings_select".
+ */
+export interface TeamSettingsSelect<T extends boolean = true> {
+  labels?:
+    | T
+    | {
+        breadcrumbHomeLabel?: T;
+        breadcrumbSectionLabel?: T;
+        roleLabel?: T;
+        qualificationLabel?: T;
+        aboutPrefix?: T;
       };
   updatedAt?: T;
   createdAt?: T;

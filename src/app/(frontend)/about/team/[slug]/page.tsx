@@ -12,26 +12,23 @@ import { Icon } from '@/components/Icon'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
+import { getCachedGlobal } from '@/utilities/getGlobals'
 
 import type { Team } from '@/payload-types'
 
+// `team-settings` isn't in the generated payload-types yet, so describe the shape
+// we read locally and cast defensively.
+type TeamSettingsShape = {
+  labels?: {
+    breadcrumbHomeLabel?: string | null
+    breadcrumbSectionLabel?: string | null
+    roleLabel?: string | null
+    qualificationLabel?: string | null
+    aboutPrefix?: string | null
+  } | null
+} | null
+
 type Args = { params: Promise<{ slug?: string }> }
-
-const initials = (name: string): string =>
-  name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-
-// Human labels for the Team `department` select (see src/collections/Team).
-const departmentLabels: Record<string, string> = {
-  operations: 'Operations',
-  'business-development': 'Business Development',
-  'client-support': 'Client Support',
-  'quality-assurance': 'Quality Assurance',
-}
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -54,6 +51,9 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
 
   if (!member) return <PayloadRedirects url={`/about/team/${decodedSlug}`} />
 
+  const settings = (await getCachedGlobal('team-settings' as never, 0)()) as TeamSettingsShape
+  const labels = settings?.labels
+
   const m = member as Team & Record<string, unknown>
   const photo = typeof m.photo === 'object' ? m.photo : null
   const sections = Array.isArray(m.sections)
@@ -62,99 +62,99 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
   const qualifications = Array.isArray(m.qualifications)
     ? (m.qualifications as { qualification?: string }[])
     : []
-  const departmentLabel =
-    typeof m.department === 'string' ? (departmentLabels[m.department] ?? m.department) : ''
+  // Accent word for the bio heading — the member's first name ("About Wes").
+  const firstName = (m.title ?? '').split(/\s+/)[0]
 
   return (
     <article>
       {draft && <LivePreviewListener />}
       <PayloadRedirects disableNotFound url={`/about/team/${decodedSlug}`} />
 
-      <section className="vf-profile-hero">
+      {/* Hero */}
+      <section className="staff-hero">
         <div className="container">
-          <nav className="vf-profile-breadcrumb" aria-label="Breadcrumb">
-            <Link href="/">Home</Link>
+          <nav className="staff-hero-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/">{labels?.breadcrumbHomeLabel || 'Home'}</Link>
             <span aria-hidden>›</span>
-            <Link href="/about">About</Link>
-            <span aria-hidden>›</span>
-            <Link href="/about/team">Meet the Team</Link>
+            <Link href="/meet-the-team">{labels?.breadcrumbSectionLabel || 'Meet the Team'}</Link>
             <span aria-hidden>›</span>
             <strong>{m.title}</strong>
           </nav>
-          <div className="vf-profile-hero__inner">
-            <div className="vf-profile-hero__avatar">
-              {photo ? (
-                <Media resource={photo} imgClassName="vf-profile-hero__img" />
-              ) : (
-                <span className="vf-profile-hero__initials">{initials(m.title)}</span>
-              )}
-            </div>
-            <div className="vf-profile-hero__body">
-              <h1 className="vf-profile-hero__name">{m.title}</h1>
-              {m.role ? <p className="vf-profile-hero__position">{m.role}</p> : null}
-            </div>
+          <div className="staff-hero-content">
+            <h1 className="staff-hero-name">{m.title}</h1>
+            {m.role ? <p className="staff-hero-role">{m.role}</p> : null}
           </div>
         </div>
       </section>
 
-      <section className="vf-section--white" style={{ paddingBlock: 'var(--space-normal)' }}>
-        <div className="container vf-profile-grid">
-          <div className="vf-profile-main">
-            {m.bio ? (
-              <div className="vf-profile-block">
-                <h2 className="vf-profile-block__title">About</h2>
-                <RichText data={m.bio as never} enableGutter={false} />
+      {/* Body */}
+      <section className="staff-body">
+        <div className="container">
+          <div className="staff-body-grid">
+            {/* Bio column */}
+            <div>
+              {m.bio ? (
+                <div className="staff-section">
+                  <div className="staff-section-heading">
+                    {labels?.aboutPrefix || 'About'} <span>{firstName}</span>
+                  </div>
+                  <div className="staff-bio">
+                    <RichText data={m.bio as never} enableGutter={false} enableProse={false} />
+                  </div>
+                </div>
+              ) : null}
+              {sections.map((sec, i) => (
+                <div className="staff-section" key={i}>
+                  <div className="staff-section-heading">
+                    <span>{sec.heading}</span>
+                  </div>
+                  {sec.body ? (
+                    <div className="staff-bio">
+                      <RichText data={sec.body as never} enableGutter={false} enableProse={false} />
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+
+            {/* Sidebar */}
+            <div>
+              <div className="staff-photo">
+                {photo ? (
+                  <Media resource={photo} imgClassName="staff-photo-img" />
+                ) : null}
               </div>
-            ) : null}
-            {sections.map((sec, i) => (
-              <div className="vf-profile-block" key={i}>
-                <h2 className="vf-profile-block__title">{sec.heading}</h2>
-                {sec.body ? <RichText data={sec.body as never} enableGutter={false} /> : null}
+
+              <div className="staff-sidebar-info">
+                {m.role ? (
+                  <div className="staff-sidebar-item">
+                    <div className="staff-sidebar-item-icon">
+                      <Icon name="briefcase" />
+                    </div>
+                    <div>
+                      <div className="staff-sidebar-item-label">{labels?.roleLabel || 'Role'}</div>
+                      <div className="staff-sidebar-item-text">{m.role}</div>
+                    </div>
+                  </div>
+                ) : null}
+                {qualifications.map((q, i) =>
+                  q.qualification ? (
+                    <div className="staff-sidebar-item" key={i}>
+                      <div className="staff-sidebar-item-icon">
+                        <Icon name="graduation-cap" />
+                      </div>
+                      <div>
+                        <div className="staff-sidebar-item-label">
+                          {labels?.qualificationLabel || 'Qualification'}
+                        </div>
+                        <div className="staff-sidebar-item-text">{q.qualification}</div>
+                      </div>
+                    </div>
+                  ) : null,
+                )}
               </div>
-            ))}
+            </div>
           </div>
-          <aside className="vf-profile-sidebar">
-            {m.role || departmentLabel ? (
-              <div className="vf-profile-card">
-                <ul className="vf-profile-meta">
-                  {m.role ? (
-                    <li className="vf-profile-meta__row">
-                      <span className="vf-profile-meta__icon">
-                        <Icon name="briefcase" className="size-5" />
-                      </span>
-                      <span className="vf-profile-meta__body">
-                        <span className="vf-profile-meta__label">Role</span>
-                        <span className="vf-profile-meta__value">{m.role}</span>
-                      </span>
-                    </li>
-                  ) : null}
-                  {departmentLabel ? (
-                    <li className="vf-profile-meta__row">
-                      <span className="vf-profile-meta__icon">
-                        <Icon name="users-three" className="size-5" />
-                      </span>
-                      <span className="vf-profile-meta__body">
-                        <span className="vf-profile-meta__label">Department</span>
-                        <span className="vf-profile-meta__value">{departmentLabel}</span>
-                      </span>
-                    </li>
-                  ) : null}
-                </ul>
-              </div>
-            ) : null}
-            {qualifications.length ? (
-              <div className="vf-profile-card">
-                <h3 className="vf-profile-card__title">Qualifications</h3>
-                <ul>
-                  {qualifications.map((q, i) => (
-                    <li key={i} className="vf-profile-card__item">
-                      {q.qualification}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </aside>
         </div>
       </section>
     </article>

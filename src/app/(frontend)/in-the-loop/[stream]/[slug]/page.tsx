@@ -13,6 +13,8 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { mediaFocal, focalImgStyle } from '@/utilities/focalPoint'
+import { ArticleToc } from './ArticleToc'
 
 import type { ArticleSetting, Category, Post, Stream } from '@/payload-types'
 
@@ -86,11 +88,21 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
 
   const settings = (await getCachedGlobal('article-settings', 1)()) as ArticleSetting
   const sidebarCards = Array.isArray(settings?.sidebarCards) ? settings.sidebarCards : []
-  const labels = settings?.labels ?? {}
+  const labels = (settings?.labels ?? {}) as Record<string, string | null | undefined>
 
   const stream = typeof post.stream === 'object' && post.stream ? post.stream : null
   const streamTitle = stream?.title
   const streamSlug = stream?.slug
+  // The hub's sticky section ids use short forms for three streams; map so the
+  // breadcrumb's "/in-the-loop#<stream>" anchor lands on the right hub section.
+  const streamHubAnchor =
+    (
+      {
+        'news-updates': 'news',
+        'industry-insights': 'insights',
+        'specialist-spotlights': 'spotlights',
+      } as Record<string, string>
+    )[streamSlug || ''] || streamSlug
 
   const heroImage = typeof post.heroImage === 'object' ? post.heroImage : null
 
@@ -104,6 +116,14 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
   const authorName = author.name || (src?.title as string) || (src?.name as string) || ''
   const authorRole = author.role || (src?.role as string) || (src?.position as string) || ''
   const authorBio = author.bio || (typeof src?.bio === 'string' ? (src.bio as string) : '') || ''
+  // Author avatar: a per-post uploaded photo overrides the linked person's
+  // profile photo (Team member / Specialist via `author.source`); when neither
+  // exists we keep the placeholder icon.
+  const authorPhoto =
+    (author.photo && typeof author.photo === 'object' && author.photo) ||
+    (src && typeof src.photo === 'object' && src.photo) ||
+    null
+  const authorFocal = mediaFocal(authorPhoto)
 
   const toc = tocFromContent(post)
 
@@ -151,13 +171,13 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
         <div className="container">
           <div className="art-meta-inner">
             <nav aria-label="Breadcrumb" className="art-breadcrumb">
-              <a href="/">Home</a>
+              <a href="/">{labels.breadcrumbHomeLabel || 'Home'}</a>
               <span className="art-breadcrumb-sep">›</span>
-              <a href="/in-the-loop">In the Loop</a>
+              <a href="/in-the-loop">{labels.breadcrumbSectionLabel || 'In the Loop'}</a>
               {streamTitle ? (
                 <>
                   <span className="art-breadcrumb-sep">›</span>
-                  <a href={streamSlug ? `/in-the-loop#${streamSlug}` : '/in-the-loop'}>
+                  <a href={streamSlug ? `/in-the-loop#${streamHubAnchor}` : '/in-the-loop'}>
                     {streamTitle}
                   </a>
                 </>
@@ -166,7 +186,8 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
             <div className="art-meta-right">
               {authorName ? (
                 <div className="art-meta-author">
-                  By <strong>{authorName}</strong>
+                  {labels.bylinePrefix || 'By '}
+                  <strong>{authorName}</strong>
                   {authorRole ? `, ${authorRole}` : ''}
                 </div>
               ) : null}
@@ -174,11 +195,13 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
                 <div className="art-meta-date">{fmtDate(post.publishedAt)}</div>
               ) : null}
               {post.readTime ? (
-                <div className="art-meta-read">{post.readTime} min read</div>
+                <div className="art-meta-read">
+                  {post.readTime} {labels.minReadSuffix || 'min read'}
+                </div>
               ) : null}
               <div className="art-share-btns">
                 <a
-                  aria-label="Share on LinkedIn"
+                  aria-label={labels.shareLinkedinLabel || 'Share on LinkedIn'}
                   className="art-share-btn"
                   href="https://www.linkedin.com/sharing/share-offsite/"
                   rel="noopener noreferrer"
@@ -186,7 +209,11 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
                 >
                   in
                 </a>
-                <a aria-label="Copy link" className="art-share-btn" href={url}>
+                <a
+                  aria-label={labels.shareCopyLabel || 'Copy link'}
+                  className="art-share-btn"
+                  href={url}
+                >
                   <Icon name="link" className="size-4" />
                 </a>
               </div>
@@ -198,20 +225,9 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
       {/* ── 3-column layout ───────────────────────────────── */}
       <div className="container">
         <div className="art-layout">
-          {/* LEFT: table of contents */}
+          {/* LEFT: table of contents (scroll-spy client component) */}
           {toc.length ? (
-            <aside aria-label="Article navigation" className="art-toc">
-              <div className="art-toc-label">{labels.toc || 'In This Article'}</div>
-              <ul className="art-toc-list">
-                {toc.map((item, i) => (
-                  <li key={item.id}>
-                    <a className={`art-toc-link${i === 0 ? ' is-active' : ''}`} href={`#${item.id}`}>
-                      {item.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </aside>
+            <ArticleToc items={toc} label={labels.toc || 'In This Article'} />
           ) : (
             <aside aria-hidden className="art-toc" />
           )}
@@ -234,7 +250,19 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
             {authorName ? (
               <div className="art-author-card">
                 <div className="art-author-avatar">
-                  <Icon name="user" className="size-6" weight="light" />
+                  {authorFocal.url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={authorFocal.url}
+                      alt={authorName}
+                      style={focalImgStyle(authorFocal.focus, authorFocal.zoom, {
+                        width: '100%',
+                        height: '100%',
+                      })}
+                    />
+                  ) : (
+                    <Icon name="user" className="size-6" weight="light" />
+                  )}
                 </div>
                 <div>
                   <div className="art-author-name">{authorName}</div>

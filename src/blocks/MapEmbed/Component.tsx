@@ -14,13 +14,18 @@ import { toClassName } from '@/utilities/cssClass'
 // Aspect-ratio presets → CSS. `map` is a tall fixed-height frame.
 const RATIOS: Record<string, string> = { '16-9': '16 / 9', '4-3': '4 / 3', '1-1': '1 / 1' }
 
-const tel = (v: string) => `tel:${v.replace(/[^+0-9]/g, '')}`
+// Split lines that carry line breaks (e.g. a postal address) into rows.
+const lines = (v?: string | null) =>
+  (v || '')
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
 
-// Small uppercase panel label, reusing the shared design-reference class.
-const Label: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="vf-map-embed__label section-label" style={{ marginBottom: '.35rem' }}>
+// External links in the info panel open in a new tab, like the reference.
+const ExtLink: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => (
+  <a href={href} rel="noopener noreferrer" target="_blank">
     {children}
-  </p>
+  </a>
 )
 
 export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
@@ -40,6 +45,14 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
     motion,
     bare,
   } = props
+
+  const officeHoursHeading =
+    (props as { officeHoursHeading?: string | null }).officeHoursHeading || 'Office Hours'
+  const transportHeading =
+    (props as { transportHeading?: string | null }).transportHeading ||
+    'Recommended Public Transport'
+  const parkingHeading =
+    (props as { parkingHeading?: string | null }).parkingHeading || 'Nearby Car Parks'
 
   // Resolve the office relationship (populated object at depth>0, else id).
   let office: Office | null = null
@@ -79,7 +92,20 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
       ? { height: 'clamp(360px, 60vh, 620px)' }
       : { aspectRatio: RATIOS[aspect || '16-9'] || '16 / 9' }
 
-  const frame = hasFrame ? (
+  // The bare iframe. In the split layout it lives inside the reference
+  // ".ct-map-wrap" (fixed aspect-ratio); otherwise it keeps the generic frame.
+  const iframe = hasFrame ? (
+    <iframe
+      src={src as string}
+      title={title || office?.title || 'Embedded map'}
+      loading="lazy"
+      allowFullScreen
+      referrerPolicy="no-referrer-when-downgrade"
+      sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
+    />
+  ) : null
+
+  const genericFrame = hasFrame ? (
     <div
       className="vf-map-embed__frame"
       style={{ position: 'relative', overflow: 'hidden', borderRadius: '1rem', ...frameStyle }}
@@ -96,114 +122,113 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
     </div>
   ) : null
 
-  const panel = hasPanel ? (
-    <aside
-      className={cn('vf-map-embed__panel', showSplit && 'lg:col-span-1')}
-      style={{ display: 'grid', gap: '1.5rem', alignContent: 'start' }}
-    >
-      {office?.title ? (
-        <h3 className="vf-map-embed__panel-title" style={{ fontSize: '1.25rem', fontWeight: 600 }}>
-          {office.title}
-        </h3>
-      ) : null}
+  // Quick-action buttons rendered below the map (Get Directions / phone / Email),
+  // three across — the reference ".ct-map-actions" row.
+  const mapActions = hasActions ? (
+    <div className="ct-map-actions">
+      {actions!.map(({ link }, i) => {
+        if (!link) return null
+        return (
+          <CMSLink
+            key={i}
+            {...link}
+            appearance="inline"
+            className="ct-map-action"
+          />
+        )
+      })}
+    </div>
+  ) : null
 
-      {office?.address ? (
-        <div className="vf-map-embed__info">
-          <Label>Address</Label>
-          <p style={{ whiteSpace: 'pre-line' }}>{office.address}</p>
-        </div>
-      ) : null}
-
-      {office?.phone || office?.email ? (
-        <div className="vf-map-embed__info">
-          <Label>Contact</Label>
-          {office?.phone ? (
-            <p>
-              <a href={tel(office.phone)}>{office.phone}</a>
-            </p>
-          ) : null}
-          {office?.email ? (
-            <p>
-              <a href={`mailto:${office.email}`}>{office.email}</a>
-            </p>
-          ) : null}
-        </div>
-      ) : null}
-
-      {Array.isArray(office?.hours) && office.hours.length > 0 ? (
-        <div className="vf-map-embed__info">
-          <Label>Opening hours</Label>
-          <dl style={{ display: 'grid', gap: '.25rem' }}>
-            {office.hours.map((h, i) => (
-              <div
-                key={h.id || i}
-                style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}
-              >
-                <dt>{h.days}</dt>
-                <dd style={{ opacity: 0.75 }}>{h.time}</dd>
+  // Standalone white info card — built entirely from Office fields.
+  const infoPanel = hasPanel ? (
+    <div className="ct-info-panel">
+      {/* Our Office */}
+      {office?.title || office?.address ? (
+        <div className="ct-info-item">
+          <div className="ct-info-item-icon">
+            <Icon name="map-pin" />
+          </div>
+          <div className="ct-info-item-content">
+            {office?.title ? <div className="ct-info-item-title">{office.title}</div> : null}
+            {lines(office?.address).map((l, i) => (
+              <div key={i} className="ct-info-item-line">
+                {l}
               </div>
             ))}
-          </dl>
-          {office.hoursNote ? (
-            <p style={{ opacity: 0.7, fontSize: '.875rem', marginTop: '.35rem' }}>{office.hoursNote}</p>
-          ) : null}
+          </div>
         </div>
       ) : null}
 
+      {/* Office Hours */}
+      {Array.isArray(office?.hours) && office.hours.length > 0 ? (
+        <div className="ct-info-item">
+          <div className="ct-info-item-icon">
+            <Icon name="clock" />
+          </div>
+          <div className="ct-info-item-content">
+            <div className="ct-info-item-title">{officeHoursHeading}</div>
+            {office.hours.map((h, i) => (
+              <React.Fragment key={h.id || i}>
+                {h.days ? <div className="ct-info-item-line">{h.days}</div> : null}
+                {h.time ? <div className="ct-info-item-line">{h.time}</div> : null}
+              </React.Fragment>
+            ))}
+            {office.hoursNote ? <p className="ct-info-item-note">{office.hoursNote}</p> : null}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Recommended Public Transport */}
       {Array.isArray(office?.transport) && office.transport.length > 0 ? (
-        <div className="vf-map-embed__info">
-          <Label>Getting here</Label>
-          <ul style={{ display: 'grid', gap: '.35rem', listStyle: 'none', padding: 0, margin: 0 }}>
+        <div className="ct-info-item">
+          <div className="ct-info-item-icon">
+            <Icon name="bus" />
+          </div>
+          <div className="ct-info-item-content">
+            <div className="ct-info-item-title">{transportHeading}</div>
             {office.transport.map((t, i) => (
-              <li key={t.id || i}>
-                {t.href ? (
-                  <a href={t.href} rel="noopener noreferrer" target="_blank">
-                    {t.label}
-                  </a>
-                ) : (
-                  <span>{t.label}</span>
-                )}
-                {t.note ? <span style={{ opacity: 0.7 }}> — {t.note}</span> : null}
-              </li>
+              <div key={t.id || i} className="ct-info-item-line">
+                {t.href ? <ExtLink href={t.href}>{t.label}</ExtLink> : t.label}
+                {t.note ? ` | ${t.note}` : null}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       ) : null}
 
+      {/* Nearby Car Parks */}
       {Array.isArray(office?.parking) && office.parking.length > 0 ? (
-        <div className="vf-map-embed__info">
-          <Label>Parking</Label>
-          <ul style={{ display: 'grid', gap: '.6rem', listStyle: 'none', padding: 0, margin: 0 }}>
+        <div className="ct-info-item">
+          <div className="ct-info-item-icon">
+            <Icon name="car" />
+          </div>
+          <div className="ct-info-item-content">
+            <div className="ct-info-item-title">{parkingHeading}</div>
             {office.parking.map((p, i) => (
-              <li key={p.id || i}>
-                <span style={{ fontWeight: 600 }}>
-                  {p.href ? (
-                    <a href={p.href} rel="noopener noreferrer" target="_blank">
-                      {p.name}
-                    </a>
-                  ) : (
-                    p.name
-                  )}
-                </span>
-                {p.address ? <span style={{ opacity: 0.75 }}> — {p.address}</span> : null}
-                {p.walkTime || p.heightLimit ? (
-                  <span style={{ display: 'block', opacity: 0.7, fontSize: '.875rem' }}>
-                    {[p.walkTime, p.heightLimit].filter(Boolean).join(' · ')}
-                  </span>
+              <React.Fragment key={p.id || i}>
+                <div className="ct-info-item-line" style={i > 0 ? { marginTop: 6 } : undefined}>
+                  {p.href ? <ExtLink href={p.href}>{p.name}</ExtLink> : p.name}
+                  {p.address ? ` (${p.address})` : null}
+                  {p.walkTime ? ` | ${p.walkTime}` : null}
+                </div>
+                {p.heightLimit ? (
+                  <div
+                    className="ct-info-item-line"
+                    style={{ color: 'var(--text-mid)', fontSize: '0.78rem' }}
+                  >
+                    {p.heightLimit}
+                  </div>
                 ) : null}
-                {p.note ? (
-                  <span style={{ display: 'block', opacity: 0.7, fontSize: '.875rem' }}>{p.note}</span>
-                ) : null}
-              </li>
+                {p.note ? <p className="ct-info-item-note">{p.note}</p> : null}
+              </React.Fragment>
             ))}
-          </ul>
+          </div>
         </div>
       ) : null}
 
-      {office?.note ? (
-        <p style={{ opacity: 0.8, whiteSpace: 'pre-line' }}>{office.note}</p>
-      ) : null}
-    </aside>
+      {office?.note ? <p className="ct-info-item-note">{office.note}</p> : null}
+    </div>
   ) : null
 
   return (
@@ -216,39 +241,41 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
       <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} />
 
       {showSplit ? (
-        <div className="vf-map-embed__layout grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2">{frame}</div>
-          {panel}
+        <div className="ct-location-module">
+          <div className="ct-map-col">
+            <div className="ct-map-wrap">{iframe}</div>
+            {mapActions}
+          </div>
+          {infoPanel}
         </div>
       ) : (
         <>
-          {frame}
-          {panel}
+          {genericFrame}
+          {infoPanel}
+          {hasActions ? (
+            <div
+              className="vf-map-embed__actions"
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '.75rem', marginTop: '2rem' }}
+            >
+              {actions!.map(({ link }, i) => {
+                if (!link) return null
+                const outline = link.appearance === 'outline'
+                return (
+                  <CMSLink
+                    key={i}
+                    {...link}
+                    label={undefined}
+                    appearance="inline"
+                    className={cn('btn', outline ? 'btn-outline' : 'btn-primary')}
+                  >
+                    <span>{link.label}</span>
+                  </CMSLink>
+                )
+              })}
+            </div>
+          ) : null}
         </>
       )}
-
-      {hasActions ? (
-        <div
-          className="vf-map-embed__actions"
-          style={{ display: 'flex', flexWrap: 'wrap', gap: '.75rem', marginTop: '2rem' }}
-        >
-          {actions!.map(({ link }, i) => {
-            if (!link) return null
-            const outline = link.appearance === 'outline'
-            return (
-              <CMSLink
-                key={i}
-                {...link}
-                label={undefined}
-                appearance="inline"
-                className={cn('btn', outline ? 'btn-outline' : 'btn-primary')}
-              >
-                <span>{link.label}</span>
-              </CMSLink>
-            )
-          })}
-        </div>
-      ) : null}
     </Section>
   )
 }

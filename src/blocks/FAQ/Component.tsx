@@ -13,6 +13,7 @@ import { toClassName } from '@/utilities/cssClass'
 export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }> = (props) => {
   const { eyebrow, heading, subheading, columns, items, cssClass, exclusive, openFirst, helpCard, id, bare } =
     props
+  const anchorId = (props as { anchorId?: string | null }).anchorId || undefined
 
   if (!items || items.length === 0) return null
   const groupName = exclusive ? `faq-${id || 'group'}` : undefined
@@ -21,7 +22,7 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
     | undefined
 
   return (
-    <div className={cn('vf-faq', bare ? '' : 'container content-narrow', toClassName(cssClass))}>
+    <div id={anchorId} className={cn('vf-faq', bare ? '' : 'container content-narrow', toClassName(cssClass))}>
       <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
 
       <div
@@ -36,7 +37,7 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
           <details
             key={index}
             name={groupName}
-            open={openFirst && index === 0}
+            open={Boolean(openFirst) && index === 0}
             className="faq-item vf-faq__item"
           >
             <summary className="vf-faq__question">

@@ -9,7 +9,7 @@ import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { TabsClient } from './TabsClient'
 
-export const TabsBlock: React.FC<Props & { bare?: boolean }> = ({
+export const TabsBlock: React.FC<Props & { bare?: boolean; anchorId?: string | null }> = ({
   eyebrow,
   heading,
   subheading,
@@ -21,6 +21,7 @@ export const TabsBlock: React.FC<Props & { bare?: boolean }> = ({
   containerWidth,
   tabStyle,
   defaultTab,
+  anchorId,
   bare,
 }) => {
   if (!tabs || tabs.length === 0) return null
@@ -35,6 +36,7 @@ export const TabsBlock: React.FC<Props & { bare?: boolean }> = ({
 
   return (
     <Section
+      id={anchorId || undefined}
       background={background as SectionBackground}
       className={cn('vf-tabs', toClassName(cssClass))}
       motion={motion}

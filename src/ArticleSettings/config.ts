@@ -52,6 +52,57 @@ export const ArticleSettings: GlobalConfig = {
             { name: 'topics', type: 'text', defaultValue: 'Topics', admin: { width: '34%' } },
           ],
         },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'breadcrumbHomeLabel',
+              type: 'text',
+              defaultValue: 'Home',
+              admin: { width: '50%' },
+            },
+            {
+              name: 'breadcrumbSectionLabel',
+              type: 'text',
+              defaultValue: 'In the Loop',
+              admin: { width: '50%' },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'bylinePrefix',
+              type: 'text',
+              defaultValue: 'By ',
+              admin: { width: '50%' },
+            },
+            {
+              name: 'minReadSuffix',
+              type: 'text',
+              defaultValue: 'min read',
+              admin: { width: '50%' },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'shareLinkedinLabel',
+              type: 'text',
+              defaultValue: 'Share on LinkedIn',
+              admin: { width: '50%' },
+            },
+            {
+              name: 'shareCopyLabel',
+              type: 'text',
+              defaultValue: 'Copy link',
+              admin: { width: '50%' },
+            },
+          ],
+        },
       ],
     },
   ],

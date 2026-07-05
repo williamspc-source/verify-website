@@ -52,9 +52,12 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
         // no real image; only rows with neither image nor placeholder go full-width.
         const twoColumn = hasImage || placeholder
 
+        const anchorId = (row as { anchorId?: string | null }).anchorId || undefined
+
         return (
           <div
             key={i}
+            id={anchorId}
             className={cn('vf-split', !twoColumn && 'vf-split--solo', twoColumn && !imageLeft && 'vf-split--reverse')}
           >
             {hasImage ? (

@@ -28,6 +28,8 @@ export const Callout: Block = {
           options: [
             { label: 'Info (blue)', value: 'info' },
             { label: 'Note (neutral)', value: 'note' },
+            { label: 'Good to know (process note)', value: 'good-to-know' },
+            { label: 'Reassurance box (icon)', value: 'reassurance' },
             { label: 'Success (green)', value: 'success' },
             { label: 'Warning (amber)', value: 'warning' },
           ],

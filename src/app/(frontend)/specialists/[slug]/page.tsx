@@ -60,6 +60,13 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   const settings = await getCachedGlobal('specialist-profile', 1)()
   const portal = (settings as { portalCta?: Record<string, unknown> })?.portalCta ?? {}
   const labels = (settings as { labels?: Record<string, string> })?.labels ?? {}
+  const breadcrumb = (settings as { breadcrumb?: Record<string, string> })?.breadcrumb ?? {}
+  const portalEnquirySubject =
+    (settings as { portalEnquirySubject?: string })?.portalEnquirySubject ||
+    'VERIFY Booking Portal Access Request'
+  const portalEnquiryType =
+    (settings as { portalEnquiryType?: string })?.portalEnquiryType ||
+    'Register for Online Booking Portal'
 
   const portalTiles = Array.isArray(portal.tiles)
     ? (portal.tiles as { icon?: string | null; label?: string | null }[]).filter((t) => t?.label)
@@ -67,13 +74,15 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   const enquiryLabel = (portal.enquiryLabel as string) || 'Send Enquiry'
   const enquiryEmail = (portal.enquiryEmail as string) || ''
   const enquiryHref = enquiryEmail
-    ? `mailto:${enquiryEmail}?subject=${encodeURIComponent('VERIFY Booking Portal Access Request')}`
+    ? `mailto:${enquiryEmail}?subject=${encodeURIComponent(portalEnquirySubject)}`
     : undefined
 
   const s = specialist as Specialist & Record<string, unknown>
   const photo = typeof s.photo === 'object' ? s.photo : null
   const specialtyTitle =
-    typeof s.specialty === 'object' && s.specialty ? (s.specialty as { title?: string }).title : ''
+    (typeof s.specialty === 'object' && s.specialty
+      ? (s.specialty as { title?: string }).title
+      : '') || (s.position as string) || ''
   const locations = relTitles(s.locations)
   const languages = Array.isArray(s.languages)
     ? (s.languages as { language?: string }[]).map((l) => l.language).filter(Boolean)
@@ -90,118 +99,127 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
       {draft && <LivePreviewListener />}
       <PayloadRedirects disableNotFound url={`/specialists/${decodedSlug}`} />
 
-      {/* Breadcrumb */}
-      <div className="container" style={{ paddingTop: '1.5rem' }}>
-        <nav className="profile-breadcrumb" aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
-          <span aria-hidden>›</span>
-          <Link href="/specialists">Specialists</Link>
-          <span aria-hidden>›</span>
-          <strong>{s.title}</strong>
-        </nav>
-      </div>
-
       {/* Hero */}
-      <section className="vf-profile-hero">
-        <div className="container vf-profile-hero__inner">
-          <div className="vf-profile-hero__avatar">
-            {photo ? (
-              <Media resource={photo} imgClassName="vf-profile-hero__img" />
-            ) : (
-              <span className="vf-profile-hero__initials">{initials(s.title)}</span>
-            )}
-          </div>
-          <div className="vf-profile-hero__body">
-            <h1 className="vf-profile-hero__name">{s.title}</h1>
-            {s.position ? <p className="vf-profile-hero__position">{s.position}</p> : null}
-            {specialtyTitle ? (
-              <p className="vf-profile-hero__specialty">{specialtyTitle}</p>
-            ) : null}
-            <div className="vf-profile-hero__chips">
-              {locations.map((l) => (
-                <span key={l} className="vf-chip">
-                  <Icon name="map-pin" className="size-4" /> {l}
-                </span>
-              ))}
-              {languages.map((l) => (
-                <span key={l} className="vf-chip">
-                  <Icon name="translate" className="size-4" /> {l}
-                </span>
-              ))}
+      <section className="profile-hero">
+        <div className="container">
+          <div className="profile-hero-inner">
+            <div className="profile-avatar">
+              {photo ? (
+                <Media resource={photo} alt={s.title} />
+              ) : (
+                <span>{initials(s.title)}</span>
+              )}
+            </div>
+            <div className="profile-info">
+              <nav className="profile-breadcrumb" aria-label="Breadcrumb">
+                <Link href={breadcrumb.breadcrumbParentHref || '/specialist-panel'}>
+                  {breadcrumb.breadcrumbParentLabel || 'Specialist Panel'}
+                </Link>
+                <span aria-hidden>›</span>
+                <strong>{breadcrumb.breadcrumbCurrentLabel || 'Specialist Profile'}</strong>
+              </nav>
+              <h1 className="profile-name">{s.title}</h1>
+              {specialtyTitle ? <p className="profile-specialty">{specialtyTitle}</p> : null}
+              <div className="profile-hero-meta">
+                {locations.length ? (
+                  <div className="profile-location">
+                    <Icon name="map-pin" className="profile-location-icon" />
+                    {locations.join(' | ')}
+                  </div>
+                ) : null}
+                {languages.length ? (
+                  <div className="profile-languages">
+                    <Icon name="translate" className="profile-lang-icon" />
+                    {languages.join(', ')}
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Body */}
-      <section className="vf-section--white" style={{ paddingBlock: 'var(--space-normal)' }}>
-        <div className="container vf-profile-grid">
-          <div className="vf-profile-main">
-            {s.bio ? (
-              <div className="vf-profile-block">
-                <h2 className="vf-profile-block__title">{labels.biography || 'Biography'}</h2>
-                <RichText data={s.bio as never} enableGutter={false} />
-              </div>
-            ) : null}
+      {/* Content */}
+      <section className="profile-content">
+        <div className="container">
+          <div className="profile-grid">
+            {/* Main column */}
+            <div>
+              {s.bio ? (
+                <div className="profile-section">
+                  <div className="profile-section-label">{labels.biography || 'Biography'}</div>
+                  <div className="profile-bio">
+                    <RichText data={s.bio as never} enableGutter={false} />
+                  </div>
+                </div>
+              ) : null}
 
-            {areas.length ? (
-              <div className="vf-profile-block">
-                <h2 className="vf-profile-block__title">
-                  {labels.assessmentAreas || 'Assessment Areas'}
-                </h2>
-                <ul className="vf-tag-list">
-                  {areas.map((a) => (
-                    <li key={a} className="vf-tag">
-                      {a}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
+              {areas.length ? (
+                <div className="profile-section">
+                  <div className="profile-section-label">
+                    {labels.assessmentAreas || 'Assessment Areas'}
+                  </div>
+                  <div className="profile-areas-list">
+                    {areas.map((a) => (
+                      <div key={a} className="profile-area-item">
+                        {a}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
-            {assessmentTypes.length ? (
-              <div className="vf-profile-block">
-                <h2 className="vf-profile-block__title">Assessment Types</h2>
-                <ul className="vf-tag-list">
-                  {assessmentTypes.map((a) => (
-                    <li key={a} className="vf-tag">
-                      {a}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
+              {assessmentTypes.length ? (
+                <div className="profile-section">
+                  <div className="profile-section-label">
+                    {labels.assessmentTypes || 'Assessment Types'}
+                  </div>
+                  <div className="profile-types">
+                    {assessmentTypes.map((a) => (
+                      <div key={a} className="profile-type-item">
+                        {a}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Sidebar */}
+            <div>
+              {qualifications.length ? (
+                <div className="profile-sidebar-card">
+                  <div className="profile-sidebar-title">
+                    {labels.qualifications || 'Qualifications'}
+                  </div>
+                  <ul className="profile-qual-list">
+                    {qualifications.map((q, i) => (
+                      <li key={i}>
+                        <Icon name={q.icon || 'medal'} className="profile-qual-icon" />
+                        {q.qualification}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              {accreditations.length ? (
+                <div className="profile-sidebar-card">
+                  <div className="profile-sidebar-title">
+                    {labels.accreditations || 'Accreditations'}
+                  </div>
+                  <ul className="profile-qual-list">
+                    {accreditations.map((a) => (
+                      <li key={a}>
+                        <Icon name="seal-check" className="profile-qual-icon" />
+                        {a}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
           </div>
-
-          <aside className="vf-profile-sidebar">
-            {qualifications.length ? (
-              <div className="vf-profile-card">
-                <h3 className="vf-profile-card__title">{labels.qualifications || 'Qualifications'}</h3>
-                <ul>
-                  {qualifications.map((q, i) => (
-                    <li key={i} className="vf-profile-card__item">
-                      {q.icon ? <Icon name={q.icon} className="size-5" /> : null}
-                      {q.qualification}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-
-            {accreditations.length ? (
-              <div className="vf-profile-card">
-                <h3 className="vf-profile-card__title">{labels.accreditations || 'Accreditations'}</h3>
-                <ul>
-                  {accreditations.map((a) => (
-                    <li key={a} className="vf-profile-card__item">
-                      <Icon name="seal-check" className="size-5" />
-                      {a}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </aside>
         </div>
       </section>
 
@@ -235,7 +253,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
                 <a
                   className="opt-btn-white"
                   data-enquiry-panel
-                  data-enquiry-type="Register for Online Booking Portal"
+                  data-enquiry-type={portalEnquiryType}
                   {...(enquiryHref ? { href: enquiryHref } : { role: 'button', tabIndex: 0 })}
                 >
                   {enquiryLabel}

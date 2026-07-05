@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import React from 'react'
 
 import type { Page } from '@/payload-types'
@@ -24,7 +23,7 @@ type PageHeroProps = Page['hero'] & {
  * theme: light | dark (blue gradient) | service (soft blue #cbe5fa).
  */
 export const PageHero: React.FC<PageHeroProps> = (props) => {
-  const { eyebrow, heading, subtitle, showBreadcrumb, breadcrumbs, title, links } = props
+  const { eyebrow, heading, subtitle, title, links } = props
   const cssClass = (props as { cssClass?: string | string[] | null }).cssClass
   const theme = (props as { theme?: string | null }).theme || 'light'
   const align = (props as { align?: string | null }).align || 'left'
@@ -34,45 +33,13 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
   )
   const heroLinks = ((links as HeroLink[] | null | undefined) || []).filter((l) => l?.link)
   const headingText = heading || title
-  const fullCrumbs: Crumb[] = [{ label: 'Home', url: '/' }, ...((breadcrumbs as Crumb[]) || [])]
-  // The reference shows a shallow trail — Home › [top section] › [current] — so
-  // collapse any deeper ancestor chain (e.g. Home › Services › Medico-Legal › IME)
-  // by dropping the middle crumbs. URLs stay fully nested; only the display shortens.
-  const crumbs: Crumb[] =
-    fullCrumbs.length > 3
-      ? [fullCrumbs[0], fullCrumbs[1], fullCrumbs[fullCrumbs.length - 1]]
-      : fullCrumbs
+  const imagePanel = Boolean((props as { imagePanel?: boolean | null }).imagePanel)
+  const imagePanelLabel =
+    (props as { imagePanelLabel?: string | null }).imagePanelLabel || 'Company Image Placeholder'
+  const scrollHint = (props as { scrollHint?: string | null }).scrollHint
 
-  return (
-    <section
-      className={cn(
-        'page-hero',
-        `page-hero--${theme}`,
-        align === 'center' && 'page-hero--center',
-        showShield && 'page-hero--has-shield',
-        toClassName(cssClass),
-      )}
-    >
-      <div className="container">
-        <div className="page-hero-inner">
-          {showBreadcrumb && crumbs.length > 1 ? (
-            <nav className="page-hero-breadcrumb" aria-label="Breadcrumb">
-              {crumbs.map((c, i) => {
-                const isLast = i === crumbs.length - 1
-                return (
-                  <React.Fragment key={i}>
-                    {i > 0 ? <span aria-hidden>›</span> : null}
-                    {isLast || !c.url ? (
-                      <strong>{c.label}</strong>
-                    ) : (
-                      <Link href={c.url}>{c.label}</Link>
-                    )}
-                  </React.Fragment>
-                )
-              })}
-            </nav>
-          ) : null}
-
+  const inner = (
+    <div className="page-hero-inner">
           {eyebrow ? <div className="section-label page-hero-eyebrow">{eyebrow}</div> : null}
           {headingText ? <h1>{accentText(headingText)}</h1> : null}
           {subtitle ? <p className="page-hero-sub">{subtitle}</p> : null}
@@ -111,7 +78,40 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
               })}
             </div>
           ) : null}
-        </div>
+    </div>
+  )
+
+  return (
+    <section
+      className={cn(
+        'page-hero',
+        `page-hero--${theme}`,
+        align === 'center' && 'page-hero--center',
+        showShield && 'page-hero--has-shield',
+        imagePanel && 'page-hero--image-panel',
+        toClassName(cssClass),
+      )}
+    >
+      <div className="container">
+        {imagePanel ? (
+          <div className="ph-grid">
+            {inner}
+            <div className="ph-card-wrap">
+              <div className="ph-company-img">
+                <Icon name="image" />
+                <span className="ph-card-img-label">{imagePanelLabel}</span>
+              </div>
+              {scrollHint ? (
+                <div className="ph-scroll-hint">
+                  <Icon name="arrow-down" />
+                  <span>{scrollHint}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          inner
+        )}
       </div>
 
       {showShield ? (

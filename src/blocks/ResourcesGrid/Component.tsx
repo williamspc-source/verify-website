@@ -18,7 +18,26 @@ type CardData = {
   href?: string | null
   ctaLabel: string
   download: boolean
+  resourceType?: string | null
+  audience?: string | null
 }
+
+const TYPE_LABELS: Record<string, string> = {
+  checklist: 'Checklist',
+  guide: 'Guide',
+  template: 'Template',
+  'fact-sheet': 'Fact sheet',
+}
+const AUDIENCE_LABELS: Record<string, string> = {
+  clients: 'Clients',
+  claimants: 'Claimants',
+  all: 'Everyone',
+}
+// "Checklist — Clients" kicker for the .ni-resource-card header panel.
+const kicker = (c: CardData): string =>
+  [c.resourceType ? TYPE_LABELS[c.resourceType] || c.resourceType : null, c.audience ? AUDIENCE_LABELS[c.audience] || c.audience : null]
+    .filter(Boolean)
+    .join(' — ')
 
 // Resolve a resource's target: uploaded file (download) takes priority over an
 // external URL. Relationships are objects at depth > 0; guard for numbers/nulls.
@@ -40,8 +59,43 @@ const cardFromResource = (r: Resource): CardData => {
     href,
     ctaLabel: r.ctaLabel || 'Download',
     download,
+    resourceType: r.resourceType,
+    audience: r.audience,
   }
 }
+
+// Link attributes for a resource CTA: real file → download; external (http)
+// URL → new tab; internal (/…) article/page link → same tab.
+const linkAttrs = (href: string, download?: boolean): React.AnchorHTMLAttributes<HTMLAnchorElement> =>
+  download
+    ? { download: '' }
+    : /^https?:/i.test(href)
+      ? { target: '_blank', rel: 'noopener noreferrer' }
+      : {}
+
+// Design-reference In-the-Loop resource card: coloured header panel (icon +
+// type/audience kicker + title) over a white body (description + link).
+const NiResourceCard: React.FC<CardData> = (c) => (
+  <div className="ni-resource-card">
+    <div className="ni-resource-card-top">
+      {c.icon ? (
+        <div className="ni-resource-icon">
+          <Icon name={c.icon} />
+        </div>
+      ) : null}
+      {kicker(c) ? <div className="ni-resource-type">{kicker(c)}</div> : null}
+      <div className="ni-resource-title">{c.title}</div>
+    </div>
+    <div className="ni-resource-body">
+      {c.description ? <p className="ni-resource-desc">{c.description}</p> : null}
+      {c.href ? (
+        <a className="ni-resource-link" href={c.href} {...linkAttrs(c.href, c.download)}>
+          {c.ctaLabel} →
+        </a>
+      ) : null}
+    </div>
+  </div>
+)
 
 const Card: React.FC<CardData> = ({ icon, title, description, href, ctaLabel, download }) => (
   <div className="service-card vf-card vf-resource-card">
@@ -54,11 +108,7 @@ const Card: React.FC<CardData> = ({ icon, title, description, href, ctaLabel, do
     {description ? <p className="service-desc">{description}</p> : null}
     {href ? (
       <div className="vf-resource-card__cta">
-        <a
-          className="btn btn-outline vf-resource-card__btn"
-          href={href}
-          {...(download ? { download: '' } : { target: '_blank', rel: 'noopener noreferrer' })}
-        >
+        <a className="btn btn-outline vf-resource-card__btn" href={href} {...linkAttrs(href, download)}>
           <Icon name={download ? 'download-simple' : 'arrow-right'} />
           {ctaLabel}
         </a>
@@ -85,6 +135,8 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     hoverEffect,
     bare,
   } = props
+  const anchorId = (props as { anchorId?: string | null }).anchorId || undefined
+  const variant = (props as { variant?: string | null }).variant || 'card'
 
   const cols = Number(columns) || 3
 
@@ -113,6 +165,7 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
 
   return (
     <Section
+      id={anchorId}
       background={background as SectionBackground}
       className={cn('vf-resources-grid', toClassName(cssClass))}
       motion={motion}
@@ -121,11 +174,19 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
       bare={bare}
     >
       <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
-      <div className="services-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
-        {cards.map((c) => (
-          <Card key={c.id} {...c} />
-        ))}
-      </div>
+      {variant === 'ni-resource' ? (
+        <div className={`ni-grid-${cols}`}>
+          {cards.map((c) => (
+            <NiResourceCard key={c.id} {...c} />
+          ))}
+        </div>
+      ) : (
+        <div className="services-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+          {cards.map((c) => (
+            <Card key={c.id} {...c} />
+          ))}
+        </div>
+      )}
     </Section>
   )
 }

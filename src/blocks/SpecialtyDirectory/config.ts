@@ -41,6 +41,23 @@ export const SpecialtyDirectory: Block = {
       defaultValue: true,
       label: 'Show "Key Areas" tags',
     },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'allTabLabel',
+          type: 'text',
+          defaultValue: 'All Specialties',
+          admin: { width: '50%', description: 'Label for the “all categories” filter tab.' },
+        },
+        {
+          name: 'emptyLabel',
+          type: 'text',
+          defaultValue: 'No specialties in this category yet.',
+          admin: { width: '50%', description: 'Message shown when a category has no specialties.' },
+        },
+      ],
+    },
     cssClassField,
   ],
 }

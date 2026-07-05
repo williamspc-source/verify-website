@@ -67,6 +67,34 @@ export const MapEmbed: Block = {
       label: 'Show office info panel (address/hours/transport/parking)',
       admin: { condition: (_, s) => s?.kind === 'map' },
     },
+    {
+      name: 'officeHoursHeading',
+      type: 'text',
+      label: 'Office hours heading',
+      admin: {
+        condition: (_, s) => s?.kind === 'map',
+        description: 'Info-panel heading above the office hours. Defaults to "Office Hours".',
+      },
+    },
+    {
+      name: 'transportHeading',
+      type: 'text',
+      label: 'Public transport heading',
+      admin: {
+        condition: (_, s) => s?.kind === 'map',
+        description:
+          'Info-panel heading above the transport list. Defaults to "Recommended Public Transport".',
+      },
+    },
+    {
+      name: 'parkingHeading',
+      type: 'text',
+      label: 'Car parks heading',
+      admin: {
+        condition: (_, s) => s?.kind === 'map',
+        description: 'Info-panel heading above the parking list. Defaults to "Nearby Car Parks".',
+      },
+    },
     linkGroup({
       overrides: {
         name: 'actions',

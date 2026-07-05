@@ -10,6 +10,7 @@ import type { Props as MediaProps } from '../types'
 
 import { cssVariables } from '@/cssVariables'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
+import { focalMediaStyle } from '@/utilities/focalPoint'
 
 const { breakpoints } = cssVariables
 
@@ -56,6 +57,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     size: sizeFromProps,
     src: srcFromProps,
     loading: loadingFromProps,
+    imgStyle,
   } = props
 
   let width: number | undefined
@@ -76,6 +78,11 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   }
 
   const loading = loadingFromProps || (!priority ? 'lazy' : undefined)
+
+  // Apply the Media focal point / zoom (only when set) so cropped renders frame
+  // from the editor-chosen point; an explicit imgStyle prop still wins.
+  const resolvedStyle = { ...focalMediaStyle(resource), ...imgStyle }
+  const hasStyle = Object.keys(resolvedStyle).length > 0
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
   const sizes = sizeFromProps
@@ -98,6 +105,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         loading={loading}
         sizes={sizes}
         src={src}
+        style={hasStyle ? resolvedStyle : undefined}
         width={!fill ? width : undefined}
       />
     </picture>

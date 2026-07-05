@@ -169,6 +169,14 @@ export const Archive: Block = {
       ],
     },
     {
+      name: 'readMoreLabel',
+      type: 'text',
+      label: 'Read-more link label',
+      admin: {
+        description: 'Text for the per-card link (article & staff-narrative cards). Defaults to "Read More →".',
+      },
+    },
+    {
       name: 'viewAllLink',
       type: 'group',
       label: 'View-all link (optional)',

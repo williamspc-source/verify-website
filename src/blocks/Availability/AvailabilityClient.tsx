@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react'
 
 import { cn } from '@/utilities/ui'
+import { focalImgStyle } from '@/utilities/focalPoint'
 
 export type AvailabilityChip = {
   id: string
@@ -18,6 +19,8 @@ export type AvailabilityRow = {
   position?: string | null
   initials: string
   photoUrl?: string | null
+  photoFocus?: string | null
+  photoZoom?: number | null
   accreditations: string[]
   dates: { date: string; chips: AvailabilityChip[] }[]
 }
@@ -29,19 +32,32 @@ export type EnquiryConfig = {
   bodyFooter: string
 }
 
-type SelectedSession = { spec: string; date: string; time: string; end: string; type: string }
+// Editable UI copy, sourced from the Specialist Availability global's `labels`
+// group and threaded in from the server Component.
+export type AvailabilityLabels = {
+  inPerson: string
+  telehealth: string
+  either: string
+  selectionHint: string
+  clear: string
+  sendEnquiry: string
+  sessionsSelectedTemplate: string
+}
 
-const LEGEND = [
-  { cls: 'sa-inperson', label: 'In-person' },
-  { cls: 'sa-telehealth', label: 'Telehealth' },
-  { cls: 'sa-either', label: 'In-person / Telehealth' },
-]
+type SelectedSession = { spec: string; date: string; time: string; end: string; type: string }
 
 export const AvailabilityClient: React.FC<{
   rows: AvailabilityRow[]
   enquiry: EnquiryConfig
+  labels: AvailabilityLabels
   showLegend?: boolean
-}> = ({ rows, enquiry, showLegend = true }) => {
+}> = ({ rows, enquiry, labels, showLegend = true }) => {
+  const legend = [
+    { cls: 'sa-inperson', label: labels.inPerson },
+    { cls: 'sa-telehealth', label: labels.telehealth },
+    { cls: 'sa-either', label: labels.either },
+  ]
+
   // id → selected session details, plus the date for grouping the email.
   const [selected, setSelected] = useState<Map<string, SelectedSession>>(new Map())
 
@@ -92,7 +108,7 @@ export const AvailabilityClient: React.FC<{
     <div className="sa">
       {showLegend ? (
         <div className="sa-legend" aria-label="Session type colour key">
-          {LEGEND.map((l) => (
+          {legend.map((l) => (
             <div className="sa-legend-item" key={l.cls}>
               <span className={cn('sa-legend-swatch', l.cls)} />
               <span className="sa-legend-label">{l.label}</span>
@@ -100,7 +116,7 @@ export const AvailabilityClient: React.FC<{
           ))}
           {hasAnySessions ? (
             <div className="sa-legend-item sa-legend-hint">
-              <span className="sa-legend-label">Tap sessions to select, then send us an enquiry.</span>
+              <span className="sa-legend-label">{labels.selectionHint}</span>
             </div>
           ) : null}
         </div>
@@ -121,6 +137,7 @@ export const AvailabilityClient: React.FC<{
                     loading="lazy"
                     width={150}
                     height={170}
+                    style={focalImgStyle(row.photoFocus, row.photoZoom)}
                   />
                 ) : (
                   <span className="sa-avatar-initials" aria-hidden="true">
@@ -168,14 +185,16 @@ export const AvailabilityClient: React.FC<{
 
       <div className={cn('sa-bar', count > 0 && 'active')} role="region" aria-label="Selected sessions">
         <span className="sa-bar-count">
-          {count} {count === 1 ? 'session' : 'sessions'} selected
+          {labels.sessionsSelectedTemplate
+            .replace('{count}', String(count))
+            .replace('{noun}', count === 1 ? 'session' : 'sessions')}
         </span>
         <div className="sa-bar-actions">
           <button type="button" className="sa-bar-clear" onClick={clear}>
-            Clear
+            {labels.clear}
           </button>
           <button type="button" className="btn btn-primary" onClick={sendEnquiry}>
-            Send enquiry
+            {labels.sendEnquiry}
           </button>
         </div>
       </div>

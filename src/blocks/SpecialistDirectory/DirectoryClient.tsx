@@ -6,6 +6,7 @@ import React, { useMemo, useState } from 'react'
 import { Icon } from '@/components/Icon'
 import { initialsOf } from '@/components/PersonCard'
 import { accentText } from '@/utilities/accentText'
+import { focalImgStyle } from '@/utilities/focalPoint'
 
 // Plain, serialisable shape passed down from the server component.
 export type DirectorySpecialist = {
@@ -14,6 +15,8 @@ export type DirectorySpecialist = {
   position: string | null
   slug: string | null
   photoUrl: string | null
+  photoFocus: string | null
+  photoZoom: number | null
   specialty: string | null
   locations: string[]
   accreditations: string[]
@@ -39,6 +42,10 @@ type Props = {
   secondaryCtaHref: string
   resetLabel: string
   locationsLabel: string
+  searchGroupLabel: string
+  specialtyGroupLabel: string
+  accreditationGroupLabel: string
+  locationGroupLabel: string
 }
 
 const uniqueSorted = (values: string[]): string[] =>
@@ -63,7 +70,13 @@ const Card: React.FC<{
           <div className="spec-avatar-inner">
             {data.photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img className="spec-photo-img" src={data.photoUrl} alt={data.name} loading="lazy" />
+              <img
+                className="spec-photo-img"
+                src={data.photoUrl}
+                alt={data.name}
+                loading="lazy"
+                style={focalImgStyle(data.photoFocus, data.photoZoom)}
+              />
             ) : (
               <div className="avatar-mono">{initialsOf(data.name)}</div>
             )}
@@ -118,6 +131,10 @@ export const DirectoryClient: React.FC<Props> = ({
   secondaryCtaHref,
   resetLabel,
   locationsLabel,
+  searchGroupLabel,
+  specialtyGroupLabel,
+  accreditationGroupLabel,
+  locationGroupLabel,
 }) => {
   const [search, setSearch] = useState('')
   const [specialty, setSpecialty] = useState('')
@@ -194,7 +211,7 @@ export const DirectoryClient: React.FC<Props> = ({
         <form className="specialist-filter-form" onSubmit={(e) => e.preventDefault()}>
           {enableSearch ? (
             <label className="specialist-search-field" htmlFor="specialist-search">
-              <span>Search</span>
+              <span>{searchGroupLabel || 'Search'}</span>
               <span className="specialist-input-shell">
                 <span className="specialist-field-icon" aria-hidden>
                   <Icon name="magnifying-glass" />
@@ -213,7 +230,7 @@ export const DirectoryClient: React.FC<Props> = ({
 
           {showSpecialty ? (
             <label className="specialist-select-field" htmlFor="specialist-specialty">
-              <span>Filter by specialty</span>
+              <span>{specialtyGroupLabel || 'Filter by specialty'}</span>
               <span className="specialist-select-shell">
                 <select
                   id="specialist-specialty"
@@ -233,7 +250,7 @@ export const DirectoryClient: React.FC<Props> = ({
 
           {showAccreditation ? (
             <label className="specialist-select-field" htmlFor="specialist-accreditation">
-              <span>Filter by accreditation</span>
+              <span>{accreditationGroupLabel || 'Filter by accreditation'}</span>
               <span className="specialist-select-shell">
                 <select
                   id="specialist-accreditation"
@@ -253,7 +270,7 @@ export const DirectoryClient: React.FC<Props> = ({
 
           {showLocation ? (
             <label className="specialist-select-field" htmlFor="specialist-location">
-              <span>Filter by location</span>
+              <span>{locationGroupLabel || 'Filter by location'}</span>
               <span className="specialist-select-shell">
                 <select
                   id="specialist-location"

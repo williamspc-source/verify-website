@@ -41,6 +41,8 @@ import { PortalCta } from '../../blocks/PortalCta/config'
 import { Newsletter } from '../../blocks/Newsletter/config'
 import { VideoEmbed } from '../../blocks/VideoEmbed/config'
 import { SectionNav } from '../../blocks/SectionNav/config'
+import { FeaturedArticles } from '../../blocks/FeaturedArticles/config'
+import { EventsExplorer } from '../../blocks/EventsExplorer/config'
 import { Section } from '../../blocks/Section/config'
 import { Row } from '../../blocks/Row/config'
 import { hero } from '@/heros/config'
@@ -167,6 +169,8 @@ export const Pages: CollectionConfig<'pages'> = {
                 Newsletter,
                 VideoEmbed,
                 SectionNav,
+                FeaturedArticles,
+                EventsExplorer,
               ],
               required: true,
               admin: {

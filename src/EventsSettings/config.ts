@@ -30,6 +30,75 @@ const hostGroup = (name: string, label: string): Field => ({
   ],
 })
 
+// Generic UI labels shown on every event detail page, regardless of host.
+const labelsGroup: Field = {
+  name: 'labels',
+  type: 'group',
+  label: 'Event page labels',
+  admin: {
+    description: 'Generic UI labels shown on every event detail page, regardless of host.',
+  },
+  fields: [
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'statusUpcomingLabel',
+          type: 'text',
+          defaultValue: 'Upcoming Event',
+          admin: { width: '50%', description: 'Status pill for events still to come.' },
+        },
+        {
+          name: 'statusPastLabel',
+          type: 'text',
+          defaultValue: 'Past Event',
+          admin: { width: '50%', description: 'Status pill for events whose date has passed.' },
+        },
+      ],
+    },
+    {
+      name: 'freeLabel',
+      type: 'text',
+      defaultValue: 'Free',
+      admin: { description: 'Cost shown when an event has no cost set.' },
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'cpdPointsTemplate',
+          type: 'text',
+          defaultValue: 'CPD · {points} point(s)',
+          admin: {
+            width: '50%',
+            description: 'CPD line when points are set. Use {points} for the number.',
+          },
+        },
+        {
+          name: 'cpdEligibleLabel',
+          type: 'text',
+          defaultValue: 'CPD eligible',
+          admin: { width: '50%', description: 'CPD line when eligible but no point count is set.' },
+        },
+      ],
+    },
+    {
+      name: 'concludedFallback',
+      type: 'textarea',
+      label: 'Concluded-event fallback',
+      defaultValue:
+        'This event has now concluded. Contact our team for recordings or resources from this session.',
+      admin: { description: 'Shown under a past event that has no recap content.' },
+    },
+    {
+      name: 'backToEventsLabel',
+      type: 'text',
+      defaultValue: 'Back to all events',
+      admin: { description: 'Link back to the events listing at the bottom of the page.' },
+    },
+  ],
+}
+
 export const EventsSettings: GlobalConfig = {
   slug: 'events-settings',
   label: 'Events Settings',
@@ -38,7 +107,7 @@ export const EventsSettings: GlobalConfig = {
     group: 'Content',
     description: 'Host-specific boilerplate copy shown on event detail pages (AAMLE / VERIFY).',
   },
-  fields: [hostGroup('aamle', 'AAMLE events'), hostGroup('verify', 'VERIFY events')],
+  fields: [hostGroup('aamle', 'AAMLE events'), hostGroup('verify', 'VERIFY events'), labelsGroup],
   hooks: {
     afterChange: [revalidateGlobal('events-settings')],
   },

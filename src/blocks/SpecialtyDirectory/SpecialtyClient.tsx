@@ -5,6 +5,7 @@ import Link from 'next/link'
 
 import { Icon } from '@/components/Icon'
 import { cn } from '@/utilities/ui'
+import { focalImgStyle } from '@/utilities/focalPoint'
 
 export type RosterPerson = {
   id: string
@@ -13,6 +14,8 @@ export type RosterPerson = {
   slug: string | null
   locations: string[]
   photoUrl: string | null
+  photoFocus: string | null
+  photoZoom: number | null
 }
 export type SpecialtyEntry = {
   id: string
@@ -55,7 +58,9 @@ export const SpecialtyClient: React.FC<{
   showFilterBar: boolean
   showRosters: boolean
   showKeyAreas: boolean
-}> = ({ categories, entries, showFilterBar, showRosters, showKeyAreas }) => {
+  allTabLabel?: string | null
+  emptyLabel?: string | null
+}> = ({ categories, entries, showFilterBar, showRosters, showKeyAreas, allTabLabel, emptyLabel }) => {
   const [cat, setCat] = useState<string>('all')
   // Open the first (visible) card by default; multiple cards may be open at once.
   const [openIds, setOpenIds] = useState<Set<string>>(() =>
@@ -92,7 +97,7 @@ export const SpecialtyClient: React.FC<{
             onClick={() => handleFilter('all')}
           >
             <Icon name="squares-four" className="vf-specialty-filter-tile__icon" />
-            All Specialties
+            {allTabLabel || 'All Specialties'}
           </button>
           {categories.map((c) => (
             <button
@@ -113,6 +118,12 @@ export const SpecialtyClient: React.FC<{
       ) : null}
 
       <div className="vf-specialty-cards">
+        {visible.length === 0 ? (
+          <p className="text-center text-sm text-muted-foreground">
+            {emptyLabel || 'No specialties in this category yet.'}
+          </p>
+        ) : null}
+
         {visible.map((e) => {
           const isOpen = openIds.has(e.id)
           const panelId = `vf-specialty-panel-${e.id}`
@@ -153,7 +164,12 @@ export const SpecialtyClient: React.FC<{
                         <span className="vf-specialty-avatar">
                           {p.photoUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.photoUrl} alt="" loading="lazy" />
+                            <img
+                              src={p.photoUrl}
+                              alt=""
+                              loading="lazy"
+                              style={focalImgStyle(p.photoFocus, p.photoZoom)}
+                            />
                           ) : (
                             initialsOf(p.name)
                           )}

@@ -13,6 +13,8 @@
 // QA-insight posts deliberately omit a category and inherit the "QA Insights"
 // stream tag.
 
+import { POST_BODIES } from './postBodies'
+
 export type PostSeed = {
   title: string
   slug: string
@@ -22,10 +24,10 @@ export type PostSeed = {
   excerpt: string
   author: { name: string; role: string }
   publishedAt: string // ISO date string, e.g. '2026-06-15'
-  body: string // plain text; paragraphs separated by \n\n
+  body: string // plain text; paragraphs separated by \n\n, `## ` lines → H2 sections
 }
 
-export const POSTS: PostSeed[] = [
+const RAW_POSTS: PostSeed[] = [
   // ————————————————————————————————————————————————————————————————
   // FEATURED (3) — all flagged featured for the hub carousel
   // ————————————————————————————————————————————————————————————————
@@ -368,4 +370,48 @@ Advising specialists and legal teams alike, I have found the tension resolves th
 
 When a report achieves that balance, it is both accurate and genuinely useful, and far more likely to withstand scrutiny. Getting there is largely a matter of discipline: say what the evidence supports, address exactly what was asked, and make the reasoning easy to follow.`,
   },
+
+  // ————————————————————————————————————————————————————————————————
+  // RESOURCES (3) — practical guides. Live at /in-the-loop/resources/<slug>;
+  // the hub's resourcesGrid cards ("Read Guide →") point here. Full headed
+  // bodies live in data/postBodies.ts (merged below).
+  // ————————————————————————————————————————————————————————————————
+  {
+    title: 'Brief Preparation Checklist for IME Referrals',
+    slug: 'brief-preparation-checklist-for-ime-referrals',
+    stream: 'resources',
+    excerpt:
+      'A step-by-step checklist for solicitors and case managers preparing referral briefs for independent medical examinations — covering documentation, claimant history, and referral-question structure.',
+    author: { name: 'VERIFY Editorial Team', role: 'Medico-Legal Solutions' },
+    publishedAt: '2026-05-20',
+    body: `A well-prepared referral brief is the foundation of a clear, defensible IME report. This checklist distils what our coordinators look for in the briefs that produce the strongest opinions.`,
+  },
+  {
+    title: 'Understanding IME Report Turnaround Times',
+    slug: 'understanding-ime-report-turnaround-times',
+    stream: 'resources',
+    excerpt:
+      'A plain-language guide explaining how IME report timelines work, what affects turnaround, and how to plan your matter around realistic delivery expectations.',
+    author: { name: 'VERIFY Editorial Team', role: 'Medico-Legal Solutions' },
+    publishedAt: '2026-05-14',
+    body: `IME report timelines are shaped by more than the specialist's drafting speed. This guide explains what drives turnaround and how to plan your matter around realistic delivery expectations.`,
+  },
+  {
+    title: 'What to Expect at Your Independent Medical Examination',
+    slug: 'what-to-expect-at-your-independent-medical-examination',
+    stream: 'resources',
+    excerpt:
+      'A clear, reassuring guide for claimants attending an IME — covering what to bring, what happens during the examination, and answers to the most common questions.',
+    author: { name: 'VERIFY Editorial Team', role: 'Medico-Legal Solutions' },
+    publishedAt: '2026-05-08',
+    body: `An independent medical examination is a straightforward, structured appointment. This guide explains what to bring, what happens on the day, and answers the questions claimants ask most.`,
+  },
 ]
+
+// Prefer the H2-sectioned long-read body (data/postBodies.ts) when one exists
+// for the slug, so the article page renders reference-style sections and the
+// scroll-spy TOC populates; fall back to the inline flat body otherwise.
+export const POSTS: PostSeed[] = RAW_POSTS.map((p) => ({
+  ...p,
+  body: POST_BODIES[p.slug] ?? p.body,
+}))

@@ -8,6 +8,7 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { mediaFocal } from '@/utilities/focalPoint'
 
 import { SpecialtyClient, type Category, type SpecialtyEntry, type RosterPerson } from './SpecialtyClient'
 
@@ -17,9 +18,6 @@ const relId = (v: unknown): string | null => {
   if (typeof v === 'number' || typeof v === 'string') return String(v)
   return null
 }
-// url of an upload relationship (populated media object) or null.
-const mediaUrl = (m: unknown): string | null =>
-  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
 const relTitles = (rels: unknown): string[] =>
   Array.isArray(rels)
     ? rels
@@ -31,6 +29,13 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
   const { eyebrow, heading, subheading, background, showFilterBar, showRosters, showKeyAreas, cssClass, bare } =
     props
 
+  // Newer config fields — read defensively so a not-yet-regenerated
+  // `payload-types` doesn't fail typecheck.
+  const { allTabLabel, emptyLabel } = props as Props & {
+    allTabLabel?: string | null
+    emptyLabel?: string | null
+  }
+
   const payload = await getPayload({ config: configPromise })
   const [specialtiesRes, specialistsRes, categoriesRes] = await Promise.all([
     payload.find({ collection: 'specialties', depth: 1, limit: 200, sort: 'order' }),
@@ -38,6 +43,7 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
       collection: 'specialists',
       depth: 1,
       limit: 500,
+      sort: '_order',
       where: { _status: { equals: 'published' } },
     }),
     payload.find({ collection: 'specialty-categories', depth: 0, limit: 100, sort: 'order' }),
@@ -48,13 +54,16 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
   for (const s of specialistsRes.docs) {
     const specId = relId(s.specialty)
     if (!specId) continue
+    const photo = mediaFocal(s.photo)
     const person: RosterPerson = {
       id: String(s.id),
       name: s.title,
       position: s.position ?? null,
       slug: s.slug ?? null,
       locations: relTitles(s.locations),
-      photoUrl: mediaUrl(s.photo),
+      photoUrl: photo.url,
+      photoFocus: photo.focus,
+      photoZoom: photo.zoom,
     }
     const list = bySpecialty.get(specId) ?? []
     list.push(person)
@@ -91,6 +100,8 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
         showFilterBar={showFilterBar ?? true}
         showRosters={showRosters ?? true}
         showKeyAreas={showKeyAreas ?? true}
+        allTabLabel={allTabLabel}
+        emptyLabel={emptyLabel}
       />
     </Section>
   )

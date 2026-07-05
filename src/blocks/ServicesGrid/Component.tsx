@@ -145,7 +145,15 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
           className="as-accordion-richtext"
         />
       ) : null
-      return <ServicesAccordionItem key={s.id} title={s.title} media={media} body={body} />
+      return (
+        <ServicesAccordionItem
+          key={s.id}
+          title={s.title}
+          media={media}
+          body={body}
+          anchorId={s.slug ?? undefined}
+        />
+      )
     })
 
     // Two balanced columns, matching the reference's `.as-accordion-grid`.

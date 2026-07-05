@@ -431,7 +431,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         text: 'Whether you have a specific session in mind or need guidance on the right specialist and format, our team is here to make booking simple, efficient, and responsive from the very start.',
         links: [
           enquiry('Make an Enquiry'),
-          custom('/specialists/specialist-panel', 'View Specialist Panel'),
+          custom('/specialist-panel', 'View Specialist Panel'),
         ],
       },
     ],
@@ -530,7 +530,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
             servicePathPrefix: '/services',
             footerLinks: [
               custom('/services', 'View Medico-Legal Services'),
-              custom('/specialists/specialist-panel', 'View Specialist Panel'),
+              custom('/specialist-panel', 'View Specialist Panel'),
             ],
           },
         ],
@@ -545,6 +545,8 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         content: [
           {
             blockType: 'processSteps',
+            variant: 'two-row',
+            background: 'white',
             eyebrow: 'How We Work',
             heading: 'Our [[Process]]',
             subheading:
@@ -592,13 +594,12 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
           // "Good to know" callout beneath the process steps (reference `.process-note`).
           {
             blockType: 'callout',
-            style: 'info',
-            icon: 'info',
+            style: 'good-to-know',
             tag: 'Good to know',
             body: plainTextToLexical(
               'Each service may follow a slightly different workflow. Our team is always happy to walk you through what to expect for your specific matter.',
             ),
-            links: [custom('/contact', 'Contact Us', { icon: 'arrow-right' })],
+            links: [custom('/contact', 'Contact Us')],
           },
         ],
       },
@@ -739,7 +740,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
         links: [
           enquiry('Make an Enquiry'),
-          custom('/specialists/specialist-panel', 'View Specialist Panel'),
+          custom('/specialist-panel', 'View Specialist Panel'),
         ],
       },
     ],
@@ -768,62 +769,39 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
       // simple numbered 01–05 list (reference `.claimant-process-inner`). NOT a
       // heavy vertical stepper.
       {
-        blockType: 'row',
+        blockType: 'processSteps',
+        variant: 'claimant',
         anchorId: 'process-overview',
-        gap: 'wide',
-        alignY: 'top',
-        cssClass: ['vf-claimant-overview'],
-        columns: [
+        background: 'white',
+        eyebrow: 'Process Overview',
+        heading: 'Your Examination [[Step by Step]]',
+        subheading:
+          'The medico-legal examination process is coordinated through your lawyer, with VERIFY managing the appointment, paperwork, specialist brief and report delivery pathway.',
+        steps: [
           {
-            content: [
-              textAtom('Process Overview', ['vf-ic-eyebrow']),
-              {
-                blockType: 'heading',
-                text: 'Your Examination [[Step by Step]]',
-                level: 'h2',
-                size: 'lg',
-                align: 'left',
-              },
-              textAtom(
-                'The medico-legal examination process is coordinated through your lawyer, with VERIFY managing the appointment, paperwork, specialist brief and report delivery pathway.',
-              ),
-            ],
+            title: 'The appointment is booked',
+            description:
+              'Your lawyer or insurer refers your matter to VERIFY. We coordinate the specialist appointment and confirm the date, time and location through your lawyer.',
           },
           {
-            content: [
-              {
-                blockType: 'processSteps',
-                columns: '1',
-                cssClass: ['vf-claimant-steps'],
-                steps: [
-                  {
-                    title: 'The appointment is booked',
-                    description:
-                      'Your lawyer or insurer refers your matter to VERIFY. We coordinate the specialist appointment and confirm the date, time and location through your lawyer.',
-                  },
-                  {
-                    title: 'Paperwork is sent to you or your lawyers',
-                    description:
-                      'VERIFY sends the Claimant Questionnaire and Informed Consent form to you or your lawyers to complete before the examination.',
-                  },
-                  {
-                    title: 'The examiner receives the medical brief',
-                    description:
-                      'Before your appointment, the specialist receives the medical brief, records, imaging and instructions prepared for the assessment.',
-                  },
-                  {
-                    title: 'You attend the examination',
-                    description:
-                      'The examiner asks about your injury, symptoms, treatment and daily function, and may complete a physical or clinical assessment.',
-                  },
-                  {
-                    title: 'The report is provided to your lawyer',
-                    description:
-                      'The specialist prepares the report, VERIFY completes its quality review, and the report is provided to your lawyer.',
-                  },
-                ],
-              },
-            ],
+            title: 'Paperwork is sent to you or your lawyers',
+            description:
+              'VERIFY sends the Claimant Questionnaire and Informed Consent form to you or your lawyers to complete before the examination.',
+          },
+          {
+            title: 'The examiner receives the medical brief',
+            description:
+              'Before your appointment, the specialist receives the medical brief, records, imaging and instructions prepared for the assessment.',
+          },
+          {
+            title: 'You attend the examination',
+            description:
+              'The examiner asks about your injury, symptoms, treatment and daily function, and may complete a physical or clinical assessment.',
+          },
+          {
+            title: 'The report is provided to your lawyer',
+            description:
+              'The specialist prepares the report, VERIFY completes its quality review, and the report is provided to your lawyer.',
           },
         ],
       },

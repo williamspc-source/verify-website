@@ -187,7 +187,7 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
           { cred: 'AAMLP QLD Delegate (2024)' },
           { cred: 'Founder, AAMLE' },
         ],
-        ...custom('/about/meet-the-team', 'Meet the Full Team'),
+        ...custom('/meet-the-team', 'Meet the Full Team'),
       },
       // ── Standard bottom CTA ──
       {

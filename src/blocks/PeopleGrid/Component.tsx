@@ -11,6 +11,7 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { mediaFocal } from '@/utilities/focalPoint'
 
 const DEPARTMENT_LABELS: Record<string, string> = {
   operations: 'Operations',
@@ -25,9 +26,6 @@ const DEPARTMENT_ORDER = [
   'quality-assurance',
 ]
 
-const mediaUrl = (m: unknown): string | null =>
-  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
-
 const firstLocationTitle = (locations: Specialist['locations']): string | null => {
   const first = Array.isArray(locations) ? locations[0] : null
   return first && typeof first === 'object' ? (first.title ?? null) : null
@@ -36,24 +34,34 @@ const firstLocationTitle = (locations: Specialist['locations']): string | null =
 // Reference expert cards are deliberately simple: photo, name, specialty role.
 // No specialty badge overlay on the photo and no qualification/degree pills
 // (those live on the full specialist profile, not the panel card).
-const specialistToCard = (s: Specialist, linkProfiles: boolean): PersonCardData => ({
-  name: s.title,
-  position: s.position,
-  location: firstLocationTitle(s.locations),
-  photoUrl: mediaUrl(s.photo),
-  href: linkProfiles && s.slug ? `/specialists/${s.slug}` : null,
-})
+const specialistToCard = (s: Specialist, linkProfiles: boolean): PersonCardData => {
+  const photo = mediaFocal(s.photo)
+  return {
+    name: s.title,
+    position: s.position,
+    location: firstLocationTitle(s.locations),
+    photoUrl: photo.url,
+    photoFocus: photo.focus,
+    photoZoom: photo.zoom,
+    href: linkProfiles && s.slug ? `/specialists/${s.slug}` : null,
+  }
+}
 
 // Team members render as rectangular photo cards (full-bleed headshot on top,
 // name + role beneath) — the design-reference "Meet the Team" treatment.
-const teamToCard = (t: Team, linkProfiles: boolean): PersonCardData => ({
-  name: t.title,
-  position: t.role,
-  location: null,
-  photoUrl: mediaUrl(t.photo),
-  href: linkProfiles && t.slug ? `/about/team/${t.slug}` : null,
-  variant: 'rect',
-})
+const teamToCard = (t: Team, linkProfiles: boolean): PersonCardData => {
+  const photo = mediaFocal(t.photo)
+  return {
+    name: t.title,
+    position: t.role,
+    location: null,
+    photoUrl: photo.url,
+    photoFocus: photo.focus,
+    photoZoom: photo.zoom,
+    href: linkProfiles && t.slug ? `/about/team/${t.slug}` : null,
+    variant: 'rect',
+  }
+}
 
 export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
   const {
@@ -134,6 +142,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
       collection: 'specialists',
       depth: 1,
       limit: lim ?? 8,
+      sort: '_order',
       ...(and.length ? { where: { and } } : {}),
     })
     res.docs.forEach((s) => cards.push(specialistToCard(s, Boolean(linkProfiles))))
@@ -176,7 +185,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
           cards={cards}
           speed={co.speed}
           startDirection={co.direction === 'right' ? 'right' : 'left'}
-          showArrows={co.showArrows ?? true}
+          showArrows={false}
           cardClassName={cardClass}
         />
       ) : (

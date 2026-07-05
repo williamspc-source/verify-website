@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { cn } from '@/utilities/ui'
+import { focalImgStyle } from '@/utilities/focalPoint'
 
 export type PersonCardData = {
   name: string
@@ -9,6 +10,10 @@ export type PersonCardData = {
   location?: string | null
   badge?: string | null
   photoUrl?: string | null
+  /** CSS object-position from the Media focal point (e.g. "50% 30%"). */
+  photoFocus?: string | null
+  /** Zoom (percent) from the Media doc; >100 scales into the focal point. */
+  photoZoom?: number | null
   href?: string | null
   /** Qualification pills shown on the expert (marquee) card. */
   tags?: string[] | null
@@ -38,6 +43,8 @@ export const TeamCard: React.FC<PersonCardData> = ({
   name,
   position,
   photoUrl,
+  photoFocus,
+  photoZoom,
   href,
   className,
 }) => {
@@ -49,7 +56,13 @@ export const TeamCard: React.FC<PersonCardData> = ({
         </div>
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img className="vf-team-card__image" src={photoUrl} alt={name} loading="lazy" />
+          <img
+            className="vf-team-card__image"
+            src={photoUrl}
+            alt={name}
+            loading="lazy"
+            style={focalImgStyle(photoFocus, photoZoom)}
+          />
         ) : null}
       </div>
       <div className="vf-team-card__body">
@@ -78,6 +91,8 @@ export const PersonCard: React.FC<PersonCardData> = ({
   position,
   location,
   photoUrl,
+  photoFocus,
+  photoZoom,
   href,
   variant,
   className,
@@ -88,6 +103,8 @@ export const PersonCard: React.FC<PersonCardData> = ({
         name={name}
         position={position}
         photoUrl={photoUrl}
+        photoFocus={photoFocus}
+        photoZoom={photoZoom}
         href={href}
         className={className}
       />
@@ -105,7 +122,7 @@ export const PersonCard: React.FC<PersonCardData> = ({
           <img
             src={photoUrl}
             alt={name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={focalImgStyle(photoFocus, photoZoom, { width: '100%', height: '100%' })}
           />
         ) : (
           <div className="avatar-mono">{initialsOf(name)}</div>
@@ -133,7 +150,19 @@ export const PersonCard: React.FC<PersonCardData> = ({
 // specialty badge, role, and qualification tag pills.
 export const ExpertCard: React.FC<
   PersonCardData & { ariaHidden?: boolean; tabIndex?: number }
-> = ({ name, position, badge, photoUrl, href, tags, className, ariaHidden, tabIndex }) => {
+> = ({
+  name,
+  position,
+  badge,
+  photoUrl,
+  photoFocus,
+  photoZoom,
+  href,
+  tags,
+  className,
+  ariaHidden,
+  tabIndex,
+}) => {
   const inner = (
     <>
       <div className="expert-avatar vf-person-card__avatar">
@@ -142,7 +171,7 @@ export const ExpertCard: React.FC<
           <img
             src={photoUrl}
             alt={name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={focalImgStyle(photoFocus, photoZoom, { width: '100%', height: '100%' })}
           />
         ) : (
           <span aria-hidden>{initialsOf(name)}</span>

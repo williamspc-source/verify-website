@@ -1,6 +1,7 @@
 import type { Block } from 'payload'
 
 import {
+  anchorIdField,
   backgroundField,
   cssClassField,
   elementClassesField,
@@ -17,10 +18,27 @@ export const ProcessSteps: Block = {
     ...sectionHeaderFields,
     backgroundField,
     {
+      name: 'variant',
+      type: 'select',
+      defaultValue: 'cards',
+      admin: {
+        description:
+          'Layout. "Cards" = numbered card grid. "Two-row process" = connected numbered rows (01–03 blue, 04+ dark) matching the reference Our Process. "Claimant step list" = left intro + a compact numbered list on the right (reference Your Examination Step by Step).',
+      },
+      options: [
+        { label: 'Cards (numbered grid)', value: 'cards' },
+        { label: 'Two-row process (connected)', value: 'two-row' },
+        { label: 'Claimant step list', value: 'claimant' },
+        { label: 'AAMLE education feature panels', value: 'edu-panels' },
+      ],
+    },
+    {
       name: 'columns',
       type: 'select',
       defaultValue: '3',
-      admin: { description: 'How many steps per row on desktop.' },
+      admin: {
+        description: 'How many steps per row on desktop (Cards + Two-row variants).',
+      },
       options: [
         { label: '1 (vertical list)', value: '1' },
         { label: '2 per row', value: '2' },
@@ -62,6 +80,7 @@ export const ProcessSteps: Block = {
         },
       ],
     },
+    anchorIdField,
     cssClassField,
     elementClassesField,
     ...gridDisplayFields,

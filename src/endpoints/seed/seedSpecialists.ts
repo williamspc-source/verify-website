@@ -143,8 +143,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
         content: [
           {
             blockType: 'callout',
-            style: 'info',
-            icon: 'info',
+            style: 'good-to-know',
             tag: 'Good to know',
             body: plainTextToLexical(
               "Can't find the specialty or specialist you need? We work with an extended network of specialists beyond those listed on our website. Contact our team to see how we can assist with your matter.",
@@ -349,7 +348,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
               },
               {
                 blockType: 'callout',
-                style: 'info',
+                style: 'reassurance',
                 icon: 'info',
                 cssClass: 'vf-join-eoi__note',
                 body: plainTextToLexical(

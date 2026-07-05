@@ -42,6 +42,18 @@ export const Media: CollectionConfig = {
         },
       }),
     },
+    {
+      name: 'zoom',
+      type: 'number',
+      min: 100,
+      max: 300,
+      admin: {
+        position: 'sidebar',
+        step: 5,
+        description:
+          'Optional zoom for cropped avatars/headshots (100 = fit, 150 = 1.5× into the focal point). Set the focal point above to choose which part of the image stays centred; increase zoom to fill more of the frame.',
+      },
+    },
   ],
   upload: {
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload

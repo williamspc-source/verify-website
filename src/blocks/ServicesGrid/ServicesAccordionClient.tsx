@@ -8,6 +8,8 @@ export type ServicesAccordionItemProps = {
   media?: React.ReactNode
   /** RichText body revealed when the row expands. */
   body?: React.ReactNode
+  /** Optional DOM id so header/deep-link anchors can scroll to this row. */
+  anchorId?: string
 }
 
 /**
@@ -22,6 +24,7 @@ export const ServicesAccordionItem: React.FC<ServicesAccordionItemProps> = ({
   title,
   media,
   body,
+  anchorId,
 }) => {
   const [open, setOpen] = useState(false)
   const bodyId = useId()
@@ -31,7 +34,7 @@ export const ServicesAccordionItem: React.FC<ServicesAccordionItemProps> = ({
   const header = <span className="as-accordion-trigger-title">{title}</span>
 
   return (
-    <div className="as-accordion-item">
+    <div className="as-accordion-item" id={anchorId || undefined}>
       {media}
       {collapsible ? (
         <button

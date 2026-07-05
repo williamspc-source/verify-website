@@ -33,6 +33,16 @@ export const Availability: Block = {
         },
       ],
     },
+    {
+      name: 'showSpecialtyBadge',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Show specialty pill over carousel photos',
+      admin: {
+        description:
+          'Overlays each specialist’s specialty as a pill on their carousel photo. Off by default — the specialty already appears beneath the photo.',
+      },
+    },
     cssClassField,
   ],
 }

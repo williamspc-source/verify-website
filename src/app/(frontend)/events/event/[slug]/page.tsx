@@ -17,6 +17,18 @@ import type { Event, EventsSetting } from '@/payload-types'
 
 type Args = { params: Promise<{ slug?: string }> }
 
+// Generic event-page UI labels, sourced from the Events Settings global's `labels`
+// group. Typed locally and read defensively until types are regenerated on deploy.
+type EventLabels = {
+  statusPastLabel?: string | null
+  statusUpcomingLabel?: string | null
+  freeLabel?: string | null
+  cpdPointsTemplate?: string | null
+  cpdEligibleLabel?: string | null
+  concludedFallback?: string | null
+  backToEventsLabel?: string | null
+}
+
 // Human-readable labels for the event type, matching the Events collection options.
 const EVENT_TYPE_LABELS: Record<string, string> = {
   networking: 'Networking Event',
@@ -65,6 +77,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   const settings = (await getCachedGlobal('events-settings', 0)()) as EventsSetting | null
   const hostKey = event.host === 'verify' ? 'verify' : 'aamle'
   const host = (settings?.[hostKey] ?? {}) as NonNullable<EventsSetting['aamle']>
+  const labels = ((settings as { labels?: EventLabels } | null)?.labels ?? {}) as EventLabels
 
   // Upcoming vs past is derived at render time from the event date.
   const eventTime = new Date(event.date).getTime()
@@ -75,7 +88,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
     (p): p is string => Boolean(p),
   )
 
-  const cost = event.cost?.trim() || 'Free'
+  const cost = event.cost?.trim() || labels.freeLabel || 'Free'
   const showFacts = Boolean(cost) || Boolean(event.cpdEligible)
 
   const hasDescription = !isRichTextEmpty(event.description)
@@ -117,7 +130,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
           {metaParts.length ? (
             <p className="event-hero-meta">{metaParts.join(' · ')}</p>
           ) : null}
-          <p className="event-hero-status">{isPast ? 'Past Event' : 'Upcoming Event'}</p>
+          <p className="event-hero-status">
+            {isPast
+              ? labels.statusPastLabel || 'Past Event'
+              : labels.statusUpcomingLabel || 'Upcoming Event'}
+          </p>
         </div>
       </section>
 
@@ -133,8 +150,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 <li>
                   <Icon name="certificate" className="size-4" />
                   {event.cpdPoints
-                    ? `CPD · ${event.cpdPoints} point${event.cpdPoints === 1 ? '' : 's'}`
-                    : 'CPD eligible'}
+                    ? (labels.cpdPointsTemplate || 'CPD · {points} point(s)').replace(
+                        /\{points\}/g,
+                        String(event.cpdPoints),
+                      )
+                    : labels.cpdEligibleLabel || 'CPD eligible'}
                 </li>
               ) : null}
             </ul>
@@ -173,8 +193,8 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 </div>
               ) : (
                 <p>
-                  This event has now concluded. Contact our team for recordings or resources from
-                  this session.
+                  {labels.concludedFallback ||
+                    'This event has now concluded. Contact our team for recordings or resources from this session.'}
                 </p>
               )
             ) : (
@@ -188,7 +208,8 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
           <p className="event-back-wrap">
             <a className="event-back" href="/events">
-              <Icon name="caret-left" className="size-4" /> Back to all events
+              <Icon name="caret-left" className="size-4" /> {labels.backToEventsLabel ||
+                'Back to all events'}
             </a>
           </p>
         </div>
