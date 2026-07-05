@@ -398,6 +398,8 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   // 5b) In-the-Loop article posts (grouped by stream). Each post's topic
   // categories drive the per-card reference chip (Company News, Practice Guide…).
   let postCount = 0
+  const postIdBySlug = new Map<string, number | string>()
+  const alreadyRelated = new Set<string>()
   for (const p of POSTS) {
     const catIds = ((p as { categories?: string[] }).categories || [])
       .map((slug) => categoryMap.get(slug))
@@ -422,8 +424,41 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       _status: 'published',
     })
     if (created) postCount++
+    const foundPost = await payload.find({
+      collection: 'posts',
+      where: { slug: { equals: p.slug } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    const doc = foundPost.docs[0] as { id: number | string; relatedPosts?: unknown[] } | undefined
+    if (doc) {
+      postIdBySlug.set(p.slug, doc.id)
+      if (Array.isArray(doc.relatedPosts) && doc.relatedPosts.length) alreadyRelated.add(p.slug)
+    }
   }
   payload.logger.info(`— Posts seeded (${postCount} new)`)
+
+  // Populate the reference's "You Might Also Like" section (relatedPosts): link
+  // each post to the next three, cyclically, so the related-articles list shows
+  // out of the box. Skips any post an editor has already curated in admin.
+  const nPosts = POSTS.length
+  for (let i = 0; i < nPosts; i++) {
+    const slug = POSTS[i].slug
+    const selfId = postIdBySlug.get(slug)
+    if (!selfId || alreadyRelated.has(slug)) continue
+    const relIds = [1, 2, 3]
+      .map((k) => postIdBySlug.get(POSTS[(i + k) % nPosts].slug))
+      .filter((id): id is number | string => id != null)
+    if (!relIds.length) continue
+    await payload.update({
+      collection: 'posts',
+      id: selfId,
+      data: { relatedPosts: relIds } as never,
+      req,
+      context: { disableRevalidate: true },
+    })
+  }
 
   // 6) Services.
   let serviceCount = 0
