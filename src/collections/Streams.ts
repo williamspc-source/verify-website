@@ -4,6 +4,7 @@ import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
 import { iconField } from '@/fields/blockFields'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // "In the Loop" content streams (Featured, News & Updates, Industry Insights,
 // Specialist Spotlights, QA Insights, Staff Narratives, Resources). A Post's
@@ -45,4 +46,8 @@ export const Streams: CollectionConfig = {
       position: undefined,
     }),
   ],
+  hooks: {
+    afterChange: [revalidateSiteOnChange],
+    afterDelete: [revalidateSiteOnDelete],
+  },
 }

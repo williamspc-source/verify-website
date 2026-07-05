@@ -4,6 +4,7 @@ import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateTeam } from './hooks/revalidateTeam'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 import { slugField } from 'payload'
 
 import {
@@ -139,9 +140,9 @@ export const Team: CollectionConfig<'team'> = {
     slugField(),
   ],
   hooks: {
-    afterChange: [revalidateTeam],
+    afterChange: [revalidateTeam, revalidateSiteOnChange],
     beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidateDelete, revalidateSiteOnDelete],
   },
   versions: {
     drafts: {

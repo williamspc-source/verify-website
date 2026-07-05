@@ -4,6 +4,7 @@ import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
 import { iconField } from '@/fields/blockFields'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // Groups of specialties (Surgery, Psychiatry & Psychology, Medicine, Allied
 // Health) used to build the Specialty List filter bar + accordion grouping.
@@ -40,4 +41,8 @@ export const SpecialtyCategories: CollectionConfig = {
       position: undefined,
     }),
   ],
+  hooks: {
+    afterChange: [revalidateSiteOnChange],
+    afterDelete: [revalidateSiteOnDelete],
+  },
 }

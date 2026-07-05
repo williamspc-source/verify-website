@@ -4,6 +4,7 @@ import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateSpecialist } from './hooks/revalidateSpecialist'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 import { slugField } from 'payload'
 import { iconField } from '@/fields/blockFields'
 
@@ -251,9 +252,9 @@ export const Specialists: CollectionConfig<'specialists'> = {
     slugField(),
   ],
   hooks: {
-    afterChange: [revalidateSpecialist],
+    afterChange: [revalidateSpecialist, revalidateSiteOnChange],
     beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidateDelete, revalidateSiteOnDelete],
   },
   versions: {
     drafts: {

@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 import { slugField } from 'payload'
 
 import {
@@ -210,8 +211,8 @@ export const Events: CollectionConfig<'events'> = {
     slugField(),
   ],
   hooks: {
-    afterChange: [revalidateEvent],
-    afterDelete: [revalidateDelete],
+    afterChange: [revalidateEvent, revalidateSiteOnChange],
+    afterDelete: [revalidateDelete, revalidateSiteOnDelete],
   },
   versions: {
     drafts: {

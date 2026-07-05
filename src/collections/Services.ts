@@ -4,6 +4,7 @@ import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
 import { iconField } from '@/fields/blockFields'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // The services VERIFY offers. One source of truth for: home service cards, the
 // dedicated service pages, and the contact form's "Service Required" dropdown.
@@ -102,4 +103,8 @@ export const Services: CollectionConfig = {
       position: undefined,
     }),
   ],
+  hooks: {
+    afterChange: [revalidateSiteOnChange],
+    afterDelete: [revalidateSiteOnDelete],
+  },
 }

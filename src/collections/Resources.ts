@@ -4,6 +4,7 @@ import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
 import { iconField } from '@/fields/blockFields'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // Downloadable / link-out resources shown in the "In the Loop → Resources" grid
 // and the Information Centre (checklists, guides, templates). Each card can point
@@ -91,4 +92,8 @@ export const Resources: CollectionConfig = {
       position: undefined,
     }),
   ],
+  hooks: {
+    afterChange: [revalidateSiteOnChange],
+    afterDelete: [revalidateSiteOnDelete],
+  },
 }

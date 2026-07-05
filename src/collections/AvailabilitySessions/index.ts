@@ -3,6 +3,10 @@ import type { CollectionConfig } from 'payload'
 import { anyone } from '../../access/anyone'
 import { authenticated } from '../../access/authenticated'
 import { setSessionTitle } from './hooks/setSessionTitle'
+import {
+  revalidateAvailabilitySession,
+  revalidateAvailabilitySessionDelete,
+} from './hooks/revalidateAvailabilitySession'
 
 // 24-hour HH:mm validation, lenient on empty (presence handled by `required`).
 const validateTime = (val?: string | null) =>
@@ -148,5 +152,7 @@ export const AvailabilitySessions: CollectionConfig<'availability-sessions'> = {
   ],
   hooks: {
     beforeChange: [setSessionTitle],
+    afterChange: [revalidateAvailabilitySession],
+    afterDelete: [revalidateAvailabilitySessionDelete],
   },
 }

@@ -318,7 +318,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         heading: 'Latest from [[VERIFY]]',
         desc: 'Company news, announcements, and updates from the medico-legal industry.',
         cssClass: ['ni-section', 'bg-grey'],
-        viewAll: '/in-the-loop',
+        viewAll: '/in-the-loop/news-updates',
         viewAllLabel: 'View All News',
       }),
       // AAMLE Events (upcoming) — compact date-badge cards, 2×2, next 4 events.
@@ -341,7 +341,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         heading: 'Practical Knowledge for [[Practitioners]]',
         desc: 'In-depth articles on medico-legal practice, legislation, and clinical assessment written for legal and insurance professionals.',
         cssClass: ['ni-section', 'bg-grey'],
-        viewAll: '/in-the-loop',
+        viewAll: '/in-the-loop/industry-insights',
         viewAllLabel: 'View All Insights',
       }),
       // Specialist Spotlights (dark band) — "Orthopaedics" / "Psychiatry" / "Pain Medicine".
@@ -351,7 +351,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         heading: 'Meet the Experts [[Behind the Reports]]',
         desc: 'Short profiles and conversations with specialists on the VERIFY expert panel.',
         cssClass: ['ni-section', 'bg-dark'],
-        viewAll: '/specialist-panel',
+        viewAll: '/in-the-loop/specialist-spotlights',
         viewAllLabel: 'View All Spotlights',
       }),
       // Resources (light-blue band, driven by the Resources collection)
@@ -376,7 +376,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         heading: "From VERIFY's [[Quality Assurance Team]]",
         desc: 'Practical notes from the team that reviews every report — what they look for, what they find, and what it means for your matter.',
         cssClass: ['ni-section', 'bg-white'],
-        viewAll: '/in-the-loop',
+        viewAll: '/in-the-loop/qa-insights',
         viewAllLabel: 'View All QA Insights',
       }),
       // Staff Narratives — 2×2 narrative cards with author photo/name/role.
@@ -388,7 +388,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         heading: 'Insights from the [[VERIFY Team]]',
         desc: 'Practical perspectives from the people behind your medico-legal outcomes.',
         cssClass: ['ni-section', 'bg-grey'],
-        viewAll: '/in-the-loop',
+        viewAll: '/in-the-loop/staff-narratives',
         viewAllLabel: 'View All Narratives',
       }),
       // Newsletter

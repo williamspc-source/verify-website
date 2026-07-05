@@ -204,7 +204,8 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
     photoUrl: photo.url,
     photoFocus: photo.focus,
     photoZoom: photo.zoom,
-    href: null,
+    // Link each carousel card to the specialist's public profile.
+    href: sp.slug ? `/specialists/${sp.slug}` : null,
     tags: (sp.accreditations || [])
       .map((a) => (a && typeof a === 'object' ? a.title : null))
       .filter((a): a is string => Boolean(a))

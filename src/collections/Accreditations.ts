@@ -4,6 +4,7 @@ import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
 import { iconField } from '@/fields/blockFields'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // Specialist accreditations / impairment-rating credentials (AMA 5, GEPI 2,
 // CIME (ABIME), PIRS, …). A controlled taxonomy so the Specialist Panel filter
@@ -38,4 +39,8 @@ export const Accreditations: CollectionConfig = {
       position: undefined,
     }),
   ],
+  hooks: {
+    afterChange: [revalidateSiteOnChange],
+    afterDelete: [revalidateSiteOnDelete],
+  },
 }

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // Client testimonials shown across the site (home "What Our Clients Say", etc.).
 // Fully admin-editable — the front end never hardcodes quotes.
@@ -83,4 +84,8 @@ export const Testimonials: CollectionConfig = {
       admin: { description: 'Show in featured testimonial listings.' },
     },
   ],
+  hooks: {
+    afterChange: [revalidateSiteOnChange],
+    afterDelete: [revalidateSiteOnDelete],
+  },
 }
