@@ -95,12 +95,19 @@ export const MapEmbed: Block = {
         description: 'Info-panel heading above the parking list. Defaults to "Nearby Car Parks".',
       },
     },
+    // Appearance is deliberately offered: the generic map variant renders these
+    // as btn / btn-outline and honours the choice. The contact variant renders
+    // them as `.ct-map-action`, a single treatment, and ignores it — noted in
+    // the field description rather than removing a control that does work.
     linkGroup({
       overrides: {
         name: 'actions',
         label: 'Action buttons',
         maxRows: 3,
-        admin: { description: 'e.g. Get directions / Call / Email.' },
+        admin: {
+          description:
+            'e.g. Get directions / Call / Email. Each link’s Appearance (Default/Outline) applies on the standard map layout; the contact-details layout renders them all in one style.',
+        },
       },
     }),
     cssClassField,

@@ -6,7 +6,15 @@ import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
-export const ImageBlock: React.FC<Props> = ({ media, width, rounded, align, caption, cssClass }) => {
+export const ImageBlock: React.FC<Props> = ({
+  media,
+  width,
+  rounded,
+  shadow,
+  align,
+  caption,
+  cssClass,
+}) => {
   if (!media || typeof media !== 'object') return null
   return (
     <figure
@@ -14,6 +22,7 @@ export const ImageBlock: React.FC<Props> = ({ media, width, rounded, align, capt
         'vf-image',
         `vf-image--${width || 'full'}`,
         `vf-image--rounded-${rounded || 'md'}`,
+        shadow && shadow !== 'none' ? `vf-image--shadow-${shadow}` : undefined,
         align && align !== 'left' ? `vf-align-${align}` : undefined,
         toClassName(cssClass),
       )}

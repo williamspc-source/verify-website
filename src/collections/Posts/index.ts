@@ -1,4 +1,6 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
+
+import type { Post } from '../../payload-types'
 
 import {
   BlocksFeature,
@@ -15,6 +17,7 @@ import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+import { postPath } from '../../utilities/routes'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
@@ -27,6 +30,52 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
+
+/**
+ * Preview / Live Preview URL for a post.
+ *
+ * An article lives at `/in-the-loop/<stream>/<slug>`, so the path cannot be built
+ * from `slug` alone. In the admin, `data.stream` is whatever the form currently
+ * holds — a populated document once the field has been loaded, but a bare id
+ * straight after a save — so resolve the id through `req.payload` when needed.
+ * Both `preview` and `livePreview.url` may return a promise, and both run
+ * server-side, so this is a legitimate query rather than a client round-trip.
+ *
+ * Returns null (no preview button) for a post with no stream, rather than a URL
+ * that resolves to the legacy `/posts/<slug>` redirect stub — which is what the
+ * old collection-prefix map produced, and which 404s for an unpublished draft.
+ */
+const postPreviewPath = async (
+  data: Partial<Post> | Record<string, unknown> | undefined,
+  req: PayloadRequest,
+): Promise<string | null> => {
+  const slug = typeof data?.slug === 'string' ? data.slug : null
+  if (!slug) return null
+
+  const stream = (data as { stream?: unknown } | undefined)?.stream
+  let streamSlug: string | null = null
+
+  if (stream && typeof stream === 'object') {
+    streamSlug = (stream as { slug?: string | null }).slug ?? null
+  } else if (stream != null) {
+    try {
+      const doc = await req.payload.findByID({
+        collection: 'streams',
+        id: stream as string | number,
+        depth: 0,
+        req,
+      })
+      streamSlug = doc?.slug ?? null
+    } catch {
+      // A stream that cannot be read (deleted, or no access) leaves streamSlug
+      // null, which yields no preview button — the honest outcome, rather than a
+      // link to a path we know does not exist.
+      streamSlug = null
+    }
+  }
+
+  return generatePreviewPath({ path: postPath({ slug, stream: { slug: streamSlug } }) })
+}
 
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
@@ -42,6 +91,11 @@ export const Posts: CollectionConfig<'posts'> = {
   defaultPopulate: {
     title: true,
     slug: true,
+    // `stream` is load-bearing, not decorative: postPath() builds
+    // /in-the-loop/<stream>/<slug> and returns null without it. Omitting it here
+    // meant every INTERNAL LINK to a post resolved to null, and CMSLink's
+    // `if (!href) return null` then dropped the entire link from the page.
+    stream: true,
     categories: true,
     meta: {
       image: true,
@@ -51,19 +105,9 @@ export const Posts: CollectionConfig<'posts'> = {
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data, req }) =>
-        generatePreviewPath({
-          slug: data?.slug,
-          collection: 'posts',
-          req,
-        }),
+      url: ({ data, req }) => postPreviewPath(data, req),
     },
-    preview: (data, { req }) =>
-      generatePreviewPath({
-        slug: data?.slug as string,
-        collection: 'posts',
-        req,
-      }),
+    preview: (data, { req }) => postPreviewPath(data, req),
     useAsTitle: 'title',
     group: 'Content',
   },
@@ -197,6 +241,10 @@ export const Posts: CollectionConfig<'posts'> = {
               name: 'stream',
               type: 'relationship',
               relationTo: 'streams',
+              // Required: the stream is the first segment of a post's canonical URL
+              // (/in-the-loop/<stream>/<slug>). Without one there is no valid article
+              // path, so an editor must not be able to publish a stream-less post.
+              required: true,
               admin: {
                 position: 'sidebar',
                 description: 'Which In-the-Loop section this belongs to (drives URL + hub placement).',
@@ -230,7 +278,11 @@ export const Posts: CollectionConfig<'posts'> = {
               },
             },
           ],
-          label: 'Meta',
+          // Not "Meta": this tab holds taxonomy and cross-links, while the real
+          // metadata (title/description/image) lives in the SEO tab below. The
+          // Payload template names its SEO tab "Meta", so anyone with prior
+          // Payload exposure opened this one looking for the meta description.
+          label: 'Categorisation',
         },
         {
           name: 'meta',

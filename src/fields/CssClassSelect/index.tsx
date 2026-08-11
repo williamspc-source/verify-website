@@ -21,20 +21,27 @@ export const CssClassSelect: React.FC<Props> = ({ path, field }) => {
 
   useEffect(() => {
     let active = true
-    fetch(`${getClientSideURL()}/api/globals/custom-styles?depth=0`, { credentials: 'include' })
-      .then((r) => r.json())
-      .then((data) => {
-        if (!active) return
-        const presets = (data?.presets || []) as { name?: string; label?: string }[]
-        setOptions(
-          presets
-            .filter((p) => p.name)
-            .map((p) => ({ label: p.label || (p.name as string), value: p.name as string })),
-        )
-      })
-      .catch(() => {})
+    const load = () =>
+      fetch(`${getClientSideURL()}/api/globals/custom-styles?depth=0`, { credentials: 'include' })
+        .then((r) => r.json())
+        .then((data) => {
+          if (!active) return
+          const presets = (data?.presets || []) as { name?: string; label?: string }[]
+          setOptions(
+            presets
+              .filter((p) => p.name)
+              .map((p) => ({ label: p.label || (p.name as string), value: p.name as string })),
+          )
+        })
+        .catch(() => {})
+
+    load()
+    // Presets are usually created in a second tab (Globals → Custom Styles).
+    // Without this, the new class wouldn't appear here until a full page reload.
+    window.addEventListener('focus', load)
     return () => {
       active = false
+      window.removeEventListener('focus', load)
     }
   }, [])
 

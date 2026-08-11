@@ -23,9 +23,6 @@ node_modules/
 .design-reference/
 tsconfig.tsbuildinfo
 
-# Local Claude Code instructions (not pushed)
-CLAUDE.md
-
 # Local dev server runtime (start.sh / stop.sh)
 .dev.pid
 .dev.log

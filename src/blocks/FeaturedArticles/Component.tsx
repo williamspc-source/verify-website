@@ -8,6 +8,7 @@ import React from 'react'
 import { Section } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { postPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 import { FeaturedArticlesClient, type FeaturedSlide } from './FeaturedArticlesClient'
 
 const MONTHS_SHORT = [
@@ -65,8 +66,7 @@ const postTagLabel = (post: Post, stream: Stream | null): string | null => {
 
 const toSlide = (post: Post, badgeLabel: string, bylinePrefix: string): FeaturedSlide => {
   const stream = typeof post.stream === 'object' && post.stream ? (post.stream as Stream) : null
-  const streamSlug = stream?.slug ?? null
-  const href = streamSlug ? `/in-the-loop/${streamSlug}/${post.slug}` : `/in-the-loop/${post.slug}`
+  const href = postPath(post) ?? IN_THE_LOOP_PATH
 
   const name = resolveAuthorName(post)
   const dateLabel = formatDate(post.publishedAt)
@@ -130,6 +130,8 @@ export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
 
     const fetched = await payload.find({
       collection: 'posts',
+      // Local API defaults to overrideAccess: true, which would feature drafts.
+      overrideAccess: false,
       // depth 2 so the author's linked Team/Specialist, categories and stream
       // are populated for the slide byline/tag/href.
       depth: 2,

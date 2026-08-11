@@ -1,20 +1,31 @@
 import { cn } from '@/utilities/ui'
 import React from 'react'
 
-export type SectionBackground = 'white' | 'muted' | 'accent' | 'primary' | 'dark'
+export type SectionBackground =
+  | 'white'
+  | 'muted'
+  | 'accent'
+  | 'accent-solid'
+  | 'primary'
+  | 'dark'
 
 // Background → design section banding (defined in globals.css as `.vf-section--*`).
 // Mirrors the design reference: white, grey, light-blue gradient, dark-blue gradient,
 // solid charcoal.
-const bgClasses: Record<SectionBackground, string> = {
+// The dark bands also carry `vf-on-dark`, which re-points the text tokens so every
+// descendant flips to the on-dark palette (see globals.css). It's a documented hook
+// for Custom Styles authors as well, so keep it on the element, not just implied by
+// the `.vf-section--*` selector.
+export const bgClasses: Record<SectionBackground, string> = {
   white: 'vf-section--white',
   muted: 'vf-section--muted',
   accent: 'vf-section--accent',
-  primary: 'vf-section--primary',
-  dark: 'vf-section--dark',
+  'accent-solid': 'vf-section--accent-solid',
+  primary: 'vf-section--primary vf-on-dark',
+  dark: 'vf-section--dark vf-on-dark',
 }
 
-const widthClasses: Record<string, string> = {
+export const widthClasses: Record<string, string> = {
   normal: 'container',
   narrow: 'container content-narrow',
   wide: 'container max-w-[88rem]',
@@ -35,6 +46,8 @@ type SectionProps = {
   containerWidth?: string | null
   motion?: string | null
   hoverEffect?: string | null
+  /** Resting card depth preset → `.vf-shadow-<slug>`. 'default' emits nothing. */
+  shadow?: string | null
   className?: string
   innerClassName?: string
   id?: string
@@ -59,6 +72,7 @@ export const Section: React.FC<SectionProps> = ({
   containerWidth = 'normal',
   motion = 'none',
   hoverEffect,
+  shadow,
   className,
   innerClassName,
   id,
@@ -66,11 +80,16 @@ export const Section: React.FC<SectionProps> = ({
   children,
 }) => {
   const hasMotion = Boolean(motion && motion !== 'none')
-  const hoverClass = hoverEffect && hoverEffect !== 'none' ? `vf-hover-${hoverEffect}` : undefined
+  // 'none' emits `vf-hover-none` rather than nothing. The ported card styles
+  // carry their own :hover, so without a class to hook onto there was no way to
+  // express "no hover" and the None option did nothing at all.
+  const hoverClass = hoverEffect ? `vf-hover-${hoverEffect}` : undefined
+  // 'default' means "leave the component's own resting shadow alone".
+  const shadowClass = shadow && shadow !== 'default' ? `vf-shadow-${shadow}` : undefined
 
   // Nested inside a Section/Row: no <section> banding, no padding, no container.
   if (bare) {
-    return <div className={cn('vf-section-bare', hoverClass, className)}>{children}</div>
+    return <div className={cn('vf-section-bare', hoverClass, shadowClass, className)}>{children}</div>
   }
 
   return (
@@ -82,6 +101,7 @@ export const Section: React.FC<SectionProps> = ({
         bgClasses[background || 'white'],
         motionClass(motion),
         hoverClass,
+        shadowClass,
         className,
       )}
     >

@@ -11,14 +11,10 @@ import { toClassName } from '@/utilities/cssClass'
 
 type BoxVariant = 'info' | 'note' | 'success' | 'warning'
 
-// Self-contained colour tokens per boxed style so the block needs no bespoke CSS —
-// the box is themed entirely with inline styles driven by the selected `style`.
-const styleTokens: Record<BoxVariant, { accent: string; bg: string; border: string }> = {
-  info: { accent: '#2563eb', bg: 'rgba(37, 99, 235, 0.06)', border: 'rgba(37, 99, 235, 0.22)' },
-  note: { accent: '#475569', bg: 'rgba(71, 85, 105, 0.06)', border: 'rgba(71, 85, 105, 0.20)' },
-  success: { accent: '#16a34a', bg: 'rgba(22, 163, 74, 0.06)', border: 'rgba(22, 163, 74, 0.24)' },
-  warning: { accent: '#d97706', bg: 'rgba(217, 119, 6, 0.08)', border: 'rgba(217, 119, 6, 0.28)' },
-}
+// Colours live in CSS (`.vf-callout--<variant>`) and resolve from the status
+// tokens in Site Settings → Brand colours → Status & feedback. They used to be
+// inline styles from a constant here, which put the whole four-variant palette
+// beyond the admin's reach — inline styles outrank even Custom Styles.
 
 // A sensible leading icon per style when the editor hasn't picked one.
 const defaultIcon: Record<BoxVariant, string> = {
@@ -84,22 +80,16 @@ export const CalloutBlock: React.FC<Props & { bare?: boolean }> = ({
   const boxVariant = (['info', 'note', 'success', 'warning'].includes(variant)
     ? variant
     : 'info') as BoxVariant
-  const tokens = styleTokens[boxVariant]
   const iconName = icon || defaultIcon[boxVariant]
 
   return (
     <Section bare={bare} className={cn('vf-callout-block', toClassName(cssClass))}>
       <div
         role="note"
-        className="vf-callout flex gap-4 rounded-lg p-5"
-        style={{
-          background: tokens.bg,
-          border: `1px solid ${tokens.border}`,
-          borderLeft: `4px solid ${tokens.accent}`,
-        }}
+        className={cn('vf-callout flex gap-4 rounded-lg p-5', `vf-callout--${boxVariant}`)}
       >
         {iconName ? (
-          <div className="vf-callout__icon shrink-0" style={{ color: tokens.accent }} aria-hidden>
+          <div className="vf-callout__icon shrink-0" aria-hidden>
             <Icon name={iconName} />
           </div>
         ) : null}
@@ -108,7 +98,6 @@ export const CalloutBlock: React.FC<Props & { bare?: boolean }> = ({
           {tag ? (
             <span
               className="vf-callout__tag mb-2 inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
-              style={{ background: tokens.border, color: tokens.accent }}
             >
               {tag}
             </span>
@@ -125,7 +114,6 @@ export const CalloutBlock: React.FC<Props & { bare?: boolean }> = ({
           {hasLinks ? (
             <div
               className="vf-callout__links mt-4 flex flex-wrap gap-x-5 gap-y-2 font-medium"
-              style={{ color: tokens.accent }}
             >
               {links!.map(({ link }, i) => (
                 <CMSLink key={i} {...link} className="underline underline-offset-2" />

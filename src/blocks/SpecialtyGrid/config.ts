@@ -63,6 +63,13 @@ export const SpecialtyGrid: Block = {
       name: 'columns',
       type: 'select',
       defaultValue: '4',
+      admin: {
+        description: 'Cards per row. Not used by the arrow checklist, which is a single list.',
+        // The checklist variant renders a <ul>, not a grid, so `columns` has no
+        // effect there — hide it rather than offer a control that silently does
+        // nothing (see the isChecklist branch in ./Component.tsx).
+        condition: (_, d) => (d as { variant?: string })?.variant !== 'checklist',
+      },
       options: [
         { label: '2', value: '2' },
         { label: '3', value: '3' },
@@ -85,10 +92,10 @@ export const SpecialtyGrid: Block = {
     {
       name: 'directoryPath',
       type: 'text',
-      defaultValue: '/specialists',
+      defaultValue: '/specialists/specialist-panel',
       admin: {
         condition: (_, d) => sourceIs('auto')(_, d) && Boolean((d as { linkToDirectory?: boolean })?.linkToDirectory),
-        description: 'Links become <path>?specialty=<slug>.',
+        description: 'Links become <path>?specialty=<slug>. Default: the Specialist Panel directory.',
       },
     },
     // Manual mode

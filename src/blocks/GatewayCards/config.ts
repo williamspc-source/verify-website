@@ -13,7 +13,10 @@ import {
 export const GatewayCards: Block = {
   slug: 'gatewayCards',
   interfaceName: 'GatewayCardsBlock',
-  labels: { singular: 'Gateway Cards', plural: 'Gateway Cards' },
+  labels: {
+    singular: 'Gateway Cards (homepage “For Clients / For Claimants”)',
+    plural: 'Gateway Cards',
+  },
   fields: [
     ...sectionHeaderFields,
     backgroundField,

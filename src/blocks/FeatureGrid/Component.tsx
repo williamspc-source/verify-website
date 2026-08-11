@@ -14,12 +14,14 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
   subheading,
   background,
   columns,
+  cardStyle,
   items,
   cssClass,
   elementClasses,
   motion,
   containerWidth,
   hoverEffect,
+  shadow,
   bare,
 }) => {
   if (!items || items.length === 0) return null
@@ -32,6 +34,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       <SectionHeader
@@ -47,7 +50,16 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {items.map((item, i) => (
-          <div key={i} className={cn('service-card vf-card', toClassName(elementClasses?.card))}>
+          <div
+            key={i}
+            className={cn(
+              'service-card vf-card',
+              // 'Plain (no border)' was stored and ignored — the bordered card
+              // rendered either way.
+              cardStyle === 'plain' && 'vf-card--plain',
+              toClassName(elementClasses?.card),
+            )}
+          >
             {item.icon ? (
               <div className="service-icon vf-card__icon">
                 <Icon name={item.icon} />

@@ -105,7 +105,10 @@ export const PeopleGrid: Block = {
           name: 'layout',
           type: 'select',
           defaultValue: 'grid',
-          admin: { width: '33%' },
+          // Grouping by department forces the grouped grid renderer, so Layout
+          // and Limit stop having any effect. They used to stay visible and
+          // editable while doing nothing.
+          admin: { width: '33%', condition: (_, sib) => !sib?.groupByDepartment },
           options: [
             { label: 'Grid', value: 'grid' },
             { label: 'Carousel', value: 'carousel' },
@@ -115,7 +118,11 @@ export const PeopleGrid: Block = {
           name: 'columns',
           type: 'select',
           defaultValue: '4',
-          admin: { width: '33%' },
+          admin: {
+            width: '33%',
+            description: 'Grid only.',
+            condition: (_, sib) => sib?.layout !== 'carousel',
+          },
           options: [
             { label: '2', value: '2' },
             { label: '3', value: '3' },
@@ -126,7 +133,11 @@ export const PeopleGrid: Block = {
           name: 'limit',
           type: 'number',
           defaultValue: 8,
-          admin: { width: '33%', description: 'Max people to show (0 = show all).' },
+          admin: {
+            width: '33%',
+            description: 'Max people to show (0 = show all).',
+            condition: (_, sib) => !sib?.groupByDepartment,
+          },
         },
       ],
     },

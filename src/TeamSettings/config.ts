@@ -20,27 +20,13 @@ export const TeamSettings: GlobalConfig = {
       label: 'Fixed labels',
       fields: [
         {
-          type: 'row',
-          fields: [
-            {
-              name: 'breadcrumbHomeLabel',
-              type: 'text',
-              defaultValue: 'Home',
-              admin: {
-                width: '50%',
-                description: 'First breadcrumb link (site home).',
-              },
-            },
-            {
-              name: 'breadcrumbSectionLabel',
-              type: 'text',
-              defaultValue: 'Meet the Team',
-              admin: {
-                width: '50%',
-                description: 'Second breadcrumb link (team index).',
-              },
-            },
-          ],
+          name: 'breadcrumbSectionLabel',
+          type: 'text',
+          defaultValue: 'Meet the Team',
+          admin: {
+            description:
+              'Second breadcrumb link (the team index). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.',
+          },
         },
         {
           type: 'row',

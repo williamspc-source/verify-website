@@ -6,7 +6,8 @@ import { HighImpactHero } from '@/heros/HighImpact'
 import { LowImpactHero } from '@/heros/LowImpact'
 import { MediumImpactHero } from '@/heros/MediumImpact'
 import { HomeHero } from '@/heros/HomeHero'
-import { PageHero, type Crumb } from '@/heros/PageHero'
+import { PageHero } from '@/heros/PageHero'
+import type { Crumb } from '@/utilities/breadcrumbs'
 
 const heroes = {
   highImpact: HighImpactHero,
@@ -17,7 +18,9 @@ const heroes = {
 }
 
 type RenderHeroProps = Page['hero'] & {
-  breadcrumbs?: Crumb[] | null
+  crumbs?: Crumb[] | null
+  crumbSeparator?: string | null
+  crumbNavLabel?: string | null
   title?: string | null
 }
 

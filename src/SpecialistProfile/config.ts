@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 
 import { iconField } from '@/fields/blockFields'
 import { revalidateGlobal } from '@/utilities/revalidateGlobal'
+import { SPECIALIST_INDEX_PATH } from '@/utilities/routes'
 
 // Shared copy for the "Online Booking Portal" CTA band that is byte-identical
 // across all Specialist profiles, the Specialist Panel and the Specialty List —
@@ -46,6 +47,27 @@ export const SpecialistProfile: GlobalConfig = {
               type: 'text',
               defaultValue: 'Send Enquiry',
               admin: { width: '50%' },
+            },
+            {
+              name: 'bookingLabel',
+              type: 'text',
+              defaultValue: 'Book an appointment',
+              admin: {
+                width: '50%',
+                description: 'Shown only when the specialist has a Booking link.',
+              },
+            },
+            {
+              name: 'cvLabel',
+              type: 'text',
+              defaultValue: 'Download CV',
+              admin: { width: '50%', description: 'Shown only when a CV is attached.' },
+            },
+            {
+              name: 'sampleReportLabel',
+              type: 'text',
+              defaultValue: 'Sample report',
+              admin: { width: '50%', description: 'Shown only when a sample report is attached.' },
             },
             {
               name: 'enquiryEmail',
@@ -128,7 +150,10 @@ export const SpecialistProfile: GlobalConfig = {
       name: 'breadcrumb',
       type: 'group',
       label: 'Breadcrumb',
-      admin: { description: 'The breadcrumb trail shown at the top of every profile.' },
+      admin: {
+        description:
+          'The middle crumb of the trail shown at the top of every profile. The first crumb — “Home” — is shared site-wide (Site Settings → Breadcrumbs); the last is the specialist’s own name.',
+      },
       fields: [
         {
           type: 'row',
@@ -137,19 +162,13 @@ export const SpecialistProfile: GlobalConfig = {
               name: 'breadcrumbParentLabel',
               type: 'text',
               defaultValue: 'Specialist Panel',
-              admin: { width: '33%' },
+              admin: { width: '50%' },
             },
             {
               name: 'breadcrumbParentHref',
               type: 'text',
-              defaultValue: '/specialist-panel',
-              admin: { width: '33%' },
-            },
-            {
-              name: 'breadcrumbCurrentLabel',
-              type: 'text',
-              defaultValue: 'Specialist Profile',
-              admin: { width: '34%' },
+              defaultValue: SPECIALIST_INDEX_PATH,
+              admin: { width: '50%' },
             },
           ],
         },

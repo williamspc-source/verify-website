@@ -20,7 +20,7 @@ const closingCta = () => ({
   eyebrow: 'Get Started',
   heading: 'Ready to Refer Your [[Next Matter to VERIFY?]]',
   text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
-  links: [enquiry('Make an Enquiry'), custom('/specialist-panel', 'View Specialist Panel')],
+  links: [enquiry('Make an Enquiry'), custom('/specialists/specialist-panel', 'View Specialist Panel')],
 })
 
 async function authorPage(
@@ -257,7 +257,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             body: plainTextToLexical(
               'Impartial assessments delivered nationally by accredited specialists, supported by full end-to-end coordination and a mandatory quality assurance review on every report.',
             ),
-            ...custom('/ime', 'Learn more →'),
+            ...custom('/services/medico-legal/ime', 'Learn more →'),
           },
           {
             imagePlaceholder: true,
@@ -267,7 +267,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             body: plainTextToLexical(
               'A single specialist agreed upon by both parties — delivering a shared, independent medical opinion that reduces duplication, cost, and resolution time across WorkCover, CTP, and TPD matters.',
             ),
-            ...custom('/jme', 'Learn more →'),
+            ...custom('/services/medico-legal/jme', 'Learn more →'),
           },
         ],
       },
@@ -629,7 +629,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
                   "The finalised report passes through VERIFY's Quality Assurance review before being delivered to your office.",
               },
             ],
-            ...custom('/for-clients', 'View Client Process'),
+            ...custom('/information-centre/for-clients', 'View Client Process'),
           },
           {
             variant: 'claimant',
@@ -659,7 +659,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
                   'The specialist prepares a report for the referring party. VERIFY does not share the report directly with claimants.',
               },
             ],
-            ...custom('/for-claimants', 'View Claimant Guide'),
+            ...custom('/information-centre/for-claimants', 'View Claimant Guide'),
           },
         ],
       },
@@ -798,7 +798,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
         linkProfiles: true,
         carouselOptions: { speed: 34, direction: 'left', showArrows: true },
         footerLinks: [
-          custom('/specialist-panel', 'View Full Panel'),
+          custom('/specialists/specialist-panel', 'View Full Panel'),
           enquiry('Make an Enquiry'),
         ],
       },

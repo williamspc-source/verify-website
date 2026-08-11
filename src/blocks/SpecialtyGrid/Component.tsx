@@ -46,11 +46,13 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     linkToDirectory,
     directoryPath,
     items,
+    columns,
     cssClass,
     elementClasses,
     motion,
     containerWidth,
     hoverEffect,
+    shadow,
     bare,
   } = props
 
@@ -72,14 +74,17 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     // claim-types & specialties carry an explicit display `order`; other
     // taxonomies fall back to alphabetical.
     const sort = collection === 'claim-types' || collection === 'specialties' ? 'order' : 'title'
-    const res = await payload.find({ collection, limit: 100, sort })
+    // `collection` is a variable, so no static check can tell whether it targets
+    // a draft-enabled collection. These taxonomies have no drafts today, but the
+    // select above could gain one — state the public-read intent explicitly.
+    const res = await payload.find({ collection, limit: 100, sort, overrideAccess: false })
     tiles = res.docs.map((s: { id: string | number; title?: string | null; slug?: string | null; icon?: string | null }) => ({
       id: String(s.id),
       icon: s.icon || defaultIcon || 'stethoscope',
       label: s.title ?? '',
       href:
         linkToDirectory && s.slug && collection === 'specialties'
-          ? `${directoryPath || '/specialists'}?specialty=${s.slug}`
+          ? `${directoryPath || '/specialists/specialist-panel'}?specialty=${s.slug}`
           : null,
     }))
   }
@@ -95,6 +100,7 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       <SectionHeader
@@ -116,7 +122,11 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
           ))}
         </ul>
       ) : (
-        <div className="specialty-grid">
+        // `columns` was declared and never read; the grid used a fixed track.
+        <div
+          className="specialty-grid"
+          style={{ '--vf-cols': Number(columns) || 4 } as React.CSSProperties}
+        >
           {tiles.map((t) => (
             <Tile key={t.id} {...t} ctaLabel={ctaLabel} className={toClassName(elementClasses?.card)} />
           ))}

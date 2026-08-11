@@ -22,10 +22,14 @@ export const FAQ: Block = {
       name: 'columns',
       type: 'select',
       defaultValue: '1',
-      admin: { description: 'Lay the questions out in one or two columns.' },
+      admin: {
+        description:
+          'Lay the questions out in one or two columns, or side by side — heading and intro in a left column with the questions beside them (the services-page treatment).',
+      },
       options: [
         { label: '1 column', value: '1' },
         { label: '2 columns', value: '2' },
+        { label: 'Side by side (heading left, questions right)', value: 'split' },
       ],
     },
     {
@@ -45,7 +49,10 @@ export const FAQ: Block = {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          admin: { description: 'Optional image shown with this item (accordion-with-image layout).' },
+          admin: {
+        description:
+          'Optional image. Shown beneath the heading in the “Side by side” layout (first item that has one wins); ignored in the 1- and 2-column layouts.',
+      },
         },
         {
           name: 'answer',

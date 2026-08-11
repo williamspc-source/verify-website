@@ -151,32 +151,9 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     .map((s) => idBySlug.get(s))
     .filter((id): id is NonNullable<typeof id> => id != null)
 
-  // Make each "What We Do" tile clickable to its canonical destination (there are
-  // no standalone /services/<slug> pages — the reference links each card to its
-  // parent service page + section anchor). Setting `linkOverride` on the service
-  // doc keeps it editable in the admin and is honoured by the grid even with
-  // `linkToService` off. Mirrors `.design-reference/index.html` service cards.
-  const tileLinkOverrides: Record<string, string> = {
-    'independent-medical-examination': '/ime',
-    'joint-medical-examination': '/jme',
-    'file-review': '/reporting-services#file-review',
-    'supplementary-report': '/reporting-services#supplementary-report',
-    'teleconference-expert-evidence': '/reporting-services#teleconference',
-    'expert-evidence': '/reporting-services#expert-evidence',
-    'surrogate-assessment-interpreter-booking': '/admin-services#surrogate-assessment',
-    'brief-reduction-loi-review': '/admin-services#brief-reduction',
-  }
-  for (const [slug, href] of Object.entries(tileLinkOverrides)) {
-    const id = idBySlug.get(slug)
-    if (!id) continue
-    await payload.update({
-      collection: 'services',
-      id,
-      data: { linkOverride: href } as never,
-      req,
-      context: { disableRevalidate: true },
-    })
-  }
+  // Service card `linkOverride`s (canonical nested destinations) are set by
+  // `repairServiceLinks`, which seedVerify runs unconditionally — this module
+  // early-returns on an already-authored homepage, so the repair can't live here.
 
   // Medico-Legal Services grid: hand-picked (icon + title only). Falls back to the
   // medico-legal category if the service docs aren't seeded yet.
@@ -279,11 +256,11 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
           accent: 'blue',
           links: [
             custom('/services', 'Our Services'),
-            custom('/specialist-panel', 'Specialist Panel'),
+            custom('/specialists/specialist-panel', 'Specialist Panel'),
             custom('/about', 'Why Refer to Us'),
-            custom('/for-clients#faqs', 'Frequently Asked Questions'),
+            custom('/information-centre/for-clients#faqs', 'Frequently Asked Questions'),
           ],
-          ...custom('/for-clients', 'Learn More'),
+          ...custom('/information-centre/for-clients', 'Learn More'),
         },
         {
           icon: 'user',
@@ -293,12 +270,12 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
             'Helpful information to prepare you for your appointment and understand what to expect.',
           accent: 'steel',
           links: [
-            custom('/for-claimants#process-overview', 'Process Overview'),
-            custom('/for-claimants#appointment-guide', 'In-Person Appointment Guide'),
-            custom('/for-claimants#video-guide', 'Videolink Appointment Guide'),
-            custom('/for-claimants#claimant-faqs', 'Frequently Asked Questions'),
+            custom('/information-centre/for-claimants#process-overview', 'Process Overview'),
+            custom('/information-centre/for-claimants#appointment-guide', 'In-Person Appointment Guide'),
+            custom('/information-centre/for-claimants#video-guide', 'Videolink Appointment Guide'),
+            custom('/information-centre/for-claimants#claimant-faqs', 'Frequently Asked Questions'),
           ],
-          ...custom('/for-claimants', 'Learn More'),
+          ...custom('/information-centre/for-claimants', 'Learn More'),
         },
         {
           icon: 'stethoscope',
@@ -308,12 +285,12 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
             'Join a panel that values your expertise and supports your professional growth.',
           accent: 'charcoal',
           links: [
-            custom('/join-expert-panel', "Join VERIFY's Expert Panel"),
-            custom('/join-expert-panel#panel-benefits', 'Working with VERIFY'),
+            custom('/specialists/join-expert-panel', "Join VERIFY's Expert Panel"),
+            custom('/specialists/join-expert-panel#panel-benefits', 'Working with VERIFY'),
             custom('https://aamle.com.au/', 'AAMLE Education & Training', { newTab: true }),
             custom('/events', 'Upcoming Webinars & Training'),
           ],
-          ...custom('/join-expert-panel', 'Join Expert Panel'),
+          ...custom('/specialists/join-expert-panel', 'Join Expert Panel'),
         },
       ],
     },
@@ -457,7 +434,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
                 },
                 {
                   blockType: 'button',
-                  links: [custom('/ime#claim-types', 'Learn More')],
+                  links: [custom('/services/medico-legal/ime#claim-types', 'Learn More')],
                 },
               ],
             },
@@ -488,8 +465,8 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
       limit: 8,
       linkProfiles: true,
       footerLinks: [
-        custom('/specialist-panel', 'View Full Panel'),
-        custom('/join-expert-panel', 'Join Expert Panel'),
+        custom('/specialists/specialist-panel', 'View Full Panel'),
+        custom('/specialists/join-expert-panel', 'Join Expert Panel'),
       ],
     },
     // ── Testimonials (carousel) ──

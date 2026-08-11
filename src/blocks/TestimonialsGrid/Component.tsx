@@ -59,6 +59,7 @@ export const TestimonialsGridBlock: React.FC<Props & { bare?: boolean }> = async
     motion,
     containerWidth,
     hoverEffect,
+    shadow,
     bare,
   } = props
 
@@ -90,6 +91,7 @@ export const TestimonialsGridBlock: React.FC<Props & { bare?: boolean }> = async
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       <SectionHeader
@@ -117,7 +119,7 @@ export const TestimonialsGridBlock: React.FC<Props & { bare?: boolean }> = async
       ) : (
         <div
           className="testimonials-grid"
-          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+          style={{ '--vf-cols': cols } as React.CSSProperties}
         >
           {docs.map((t, i) => (
             <Card key={i} t={t} className={toClassName(elementClasses?.card)} />

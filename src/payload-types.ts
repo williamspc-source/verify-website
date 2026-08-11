@@ -224,7 +224,7 @@ export interface Page {
     theme?: ('light' | 'dark' | 'service') | null;
     align?: ('left' | 'center') | null;
     /**
-     * Decorative brand shield behind the hero (uses the Site Settings logo/shield).
+     * Decorative brand shield on the definition panel. The image comes from Site Settings → Brand assets → Shield / seal mark, falling back to the bundled VERIFY shield.
      */
     showShield?: boolean | null;
     /**
@@ -354,6 +354,22 @@ export interface Page {
         }[]
       | null;
     /**
+     * Section background colour.
+     */
+    heroBackground?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+    /**
+     * Content width for this section.
+     */
+    containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+    /**
+     * Space above the hero content.
+     */
+    heroPaddingTop?: ('default' | 'none' | 'compact' | 'normal' | 'spacious' | 'xl') | null;
+    /**
+     * Space below the hero content.
+     */
+    heroPaddingBottom?: ('default' | 'none' | 'compact' | 'normal' | 'spacious' | 'xl') | null;
+    /**
      * The dictionary-style panel shown beside the home hero.
      */
     definition?: {
@@ -370,6 +386,10 @@ export interface Page {
        * Visual treatment for the definition panel.
        */
       definitionStyle?: ('glow' | 'frame') | null;
+      /**
+       * Pointer effects on the panel. Visitors who have asked their device to reduce motion always get the calm version automatically, and touch devices get no motion at all.
+       */
+      interaction?: ('full' | 'subtle' | 'off') | null;
     };
     richText?: {
       root: {
@@ -391,6 +411,9 @@ export interface Page {
           link: {
             type?: ('reference' | 'custom' | 'enquiry') | null;
             newTab?: boolean | null;
+            /**
+             * You can link to a draft. The link will 404 for visitors until that document is published.
+             */
             reference?:
               | ({
                   relationTo: 'pages';
@@ -399,6 +422,18 @@ export interface Page {
               | ({
                   relationTo: 'posts';
                   value: number | Post;
+                } | null)
+              | ({
+                  relationTo: 'specialists';
+                  value: number | Specialist;
+                } | null)
+              | ({
+                  relationTo: 'team';
+                  value: number | Team;
+                } | null)
+              | ({
+                  relationTo: 'events';
+                  value: number | Event;
                 } | null);
             url?: string | null;
             label: string;
@@ -518,7 +553,7 @@ export interface Page {
         }[]
       | null;
     /**
-     * Hero image (background for impact heroes; a side/decorative image on page heroes).
+     * Hero image. Background for the impact heroes, the side image on the home hero, and the contents of the image panel on a page hero.
      */
     media?: (number | null) | Media;
     /**
@@ -676,7 +711,7 @@ export interface Post {
   /**
    * Which In-the-Loop section this belongs to (drives URL + hub placement).
    */
-  stream?: (number | null) | Stream;
+  stream: number | Stream;
   /**
    * Show in the featured carousel on the In-the-Loop hub.
    */
@@ -1861,7 +1896,7 @@ export interface Stream {
     | null;
   description?: string | null;
   /**
-   * Lower numbers appear first in the hub section nav.
+   * Sort order in the admin list. Note: the In-the-Loop hub’s section nav is authored by hand in the Section Nav block on that page, so changing this does NOT reorder the public nav — edit the block instead.
    */
   order?: number | null;
   /**
@@ -1900,13 +1935,142 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  /**
+   * Start date & time. Decides whether the event shows as Upcoming or Past — it counts as upcoming for the whole of its day.
+   */
+  date: string;
+  /**
+   * e.g. "12:30 pm – 1:30 pm".
+   */
+  timeLabel?: string | null;
+  location?: string | null;
+  host?: ('aamle' | 'verify') | null;
+  /**
+   * External booking link (e.g. AAMLE).
+   */
+  registrationUrl?: string | null;
+  /**
+   * e.g. "Register on AAMLE", "Register Your Interest". Optional.
+   */
+  registrationLabel?: string | null;
+  /**
+   * When registrations / expressions of interest stop being accepted. After this the button changes from "Register Your Interest" to "Contact Us". Leave empty to close at the event's start time. Set it later to keep registrations open once the event has begun, or earlier to close them in advance. This is separate from the Upcoming/Past badge, which follows the start date.
+   */
+  registrationClosesAt?: string | null;
+  cpdEligible?: boolean | null;
+  cpdPoints?: number | null;
+  /**
+   * e.g. "Free", "$120". Defaults to Free if empty.
+   */
+  cost?: string | null;
+  /**
+   * Optional — link to a Location for structured filtering. The free-text "location" above is still shown if set.
+   */
+  locationRef?: (number | null) | Location;
+  image?: (number | null) | Media;
+  /**
+   * Short summary used in listings.
+   */
+  excerpt?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional write-up shown after the event has passed.
+   */
+  recap?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  eventType:
+    | 'networking'
+    | 'client-training'
+    | 'industry-briefing'
+    | 'workshop'
+    | 'webinar'
+    | 'breakfast-seminar'
+    | 'masterclass'
+    | 'specialist-seminar';
+  /**
+   * Presenters who are on the panel or the team. They render as linked cards on the event page. For an outside speaker, use “Guest presenters” below instead.
+   */
+  presenters?:
+    | (
+        | {
+            relationTo: 'specialists';
+            value: number | Specialist;
+          }
+        | {
+            relationTo: 'team';
+            value: number | Team;
+          }
+      )[]
+    | null;
+  /**
+   * Speakers who are not on the VERIFY panel or team.
+   */
+  guestPresenters?:
+    | {
+        name: string;
+        role?: string | null;
+        organisation?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SectionBlock".
  */
 export interface SectionBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Content width for this section.
    */
@@ -2106,6 +2270,9 @@ export interface ButtonBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -2114,6 +2281,18 @@ export interface ButtonBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -2250,6 +2429,10 @@ export interface ImageBlock {
   media: number | Media;
   width?: ('full' | 'wide' | 'normal' | 'narrow') | null;
   rounded?: ('none' | 'sm' | 'md' | 'full') | null;
+  /**
+   * Drop shadow behind the image. Edit the values in Globals → Design System.
+   */
+  shadow?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
   align?: ('left' | 'center' | 'right') | null;
   /**
    * Optional caption shown below the image.
@@ -2436,6 +2619,9 @@ export interface ContentBlock {
         link?: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -2444,6 +2630,18 @@ export interface ContentBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -2609,6 +2807,9 @@ export interface CallToActionBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -2617,6 +2818,18 @@ export interface CallToActionBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -2758,9 +2971,9 @@ export interface FAQBlock {
   heading?: string | null;
   subheading?: string | null;
   /**
-   * Lay the questions out in one or two columns.
+   * Lay the questions out in one or two columns, or side by side — heading and intro in a left column with the questions beside them (the services-page treatment).
    */
-  columns?: ('1' | '2') | null;
+  columns?: ('1' | '2' | 'split') | null;
   items?:
     | {
         question: string;
@@ -2872,7 +3085,7 @@ export interface FAQBlock {
             )
           | null;
         /**
-         * Optional image shown with this item (accordion-with-image layout).
+         * Optional image. Shown beneath the heading in the “Side by side” layout (first item that has one wins); ignored in the 1- and 2-column layouts.
          */
         image?: (number | null) | Media;
         answer: {
@@ -2940,7 +3153,7 @@ export interface GatewayCardsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   columns?: ('2' | '3' | '4') | null;
   cards?:
     | {
@@ -3077,6 +3290,9 @@ export interface GatewayCardsBlock {
               link: {
                 type?: ('reference' | 'custom' | 'enquiry') | null;
                 newTab?: boolean | null;
+                /**
+                 * You can link to a draft. The link will 404 for visitors until that document is published.
+                 */
                 reference?:
                   | ({
                       relationTo: 'pages';
@@ -3085,6 +3301,18 @@ export interface GatewayCardsBlock {
                   | ({
                       relationTo: 'posts';
                       value: number | Post;
+                    } | null)
+                  | ({
+                      relationTo: 'specialists';
+                      value: number | Specialist;
+                    } | null)
+                  | ({
+                      relationTo: 'team';
+                      value: number | Team;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
                     } | null);
                 url?: string | null;
                 label: string;
@@ -3202,6 +3430,9 @@ export interface GatewayCardsBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -3210,6 +3441,18 @@ export interface GatewayCardsBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -3361,6 +3604,10 @@ export interface GatewayCardsBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'gatewayCards';
@@ -3382,7 +3629,7 @@ export interface FeatureGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   columns?: ('1' | '2' | '3' | '4') | null;
   cardStyle?: ('card' | 'plain') | null;
   items?:
@@ -3666,6 +3913,10 @@ export interface FeatureGridBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'featureGrid';
@@ -3687,7 +3938,7 @@ export interface ProcessStepsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Layout. "Cards" = numbered card grid. "Two-row process" = connected numbered rows (01–03 blue, 04+ dark) matching the reference Our Process. "Claimant step list" = left intro + a compact numbered list on the right (reference Your Examination Step by Step).
    */
@@ -3863,6 +4114,10 @@ export interface ProcessStepsBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'processSteps';
@@ -3884,7 +4139,7 @@ export interface SpecialtyGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * Which taxonomy to list.
@@ -3894,6 +4149,9 @@ export interface SpecialtyGridBlock {
    * Icon cards, or an arrow checklist (e.g. "Claims We Support").
    */
   variant?: ('cards' | 'checklist') | null;
+  /**
+   * Cards per row. Not used by the arrow checklist, which is a single list.
+   */
   columns?: ('2' | '3' | '4') | null;
   /**
    * Icon used for every specialty.
@@ -4004,7 +4262,7 @@ export interface SpecialtyGridBlock {
     | null;
   linkToDirectory?: boolean | null;
   /**
-   * Links become <path>?specialty=<slug>.
+   * Links become <path>?specialty=<slug>. Default: the Specialist Panel directory.
    */
   directoryPath?: string | null;
   items?:
@@ -4120,6 +4378,9 @@ export interface SpecialtyGridBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -4128,6 +4389,18 @@ export interface SpecialtyGridBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -4279,6 +4552,10 @@ export interface SpecialtyGridBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'specialtyGrid';
@@ -4300,7 +4577,7 @@ export interface PeopleGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   source?: ('specialists' | 'team' | 'manual') | null;
   onlyAdvertised?: boolean | null;
   featuredOnly?: boolean | null;
@@ -4333,6 +4610,9 @@ export interface PeopleGridBlock {
       )[]
     | null;
   layout?: ('grid' | 'carousel') | null;
+  /**
+   * Grid only.
+   */
   columns?: ('2' | '3' | '4') | null;
   /**
    * Max people to show (0 = show all).
@@ -4346,6 +4626,9 @@ export interface PeopleGridBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -4354,6 +4637,18 @@ export interface PeopleGridBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -4520,6 +4815,10 @@ export interface PeopleGridBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'peopleGrid';
@@ -4541,7 +4840,7 @@ export interface ServicesGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * Optional — limit to one category.
@@ -4585,6 +4884,9 @@ export interface ServicesGridBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -4593,6 +4895,18 @@ export interface ServicesGridBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -4740,6 +5054,10 @@ export interface ServicesGridBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'servicesGrid';
@@ -4929,7 +5247,7 @@ export interface TestimonialsGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   featuredOnly?: boolean | null;
   testimonials?: (number | Testimonial)[] | null;
@@ -4976,6 +5294,10 @@ export interface TestimonialsGridBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'testimonialsGrid';
@@ -5038,7 +5360,7 @@ export interface StatsBandBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   stats?:
     | {
         /**
@@ -5107,7 +5429,7 @@ export interface TabsBlockType {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   tabs?:
     | {
         label: string;
@@ -5300,7 +5622,7 @@ export interface AamleEducationBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Small uppercase label above the wordmark.
    */
@@ -5563,6 +5885,9 @@ export interface AamleEducationBlock {
   link: {
     type?: ('reference' | 'custom' | 'enquiry') | null;
     newTab?: boolean | null;
+    /**
+     * You can link to a draft. The link will 404 for visitors until that document is published.
+     */
     reference?:
       | ({
           relationTo: 'pages';
@@ -5571,6 +5896,18 @@ export interface AamleEducationBlock {
       | ({
           relationTo: 'posts';
           value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'specialists';
+          value: number | Specialist;
+        } | null)
+      | ({
+          relationTo: 'team';
+          value: number | Team;
+        } | null)
+      | ({
+          relationTo: 'events';
+          value: number | Event;
         } | null);
     url?: string | null;
     label: string;
@@ -5731,7 +6068,7 @@ export interface SplitFeatureBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Each row alternates image side automatically unless overridden.
    */
@@ -5991,6 +6328,9 @@ export interface SplitFeatureBlock {
         link?: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -5999,6 +6339,18 @@ export interface SplitFeatureBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -6169,6 +6521,9 @@ export interface CTABandBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -6177,6 +6532,18 @@ export interface CTABandBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -6458,11 +6825,17 @@ export interface CalloutBlock {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Callout links all render in the same style, so a link’s Appearance (Default/Outline) makes no difference here.
+   */
   links?:
     | {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -6471,6 +6844,18 @@ export interface CalloutBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -6942,13 +7327,16 @@ export interface MapEmbedBlock {
    */
   parkingHeading?: string | null;
   /**
-   * e.g. Get directions / Call / Email.
+   * e.g. Get directions / Call / Email. Each link’s Appearance (Default/Outline) applies on the standard map layout; the contact-details layout renders them all in one style.
    */
   actions?:
     | {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -6957,6 +7345,18 @@ export interface MapEmbedBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -7102,6 +7502,10 @@ export interface Office {
    */
   title: string;
   /**
+   * The office whose phone, email, address and hours the site falls back to — the footer and any "Use global contact details" block. Tick exactly one. Leave the matching Footer fields empty to follow this office; fill one in to override it there.
+   */
+  isPrimary?: boolean | null;
+  /**
    * Full postal address (line breaks preserved).
    */
   address?: string | null;
@@ -7174,7 +7578,7 @@ export interface LeadershipSpotlightBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Founder portrait. Falls back to a labelled placeholder when empty.
    */
@@ -7329,6 +7733,9 @@ export interface LeadershipSpotlightBlock {
   link: {
     type?: ('reference' | 'custom' | 'enquiry') | null;
     newTab?: boolean | null;
+    /**
+     * You can link to a draft. The link will 404 for visitors until that document is published.
+     */
     reference?:
       | ({
           relationTo: 'pages';
@@ -7337,6 +7744,18 @@ export interface LeadershipSpotlightBlock {
       | ({
           relationTo: 'posts';
           value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'specialists';
+          value: number | Specialist;
+        } | null)
+      | ({
+          relationTo: 'team';
+          value: number | Team;
+        } | null)
+      | ({
+          relationTo: 'events';
+          value: number | Event;
         } | null);
     url?: string | null;
     label: string;
@@ -7623,6 +8042,9 @@ export interface PortalCtaBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -7631,6 +8053,18 @@ export interface PortalCtaBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -7798,7 +8232,7 @@ export interface VideoEmbedBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
@@ -8031,7 +8465,7 @@ export interface ArchiveBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   introContent?: {
     root: {
       type: string;
@@ -8092,6 +8526,9 @@ export interface ArchiveBlock {
     link?: {
       type?: ('reference' | 'custom' | 'enquiry') | null;
       newTab?: boolean | null;
+      /**
+       * You can link to a draft. The link will 404 for visitors until that document is published.
+       */
       reference?:
         | ({
             relationTo: 'pages';
@@ -8100,6 +8537,18 @@ export interface ArchiveBlock {
         | ({
             relationTo: 'posts';
             value: number | Post;
+          } | null)
+        | ({
+            relationTo: 'specialists';
+            value: number | Specialist;
+          } | null)
+        | ({
+            relationTo: 'team';
+            value: number | Team;
+          } | null)
+        | ({
+            relationTo: 'events';
+            value: number | Event;
           } | null);
       url?: string | null;
       label?: string | null;
@@ -8226,120 +8675,6 @@ export interface ArchiveBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events".
- */
-export interface Event {
-  id: number;
-  title: string;
-  /**
-   * Start date & time. Drives the upcoming/past split.
-   */
-  date: string;
-  /**
-   * e.g. "12:30 pm – 1:30 pm".
-   */
-  timeLabel?: string | null;
-  location?: string | null;
-  host?: ('aamle' | 'verify') | null;
-  /**
-   * External booking link (e.g. AAMLE).
-   */
-  registrationUrl?: string | null;
-  /**
-   * e.g. "Register on AAMLE", "Register Your Interest". Optional.
-   */
-  registrationLabel?: string | null;
-  cpdEligible?: boolean | null;
-  cpdPoints?: number | null;
-  /**
-   * e.g. "Free", "$120". Defaults to Free if empty.
-   */
-  cost?: string | null;
-  /**
-   * Optional — link to a Location for structured filtering. The free-text "location" above is still shown if set.
-   */
-  locationRef?: (number | null) | Location;
-  image?: (number | null) | Media;
-  /**
-   * Short summary used in listings.
-   */
-  excerpt?: string | null;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Optional write-up shown after the event has passed.
-   */
-  recap?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  eventType:
-    | 'networking'
-    | 'client-training'
-    | 'industry-briefing'
-    | 'workshop'
-    | 'webinar'
-    | 'breakfast-seminar'
-    | 'masterclass'
-    | 'specialist-seminar';
-  /**
-   * Optional — link to specialist or team presenters.
-   */
-  presenters?:
-    | (
-        | {
-            relationTo: 'specialists';
-            value: number | Specialist;
-          }
-        | {
-            relationTo: 'team';
-            value: number | Team;
-          }
-      )[]
-    | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "AvailabilityBlock".
  */
 export interface AvailabilityBlock {
@@ -8433,7 +8768,7 @@ export interface SpecialistDirectoryBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   enableSearch?: boolean | null;
   enableSpecialty?: boolean | null;
   enableLocation?: boolean | null;
@@ -8513,7 +8848,7 @@ export interface SpecialtyDirectoryBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   showFilterBar?: boolean | null;
   /**
    * List each specialty’s specialists inside the accordion.
@@ -8553,7 +8888,7 @@ export interface ResourcesGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * "Standard card" or "Resource card" (design-reference In-the-Loop .ni-resource-card — coloured header panel + body).
@@ -8593,6 +8928,10 @@ export interface ResourcesGridBlock {
    * Hover effect for cards/items in this block.
    */
   hoverEffect?: ('none' | 'lift' | 'glow' | 'zoom' | 'accent-bar') | null;
+  /**
+   * Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.
+   */
+  shadow?: ('default' | 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'glow' | 'glow-strong') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'resourcesGrid';
@@ -9247,7 +9586,7 @@ export interface MissionPillarsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Small uppercase label above the heading (optional).
    */
@@ -9306,7 +9645,7 @@ export interface ValueCardsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Value cards, rendered in a 3-column grid. Every second card (2nd, 4th, 6th) is tinted light blue automatically.
    */
@@ -9516,7 +9855,7 @@ export interface AudiencePathwaysBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Two audience pathway cards shown side by side.
    */
@@ -9557,6 +9896,9 @@ export interface AudiencePathwaysBlock {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -9565,6 +9907,18 @@ export interface AudiencePathwaysBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -9841,6 +10195,9 @@ export interface BookingChooserBlock {
               link: {
                 type?: ('reference' | 'custom' | 'enquiry') | null;
                 newTab?: boolean | null;
+                /**
+                 * You can link to a draft. The link will 404 for visitors until that document is published.
+                 */
                 reference?:
                   | ({
                       relationTo: 'pages';
@@ -9849,6 +10206,18 @@ export interface BookingChooserBlock {
                   | ({
                       relationTo: 'posts';
                       value: number | Post;
+                    } | null)
+                  | ({
+                      relationTo: 'specialists';
+                      value: number | Specialist;
+                    } | null)
+                  | ({
+                      relationTo: 'team';
+                      value: number | Team;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
                     } | null);
                 url?: string | null;
                 label: string;
@@ -10141,6 +10510,10 @@ export interface CostGridBlock {
  */
 export interface NewsletterBlock {
   /**
+   * Where signups are stored. Create a form with a single "email" field under Forms, then choose it here — submissions appear under Form Submissions, and the form’s Emails tab controls who is notified. Leave this empty and the band will tell visitors that signups are unavailable rather than showing a subscribe box that discards their address.
+   */
+  form?: (number | null) | Form;
+  /**
    * Small uppercase label above the heading.
    */
   eyebrow?: string | null;
@@ -10246,7 +10619,7 @@ export interface FeaturedArticlesBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -10338,7 +10711,7 @@ export interface EventsExplorerBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -10366,7 +10739,7 @@ export interface AvailabilitySession {
    */
   location?: string | null;
   /**
-   * Optional internal/marketing note shown with the slot.
+   * Optional note about this slot. Shown as the tooltip when a visitor hovers the time chip, and read out by screen readers with the time — so keep it short and visitor-facing, not internal.
    */
   notes?: string | null;
   /**
@@ -10448,6 +10821,7 @@ export interface Search {
         value: number | Event;
       };
   slug?: string | null;
+  uri?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -10754,6 +11128,10 @@ export interface PagesSelect<T extends boolean = true> {
               href?: T;
               id?: T;
             };
+        heroBackground?: T;
+        containerWidth?: T;
+        heroPaddingTop?: T;
+        heroPaddingBottom?: T;
         definition?:
           | T
           | {
@@ -10761,6 +11139,7 @@ export interface PagesSelect<T extends boolean = true> {
               pronunciation?: T;
               text?: T;
               definitionStyle?: T;
+              interaction?: T;
             };
         richText?: T;
         links?:
@@ -11017,6 +11396,7 @@ export interface ImageBlockSelect<T extends boolean = true> {
   media?: T;
   width?: T;
   rounded?: T;
+  shadow?: T;
   align?: T;
   caption?: T;
   cssClass?: T;
@@ -11214,6 +11594,7 @@ export interface GatewayCardsBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -11263,6 +11644,7 @@ export interface FeatureGridBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -11304,6 +11686,7 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -11352,6 +11735,7 @@ export interface SpecialtyGridBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -11410,6 +11794,7 @@ export interface PeopleGridBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -11459,6 +11844,7 @@ export interface ServicesGridBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -11494,6 +11880,7 @@ export interface TestimonialsGridBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -12115,6 +12502,7 @@ export interface ResourcesGridBlockSelect<T extends boolean = true> {
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
+  shadow?: T;
   id?: T;
   blockName?: T;
 }
@@ -12347,6 +12735,7 @@ export interface CostGridBlockSelect<T extends boolean = true> {
  * via the `definition` "NewsletterBlock_select".
  */
 export interface NewsletterBlockSelect<T extends boolean = true> {
+  form?: T;
   eyebrow?: T;
   heading?: T;
   subheading?: T;
@@ -12834,6 +13223,7 @@ export interface EventsSelect<T extends boolean = true> {
   host?: T;
   registrationUrl?: T;
   registrationLabel?: T;
+  registrationClosesAt?: T;
   cpdEligible?: T;
   cpdPoints?: T;
   cost?: T;
@@ -12851,6 +13241,14 @@ export interface EventsSelect<T extends boolean = true> {
       };
   eventType?: T;
   presenters?: T;
+  guestPresenters?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        organisation?: T;
+        id?: T;
+      };
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -12920,6 +13318,7 @@ export interface ResourcesSelect<T extends boolean = true> {
  */
 export interface OfficesSelect<T extends boolean = true> {
   title?: T;
+  isPrimary?: T;
   address?: T;
   phone?: T;
   email?: T;
@@ -13148,6 +13547,7 @@ export interface SearchSelect<T extends boolean = true> {
   priority?: T;
   doc?: T;
   slug?: T;
+  uri?: T;
   meta?:
     | T
     | {
@@ -13260,6 +13660,9 @@ export interface Header {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -13268,6 +13671,18 @@ export interface Header {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -13387,6 +13802,9 @@ export interface Header {
               link: {
                 type?: ('reference' | 'custom' | 'enquiry') | null;
                 newTab?: boolean | null;
+                /**
+                 * You can link to a draft. The link will 404 for visitors until that document is published.
+                 */
                 reference?:
                   | ({
                       relationTo: 'pages';
@@ -13395,6 +13813,18 @@ export interface Header {
                   | ({
                       relationTo: 'posts';
                       value: number | Post;
+                    } | null)
+                  | ({
+                      relationTo: 'specialists';
+                      value: number | Specialist;
+                    } | null)
+                  | ({
+                      relationTo: 'team';
+                      value: number | Team;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
                     } | null);
                 url?: string | null;
                 label: string;
@@ -13514,6 +13944,9 @@ export interface Header {
                     link: {
                       type?: ('reference' | 'custom' | 'enquiry') | null;
                       newTab?: boolean | null;
+                      /**
+                       * You can link to a draft. The link will 404 for visitors until that document is published.
+                       */
                       reference?:
                         | ({
                             relationTo: 'pages';
@@ -13522,6 +13955,18 @@ export interface Header {
                         | ({
                             relationTo: 'posts';
                             value: number | Post;
+                          } | null)
+                        | ({
+                            relationTo: 'specialists';
+                            value: number | Specialist;
+                          } | null)
+                        | ({
+                            relationTo: 'team';
+                            value: number | Team;
+                          } | null)
+                        | ({
+                            relationTo: 'events';
+                            value: number | Event;
                           } | null);
                       url?: string | null;
                       label: string;
@@ -13650,6 +14095,9 @@ export interface Header {
     link: {
       type?: ('reference' | 'custom' | 'enquiry') | null;
       newTab?: boolean | null;
+      /**
+       * You can link to a draft. The link will 404 for visitors until that document is published.
+       */
       reference?:
         | ({
             relationTo: 'pages';
@@ -13658,6 +14106,18 @@ export interface Header {
         | ({
             relationTo: 'posts';
             value: number | Post;
+          } | null)
+        | ({
+            relationTo: 'specialists';
+            value: number | Specialist;
+          } | null)
+        | ({
+            relationTo: 'team';
+            value: number | Team;
+          } | null)
+        | ({
+            relationTo: 'events';
+            value: number | Event;
           } | null);
       url?: string | null;
       label: string;
@@ -13791,6 +14251,9 @@ export interface Footer {
               link: {
                 type?: ('reference' | 'custom' | 'enquiry') | null;
                 newTab?: boolean | null;
+                /**
+                 * You can link to a draft. The link will 404 for visitors until that document is published.
+                 */
                 reference?:
                   | ({
                       relationTo: 'pages';
@@ -13799,6 +14262,18 @@ export interface Footer {
                   | ({
                       relationTo: 'posts';
                       value: number | Post;
+                    } | null)
+                  | ({
+                      relationTo: 'specialists';
+                      value: number | Specialist;
+                    } | null)
+                  | ({
+                      relationTo: 'team';
+                      value: number | Team;
+                    } | null)
+                  | ({
+                      relationTo: 'events';
+                      value: number | Event;
                     } | null);
                 url?: string | null;
                 label: string;
@@ -13944,6 +14419,9 @@ export interface Footer {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -13952,6 +14430,18 @@ export interface Footer {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -14089,45 +14579,186 @@ export interface SiteSetting {
    */
   favicon?: (number | null) | Media;
   /**
+   * The brand shield used as the watermark on the home hero’s definition panel. Falls back to the bundled VERIFY shield when empty. (The home hero’s “Show VERIFY shield watermark” toggle controls whether it appears at all.)
+   */
+  shield?: (number | null) | Media;
+  /**
    * Default preview image when pages are shared. Ideally 1200×630.
    */
   socialImage?: (number | null) | Media;
   /**
-   * Overrides the site colour palette at runtime. Empty fields use the built-in defaults.
+   * The form that the site-wide “Make an Enquiry” drawer submits into. Every enquiry button on the site posts here, and the chosen form’s Emails tab decides who is notified. If this is empty the drawer tells visitors it is unavailable rather than silently discarding their enquiry — so set it, and check it after renaming any form.
+   */
+  enquiryForm?: (number | null) | Form;
+  /**
+   * Overrides the site colour palette at runtime. Empty fields use the built-in defaults. The “on dark” colours below are used automatically wherever text sits on a dark or coloured band — set those rather than restyling individual sections. Font families and sizes live in Design System.
    */
   colors?: {
     /**
-     * Hex, e.g. #1c75bc. Leave empty to use the built-in default.
+     * Default: #1c75bc. Hex, rgb(a) or any CSS colour. Empty = default.
      */
     primary?: string | null;
     /**
-     * Hex, e.g. #155fa0. Leave empty to use the built-in default.
+     * Default: #155fa0. Hex, rgb(a) or any CSS colour. Empty = default.
      */
     primaryStrong?: string | null;
     /**
-     * Hex, e.g. #414042. Leave empty to use the built-in default.
+     * Default: #414042. The softer grey used for body paragraphs. This is the LIGHTER of the two text colours — for headings and high-contrast text use “Strong text” beside it.
      */
     text?: string | null;
     /**
-     * Hex, e.g. #737373. Leave empty to use the built-in default.
+     * Default: #222222. The near-black used for headings and high-contrast copy. Despite the field being named “muted” internally, this is the DARKER of the two.
      */
     mutedText?: string | null;
     /**
-     * Hex, e.g. #cbe5fa. Leave empty to use the built-in default.
+     * Default: #cbe5fa. Hex, rgb(a) or any CSS colour. Empty = default.
      */
     accent?: string | null;
     /**
-     * Hex, e.g. #c6c6c6. Leave empty to use the built-in default.
+     * Default: #c6c6c6. Hex, rgb(a) or any CSS colour. Empty = default.
      */
     border?: string | null;
     /**
-     * Hex, e.g. #93d0f7. Leave empty to use the built-in default.
+     * Default: #93d0f7. Hex, rgb(a) or any CSS colour. Empty = default.
      */
     accentLight?: string | null;
     /**
-     * Hex, e.g. #1a3a5c. Leave empty to use the built-in default.
+     * Default: #1a3a5c. Hex, rgb(a) or any CSS colour. Empty = default.
      */
     primaryDeep?: string | null;
+    /**
+     * Default: #ffffff. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    textOnDark?: string | null;
+    /**
+     * Default: rgba(255,255,255,0.82). Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    mutedTextOnDark?: string | null;
+    /**
+     * Default: #93d0f7. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    accentOnDark?: string | null;
+    /**
+     * Default: rgba(255,255,255,0.35). Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    borderOnDark?: string | null;
+    /**
+     * Default: #ffffff. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    background?: string | null;
+    /**
+     * Default: #ffffff. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    surface?: string | null;
+    /**
+     * Default: #414042. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    surfaceText?: string | null;
+    /**
+     * Used wherever the design calls for plain white — buttons, card fills, dividers. Changing it tints many small surfaces at once.
+     */
+    white?: string | null;
+    /**
+     * Default: #f1f5f9. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    muted?: string | null;
+    /**
+     * Default: #ffffff. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    primaryText?: string | null;
+    /**
+     * Outline colour shown when tabbing through links and inputs.
+     */
+    ring?: string | null;
+    /**
+     * Default: #cbe5fa. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    secondary?: string | null;
+    /**
+     * Default: #1c75bc. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    secondaryText?: string | null;
+    /**
+     * Default: #2d8fe8. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    secondaryBright?: string | null;
+    /**
+     * Default: #14639e. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    gradientStart?: string | null;
+    /**
+     * Default: #1a3a5c. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    navy?: string | null;
+    /**
+     * Default: #5ba3d9. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    definitionBlue?: string | null;
+    /**
+     * Default: #c6c6c6. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    paleSurface?: string | null;
+    /**
+     * Default: oklch(78% 0.08 200deg). Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    success?: string | null;
+    /**
+     * Default: oklch(89% 0.1 75deg). Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    warning?: string | null;
+    /**
+     * Default: oklch(75% 0.15 25deg). Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    error?: string | null;
+    /**
+     * Default: #c0392b. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    formError?: string | null;
+    /**
+     * Default: #2563eb. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    calloutInfo?: string | null;
+    /**
+     * Default: #475569. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    calloutNote?: string | null;
+    /**
+     * Default: #16a34a. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    calloutSuccess?: string | null;
+    /**
+     * Default: #d97706. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    calloutWarning?: string | null;
+    /**
+     * Default: #2e9e6b. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    availInPerson?: string | null;
+    /**
+     * Default: #6b46c1. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    availTelehealth?: string | null;
+    /**
+     * Default: #e6b033. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    availEither?: string | null;
+  };
+  /**
+   * The trail shown at the top of every page hero. These apply site-wide; the middle “section” crumb is set per content type (Article Settings, Team Settings, Events Settings, Specialist Profile). Individual pages can hide the trail from the page’s Hero tab.
+   */
+  breadcrumbs?: {
+    /**
+     * First crumb, on every trail.
+     */
+    homeLabel?: string | null;
+    /**
+     * Character between crumbs. Default “›”.
+     */
+    separator?: string | null;
+    /**
+     * Names the navigation landmark for screen readers.
+     */
+    navLabel?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -14339,6 +14970,18 @@ export interface SpecialistProfile {
       | null;
     enquiryLabel?: string | null;
     /**
+     * Shown only when the specialist has a Booking link.
+     */
+    bookingLabel?: string | null;
+    /**
+     * Shown only when a CV is attached.
+     */
+    cvLabel?: string | null;
+    /**
+     * Shown only when a sample report is attached.
+     */
+    sampleReportLabel?: string | null;
+    /**
      * Optional — defaults to the Site Settings / Footer contact email.
      */
     enquiryEmail?: string | null;
@@ -14362,12 +15005,11 @@ export interface SpecialistProfile {
     assessmentTypes?: string | null;
   };
   /**
-   * The breadcrumb trail shown at the top of every profile.
+   * The middle crumb of the trail shown at the top of every profile. The first crumb — “Home” — is shared site-wide (Site Settings → Breadcrumbs); the last is the specialist’s own name.
    */
   breadcrumb?: {
     breadcrumbParentLabel?: string | null;
     breadcrumbParentHref?: string | null;
-    breadcrumbCurrentLabel?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -14497,6 +15139,9 @@ export interface ArticleSetting {
         link: {
           type?: ('reference' | 'custom' | 'enquiry') | null;
           newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -14505,6 +15150,18 @@ export interface ArticleSetting {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
               } | null);
           url?: string | null;
           label: string;
@@ -14620,11 +15277,21 @@ export interface ArticleSetting {
       }[]
     | null;
   labels?: {
+    /**
+     * Heading above an article’s attached files.
+     */
+    attachmentsHeading?: string | null;
     related?: string | null;
     toc?: string | null;
     topics?: string | null;
-    breadcrumbHomeLabel?: string | null;
+    /**
+     * Second breadcrumb link (the In the Loop hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
+     */
     breadcrumbSectionLabel?: string | null;
+    /**
+     * Shown under a stream heading when that stream has no description of its own.
+     */
+    streamFallbackSubtitle?: string | null;
     bylinePrefix?: string | null;
     minReadSuffix?: string | null;
     shareLinkedinLabel?: string | null;
@@ -14676,6 +15343,14 @@ export interface EventsSetting {
    */
   labels?: {
     /**
+     * Heading above the presenter cards on an event page.
+     */
+    presentersHeading?: string | null;
+    /**
+     * Second breadcrumb link (the events hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
+     */
+    breadcrumbSectionLabel?: string | null;
+    /**
      * Status pill for events still to come.
      */
     statusUpcomingLabel?: string | null;
@@ -14717,11 +15392,7 @@ export interface TeamSetting {
   id: number;
   labels?: {
     /**
-     * First breadcrumb link (site home).
-     */
-    breadcrumbHomeLabel?: string | null;
-    /**
-     * Second breadcrumb link (team index).
+     * Second breadcrumb link (the team index). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
      */
     breadcrumbSectionLabel?: string | null;
     /**
@@ -14747,7 +15418,7 @@ export interface TeamSetting {
 export interface CustomStyle {
   id: number;
   /**
-   * Define a reusable style once, then apply it by name on any block/hero/page. Target the stable vf-* hook classes (e.g. .vf-card, .vf-section-header__title, .vf-carousel__arrow) and brand tokens (var(--primary), var(--accent), var(--shadow-lg), var(--radius)…). See src/Styles/HOOKS.md for the full hook + token reference. Scope to a block via ".your-class .vf-card { … }".
+   * Define a reusable style once, then apply it by name on any block/hero/page. Target the stable vf-* hook classes (e.g. .vf-card, .vf-section-header__title, .vf-carousel__arrow) and brand tokens (var(--primary), var(--accent), var(--vf-shadow-lg), var(--vf-radius-card)…) rather than literal colours, so your styles survive a rebrand. See src/Styles/HOOKS.md for the full reference — it also lists which admin field controls each token. Scope to a block via ".your-class .vf-card { … }".
    */
   presets?:
     | {
@@ -14786,21 +15457,25 @@ export interface CustomStyle {
 export interface DesignSystem {
   id: number;
   /**
-   * Font families used site-wide. Empty = the licensed brand font (MuseoSansRounded). To use a different font, first load it via Globals → Custom Styles → Global CSS (@font-face), then enter its family name here.
+   * Font families used site-wide. Empty = the brand defaults, Montserrat for headings and Open Sans for body. (MuseoSansRounded is also bundled and is used for the hero “VERIFY” wordmark.) To use a font that is not bundled, first load it via Globals → Custom Styles → Global CSS (@font-face), then enter its family name here. Text colours live in Site Settings → Brand colours.
    */
   typography?: {
     /**
-     * Default: MuseoSansRounded, sans-serif. Any CSS length (px, rem, clamp…). Empty = default.
+     * Default: 'Montserrat', sans-serif. Any CSS font-family list. Empty = default.
      */
     headingFont?: string | null;
     /**
-     * Default: MuseoSansRounded, sans-serif. Any CSS length (px, rem, clamp…). Empty = default.
+     * Default: 'Open Sans', sans-serif. Any CSS font-family list. Empty = default.
      */
     bodyFont?: string | null;
     /**
-     * Default: 1rem. Any CSS length (px, rem, clamp…). Empty = default.
+     * Default: 1.125rem. Any CSS length (px, rem, clamp…). Empty = default.
      */
     baseSize?: string | null;
+    /**
+     * Scales the whole site proportionally — text and the spacing around it. Use this rather than editing individual sizes. 100% is the designed size. Page width is unaffected, so larger settings mean bigger type in the same column.
+     */
+    textScale?: ('0.9' | '0.95' | '1' | '1.05' | '1.1' | '1.15' | '1.25') | null;
   };
   /**
    * Vertical padding presets for sections (also drives Spacer atoms).
@@ -14866,7 +15541,7 @@ export interface DesignSystem {
     display?: string | null;
   };
   /**
-   * Sizes for the Text atom.
+   * Sizes for the Text block’s Small/Base/Large options only. This does NOT set the size of body copy generally — for that use Typography → Base body text size.
    */
   text?: {
     /**
@@ -14883,17 +15558,70 @@ export interface DesignSystem {
     lg?: string | null;
   };
   /**
-   * Rounding presets for the Image atom.
+   * How rounded each kind of element is. Set every one to 0 for a fully square look. The names below are a rough guide only — usage has drifted, so several element types are rounded by a token whose name suggests something else (most cards, for example, take their radius from “Tile”). If one field does not change what you expected, try its neighbours before assuming the control is broken.
    */
   radius?: {
+    /**
+     * Default: 0. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    none?: string | null;
     /**
      * Default: 8px. Any CSS length (px, rem, clamp…). Empty = default.
      */
     sm?: string | null;
     /**
+     * Default: 10px. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    chip?: string | null;
+    /**
+     * Default: 12px. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    card?: string | null;
+    /**
+     * Default: 14px. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    tile?: string | null;
+    /**
      * Default: 16px. Any CSS length (px, rem, clamp…). Empty = default.
      */
     md?: string | null;
+    /**
+     * Default: 20px. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    panel?: string | null;
+    /**
+     * Default: 999px. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    pill?: string | null;
+    /**
+     * Default: 50%. Any CSS length (px, rem, clamp…). Empty = default.
+     */
+    circle?: string | null;
+    /**
+     * Default: 0.5rem. Any CSS length. Used by inputs, buttons and other form controls. Empty = default.
+     */
+    base?: string | null;
+  };
+  /**
+   * Reusable gradient recipes. The colours inside them follow the brand palette automatically, so you only need to edit these to change a gradient’s angle or stop layout. Section band gradients live under “Section bands” above.
+   */
+  gradients?: {
+    /**
+     * Default: linear-gradient(145deg, var(--accent), var(--accent-light)). Any CSS gradient or colour. Empty = default.
+     */
+    imageTint?: string | null;
+    /**
+     * Default: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary) 100%). Any CSS gradient or colour. Empty = default.
+     */
+    deep?: string | null;
+    /**
+     * Default: linear-gradient(160deg, var(--gradient-start) 0%, var(--primary) 100%). Any CSS gradient or colour. Empty = default.
+     */
+    hero?: string | null;
+    /**
+     * Default: linear-gradient(145deg, #f2f9ff, #d8eefc). Any CSS gradient or colour. Empty = default.
+     */
+    avatarTint?: string | null;
   };
   /**
    * Background colour/gradient for each section banding option.
@@ -14915,6 +15643,71 @@ export interface DesignSystem {
      * Default: #414042. Any CSS length (px, rem, clamp…). Empty = default.
      */
     dark?: string | null;
+  };
+  /**
+   * Depth and glow presets, picked per block via "Card shadow". "Shadow colour" tints the whole scale at once — it follows the brand primary from Site Settings unless overridden here, so a darker brand colour makes every shadow heavier. Large-panel shadows use their own slate colour, because brand blue reads wrong at big blur radii.
+   */
+  effects?: {
+    /**
+     * Default: var(--primary). Any CSS colour. Empty = default.
+     */
+    color?: string | null;
+    /**
+     * Default: #2b4a62. Any CSS colour. Empty = default.
+     */
+    colorDeep?: string | null;
+    /**
+     * Default: 0 1px 8px color-mix(in srgb, var(--vf-shadow-color) 5%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    xs?: string | null;
+    /**
+     * Default: 0 4px 24px color-mix(in srgb, var(--vf-shadow-color) 10%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    sm?: string | null;
+    /**
+     * Default: 0 12px 32px color-mix(in srgb, var(--vf-shadow-color) 13%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    md?: string | null;
+    /**
+     * Default: 0 8px 40px color-mix(in srgb, var(--vf-shadow-color) 16%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    lg?: string | null;
+    /**
+     * Default: 0 24px 60px color-mix(in srgb, var(--vf-shadow-color-deep) 13%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    xl?: string | null;
+    /**
+     * Default: 0 32px 72px color-mix(in srgb, var(--vf-shadow-color-deep) 22%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    xxl?: string | null;
+    /**
+     * Default: 0 4px 18px color-mix(in srgb, var(--vf-shadow-color) 28%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    glowSm?: string | null;
+    /**
+     * Default: 0 6px 20px color-mix(in srgb, var(--vf-shadow-color) 30%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    glowMd?: string | null;
+    /**
+     * Default: 0 8px 28px color-mix(in srgb, var(--vf-shadow-color) 38%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    glowLg?: string | null;
+    /**
+     * Default: 0 0 0 3px color-mix(in srgb, var(--vf-shadow-color) 12%, transparent). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    ring?: string | null;
+    /**
+     * Default: inset 0 1px 0 rgba(255,255,255,0.95). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    insetHighlight?: string | null;
+    /**
+     * Default: 6px 6px 0 var(--primary). Any CSS box-shadow value (comma-separate multiple layers). Empty = default.
+     */
+    hard?: string | null;
+    /**
+     * Default: 0.28s cubic-bezier(0.4, 0, 0.2, 1). Duration and easing for hover/focus animations site-wide. Use “0s” to switch transitions off. Empty = default.
+     */
+    transition?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -15065,7 +15858,9 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   logo?: T;
   logoFooter?: T;
   favicon?: T;
+  shield?: T;
   socialImage?: T;
+  enquiryForm?: T;
   colors?:
     | T
     | {
@@ -15077,6 +15872,42 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         border?: T;
         accentLight?: T;
         primaryDeep?: T;
+        textOnDark?: T;
+        mutedTextOnDark?: T;
+        accentOnDark?: T;
+        borderOnDark?: T;
+        background?: T;
+        surface?: T;
+        surfaceText?: T;
+        white?: T;
+        muted?: T;
+        primaryText?: T;
+        ring?: T;
+        secondary?: T;
+        secondaryText?: T;
+        secondaryBright?: T;
+        gradientStart?: T;
+        navy?: T;
+        definitionBlue?: T;
+        paleSurface?: T;
+        success?: T;
+        warning?: T;
+        error?: T;
+        formError?: T;
+        calloutInfo?: T;
+        calloutNote?: T;
+        calloutSuccess?: T;
+        calloutWarning?: T;
+        availInPerson?: T;
+        availTelehealth?: T;
+        availEither?: T;
+      };
+  breadcrumbs?:
+    | T
+    | {
+        homeLabel?: T;
+        separator?: T;
+        navLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -15130,6 +15961,9 @@ export interface SpecialistProfileSelect<T extends boolean = true> {
               id?: T;
             };
         enquiryLabel?: T;
+        bookingLabel?: T;
+        cvLabel?: T;
+        sampleReportLabel?: T;
         enquiryEmail?: T;
       };
   portalEnquirySubject?: T;
@@ -15148,7 +15982,6 @@ export interface SpecialistProfileSelect<T extends boolean = true> {
     | {
         breadcrumbParentLabel?: T;
         breadcrumbParentHref?: T;
-        breadcrumbCurrentLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -15180,11 +16013,12 @@ export interface ArticleSettingsSelect<T extends boolean = true> {
   labels?:
     | T
     | {
+        attachmentsHeading?: T;
         related?: T;
         toc?: T;
         topics?: T;
-        breadcrumbHomeLabel?: T;
         breadcrumbSectionLabel?: T;
+        streamFallbackSubtitle?: T;
         bylinePrefix?: T;
         minReadSuffix?: T;
         shareLinkedinLabel?: T;
@@ -15224,6 +16058,8 @@ export interface EventsSettingsSelect<T extends boolean = true> {
   labels?:
     | T
     | {
+        presentersHeading?: T;
+        breadcrumbSectionLabel?: T;
         statusUpcomingLabel?: T;
         statusPastLabel?: T;
         freeLabel?: T;
@@ -15244,7 +16080,6 @@ export interface TeamSettingsSelect<T extends boolean = true> {
   labels?:
     | T
     | {
-        breadcrumbHomeLabel?: T;
         breadcrumbSectionLabel?: T;
         roleLabel?: T;
         qualificationLabel?: T;
@@ -15284,6 +16119,7 @@ export interface DesignSystemSelect<T extends boolean = true> {
         headingFont?: T;
         bodyFont?: T;
         baseSize?: T;
+        textScale?: T;
       };
   spacing?:
     | T
@@ -15319,8 +16155,24 @@ export interface DesignSystemSelect<T extends boolean = true> {
   radius?:
     | T
     | {
+        none?: T;
         sm?: T;
+        chip?: T;
+        card?: T;
+        tile?: T;
         md?: T;
+        panel?: T;
+        pill?: T;
+        circle?: T;
+        base?: T;
+      };
+  gradients?:
+    | T
+    | {
+        imageTint?: T;
+        deep?: T;
+        hero?: T;
+        avatarTint?: T;
       };
   bands?:
     | T
@@ -15329,6 +16181,25 @@ export interface DesignSystemSelect<T extends boolean = true> {
         accent?: T;
         primary?: T;
         dark?: T;
+      };
+  effects?:
+    | T
+    | {
+        color?: T;
+        colorDeep?: T;
+        xs?: T;
+        sm?: T;
+        md?: T;
+        lg?: T;
+        xl?: T;
+        xxl?: T;
+        glowSm?: T;
+        glowMd?: T;
+        glowLg?: T;
+        ring?: T;
+        insetHighlight?: T;
+        hard?: T;
+        transition?: T;
       };
   updatedAt?: T;
   createdAt?: T;

@@ -26,7 +26,6 @@ export const ValueCardsBlock: React.FC<Props & { bare?: boolean }> = ({
   if (!cards || cards.length === 0) return null
 
   const bg = (background as SectionBackground) || 'dark'
-  const onDark = bg === 'dark' || bg === 'primary'
 
   return (
     <Section
@@ -43,7 +42,6 @@ export const ValueCardsBlock: React.FC<Props & { bare?: boolean }> = ({
         title={heading}
         subtitle={subheading}
         align="center"
-        onDark={onDark}
       />
 
       <div className="values-grid">

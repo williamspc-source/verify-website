@@ -35,6 +35,12 @@ export const ArticleSettings: GlobalConfig = {
       label: 'Fixed labels',
       fields: [
         {
+          name: 'attachmentsHeading',
+          type: 'text',
+          defaultValue: 'Downloads',
+          admin: { description: 'Heading above an article’s attached files.' },
+        },
+        {
           type: 'row',
           fields: [
             {
@@ -53,21 +59,22 @@ export const ArticleSettings: GlobalConfig = {
           ],
         },
         {
-          type: 'row',
-          fields: [
-            {
-              name: 'breadcrumbHomeLabel',
-              type: 'text',
-              defaultValue: 'Home',
-              admin: { width: '50%' },
-            },
-            {
-              name: 'breadcrumbSectionLabel',
-              type: 'text',
-              defaultValue: 'In the Loop',
-              admin: { width: '50%' },
-            },
-          ],
+          name: 'breadcrumbSectionLabel',
+          type: 'text',
+          defaultValue: 'In the Loop',
+          admin: {
+            description:
+              'Second breadcrumb link (the In the Loop hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.',
+          },
+        },
+        {
+          name: 'streamFallbackSubtitle',
+          type: 'text',
+          defaultValue: 'Browse every article in this stream.',
+          admin: {
+            description:
+              'Shown under a stream heading when that stream has no description of its own.',
+          },
         },
         {
           type: 'row',

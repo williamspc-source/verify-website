@@ -39,14 +39,23 @@ export const CTABandBlock: React.FC<Props & { bare?: boolean }> = ({
 
         {Array.isArray(links) && links.length > 0 ? (
           <div className="vf-cta-band__actions">
-            {links.map(({ link }, i) => (
-              <CMSLink
-                key={i}
-                {...link}
-                appearance="inline"
-                className={cn('btn', i === 0 ? 'btn-white' : 'btn-outline', toClassName(elementClasses?.button))}
-              />
-            ))}
+            {/* Style follows the editor's Appearance choice; list position is the
+                fallback for links saved before it was honoured. */}
+            {links.map(({ link }, i) => {
+              const outline = link?.appearance ? link.appearance === 'outline' : i > 0
+              return (
+                <CMSLink
+                  key={i}
+                  {...link}
+                  appearance="inline"
+                  className={cn(
+                    'btn',
+                    outline ? 'btn-outline' : 'btn-white',
+                    toClassName(elementClasses?.button),
+                  )}
+                />
+              )
+            })}
           </div>
         ) : null}
       </div>

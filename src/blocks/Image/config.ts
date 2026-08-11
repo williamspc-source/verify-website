@@ -1,6 +1,12 @@
 import type { Block } from 'payload'
 
-import { cssClassField, imageWidthField, roundedField, textAlignField } from '@/fields/blockFields'
+import {
+  cssClassField,
+  imageShadowField,
+  imageWidthField,
+  roundedField,
+  textAlignField,
+} from '@/fields/blockFields'
 
 // Atom block (nestable-only): a single image with width/rounding/alignment and an
 // optional caption.
@@ -11,7 +17,7 @@ export const Image: Block = {
   fields: [
     { name: 'media', type: 'upload', relationTo: 'media', required: true, label: 'Image' },
     { type: 'row', fields: [imageWidthField, roundedField] },
-    textAlignField,
+    { type: 'row', fields: [imageShadowField, textAlignField] },
     {
       name: 'caption',
       type: 'text',

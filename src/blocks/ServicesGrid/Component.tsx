@@ -75,6 +75,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
     motion,
     containerWidth,
     hoverEffect,
+    shadow,
     bare,
   } = props
 
@@ -168,6 +169,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
         motion={motion}
         containerWidth={containerWidth}
         hoverEffect={hoverEffect}
+        shadow={shadow}
         bare={bare}
       >
         {header}
@@ -186,10 +188,11 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       {header}
-      <div className="services-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+      <div className="services-grid" style={{ '--vf-cols': cols } as React.CSSProperties}>
         {items.map((s) => (
           <Card
             key={s.id}

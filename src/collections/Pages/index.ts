@@ -50,6 +50,12 @@ import { cssClassField } from '@/fields/blockFields'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+import { docPath } from '../../utilities/routes'
+
+// Payload hands admin callbacks a loosely-typed form-data record; docPath only
+// needs these two fields and tolerates either being absent.
+type PageLike = { slug?: string | null; breadcrumbs?: ({ url?: string | null } | null)[] | null }
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '../../utilities/revalidateSite'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 
 import {
@@ -59,15 +65,6 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-
-// Full nested URL for a page from its nested-docs breadcrumbs (used for preview).
-const breadcrumbPath = (data: Record<string, unknown> | undefined): string | undefined => {
-  const breadcrumbs = data?.breadcrumbs as { url?: string | null }[] | undefined
-  if (Array.isArray(breadcrumbs) && breadcrumbs.length) {
-    return breadcrumbs[breadcrumbs.length - 1]?.url ?? undefined
-  }
-  return undefined
-}
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -83,25 +80,20 @@ export const Pages: CollectionConfig<'pages'> = {
   defaultPopulate: {
     title: true,
     slug: true,
+    // Without breadcrumbs, docPath() on an internal link falls back to the bare
+    // `/<slug>` and relies on the catch-all issuing a 308 to the real nested
+    // path — so every internal link to a nested page took a redirect hop.
+    breadcrumbs: true,
   },
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
+    // `docPath` is the same builder the `[...slug]` route resolves against, so a
+    // nested page previews at its real breadcrumb URL and Home previews at `/`.
+    // It falls back to the bare slug when breadcrumbs aren't populated yet.
     livePreview: {
-      url: ({ data, req }) =>
-        generatePreviewPath({
-          slug: data?.slug,
-          path: breadcrumbPath(data),
-          collection: 'pages',
-          req,
-        }),
+      url: ({ data }) => generatePreviewPath({ path: docPath(data as PageLike) }),
     },
-    preview: (data, { req }) =>
-      generatePreviewPath({
-        slug: data?.slug as string,
-        path: breadcrumbPath(data),
-        collection: 'pages',
-        req,
-      }),
+    preview: (data) => generatePreviewPath({ path: docPath(data as PageLike) }),
     useAsTitle: 'title',
     group: 'Content',
   },
@@ -220,9 +212,14 @@ export const Pages: CollectionConfig<'pages'> = {
     slugField(),
   ],
   hooks: {
-    afterChange: [revalidatePage],
+    // revalidatePage targets the page's own URL + nav globals; revalidateSiteOnChange
+    // is the safety net — pages are embedded across the site (directory blocks,
+    // archives, cross-links), so purge the whole layout too. It's the only content
+    // collection previously missing this net, which is why a single wrong path in
+    // revalidatePage meant nothing else caught it.
+    afterChange: [revalidatePage, revalidateSiteOnChange],
     beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    afterDelete: [revalidateDelete, revalidateSiteOnDelete],
   },
   versions: {
     drafts: {

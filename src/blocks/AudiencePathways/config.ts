@@ -17,7 +17,14 @@ import {
 export const AudiencePathways: Block = {
   slug: 'audiencePathways',
   interfaceName: 'AudiencePathwaysBlock',
-  labels: { singular: 'Audience Pathways', plural: 'Audience Pathways' },
+  // Renamed to distinguish it from Gateway Cards, which renders a near-identical
+  // "For Clients / For Claimants" pair on the homepage. An editor asked to change
+  // the homepage cards used to open this block, find different copy, and conclude
+  // the CMS was out of sync with the site.
+  labels: {
+    singular: 'Audience Pathways (numbered steps, service pages)',
+    plural: 'Audience Pathways',
+  },
   fields: [
     ...sectionHeaderFields,
     backgroundField,

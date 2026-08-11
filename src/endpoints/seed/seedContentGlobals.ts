@@ -1,5 +1,7 @@
 import type { Payload, PayloadRequest } from 'payload'
 
+import { SPECIALIST_INDEX_PATH } from '@/utilities/routes'
+
 type Ctx = { payload: Payload; req: PayloadRequest }
 
 const RECIPIENT = 'admin@vmls.com.au'
@@ -35,6 +37,24 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
     ...opts,
   })
   payload.logger.info('— Seeded Specialist Profile portal CTA')
+
+  // Repair the specialist breadcrumb's parent link. It was stored as
+  // '/specialist-panel', which only resolves via a 308 — the page actually lives
+  // at /specialists/specialist-panel. Only the known-stale value is rewritten, so
+  // a deliberate admin choice survives and re-running is a no-op.
+  const specialistProfile = await payload.findGlobal({ slug: 'specialist-profile', depth: 0, req })
+  const parentHref = (
+    specialistProfile as { breadcrumb?: { breadcrumbParentHref?: string | null } } | null
+  )?.breadcrumb?.breadcrumbParentHref
+  if (parentHref === '/specialist-panel') {
+    await payload.updateGlobal({
+      slug: 'specialist-profile',
+      data: { breadcrumb: { breadcrumbParentHref: SPECIALIST_INDEX_PATH } },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...(opts as any),
+    })
+    payload.logger.info(`— Repaired specialist breadcrumb href → ${SPECIALIST_INDEX_PATH}`)
+  }
 
   // 2) Article settings — the two fixed sidebar CTA cards on In-the-Loop articles.
   await payload.updateGlobal({

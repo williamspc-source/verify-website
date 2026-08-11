@@ -8,8 +8,6 @@ type SectionHeaderProps = {
   subtitle?: string | null
   align?: 'left' | 'center' | null
   showDivider?: boolean | null
-  /** Set true on dark/primary backgrounds to flip text colours. */
-  onDark?: boolean
   as?: 'h1' | 'h2' | 'h3'
   className?: string
   titleClassName?: string
@@ -18,6 +16,13 @@ type SectionHeaderProps = {
 /**
  * Shared section heading using the ported design-reference classes
  * (`section-label` / `section-title` / `divider` / `section-subtitle`).
+ *
+ * There is deliberately no `onDark` prop. Dark and primary Sections already
+ * carry `.vf-on-dark` (see `components/Section`), and globals.css re-points the
+ * text tokens from there — so the colours flip on their own. This component used
+ * to hardcode `#8bb9dd` / `#fff` / `rgba(255,255,255,.75)` inline, which
+ * outranked those rules and meant the four "on dark" colour fields in Site
+ * Settings had no effect on any section header anywhere on the site.
  */
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   eyebrow,
@@ -25,7 +30,6 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   subtitle,
   align = 'left',
   showDivider = false,
-  onDark = false,
   as: Heading = 'h2',
   className,
   titleClassName,
@@ -35,44 +39,24 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   return (
     <div
-      className={cn('vf-section-header', centered && 'text-center', className)}
-      style={centered ? { marginInline: 'auto', maxWidth: '720px' } : undefined}
+      className={cn(
+        'vf-section-header',
+        centered && 'text-center vf-section-header--centered',
+        className,
+      )}
     >
-      {eyebrow ? (
-        <p
-          className="vf-section-header__eyebrow section-label"
-          style={onDark ? { color: '#8bb9dd' } : undefined}
-        >
-          {eyebrow}
-        </p>
-      ) : null}
+      {eyebrow ? <p className="vf-section-header__eyebrow section-label">{eyebrow}</p> : null}
 
-      {showDivider && centered ? (
-        <div className="divider" style={{ marginInline: 'auto' }} />
-      ) : null}
+      {showDivider && centered ? <div className="divider" /> : null}
 
       {title ? (
-        <Heading
-          className={cn('vf-section-header__title section-title', titleClassName)}
-          style={onDark ? { color: '#fff' } : undefined}
-        >
+        <Heading className={cn('vf-section-header__title section-title', titleClassName)}>
           {accentText(title)}
         </Heading>
       ) : null}
 
       {subtitle ? (
-        <p
-          className="vf-section-header__subtitle section-subtitle"
-          style={
-            centered
-              ? { marginInline: 'auto', ...(onDark ? { color: 'rgba(255,255,255,.75)' } : {}) }
-              : onDark
-                ? { color: 'rgba(255,255,255,.75)' }
-                : undefined
-          }
-        >
-          {subtitle}
-        </p>
+        <p className="vf-section-header__subtitle section-subtitle">{subtitle}</p>
       ) : null}
     </div>
   )

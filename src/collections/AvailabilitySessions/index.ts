@@ -114,7 +114,10 @@ export const AvailabilitySessions: CollectionConfig<'availability-sessions'> = {
     {
       name: 'notes',
       type: 'textarea',
-      admin: { description: 'Optional internal/marketing note shown with the slot.' },
+      admin: {
+        description:
+          'Optional note about this slot. Shown as the tooltip when a visitor hovers the time chip, and read out by screen readers with the time — so keep it short and visitor-facing, not internal.',
+      },
     },
     // ── Sidebar: lifecycle ──
     {

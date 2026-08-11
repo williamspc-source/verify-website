@@ -13,16 +13,17 @@ const mediaUrl = (m: unknown): string | null =>
 
 type Slide = NonNullable<Props['slides']>[number]
 
-const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean }> = ({
+const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean; className?: string }> = ({
   slide,
   label,
   hidden,
+  className,
 }) => {
   const img = mediaUrl(slide.image)
   const pills = (slide.pills || []).filter((p) => p.text)
   return (
     <article
-      className={cn('events-offer-card', `offer-${slide.accent || 'seminars'}`)}
+      className={cn('events-offer-card', `offer-${slide.accent || 'seminars'}`, className)}
       aria-hidden={hidden || undefined}
     >
       <div className="events-offer-card-copy">
@@ -63,7 +64,13 @@ export const SlideCarouselBlock: React.FC<Props> = ({
   interval,
   slides,
   cssClass,
+  elementClasses,
 }) => {
+  // All three Element styles slots were mounted by the shared helper and never
+  // read here, so every preset an editor picked for this block was discarded.
+  const headingClass = toClassName(elementClasses?.heading)
+  const cardClass = toClassName(elementClasses?.card)
+  const buttonClass = toClassName(elementClasses?.button)
   const count = slides?.length || 0
   const looped = count > 1
   const base = looped ? 1 : 0 // track position of the first real slide
@@ -135,12 +142,12 @@ export const SlideCarouselBlock: React.FC<Props> = ({
         <div className="events-offer-toolbar vf-slide-carousel__toolbar">
           <div>
             {eyebrow ? <div className="events-offer-eyebrow">{eyebrow}</div> : null}
-            {heading ? <h2>{accentText(heading)}</h2> : null}
+            {heading ? <h2 className={headingClass || undefined}>{accentText(heading)}</h2> : null}
           </div>
           {autoplay && count > 1 ? (
             <button
               type="button"
-              className="events-offer-toggle vf-slide-carousel__toggle"
+              className={cn('events-offer-toggle vf-slide-carousel__toggle', buttonClass)}
               aria-pressed={paused}
               onClick={() => setPaused((p) => !p)}
             >
@@ -182,6 +189,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
                 slide={t.slide}
                 hidden={t.hidden}
                 label={`${String(t.realIndex + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}`}
+                className={cardClass}
               />
             ))}
           </div>
@@ -190,7 +198,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
             <>
               <button
                 type="button"
-                className="events-offer-arrow events-offer-arrow-prev vf-slide-carousel__arrow"
+                className={cn('events-offer-arrow events-offer-arrow-prev vf-slide-carousel__arrow', buttonClass)}
                 aria-label="Previous slide"
                 onClick={() => step(-1)}
               >
@@ -198,7 +206,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
               </button>
               <button
                 type="button"
-                className="events-offer-arrow events-offer-arrow-next vf-slide-carousel__arrow"
+                className={cn('events-offer-arrow events-offer-arrow-next vf-slide-carousel__arrow', buttonClass)}
                 aria-label="Next slide"
                 onClick={() => step(1)}
               >

@@ -20,6 +20,8 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
   elementClasses,
   motion,
   containerWidth,
+  hoverEffect,
+  shadow,
   bare,
 }) => {
   if (!cards || cards.length === 0) return null
@@ -31,6 +33,8 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
       className={cn('vf-gateway-cards', toClassName(cssClass))}
       motion={motion}
       containerWidth={containerWidth}
+      hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       <SectionHeader

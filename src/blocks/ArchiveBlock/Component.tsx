@@ -17,7 +17,9 @@ import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import { Icon } from '@/components/Icon'
 import { cn } from '@/utilities/ui'
+import { bgClasses, type SectionBackground } from '@/components/Section'
 import { toClassName } from '@/utilities/cssClass'
+import { postPath, eventPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 
 const MONTHS_SHORT = [
   'Jan',
@@ -119,11 +121,12 @@ const NarrativeCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, 
   if (!post) return null
 
   const stream = typeof post.stream === 'object' && post.stream ? (post.stream as Stream) : null
-  const streamSlug = stream?.slug ?? null
   const { name, role, photo } = resolveAuthor(post)
   const tagLabel = postTagLabel(post, stream)
   const dateLabel = formatDate(post.publishedAt)
-  const href = streamSlug ? `/in-the-loop/${streamSlug}/${post.slug}` : `/in-the-loop/${post.slug}`
+  // Stream-less legacy posts have no canonical article URL; send them to the hub
+  // rather than emit the /in-the-loop/<slug> path that resolves as a stream → 404.
+  const href = postPath(post) ?? IN_THE_LOOP_PATH
 
   return (
     <div className="ni-narrative-card">
@@ -172,9 +175,7 @@ const PostCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, readM
   const heroImage =
     post.heroImage && typeof post.heroImage === 'object' ? post.heroImage : null
 
-  const href = streamSlug
-    ? `/in-the-loop/${streamSlug}/${post.slug}`
-    : `/in-the-loop/${post.slug}`
+  const href = postPath(post) ?? IN_THE_LOOP_PATH
 
   const dateLabel = formatDate(post.publishedAt)
 
@@ -218,7 +219,7 @@ const EventHubCard: React.FC<{ event: Event; typeLabel: string | null }> = ({
 }) => {
   const d = event.date ? new Date(event.date) : null
   const validDate = d && !Number.isNaN(d.getTime()) ? d : null
-  const href = `/events/event/${event.slug}`
+  const href = eventPath(event.slug) ?? '/events'
 
   return (
     <div className="ni-event-card">
@@ -256,7 +257,7 @@ const EventCard: React.FC<{ event: Event; isPast: boolean; compact?: boolean }> 
 
   const image = event.image && typeof event.image === 'object' ? event.image : null
   const dateLabel = formatDate(event.date, true)
-  const href = `/events/event/${event.slug}`
+  const href = eventPath(event.slug) ?? '/events'
 
   return (
     <article className="event-card">
@@ -306,11 +307,13 @@ export const ArchiveBlock: React.FC<
     postStyle,
     eventStyle,
     anchorId,
+    background,
   } = props as {
     cssClass?: string | string[] | null
     postStyle?: 'card' | 'narrative' | null
     eventStyle?: 'card' | 'compact' | null
     anchorId?: string | null
+    background?: SectionBackground | null
   }
   const readMoreLabel =
     (props as { readMoreLabel?: string | null }).readMoreLabel || 'Read More →'
@@ -335,6 +338,9 @@ export const ArchiveBlock: React.FC<
 
       const fetched = await payload.find({
         collection: 'events',
+        // Without this the Local API's overrideAccess default bypasses
+        // authenticatedOrPublished and archives list unpublished drafts.
+        overrideAccess: false,
         depth: 1,
         limit,
         // upcoming → soonest first; past → most recent first
@@ -362,6 +368,7 @@ export const ArchiveBlock: React.FC<
 
       const fetched = await payload.find({
         collection: 'posts',
+        overrideAccess: false,
         // depth 2 so the author's linked Team member / Specialist (and their photo)
         // are populated for the staff-narrative byline.
         depth: 2,
@@ -388,7 +395,13 @@ export const ArchiveBlock: React.FC<
   const eventColumnClass = `ni-grid-${columns || '2'}`
 
   return (
-    <div className={cn(toClassName(cssClass))} id={anchorId || `block-${id}`}>
+    // Archive is the only one of 23 backgroundField consumers that rendered a
+    // plain <div>, so its "Section background colour" select — six options —
+    // did nothing at all. Apply the same band classes <Section> uses.
+    <div
+      className={cn(background ? bgClasses[background] : undefined, toClassName(cssClass))}
+      id={anchorId || `block-${id}`}
+    >
       {introContent && (
         <div className="container mb-16">
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />

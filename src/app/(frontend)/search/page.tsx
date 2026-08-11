@@ -24,6 +24,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
     select: {
       title: true,
       slug: true,
+      uri: true,
       categories: true,
       meta: true,
     },
@@ -83,6 +84,6 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Payload Website Template Search`,
+    title: `Search | VERIFY Medico-Legal Solutions`,
   }
 }

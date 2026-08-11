@@ -40,6 +40,21 @@ const labelsGroup: Field = {
   },
   fields: [
     {
+      name: 'presentersHeading',
+      type: 'text',
+      defaultValue: 'Presenters',
+      admin: { description: 'Heading above the presenter cards on an event page.' },
+    },
+    {
+      name: 'breadcrumbSectionLabel',
+      type: 'text',
+      defaultValue: 'Events & Seminars',
+      admin: {
+        description:
+          'Second breadcrumb link (the events hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.',
+      },
+    },
+    {
       type: 'row',
       fields: [
         {

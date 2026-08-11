@@ -16,7 +16,8 @@ export const defaultLexical = lexicalEditor({
     BoldFeature(),
     ItalicFeature(),
     LinkFeature({
-      enabledCollections: ['pages', 'posts'],
+      // Keep in step with `relationTo` in src/fields/link.ts.
+      enabledCollections: ['pages', 'posts', 'specialists', 'team', 'events'],
       fields: ({ defaultFields }) => {
         const defaultFieldsWithoutUrl = defaultFields.filter((field) => {
           if ('name' in field && field.name === 'url') return false

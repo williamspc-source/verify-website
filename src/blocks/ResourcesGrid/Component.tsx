@@ -133,6 +133,7 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     motion,
     containerWidth,
     hoverEffect,
+    shadow,
     bare,
   } = props
   const anchorId = (props as { anchorId?: string | null }).anchorId || undefined
@@ -171,6 +172,7 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
@@ -181,7 +183,7 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
           ))}
         </div>
       ) : (
-        <div className="services-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+        <div className="services-grid" style={{ '--vf-cols': cols } as React.CSSProperties}>
           {cards.map((c) => (
             <Card key={c.id} {...c} />
           ))}

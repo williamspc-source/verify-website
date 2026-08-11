@@ -40,13 +40,43 @@ export const Streams: CollectionConfig = {
       name: 'order',
       type: 'number',
       defaultValue: 0,
-      admin: { description: 'Lower numbers appear first in the hub section nav.' },
+      admin: {
+        description:
+          'Sort order in the admin list. Note: the In-the-Loop hub’s section nav is authored by hand in the Section Nav block on that page, so changing this does NOT reorder the public nav — edit the block instead.',
+      },
     },
     slugField({
       position: undefined,
     }),
   ],
   hooks: {
+    beforeDelete: [
+      /**
+       * Refuse to delete a stream that still has posts.
+       *
+       * The FK is ON DELETE SET NULL, so deleting a stream used to succeed
+       * silently and null `stream` on every post in it. Those posts kept saying
+       * "Published" in the admin while losing their URL entirely — `postPath()`
+       * returns null without a stream, so they 404'd, dropped out of the sitemap
+       * and out of generateStaticParams, and every card linked to the hub
+       * instead. Recovery was manual, post by post, with nothing indicating what
+       * had happened.
+       */
+      async ({ id, req }) => {
+        const { totalDocs } = await req.payload.count({
+          collection: 'posts',
+          where: { stream: { equals: id } },
+          req,
+        })
+        if (totalDocs > 0) {
+          throw new Error(
+            `This stream still has ${totalDocs} article${totalDocs === 1 ? '' : 's'}. ` +
+              `Move them to another stream first — deleting it now would remove their web ` +
+              `address and they would stop being reachable, even though they say Published.`,
+          )
+        }
+      },
+    ],
     afterChange: [revalidateSiteOnChange],
     afterDelete: [revalidateSiteOnDelete],
   },

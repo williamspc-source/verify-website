@@ -26,6 +26,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
     motion,
     containerWidth,
     hoverEffect,
+    shadow,
     bare,
   } = props
   // New fields (regenerate types on deploy); read defensively until then.
@@ -186,6 +187,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       <SectionHeader

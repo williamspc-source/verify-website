@@ -44,7 +44,6 @@ export const StatsBandBlock: React.FC<Props & { bare?: boolean }> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null)
   const [play, setPlay] = useState(false)
-  const onDark = (background || 'primary') === 'primary'
 
   useEffect(() => {
     const el = ref.current
@@ -77,7 +76,6 @@ export const StatsBandBlock: React.FC<Props & { bare?: boolean }> = ({
         title={heading}
         subtitle={subheading}
         align="center"
-        onDark={onDark}
         titleClassName={toClassName(elementClasses?.heading)}
       />
 

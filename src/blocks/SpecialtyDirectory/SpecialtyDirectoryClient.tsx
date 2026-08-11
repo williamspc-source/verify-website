@@ -41,7 +41,7 @@ export const SpecialtyDirectoryClient: React.FC<{
   return (
     <div className="vf-spec-dir">
       {showFilterBar && categories.length > 0 ? (
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <div style={{ textAlign: 'center', marginBottom: 'var(--gap-normal)' }}>
           <div className="services-tabs" role="tablist" aria-label="Specialty categories">
             <button
               type="button"

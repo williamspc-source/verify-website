@@ -6,6 +6,7 @@ import { Icon } from '@/components/Icon'
 import { Section } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getPrimaryOffice } from '@/utilities/primaryOffice'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
@@ -40,7 +41,24 @@ export const ContactDetailsBlock: React.FC<Props & { bare?: boolean }> = async (
 
   if (useGlobal) {
     const footer = await getCachedGlobal('footer', 1)()
-    const c = footer?.contact
+    // Same precedence as the footer: Offices is the source of truth, the Footer
+    // global's fields are overrides. Before this, the Offices phone/email were
+    // editable and unreachable while the footer copy was the only live one.
+    const office = await getPrimaryOffice()
+    // `phoneHref` only applies when the number it belongs to is the one being
+    // shown. Taking it unconditionally meant that clearing the footer's phone
+    // (so it falls back to the office) while leaving its phoneHref in place
+    // displayed the office's number and dialled the footer's — a link that lies
+    // about where it goes, with nothing on screen to reveal it.
+    const usingFooterPhone = Boolean(footer?.contact?.phone)
+    const c = {
+      phone: footer?.contact?.phone || office?.phone || null,
+      phoneHref: usingFooterPhone ? footer?.contact?.phoneHref || null : null,
+      email: footer?.contact?.email || office?.email || null,
+      address: footer?.contact?.address || office?.address || null,
+    }
+    const hoursSource =
+      (Array.isArray(footer?.hours) && footer.hours.length ? footer.hours : office?.hours) || []
 
     if (c?.phone) {
       contactItems.push({
@@ -64,7 +82,7 @@ export const ContactDetailsBlock: React.FC<Props & { bare?: boolean }> = async (
       contactItems.push({ key: 'address', icon: 'map-pin', label: 'Address', value: c.address })
     }
 
-    const hoursLines = (footer?.hours || [])
+    const hoursLines = hoursSource
       .map((h) => [h?.days, h?.time].filter(Boolean).join(' — '))
       .filter(Boolean)
     if (hoursLines.length > 0) {
@@ -99,7 +117,7 @@ export const ContactDetailsBlock: React.FC<Props & { bare?: boolean }> = async (
     >
       <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
 
-      <div className="contact-details" style={{ maxWidth: '560px', marginInline: 'auto' }}>
+      <div className="contact-details" style={{ maxWidth: 'var(--vf-measure-narrow, 560px)', marginInline: 'auto' }}>
         {contactItems.map(({ key, icon, label, value, href, note }) => (
           <div key={key} className="contact-item">
             {icon ? (

@@ -655,6 +655,302 @@ This is a genuine information-architecture gap, not a styling issue — recommen
 
 ---
 
+## Comparison 19: Typography & text-colour token audit (CSS-level, 2026-08-06)
+
+Unlike Comparisons 1–18 this is **not a screenshot comparison**. It is a mechanical
+selector/property diff of `.design-reference/assets/css/styles.css` (+ `article.css`,
+`events.css`, + each template's inline `<style>` block) against
+`src/app/(frontend)/globals.css`, cross-checked against the rendered DOM with a
+contrast audit over 12 representative pages.
+
+The 107 reference HTML files collapse to **23 unique templates** by inline-`<style>`
+hash — and 46 of them (index, every In-the-Loop article, every event, the legal pages)
+carry no inline CSS at all, so that one cluster covers the homepage and all article
+templates together.
+
+**Method caveats** (so the numbers below are read correctly): `@media` blocks are
+stripped before diffing, so responsive variants don't show as false positives, but
+duplicate selectors are still last-wins; and the "missing selector" pass only sees
+rules that declare a typography/colour property, so a build rule that sets only layout
+on the same selector reads as "missing" when it isn't.
+
+### 1. Fonts — the headline finding
+
+The design reference uses **three** faces (`styles.css:23-24`, `1-8`):
+
+| Role | Reference | Was in build |
+| --- | --- | --- |
+| Headings, buttons, nav, eyebrows | Montserrat | MuseoSansRounded |
+| Body copy | Open Sans | MuseoSansRounded |
+| Hero "VERIFY" definition word only | MuseoSansRounded 900 | MuseoSansRounded |
+
+Both `--font-heading` and `--font-body` pointed at Museo, so a single licensed display
+face was doing all three jobs. Fixed: Montserrat and Open Sans are now self-hosted
+(`src/app/(frontend)/fonts/`, variable woff2, latin subset, ~123 KB total, no CDN
+dependency at build or runtime) and Museo is reduced to a new `--font-display` token
+with exactly one consumer, `.hero-def-word`.
+
+296 CSS rules already routed through `var(--font-heading)`, so the switch was two lines
+in `:root` — no rule-by-rule edit. `--font-heading` had been declared in **both**
+`@theme` and `:root` and the two were out of sync; the `@theme` copy is gone and the
+`font-heading` utility is now an `@utility` that reads the runtime var, so it honours a
+Design System override (it previously did not).
+
+### 2. Base text size
+
+Reference: `body { font-size: 18px }` with `html` left at 16px (`styles.css:36`) — so
+`rem` still resolves against 16px and only *inherited, unsized* text picks up 18px. The
+build set no body size, leaving that text at 16px. Now `--font-size-base: 18px`,
+editable via Design System → Typography. Most visible on article body copy (`.prose p`
+has no explicit size).
+
+### 3. Text colour was never tokenised — root cause of recurring issue #6
+
+`--text-mid` was `#737373` in the build against **`#222222`** in the reference
+(`styles.css:20`) — 115 rules consume it, so essentially all secondary copy site-wide
+was lighter than target. Note the reference's naming is inverted: "mid" (#222222) is
+*darker* than "dark" (#414042).
+
+Critically, that value could not be fixed in CSS: `SiteSettings.colors.mutedText` is
+stored in the database and inlined onto `<html>`, which outranks every `:root` rule —
+and the branding seed **early-returned whenever a logo already existed**, so it could
+never repair an established site. The seed's colour write is now an unconditional,
+idempotent repair (fills empty fields, retires known-stale values, leaves deliberate
+admin choices alone) and no longer suppresses revalidation, since the palette is read
+through `getCachedGlobal`.
+
+Dark-band text was previously flipped by **three hardcoded allowlists naming five
+selectors**; anything outside them (rich-text prose, split-feature body, card meta)
+kept its light-mode grey on dark at roughly 3:1. Replaced with a `.vf-on-dark` context
+class that re-points `--text-dark`/`--text-mid` so all 115 consumers flip at once, plus
+a `.vf-on-light` reset for light cards sitting inside a dark band. Four new
+admin-editable tokens back it: text / muted text / accent / border on dark
+(Site Settings → Brand colours).
+
+### 4. Audience cards (homepage) — the reported bug
+
+The reference gives `.audience-card-subtitle` **no** base colour and sets it per card
+(`styles.css:2352-2360`). All four rules were dropped in the port and replaced with a
+flat `color: var(--text-mid)`, which rendered the subtitle at ~2.2:1 on the blue card
+and ~1.5:1 on the charcoal one. It was also the wrong font (inheriting Open Sans rather
+than Montserrat), weight (400 vs 600) and size (0.9rem vs 14px). All restored.
+
+Two adjacent faults found in the same block: `.audience-card-label` had absorbed the
+missing subtitle's `margin-bottom` (10px, should be 5px); and the eyebrow renders with
+`.section-label`, whose brand blue is *identical to the accent-1 card background* —
+invisible the moment an editor types one. Both fixed.
+
+### 5. Per-template drift corrected
+
+Seventeen typography values had drifted from the reference and are now aligned:
+`.section-label` 12px → 14px (every eyebrow site-wide), `.page-hero h1` weight 800 →
+700, `.faq-item summary` 600 → 700, `.faq-item .faq-a` line-height 1.7 → 1.8,
+`.spec-card .spec-name` 600 → 700 and 1.1 → 1.15rem, `.spec-card .spec-loc` colour
+`--text-mid` → `--text-dark`, `.service-title` 0.9 → 1rem, `.service-desc` 0.82rem →
+14px, `.service-icon` 1.4 → 1.55rem, `.contact-icon` 1rem → 1.4rem, `.expert-role` 0.8
+→ 0.73rem, `.form-submit` 0.95 → 0.88rem, and the FAQ open/hover question tint that had
+no equivalent in the build. The hero definition word also used `#8bb9dd` where the
+reference has `#5ba3d9` — a token (`--definition-blue`) that already existed unused.
+
+### 6. Deliberate deviations from Target (accessibility)
+
+Two reference values fail WCAG AA and were **not** reproduced. Both are ported faithfully
+from the reference's own per-page `<style>` blocks, so this is an intentional divergence:
+
+- `.mv-mission-header .section-label` — `rgba(255,255,255,0.55)` ≈ 2.9:1 → `--accent-on-dark`.
+- `.our-values .section-subtitle` — `rgba(255,255,255,0.65)` ≈ 4.0:1 → `--text-muted-on-dark`.
+
+The on-dark muted token is 0.82 alpha where the reference uses 0.72/0.75 in places,
+which lifts the audience-card and CTA-band body copy slightly above the reference.
+
+### 7. Open item for a team decision — "Why VERIFY" band is inverted
+
+**Not changed, needs a decision.** The reference renders `.why-verify` as a *light* blue
+gradient (`#eef9ff → #d9efff`) with dark text (`styles.css:1440-1445`). The build renders
+it as a *dark* blue gradient (`#0d4f85 → #1c75bc`) with white text, and every descendant
+rule (`.why-card h3`, `.why-card p`, `.why-header .section-title/.section-label`) was
+inverted to match. It is internally consistent and perfectly legible, so it reads as a
+deliberate design change rather than a porting error — which is why it was left alone.
+If Target is authoritative here, the whole block needs reverting together, not rule by rule.
+
+### 8. Verified, not just asserted
+
+A DOM contrast audit across 12 representative pages (homepage, about, services,
+specialist panel + profile, booking, contact, In the Loop listing + article, information
+centre, team member, event detail) computes each text node's ratio against its effective
+background. It confirmed **zero** white-on-white or invisible-text cases after the change.
+The token flip did initially introduce one — `.cost-item`, a white card inside the dark
+`.cost-section` — which the audit caught and which is now in the `.vf-on-light` list;
+the same sweep found and fixed a `.btn-white` label being flattened to charcoal. Every
+light surface sitting inside a flipped context (11 site-wide) was enumerated
+mechanically rather than by eye.
+
+Remaining sub-AA cases are pre-existing reference values, chiefly `#93d0f7` eyebrows on
+the blue gradient (~2.9:1) and `--primary` on `--bg-light-1` in the footer headings
+(~3.7:1). Listed here rather than changed, since they are the reference's own palette
+decisions.
+
+---
+
+## Comparison 20: Visual-effects audit — shadows, glows, interaction (CSS-level, 2026-08-06)
+
+Triggered by the VERIFY definition card on the homepage rendering flat against the
+reference. Scope was widened to a full effects diff: all 86 distinct reference
+`box-shadow` values against the build's 74, plus every `filter`, `text-shadow`,
+radial-gradient overlay and `@keyframes` in `.design-reference/`.
+
+**Headline: the static port was better than expected; the gap was interaction.**
+`.audience-card:hover`, `.btn-primary:hover` and `.expert-card:hover` are byte-identical
+to the reference, and the radial-glow overlays (`.page-hero--dark::before`,
+`.staff-hero::before`, `.why-verify::before`, …) are all present. Only three effects had
+genuinely drifted.
+
+### The definition card — the reported issue
+
+Our CSS correctly ported the card's *static* layer (`#f8fbfd` panel, resting shadow, the
+280px blurred blue orb `::before`). The reference's *interactive* layer was missed because
+it lives in `assets/js/script.js:218-266`, not in a stylesheet:
+
+| Effect | Reference source | Status |
+| --- | --- | --- |
+| Cursor-tracked white sheen (`::after` reading `--mx`/`--my`) | `styles.css:2185-2196` | ✅ added |
+| Idle float — rAF, 9px amplitude, 5.5s period | `script.js:228-240` | ✅ added |
+| 3D tilt on hover — `perspective(900px)`, ±12° | `script.js:253` | ✅ added |
+| Hover shadow lift | `script.js:245` | ✅ added, as a token not an inline style |
+
+Implemented as `src/heros/HomeHero/DefinitionPanel.tsx`, with four deliberate improvements
+on the reference: a `prefers-reduced-motion` guard (the reference has none — it drops the
+transforms but keeps sheen and shadow, which carry no motion), a
+`(hover: hover) and (pointer: fine)` guard (the reference's rAF loop runs forever on
+phones where `mousemove` never fires), an `IntersectionObserver` that pauses the loop
+offscreen, and `will-change` scoped to an `.is-tilting` class rather than applied
+permanently to a 390px layer that also contains a `blur(3px)` orb.
+
+Editors get a three-way **Panel interaction** control (Full / Subtle / Off). The motion
+constants stay CSS custom properties rather than CMS fields: they are a coupled physics
+recipe, the admin has no live preview, and four number fields would have cost 8 columns
+for a control nobody would use. They remain retunable from Custom Styles.
+
+### ⚠️ Contrast bug found and fixed
+
+`.hero-def-meaning` used the reference's `#6d767f` on `#f8fbfd` — **4.44:1, already below
+AA before any overlay**, and the new sheen dropped it to 2.98:1 (a white wash lightens
+text and background together, so the ratio falls). Solved as a pair: text darkened to
+`#50565d` and the sheen reduced from the reference's 0.28 to 0.18, giving **7.14:1 at rest
+and 4.54:1 under the sheen**. Missed by Comparison 19's sweep because these colours are
+scoped to the `--glow` panel variant.
+
+### Drift restored
+
+| Selector | Was | Now |
+| --- | --- | --- |
+| `.service-card` | flat white, `var(--shadow)`, transparent border | reference gradient, `md` + inset top highlight, blue border |
+| `.service-card:hover` | generic `translateY(-4px)` + `--shadow-lg` | the reference's neo-brutalist `translate(-4px,-4px)` + hard `6px 6px 0` offset, plus a `:focus-visible` outline (these cards are links) |
+| `.form-submit` | no shadow at all | `glow-sm` resting / `glow-lg` hover — `.btn-primary` supplies no resting shadow, so the port lost it |
+
+Geometry was deliberately **not** restored on `.service-card`: the reference card is icon
++ title only, ours also renders a description and an Enquire button, and the class is
+shared by ServicesGrid, FeatureGrid and ResourcesGrid.
+
+Three initially-suspected gaps were **rejected on inspection**: `.who-value` is dead CSS
+(no component emits it); and `.qa-icon-wrap`, `.ime-hero-seal`, `.jme-hero-seal`,
+`.ime-format-card-icon`, `.ct-response-badge-dot` are unported *elements*, not drift.
+
+### Structural fix — shadows are now editable
+
+Shadows were the one token family an editor could not touch: `--shadow`/`--shadow-lg`
+existed in CSS but appeared in neither the Design System global nor `designTokenStyle.ts`,
+and ~86 other values were hardcoded. Added a `--vf-shadow-*` / `--vf-glow-*` ladder
+(6 elevation rungs + 3 glows + ring + inset-highlight + hard offset), every rung taken
+from a real reference value, exposed as **Design System → Shadows & glows** and as a
+per-block **Card shadow** picker on the 8 grid blocks plus the Image atom.
+
+Colour comes from `--vf-shadow-color` via `color-mix()`, so one field retints the whole
+site — verified by round-trip. `color-mix` adds no support risk: Tailwind v4 already
+compiles this codebase's 27 opacity modifiers to it. Re-pointing the two legacy aliases at
+the ladder made all 28 of their existing consumers editable for zero visual change.
+
+### ⚠️ Latent bug found, deliberately not fixed
+
+`.vf-hover-*` sits inside `@layer components`, while the ported component CSS
+(`.service-card`, `.specialty-card`, …) is unlayered — and unlayered beats layered
+regardless of specificity. So for any card with its own `:hover` rule, the `glow`, `zoom`
+and `accent-bar` hover presets silently do nothing. **Inert today**: every block in the
+database stores `lift` or `none`, and `lift` resolves identically either way. Moving
+`.vf-hover-*` out of the layer would fix it but would then outrank `.service-card:hover`
+and kill the neo-brutalist hover restored above. That is a hover-precedence change, not an
+effects change — logged here rather than bundled in.
+
+The new `.vf-shadow-*` rules are scoped `:not(:hover)` for the same reason: they set
+*resting* depth only, so they compose with whatever hover treatment is in play instead of
+flattening it.
+
+---
+
+## Comparison 21: Admin-editability audit — making every visual value CMS-controlled (2026-08-06)
+
+Prompted by the handover requirement: the successor must be able to change anything visual from
+the admin, without touching code. The audit found the problem was not merely that some values were
+hardcoded — **the admin controls that already existed were largely ineffective.**
+
+### Two structural faults
+
+**1. The unlimited escape hatch was broken.** CMS tokens were applied as an inline `style`
+attribute on `<html>`. An inline style outranks every stylesheet, so `:root { --primary: … }`
+written in Globals → Custom Styles → Global CSS was silently ignored — and since the seed fills
+every brand colour field, that was the normal state, not an edge case. Fixed by emitting the
+tokens as a real stylesheet placed immediately before the Custom Styles tag, giving a genuine
+three-layer cascade (defaults → CMS values → Global CSS). Verified: Global CSS now overrides a
+Site Settings token and repaints the site.
+
+**2. The brand colour fields barely propagated.** 204 occurrences of the brand blue were hardcoded
+as `#1c75bc` / `rgba(28,117,188,α)`, so changing "Primary" repainted only a fraction of the site.
+847 colour, radius and gradient literals were mechanically converted to `var()` / `color-mix()`.
+Changing one field now repaints 66–113 elements per page.
+
+### Also fixed
+
+- **`SectionHeader` hardcoded the on-dark palette inline**, so all four "on dark" colour fields in
+  Site Settings had no effect on any section header sitewide. The CSS already routed through the
+  right tokens — the inline styles were purely defeating it. Removing them (and the now-pointless
+  `onDark` prop) made the fields work, and corrected the eyebrow from an orphan `#8bb9dd` to the
+  brand's `--accent-on-dark`.
+- **The `Callout` block's 12-value palette** lived in a module constant applied inline, unreachable
+  from admin. Now four CSS variants driven by editable status colours, per-variant alphas preserved
+  exactly.
+- **`--text-dark-base` / `--text-mid-base` / `--border-base`**: the emitter wrote the *derived*
+  tokens, but `.vf-on-light` restores from the `-base` pair — so a brand text-colour edit silently
+  reverted on every light card inside a dark band.
+- **`</style>` injection hole**: Custom Styles injected editor CSS verbatim. Both style tags now
+  strip it; token values are validated at save time rather than silently dropped at render.
+- The home hero's band and rhythm were an inline `background: #cbe5fa; padding: 80px 0` —
+  now editable fields, with `accent-solid` added as a reusable Section band.
+
+### New admin surface
+
+25 colour fields (Surfaces / Extended blues / Status & feedback), a 10-rung role-named radius
+ladder, 4 gradient recipes, a transition control, and an **Overall size** knob that scales the
+whole site proportionally. All colour fields gained a real picker — the text value stays
+authoritative so the third of values that are `rgba()`/`var()`/`oklch` aren't coerced to `#000000`.
+~40 columns, additive only.
+
+### Method note
+
+Every mechanical pass was gated on a **computed-style snapshot diff over 6,329 nodes** — value-
+preserving substitutions must produce a byte-identical computed style, so any diff at all is a bug.
+It caught three real errors that review would likely have missed: a `135deg` gradient folded onto a
+`145deg` token, a `.vf-callout--info` rule colliding with the FAQ help card that borrows the class
+name decoratively, and the home hero losing its padding to Tailwind's preflight. Tooling left in
+`tests/visual/`.
+
+**Deliberately not done:** the ~150 near-duplicate colour literals (drift clusters that in places
+encode intentional stacked tints — collapsing them flattens depth cues in a way a pixel diff
+reports as trivial), and the dead-CSS sweep (202 candidates; the detection depends on a
+hand-maintained prefix allowlist and full route coverage, and a wrong deletion breaks a page
+silently for zero editability gain). Both are now reachable via Global CSS regardless.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 These patterns showed up on multiple pages throughout this review and are most efficiently fixed once at a shared/template level rather than page-by-page:
@@ -664,7 +960,14 @@ These patterns showed up on multiple pages throughout this review and are most e
 3. **Breadcrumbs missing or too deep** — too many levels on Services sub-pages (IME, JME, Reporting, Administrative Services); missing entirely on Specialists section pages and Information Centre pages; a stray floating "tab" artifact appears in place of breadcrumbs on Information Centre pages specifically.
 4. **Extra, unrequested hero subtext paragraphs** added on pages where Target's hero is heading-only.
 5. **Shield graphic shown where Target omits it entirely** (Reporting Services, Administrative Services, In the Loop) — likely needs to be conditional rather than global.
-6. **Low-contrast/illegible text** on dark-background CTA sections (eyebrows and secondary buttons especially) — appears to be a shared text-color token issue, also seen inside light-background cards on the Specialists hub page.
+6. ~~**Low-contrast/illegible text** on dark-background CTA sections (eyebrows and secondary buttons especially) — appears to be a shared text-color token issue, also seen inside light-background cards on the Specialists hub page.~~
+   **✅ RESOLVED — see Comparison 19.** The diagnosis was right: it was a shared token
+   issue. Dark-band text was flipped by three hardcoded allowlists covering only five
+   selectors, so everything else kept its light-mode grey; and `--text-mid` itself was
+   `#737373` against the reference's `#222222`, stored in the database where no CSS fix
+   could reach it. Both are fixed at the token level (`.vf-on-dark` context class + an
+   unconditional seed repair), so this should not recur page-by-page. Verified with a
+   DOM contrast audit across 12 pages.
 7. **List/card content downgraded from icon-card rows to plain inline bullets**, with an added intro line, across several "intro" sections (IME, JME, Reporting Services, Information for Clients).
 8. **Stray "stuck focus state" blue outlines** appearing on random cards (Team page, JME page, Join Expert Panel page).
 9. **Category tags "genericized"** into a single repeated section-level tag instead of specific per-item tags (most visible on the In the Loop page).

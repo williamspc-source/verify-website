@@ -58,6 +58,7 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
   const {
     handleSubmit,
     register,
+    formState: { errors },
   } = formMethods
 
   const [isLoading, setIsLoading] = useState(false)
@@ -109,6 +110,21 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
       </label>
     ) : null
 
+    // react-hook-form blocks submission on a missing required field, but the
+    // block never rendered formState.errors — so the visitor got a form that
+    // silently refused to submit, with no indication which field was at fault.
+    const hasError = Boolean(errors?.[name])
+    const errorEl = hasError ? (
+      <p className="vf-form-error" id={`${name}-error`}>
+        {label ? `${label} is required.` : 'This field is required.'}
+      </p>
+    ) : null
+    // Spread onto every control so the invalid field is announced, not just tinted.
+    const invalidProps = {
+      'aria-invalid': hasError || undefined,
+      'aria-describedby': hasError ? `${name}-error` : undefined,
+    }
+
     if (blockType === 'message') {
       return (
         <div className="form-group" key={index}>
@@ -126,10 +142,12 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
               type="checkbox"
               id={name}
               defaultChecked={defaultValue}
+              {...invalidProps}
               {...register(name, { required })}
             />
             <span>{label}</span>
           </label>
+          {errorEl}
         </div>
       )
     }
@@ -137,7 +155,13 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
       return (
         <div className="form-group" key={index}>
           {labelEl}
-          <textarea id={name} defaultValue={defaultValue ?? ''} {...register(name, { required })} />
+          <textarea
+            id={name}
+            defaultValue={defaultValue ?? ''}
+            {...invalidProps}
+            {...register(name, { required })}
+          />
+          {errorEl}
         </div>
       )
     }
@@ -146,7 +170,12 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
       return (
         <div className="form-group" key={index}>
           {labelEl}
-          <select id={name} defaultValue={defaultValue ?? ''} {...register(name, { required })}>
+          <select
+            id={name}
+            defaultValue={defaultValue ?? ''}
+            {...invalidProps}
+            {...register(name, { required })}
+          >
             <option value="">Select…</option>
             {opts.map((o, k) => (
               <option key={k} value={o.value}>
@@ -154,6 +183,7 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
               </option>
             ))}
           </select>
+          {errorEl}
         </div>
       )
     }
@@ -166,8 +196,10 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
           id={name}
           type={inputType}
           defaultValue={defaultValue ?? ''}
+          {...invalidProps}
           {...register(name, { required })}
         />
+        {errorEl}
       </div>
     )
   }
@@ -210,7 +242,7 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
             </div>
           )}
           {error && (
-            <div className="form-confirm" role="status" style={{ color: '#c0392b' }}>
+            <div className="form-confirm vf-form-error" role="status">
               {`${error.status || '500'}: ${error.message || ''}`}
             </div>
           )}

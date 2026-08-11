@@ -7,14 +7,18 @@ import { toClassName } from '@/utilities/cssClass'
 import { accentText } from '@/utilities/accentText'
 import { CMSLink } from '@/components/Link'
 import { Icon } from '@/components/Icon'
-
-export type Crumb = { label?: string | null; url?: string | null }
+import { Media } from '@/components/Media'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import type { Crumb } from '@/utilities/breadcrumbs'
 
 type MetaItem = { icon?: string | null; text?: string | null; href?: string | null }
 type HeroLink = { link?: Record<string, unknown> | null }
 
 type PageHeroProps = Page['hero'] & {
-  breadcrumbs?: Crumb[] | null
+  /** Derived in the route (see `@/utilities/breadcrumbs`), so this stays sync. */
+  crumbs?: Crumb[] | null
+  crumbSeparator?: string | null
+  crumbNavLabel?: string | null
   title?: string | null
 }
 
@@ -23,11 +27,15 @@ type PageHeroProps = Page['hero'] & {
  * theme: light | dark (blue gradient) | service (soft blue #cbe5fa).
  */
 export const PageHero: React.FC<PageHeroProps> = (props) => {
-  const { eyebrow, heading, subtitle, title, links } = props
+  const { eyebrow, heading, subtitle, title, links, crumbs, crumbSeparator, crumbNavLabel } = props
+  const showBreadcrumb = (props as { showBreadcrumb?: boolean | null }).showBreadcrumb
   const cssClass = (props as { cssClass?: string | string[] | null }).cssClass
   const theme = (props as { theme?: string | null }).theme || 'light'
   const align = (props as { align?: string | null }).align || 'left'
   const showShield = Boolean((props as { showShield?: boolean | null }).showShield)
+  // Hero image, rendered in the image panel below.
+  const heroMedia =
+    props.media && typeof props.media === 'object' ? props.media : null
   const metaItems = ((props as { metaItems?: MetaItem[] | null }).metaItems || []).filter(
     (m) => m?.text,
   )
@@ -38,22 +46,45 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
     (props as { imagePanelLabel?: string | null }).imagePanelLabel || 'Company Image Placeholder'
   const scrollHint = (props as { scrollHint?: string | null }).scrollHint
 
+  // The trail and the eyebrow compete for one slot directly above the heading,
+  // and they are near-identical in texture (uppercase, letter-spaced, ~13px), so
+  // stacking them is the classic bad-breadcrumb look. The reference never shows
+  // both. Crumb wins; the eyebrow copy stays in the CMS and returns the moment
+  // an editor switches the trail off. Matching the component's own floor of 2
+  // means a trail too short to render restores the eyebrow rather than leaving
+  // an empty gap.
+  const trail = showBreadcrumb === false ? [] : (crumbs ?? []).filter((c) => c?.label?.trim())
+  const hasCrumb = trail.length >= 2
+
   const inner = (
     <div className="page-hero-inner">
-          {eyebrow ? <div className="section-label page-hero-eyebrow">{eyebrow}</div> : null}
+          {hasCrumb ? (
+            <Breadcrumbs items={trail} separator={crumbSeparator} label={crumbNavLabel} />
+          ) : null}
+          {!hasCrumb && eyebrow ? (
+            <div className="section-label page-hero-eyebrow">{eyebrow}</div>
+          ) : null}
           {headingText ? <h1>{accentText(headingText)}</h1> : null}
           {subtitle ? <p className="page-hero-sub">{subtitle}</p> : null}
 
           {heroLinks.length ? (
             <div className="page-hero-actions">
-              {heroLinks.map(({ link }, i) => (
-                <CMSLink
-                  key={i}
-                  {...(link as Record<string, unknown>)}
-                  appearance="inline"
-                  className={i === 0 ? 'btn-hero-primary' : 'btn-hero-outline'}
-                />
-              ))}
+              {/* The button style follows the editor's Appearance choice. It used
+                  to follow list position, so the Appearance select on every hero
+                  link did nothing. Position is still the fallback for links saved
+                  before the choice was honoured (appearance unset). */}
+              {heroLinks.map(({ link }, i) => {
+                const appearance = (link as { appearance?: string | null })?.appearance
+                const outline = appearance ? appearance === 'outline' : i > 0
+                return (
+                  <CMSLink
+                    key={i}
+                    {...(link as Record<string, unknown>)}
+                    appearance="inline"
+                    className={outline ? 'btn-hero-outline' : 'btn-hero-primary'}
+                  />
+                )
+              })}
             </div>
           ) : null}
 
@@ -86,6 +117,10 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
       className={cn(
         'page-hero',
         `page-hero--${theme}`,
+        // Carries the on-dark token context, same as Section does for its dark
+        // bands. Needed as a real class (not just a selector-list entry) so
+        // descendant rules like `.vf-on-dark .vf-breadcrumb` can match.
+        theme === 'dark' && 'vf-on-dark',
         align === 'center' && 'page-hero--center',
         showShield && 'page-hero--has-shield',
         imagePanel && 'page-hero--image-panel',
@@ -97,9 +132,17 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
           <div className="ph-grid">
             {inner}
             <div className="ph-card-wrap">
+              {/* The hero's Image field is rendered here. It was previously
+                  ignored entirely, and the placeholder used <Icon name="image">
+                  — "image" is not a key in iconMap, so it rendered an empty 48px
+                  gap. There was no working way to put an image on an interior
+                  page hero at all. */}
               <div className="ph-company-img">
-                <Icon name="image" />
-                <span className="ph-card-img-label">{imagePanelLabel}</span>
+                {heroMedia ? (
+                  <Media resource={heroMedia} imgClassName="ph-company-img__media" />
+                ) : (
+                  <span className="ph-card-img-label">{imagePanelLabel}</span>
+                )}
               </div>
               {scrollHint ? (
                 <div className="ph-scroll-hint">

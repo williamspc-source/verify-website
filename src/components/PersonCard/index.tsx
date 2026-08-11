@@ -115,7 +115,13 @@ export const PersonCard: React.FC<PersonCardData> = ({
     <>
       <div
         className="vf-person-card__avatar"
-        style={{ width: 104, height: 104, borderRadius: '50%', overflow: 'hidden', marginBottom: 18 }}
+        style={{
+            width: 'var(--vf-avatar-size, 104px)',
+            height: 'var(--vf-avatar-size, 104px)',
+            borderRadius: 'var(--vf-radius-circle)',
+            overflow: 'hidden',
+            marginBottom: 18,
+          }}
       >
         {photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

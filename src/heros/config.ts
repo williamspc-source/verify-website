@@ -8,12 +8,35 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@/fields/linkGroup'
-import { cssClassField, iconField } from '@/fields/blockFields'
+import { backgroundField, containerWidthField, cssClassField, iconField } from '@/fields/blockFields'
 
 const isType =
   (...types: string[]) =>
   (_: unknown, siblingData: { type?: string } = {}) =>
     types.includes(siblingData?.type ?? '')
+
+/**
+ * Section spacing presets plus a "default" sentinel. The home hero's own 80px
+ * padding is not one of the presets (`normal` is ~88px), so defaulting to a
+ * preset would silently reshape the hero. 'default' emits no class and leaves
+ * the hero's CSS in charge until an editor deliberately picks something.
+ */
+const heroSpacingField = (name: string, label: string, description: string): Field =>
+  ({
+    name,
+    type: 'select',
+    label,
+    defaultValue: 'default',
+    admin: { width: '50%', description },
+    options: [
+      { label: "Default (hero's own)", value: 'default' },
+      { label: 'None', value: 'none' },
+      { label: 'Compact', value: 'compact' },
+      { label: 'Normal', value: 'normal' },
+      { label: 'Spacious', value: 'spacious' },
+      { label: 'Extra large', value: 'xl' },
+    ],
+  }) as Field
 
 export const hero: Field = {
   name: 'hero',
@@ -94,7 +117,8 @@ export const hero: Field = {
       type: 'checkbox',
       label: 'Show VERIFY shield watermark',
       admin: {
-        description: 'Decorative brand shield behind the hero (uses the Site Settings logo/shield).',
+        description:
+          'Decorative brand shield on the definition panel. The image comes from Site Settings → Brand assets → Shield / seal mark, falling back to the bundled VERIFY shield.',
         condition: isType('pageHero', 'homeHero'),
       },
     },
@@ -152,6 +176,39 @@ export const hero: Field = {
         },
       ],
     },
+    // Home hero band. These exist because the band colour and vertical rhythm
+    // used to be an inline style on the <section>, which outranks even Custom
+    // Styles and so could not be changed from the admin at all.
+    // `heroPadding*` default to 'default' (the hero's own 80px) rather than to a
+    // spacing preset, because 80px is not one of the presets — so an untouched
+    // hero renders exactly as before.
+    {
+      type: 'row',
+      admin: { condition: isType('homeHero') },
+      fields: [
+        // Cast: spreading a shared Field and overriding `admin` widens the
+        // discriminated union past what TS can narrow back to `Field`.
+        {
+          ...backgroundField,
+          name: 'heroBackground',
+          label: 'Hero background',
+          defaultValue: 'accent-solid',
+          admin: { ...backgroundField.admin, width: '50%' },
+        } as Field,
+        {
+          ...containerWidthField,
+          admin: { ...containerWidthField.admin, width: '50%' },
+        } as Field,
+      ],
+    },
+    {
+      type: 'row',
+      admin: { condition: isType('homeHero') },
+      fields: [
+        heroSpacingField('heroPaddingTop', 'Padding top', 'Space above the hero content.'),
+        heroSpacingField('heroPaddingBottom', 'Padding bottom', 'Space below the hero content.'),
+      ],
+    },
     {
       name: 'definition',
       type: 'group',
@@ -173,6 +230,23 @@ export const hero: Field = {
           options: [
             { label: 'Glow (light panel, radial glow)', value: 'glow' },
             { label: 'Frame (grey gradient, inner frame)', value: 'frame' },
+          ],
+        },
+        {
+          name: 'interaction',
+          type: 'select',
+          defaultValue: 'full',
+          label: 'Panel interaction',
+          admin: {
+            description:
+              'Pointer effects on the panel. Visitors who have asked their device to reduce motion always get the calm version automatically, and touch devices get no motion at all.',
+            condition: (_data, siblingData) =>
+              ((siblingData as { definitionStyle?: string })?.definitionStyle ?? 'glow') === 'glow',
+          },
+          options: [
+            { label: 'Full (float + 3D tilt + cursor sheen)', value: 'full' },
+            { label: 'Subtle (cursor sheen + shadow lift only)', value: 'subtle' },
+            { label: 'Off', value: 'off' },
           ],
         },
       ],
@@ -204,8 +278,15 @@ export const hero: Field = {
       type: 'upload',
       relationTo: 'media',
       admin: {
-        description: 'Hero image (background for impact heroes; a side/decorative image on page heroes).',
-        condition: isType('highImpact', 'mediumImpact', 'homeHero', 'pageHero'),
+        description:
+          'Hero image. Background for the impact heroes, the side image on the home hero, and the contents of the image panel on a page hero.',
+        // On a page hero the image is only rendered inside the image panel
+        // (src/heros/PageHero/index.tsx), so offering the field with the panel
+        // switched off gave the editor an upload that went nowhere and said
+        // nothing. Hide it there instead.
+        condition: (_: unknown, s: { type?: string; imagePanel?: boolean } = {}) =>
+          ['highImpact', 'mediumImpact', 'homeHero'].includes(s?.type ?? '') ||
+          (s?.type === 'pageHero' && Boolean(s?.imagePanel)),
       },
     },
     { ...cssClassField, admin: { ...cssClassField.admin, condition: isType('pageHero', 'homeHero') } } as Field,

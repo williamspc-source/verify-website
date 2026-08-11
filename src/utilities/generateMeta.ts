@@ -21,8 +21,18 @@ const mediaURL = (image: unknown, fallback: string): string => {
 
 export const generateMeta = async (args: {
   doc: Partial<Page> | Partial<Post> | null
+  /**
+   * Canonical path for this document, from `src/utilities/routes.ts`.
+   *
+   * Required in practice: `og:url` used to be
+   * `Array.isArray(doc?.slug) ? doc.slug.join('/') : '/'`, and `slug` is a string
+   * on every collection — so the test never passed and EVERY page, post,
+   * specialist and event advertised `og:url: "/"`. Sharing any inner page
+   * attributed the preview to the homepage.
+   */
+  url?: string | null
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { doc, url } = args
 
   // Site-wide defaults (name + fallback social image) come from Site Settings.
   const settings = await getCachedGlobal('site-settings', 1)()
@@ -46,7 +56,8 @@ export const generateMeta = async (args: {
           ]
         : undefined,
       title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      // Absolute: og:url must be a full URL, not a path.
+      url: `${getServerSideURL()}${url && url.startsWith('/') ? url : '/'}`,
     }),
     title,
   }

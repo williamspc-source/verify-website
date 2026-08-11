@@ -12,6 +12,7 @@ import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { mediaFocal } from '@/utilities/focalPoint'
+import { specialistPath, teamPath } from '@/utilities/routes'
 
 const DEPARTMENT_LABELS: Record<string, string> = {
   operations: 'Operations',
@@ -43,7 +44,7 @@ const specialistToCard = (s: Specialist, linkProfiles: boolean): PersonCardData 
     photoUrl: photo.url,
     photoFocus: photo.focus,
     photoZoom: photo.zoom,
-    href: linkProfiles && s.slug ? `/specialists/${s.slug}` : null,
+    href: linkProfiles ? specialistPath(s.slug) : null,
   }
 }
 
@@ -58,7 +59,7 @@ const teamToCard = (t: Team, linkProfiles: boolean): PersonCardData => {
     photoUrl: photo.url,
     photoFocus: photo.focus,
     photoZoom: photo.zoom,
-    href: linkProfiles && t.slug ? `/about/team/${t.slug}` : null,
+    href: linkProfiles ? teamPath(t.slug) : null,
     variant: 'rect',
   }
 }
@@ -86,11 +87,17 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     motion,
     containerWidth,
     hoverEffect,
+    shadow,
     carouselOptions,
+    columns,
     bare,
   } = props
   const cardClass = toClassName(elementClasses?.card)
   const co = carouselOptions || {}
+  // `columns` and `showArrows` were both stored and never read: the grid used a
+  // fixed auto-fill track and the carousel was hardcoded to showArrows={false}.
+  const cols = Number(columns) || 4
+  const showArrows = (co as { showArrows?: boolean | null }).showArrows !== false
   const lim = limit === 0 ? 0 : limit || undefined
 
   const payload = await getPayload({ config: configPromise })
@@ -111,6 +118,9 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     if (department) where.department = { equals: department }
     const res = await payload.find({
       collection: 'team',
+      // Local API defaults to overrideAccess: true, which bypasses
+      // authenticatedOrPublished and puts unpublished drafts on the live page.
+      overrideAccess: false,
       depth: 1,
       limit: groupByDepartment ? 0 : (lim ?? 12),
       sort: 'order',
@@ -140,6 +150,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     if (location) and.push({ locations: { equals: typeof location === 'object' ? location.id : location } })
     const res = await payload.find({
       collection: 'specialists',
+      overrideAccess: false,
       depth: 1,
       limit: lim ?? 8,
       sort: '_order',
@@ -157,6 +168,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
+      shadow={shadow}
       bare={bare}
     >
       <SectionHeader
@@ -172,7 +184,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
           {groups.map((g) => (
             <div key={g.label} className="vf-people-grid__group">
               <div className="vf-people-grid__group-label divider-label">{g.label}</div>
-              <div className="spec-grid">
+              <div className="spec-grid" style={{ '--vf-cols': cols } as React.CSSProperties}>
                 {g.cards.map((c, i) => (
                   <PersonCard key={i} {...c} className={cardClass} />
                 ))}
@@ -185,11 +197,11 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
           cards={cards}
           speed={co.speed}
           startDirection={co.direction === 'right' ? 'right' : 'left'}
-          showArrows={false}
+          showArrows={showArrows}
           cardClassName={cardClass}
         />
       ) : (
-        <div className="spec-grid">
+        <div className="spec-grid" style={{ '--vf-cols': cols } as React.CSSProperties}>
           {cards.map((c, i) => (
             <PersonCard key={i} {...c} className={cardClass} />
           ))}

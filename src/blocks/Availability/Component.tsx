@@ -13,6 +13,7 @@ import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { accentText } from '@/utilities/accentText'
 import { mediaFocal } from '@/utilities/focalPoint'
+import { specialistPath } from '@/utilities/routes'
 
 import {
   AvailabilityClient,
@@ -108,6 +109,9 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
   // Advertised specialists → the featured carousel only.
   const specialistsRes = await payload.find({
     collection: 'specialists',
+    // Local API defaults to overrideAccess: true, which bypasses
+    // authenticatedOrPublished and shows unpublished specialists publicly.
+    overrideAccess: false,
     where: { advertise: { equals: true } },
     depth: 1,
     limit: 100,
@@ -167,6 +171,7 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
           end: sess.endTime || '',
           type: meta.label,
           modeClass: meta.cls,
+          note: sess.notes || null,
         })
       }
       const photo = mediaFocal(sp.photo)
@@ -205,7 +210,7 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
     photoFocus: photo.focus,
     photoZoom: photo.zoom,
     // Link each carousel card to the specialist's public profile.
-    href: sp.slug ? `/specialists/${sp.slug}` : null,
+    href: specialistPath(sp.slug),
     tags: (sp.accreditations || [])
       .map((a) => (a && typeof a === 'object' ? a.title : null))
       .filter((a): a is string => Boolean(a))

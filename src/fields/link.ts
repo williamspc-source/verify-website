@@ -85,12 +85,17 @@ export const link: LinkType = ({
     {
       name: 'reference',
       type: 'relationship',
+      label: 'Document to link to',
+      // Specialists / Team / Events are linkable so an editor never has to type
+      // a path by hand. A hand-typed path bypasses src/utilities/routes.ts and
+      // silently 404s the day a prefix moves — which has already happened once.
+      relationTo: ['pages', 'posts', 'specialists', 'team', 'events'],
+      required: req,
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'reference',
+        description:
+          'You can link to a draft. The link will 404 for visitors until that document is published.',
       },
-      label: 'Document to link to',
-      relationTo: ['pages', 'posts'],
-      required: req,
     },
     {
       name: 'url',

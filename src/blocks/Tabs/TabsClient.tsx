@@ -68,7 +68,7 @@ export const TabsClient: React.FC<{
     <div className="vf-tabs__wrap">
       {/* Pills are centered (inline-flex inside a centered bar); underline stays left-aligned. */}
       {isPills ? (
-        <div className="vf-tabs__tabbar" style={{ textAlign: 'center', marginBottom: 32 }}>
+        <div className="vf-tabs__tabbar" style={{ textAlign: 'center', marginBottom: 'var(--gap-normal)' }}>
           {tablist}
         </div>
       ) : (

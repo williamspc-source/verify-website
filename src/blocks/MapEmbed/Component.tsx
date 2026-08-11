@@ -108,7 +108,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
   const genericFrame = hasFrame ? (
     <div
       className="vf-map-embed__frame"
-      style={{ position: 'relative', overflow: 'hidden', borderRadius: '1rem', ...frameStyle }}
+      style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--vf-radius-md)', ...frameStyle }}
     >
       <iframe
         src={src as string}

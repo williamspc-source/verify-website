@@ -50,7 +50,19 @@ export const Callout: Block = {
         ],
       }),
     },
-    linkGroup({ overrides: { maxRows: 2 } }),
+    // Appearance is left in place deliberately. A callout link renders as
+    // `.process-note-link`, a single treatment, so the choice has no effect —
+    // but removing the field drops a populated column, and this schema has been
+    // kept strictly additive. Say so in the description instead.
+    linkGroup({
+      overrides: {
+        maxRows: 2,
+        admin: {
+          description:
+            'Callout links all render in the same style, so a link’s Appearance (Default/Outline) makes no difference here.',
+        },
+      },
+    }),
     cssClassField,
   ],
 }

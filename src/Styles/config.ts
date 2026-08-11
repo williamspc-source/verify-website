@@ -23,7 +23,7 @@ export const CustomStyles: GlobalConfig = {
       labels: { singular: 'Preset', plural: 'Presets' },
       admin: {
         description:
-          'Define a reusable style once, then apply it by name on any block/hero/page. Target the stable vf-* hook classes (e.g. .vf-card, .vf-section-header__title, .vf-carousel__arrow) and brand tokens (var(--primary), var(--accent), var(--shadow-lg), var(--radius)…). See src/Styles/HOOKS.md for the full hook + token reference. Scope to a block via ".your-class .vf-card { … }".',
+          'Define a reusable style once, then apply it by name on any block/hero/page. Target the stable vf-* hook classes (e.g. .vf-card, .vf-section-header__title, .vf-carousel__arrow) and brand tokens (var(--primary), var(--accent), var(--vf-shadow-lg), var(--vf-radius-card)…) rather than literal colours, so your styles survive a rebrand. See src/Styles/HOOKS.md for the full reference — it also lists which admin field controls each token. Scope to a block via ".your-class .vf-card { … }".',
         components: { RowLabel: '@/Styles/RowLabel#RowLabel' },
       },
       fields: [

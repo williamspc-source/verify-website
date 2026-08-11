@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Icon } from '@/components/Icon'
 import { cn } from '@/utilities/ui'
 import { focalImgStyle } from '@/utilities/focalPoint'
+import { specialistPath } from '@/utilities/routes'
 
 export type RosterPerson = {
   id: string
@@ -184,8 +185,8 @@ export const SpecialtyClient: React.FC<{
                           ) : null}
                         </span>
                         <span className="vf-specialty-person__actions">
-                          {p.slug ? (
-                            <Link className="vf-specialty-profile-link" href={`/specialists/${p.slug}`}>
+                          {specialistPath(p.slug) ? (
+                            <Link className="vf-specialty-profile-link" href={specialistPath(p.slug)!}>
                               View Profile
                             </Link>
                           ) : null}

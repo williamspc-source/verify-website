@@ -13,6 +13,10 @@ export const backgroundField: Field = {
     { label: 'White', value: 'white' },
     { label: 'Light grey', value: 'muted' },
     { label: 'Light blue accent', value: 'accent' },
+    // Flat fill rather than the `accent` gradient. Added so the home hero's band
+    // could stop being a hardcoded inline colour; available everywhere since it
+    // is a genuinely useful option, not a one-off.
+    { label: 'Light blue (solid)', value: 'accent-solid' },
     { label: 'Primary (dark blue)', value: 'primary' },
     { label: 'Dark (charcoal)', value: 'dark' },
   ],
@@ -71,9 +75,60 @@ export const containerWidthField: Field = {
   ],
 }
 
+// Resting depth for cards/items → `.vf-shadow-<slug>` (globals.css tail).
+// 'default' emits no class, so adding this to a block changes nothing until an
+// editor opts in. The presets set the RESTING shadow only; hover treatment
+// stays with hoverEffectField, so the two compose rather than fight.
+export const shadowField: Field = {
+  name: 'shadow',
+  type: 'select',
+  defaultValue: 'default',
+  label: 'Card shadow',
+  admin: {
+    description:
+      'Resting depth/glow for cards in this block. Edit what each preset looks like in Globals → Design System → Shadows & glows.',
+  },
+  options: [
+    { label: "Default (component's own)", value: 'default' },
+    { label: 'None (flat)', value: 'none' },
+    { label: 'Extra small', value: 'xs' },
+    { label: 'Small', value: 'sm' },
+    { label: 'Medium', value: 'md' },
+    { label: 'Large', value: 'lg' },
+    { label: 'Extra large', value: 'xl' },
+    { label: 'Glow', value: 'glow' },
+    { label: 'Glow (strong)', value: 'glow-strong' },
+  ],
+}
+
+// Drop shadow for the Image atom → `.vf-image--shadow-<slug>`. A narrower scale
+// than shadowField on purpose: the glow rungs are a card treatment and read as a
+// halo behind a photo. Defaults to none, so existing images are untouched.
+export const imageShadowField: Field = {
+  name: 'shadow',
+  type: 'select',
+  defaultValue: 'none',
+  label: 'Shadow',
+  admin: {
+    description: 'Drop shadow behind the image. Edit the values in Globals → Design System.',
+  },
+  options: [
+    { label: 'None', value: 'none' },
+    { label: 'Small', value: 'sm' },
+    { label: 'Medium', value: 'md' },
+    { label: 'Large', value: 'lg' },
+    { label: 'Extra large', value: 'xl' },
+  ],
+}
+
 // Display option bundles appended to block configs to keep them DRY.
 export const displayFields: Field[] = [containerWidthField, motionField]
-export const gridDisplayFields: Field[] = [containerWidthField, motionField, hoverEffectField]
+export const gridDisplayFields: Field[] = [
+  containerWidthField,
+  motionField,
+  hoverEffectField,
+  shadowField,
+]
 
 // Eyebrow + heading + subheading, used by most blocks via a SectionHeader.
 export const sectionHeaderFields: Field[] = [

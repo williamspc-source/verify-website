@@ -10,6 +10,18 @@ export const searchFields: Field[] = [
     },
   },
   {
+    // Canonical URL of the indexed doc, computed at sync time (beforeSync). The
+    // search index spans posts, specialists and events, whose URLs differ and — for
+    // posts — depend on the stream, which the results page can't recompute. Storing
+    // it here lets each result link correctly instead of assuming /posts/<slug>.
+    name: 'uri',
+    type: 'text',
+    index: true,
+    admin: {
+      readOnly: true,
+    },
+  },
+  {
     name: 'meta',
     label: 'Meta',
     type: 'group',
