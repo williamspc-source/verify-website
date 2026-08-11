@@ -1,303 +1,153 @@
-# Payload Website Template
+# VERIFY Medico-Legal Solutions — website
 
-This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/3.x/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
+Next.js 16 (App Router) + Payload 3 (Postgres), Tailwind 4, `pnpm`.
 
-This template is right for you if you are working on:
+The public site and the admin are one application. Content is edited at `/admin` and goes live on
+save — there is no separate publish step beyond each document's Draft/Published toggle, and no
+deploy needed for a content change.
 
-- A personal or enterprise-grade website, blog, or portfolio
-- A content publishing platform with a fully featured publication workflow
-- Exploring the capabilities of Payload
+**If you are taking this over and do not write code, read `src/Styles/HOOKS.md`.** It is the
+editor's manual: where every colour, font, spacing and corner-rounding control lives, what each one
+reaches, and what to do when a change appears not to work. This file is for whoever maintains the
+code.
 
-Core features:
+**If you are taking over the code, read [`OUTSTANDING.md`](OUTSTANDING.md) first.** It is the
+register of what is knowingly imperfect — measured impact, what fixing each costs, and one item
+(the migration) that blocks the next deploy until it is done.
 
-- [Pre-configured Payload Config](#how-it-works)
-- [Authentication](#users-authentication)
-- [Access Control](#access-control)
-- [Layout Builder](#layout-builder)
-- [Draft Preview](#draft-preview)
-- [Live Preview](#live-preview)
-- [On-demand Revalidation](#on-demand-revalidation)
-- [SEO](#seo)
-- [Search](#search)
-- [Redirects](#redirects)
-- [Jobs and Scheduled Publishing](#jobs-and-scheduled-publish)
-- [Website](#website)
+---
 
-## Quick Start
-
-To spin up this example locally, follow these steps:
-
-### Clone
-
-If you have not done so already, you need to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
-
-Use the `create-payload-app` CLI to clone this template directly to your machine:
+## Running it locally
 
 ```bash
-pnpx create-payload-app my-project -t website
+pnpm install
+cp .env.example .env      # then fill in DATABASE_URL and PAYLOAD_SECRET
+pnpm dev                  # http://localhost:3000, admin at /admin
 ```
 
-### Development
-
-1. First [clone the repo](#clone) if you have not done so already
-1. `cd my-project && cp .env.example .env` to copy the example environment variables
-1. `pnpm install && pnpm dev` to install dependencies and start the dev server
-1. open `http://localhost:3000` to open the app in your browser
-
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
-
-## How it works
-
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
-
-### Collections
-
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
-
-- #### Users (Authentication)
-
-  Users are auth-enabled collections that have access to the admin panel and unpublished content. See [Access Control](#access-control) for more details.
-
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/3.x/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
-
-- #### Posts
-
-  Posts are used to generate blog posts, news articles, or any other type of content that is published over time. All posts are layout builder enabled so you can generate unique layouts for each post using layout-building blocks, see [Layout Builder](#layout-builder) for more details. Posts are also draft-enabled so you can preview them before publishing them to your website, see [Draft Preview](#draft-preview) for more details.
-
-- #### Pages
-
-  All pages are layout builder enabled so you can generate unique layouts for each page using layout-building blocks, see [Layout Builder](#layout-builder) for more details. Pages are also draft-enabled so you can preview them before publishing them to your website, see [Draft Preview](#draft-preview) for more details.
-
-- #### Media
-
-  This is the uploads enabled collection used by pages, posts, and projects to contain media like images, videos, downloads, and other assets. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
-
-- #### Categories
-
-  A taxonomy used to group posts together. Categories can be nested inside of one another, for example "News > Technology". See the official [Payload Nested Docs Plugin](https://payloadcms.com/docs/plugins/nested-docs) for more details.
-
-### Globals
-
-See the [Globals](https://payloadcms.com/docs/configuration/globals) docs for details on how to extend this functionality.
-
-- `Header`
-
-  The data required by the header on your front-end like nav links.
-
-- `Footer`
-
-  Same as above but for the footer of your site.
-
-## Access control
-
-Basic access control is setup to limit access to various content based based on publishing status.
-
-- `users`: Users can access the admin panel and create or edit content.
-- `posts`: Everyone can access published posts, but only users can create, update, or delete them.
-- `pages`: Everyone can access published pages, but only users can create, update, or delete them.
-
-For more details on how to extend this functionality, see the [Payload Access Control](https://payloadcms.com/docs/access-control/overview#access-control) docs.
-
-## Layout Builder
-
-Create unique page layouts for any type of content using a powerful layout builder. This template comes pre-configured with the following layout building blocks:
-
-- Hero
-- Content
-- Media
-- Call To Action
-- Archive
-
-Each block is fully designed and built into the front-end website that comes with this template. See [Website](#website) for more details.
-
-## Lexical editor
-
-A deep editorial experience that allows complete freedom to focus just on writing content without breaking out of the flow with support for Payload blocks, media, links and other features provided out of the box. See [Lexical](https://payloadcms.com/docs/rich-text/overview) docs.
-
-## Draft Preview
-
-All posts and pages are draft-enabled so you can preview them before publishing them to your website. To do this, these collections use [Versions](https://payloadcms.com/docs/configuration/collections#versions) with `drafts` set to `true`. This means that when you create a new post, project, or page, it will be saved as a draft and will not be visible on your website until you publish it. This also means that you can preview your draft before publishing it to your website. To do this, we automatically format a custom URL which redirects to your front-end to securely fetch the draft version of your content.
-
-Since the front-end of this template is statically generated, this also means that pages, posts, and projects will need to be regenerated as changes are made to published documents. To do this, we use an `afterChange` hook to regenerate the front-end when a document has changed and its `_status` is `published`.
-
-For more details on how to extend this functionality, see the official [Draft Preview Example](https://github.com/payloadcms/payload/tree/3.x/examples/draft-preview).
-
-## Live preview
-
-In addition to draft previews you can also enable live preview to view your end resulting page as you're editing content with full support for SSR rendering. See [Live preview docs](https://payloadcms.com/docs/live-preview/overview) for more details.
-
-## On-demand Revalidation
-
-We've added hooks to collections and globals so that all of your pages, posts, footer, or header changes will automatically be updated in the frontend via on-demand revalidation supported by Nextjs.
-
-> Note: if an image has been changed, for example it's been cropped, you will need to republish the page it's used on in order to be able to revalidate the Nextjs image cache.
-
-## SEO
-
-This template comes pre-configured with the official [Payload SEO Plugin](https://payloadcms.com/docs/plugins/seo) for complete SEO control from the admin panel. All SEO data is fully integrated into the front-end website that comes with this template. See [Website](#website) for more details.
-
-## Search
-
-This template also pre-configured with the official [Payload Search Plugin](https://payloadcms.com/docs/plugins/search) to showcase how SSR search features can easily be implemented into Next.js with Payload. See [Website](#website) for more details.
-
-## Redirects
-
-If you are migrating an existing site or moving content to a new URL, you can use the `redirects` collection to create a proper redirect from old URLs to new ones. This will ensure that proper request status codes are returned to search engines and that your users are not left with a broken link. This template comes pre-configured with the official [Payload Redirects Plugin](https://payloadcms.com/docs/plugins/redirects) for complete redirect control from the admin panel. All redirects are fully integrated into the front-end website that comes with this template. See [Website](#website) for more details.
-
-## Jobs and Scheduled Publish
-
-We have configured [Scheduled Publish](https://payloadcms.com/docs/versions/drafts#scheduled-publish) which uses the [jobs queue](https://payloadcms.com/docs/jobs-queue/jobs) in order to publish or unpublish your content on a scheduled time. The tasks are run on a cron schedule and can also be run as a separate instance if needed.
-
-> Note: When deployed on Vercel, depending on the plan tier, you may be limited to daily cron only.
-
-## Website
-
-This template includes a beautifully designed, production-ready front-end built with the [Next.js App Router](https://nextjs.org), served right alongside your Payload app in a instance. This makes it so that you can deploy both your backend and website where you need it.
-
-Core features:
-
-- [Next.js App Router](https://nextjs.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [React Hook Form](https://react-hook-form.com)
-- [Payload Admin Bar](https://github.com/payloadcms/payload/tree/3.x/packages/admin-bar)
-- [TailwindCSS styling](https://tailwindcss.com/)
-- [shadcn/ui components](https://ui.shadcn.com/)
-- User Accounts and Authentication
-- Fully featured blog
-- Publication workflow
-- Dark mode
-- Pre-made layout building blocks
-- SEO
-- Search
-- Redirects
-- Live preview
-
-### Cache
-
-Although Next.js includes a robust set of caching strategies out of the box, Payload Cloud proxies and caches all files through Cloudflare using the [Official Cloud Plugin](https://www.npmjs.com/package/@payloadcms/payload-cloud). This means that Next.js caching is not needed and is disabled by default. If you are hosting your app outside of Payload Cloud, you can easily reenable the Next.js caching mechanisms by removing the `no-store` directive from all fetch requests in `./src/app/_api` and then removing all instances of `export const dynamic = 'force-dynamic'` from pages files, such as `./src/app/(pages)/[slug]/page.tsx`. For more details, see the official [Next.js Caching Docs](https://nextjs.org/docs/app/building-your-application/caching).
-
-## Development
-
-To spin up this example locally, follow the [Quick Start](#quick-start). Then [Seed](#seed) the database with a few pages, posts, and projects.
-
-### Working with Postgres
-
-Postgres and other SQL-based databases follow a strict schema for managing your data. In comparison to our MongoDB adapter, this means that there's a few extra steps to working with Postgres.
-
-Note that often times when making big schema changes you can run the risk of losing data if you're not manually migrating it.
-
-#### Local development
-
-Ideally we recommend running a local copy of your database so that schema updates are as fast as possible. By default the Postgres adapter has `push: true` for development environments. This will let you add, modify and remove fields and collections without needing to run any data migrations.
-
-If your database is pointed to production you will want to set `push: false` otherwise you will risk losing data or having your migrations out of sync.
-
-#### Migrations
-
-[Migrations](https://payloadcms.com/docs/database/migrations) are essentially SQL code versions that keeps track of your schema. When deploy with Postgres you will need to make sure you create and then run your migrations.
-
-Locally create a migration
-
-```bash
-pnpm payload migrate:create
+Requires Postgres. Local development uses a dedicated `verify_cms` database and never touches
+production. See `CLAUDE.md` for the full local setup, including the seed endpoint.
+
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Dev server on `:3000` (binds `0.0.0.0`) |
+| `pnpm build` / `pnpm start` | Production build and serve |
+| `pnpm dev:prod` | Build + serve in production mode locally — needs `LOCAL_PROD_REPRO=1` (below) |
+| `pnpm lint` | ESLint |
+| `pnpm test` | Integration (vitest) + e2e (playwright) |
+| `pnpm test:int` | Integration only — includes the admin-control guards below |
+| `pnpm generate:types` | Regenerate `src/payload-types.ts` after ANY field change |
+| `pnpm generate:importmap` | Regenerate the admin import map after adding a custom admin component |
+| `pnpm exec tsc --noEmit` | Typecheck (there is no `typecheck` script) |
+
+### Running in production mode locally
+
+`pnpm dev:prod` runs `next start`, which sets `NODE_ENV=production`. The server refuses to start
+without `SMTP_HOST`, `NEXT_PUBLIC_SERVER_URL` and `PREVIEW_SECRET` — that check is deliberate, and
+it is what stops a deploy from quietly discarding every enquiry notification.
+
+To run it on your own machine anyway, add to your local `.env`:
+
+```
+LOCAL_PROD_REPRO=1
 ```
 
-This creates the migration files you will need to push alongside with your new configuration.
+It disables nothing except the refusal to start, prints a banner on every boot, and every email
+is still reported as `[EMAIL NOT SENT]` at error level. **Never set it on the server.**
 
-On the server after building and before running `pnpm start` you will want to run your migrations
+## Before you deploy
+
+In order. Each step catches something the next one would hide.
+
+1. `pnpm exec tsc --noEmit`
+2. `pnpm test:int` — includes the admin-control guards below
+3. `pnpm build` — must pass without `LOCAL_PROD_REPRO`; building needs no deploy secrets
+4. `pnpm dev:prod` and click through: submit the enquiry drawer and confirm a row appears under
+   **Form Submissions**; open a draft post's **Preview**; check the header and footer nav links
+   resolve
+5. `pnpm test:e2e`
+6. On the box, after any field change: `pnpm payload generate:types` →
+   `pnpm payload migrate:create <name>` → `pnpm payload migrate` → `pnpm build`
+7. After any bulk content import or seed: **Admin → System → Search → Reindex**. Search results
+   store their own canonical URL (`uri`), written on save — documents that predate a change to
+   that logic keep whatever they had, and a result with no `uri` renders unlinked. On the local
+   database only 7 of 66 search documents had one until it was reindexed.
+
+## Deploying
+
+Production builds and migrates on a remote box: commit and push, then the box pulls, builds and
+migrates against the live database.
+
+After changing any collection, global or block field:
 
 ```bash
+pnpm payload generate:types
+pnpm payload migrate:create <name>   # answer "create column" unless it is genuinely a rename
 pnpm payload migrate
+pnpm build
 ```
 
-This command will check for any migrations that have not yet been run and try to run them and it will keep a record of migrations that have been run in the database.
+**Keep the schema additive.** Every migration so far only adds columns. A dropped column is
+irreversible data loss on a live site, and the `migrate:create` prompt that asks "created or renamed
+from another column?" is where that happens by accident — choosing *rename* moves an unrelated
+column's data into the new field.
 
-### Docker
+Three environment variables are required in production and the app refuses to boot without them:
+`SMTP_HOST`, `NEXT_PUBLIC_SERVER_URL`, `PREVIEW_SECRET`. Each fails *silently* rather than loudly
+when missing — most dangerously `SMTP_HOST`, whose absence makes Payload fall back to a console mock
+that reports every enquiry notification and password-reset email as sent. See `.env.example`.
 
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
+## Guards you should not delete
 
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
+`tests/int/adminControls.int.spec.ts` fails the build when:
 
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
+1. a block, collection or global declares a field nothing reads (a control that looks editable and
+   is not),
+2. a `select` offers an option whose `.vf-*` class no rule defines,
+3. a component hardcodes `appearance=` after a `{...spread}` while its config still offers the
+   Appearance choice, so the editor's stored value is discarded,
+4. a query against a draft-enabled collection has no `overrideAccess` and no `_status` filter,
+   leaking unpublished documents onto the public site,
+5. `HOOKS.md` documents a style hook class that nothing emits.
 
-### Seed
+These exist because a 2026 audit found ~118 verified cases of exactly those shapes.
 
-To seed the database with a few pages, posts, and projects you can click the 'seed database' link from the admin panel.
+**A guard that has never failed is not evidence.** An earlier version of this file justified itself
+with "a crude test that runs beats an accurate one that rots", and under that licence three of its
+four patterns could not fail on the defect they named — one collected results into an array it never
+wrote to, another omitted the only property anything actually violated. The suite reported 94/94 and
+meant nothing. Each test now records, in a comment above it, the deliberate break used to prove it
+goes red, and `zsh tests/int/prove-guards.sh` applies all five in turn and restores the tree.
+**If you change a test, re-run that script — all five must report PASS.**
 
-The seed script will also create a demo user for demonstration purposes only:
+`pnpm lint` runs as part of `pnpm test`. It is enforced, not advisory: it had been crashing on an
+obsolete config shim and so had never run at all, which is how ten React Compiler errors — two of
+them real bugs (a `prefers-reduced-motion` check that never reacted, and a directory filter that
+overwrote the visitor's own selection) — sat unnoticed.
 
-- Demo Author
-  - Email: `demo-author@payloadcms.com`
-  - Password: `password`
+Those ten were fixed by changing the code, not by suppressing the rules: **no `react-hooks/*`
+disable exists outside `useClickableCard.ts`**, which carries three pre-existing
+`exhaustive-deps` ones. The other `eslint-disable` comments in `src/` are `@next/next/no-img-element`
+(deliberate `<img>` use) and `@typescript-eslint/no-explicit-any` (seed fixtures). Reach for a code
+change before a disable — these rules have already earned their keep.
 
-> NOTICE: seeding the database is destructive because it drops your current database to populate a fresh one from the seed template. Only run this command if you are starting a new project or can afford to lose your current data.
+When one fails, wire the control up; if it genuinely should not be wired, add it to the allowlist
+**with a reason**.
 
-## Production
+`tests/visual/computedSnapshot.mjs` captures computed styles across the site so a CSS change can be
+diffed. Note its limits before trusting a clean run: it measures 30 properties that do **not**
+include `width`, `height`, `grid-template-columns` or `transform`, and it never triggers `:hover`.
 
-To run Payload in production, you need to build and start the Admin panel. To do so, follow these steps:
+## Architecture
 
-1. Invoke the `next build` script by running `pnpm build` or `npm run build` in your project root. This creates a `.next` directory with a production-ready admin bundle.
-1. Finally run `pnpm start` or `npm run start` to run Node in production and serve Payload from the `.build` directory.
-1. When you're ready to go live, see Deployment below for more details.
+`CLAUDE.md` (checked in, at the repo root) is the maintained architecture reference: routing and the
+nested-docs URL model, the block system, the three-layer styling/token pipeline, the content model,
+and caching/revalidation. Start there before changing anything structural.
 
-### Deploying to Vercel
+Two things worth knowing up front:
 
-This template can also be deployed to Vercel for free. You can get started by choosing the Vercel DB adapter during the setup of the template or by manually installing and configuring it:
-
-```bash
-pnpm add @payloadcms/db-vercel-postgres
-```
-
-```ts
-// payload.config.ts
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
-
-export default buildConfig({
-  // ...
-  db: vercelPostgresAdapter({
-    pool: {
-      connectionString: process.env.POSTGRES_URL || '',
-    },
-  }),
-  // ...
-```
-
-We also support Vercel's blob storage:
-
-```bash
-pnpm add @payloadcms/storage-vercel-blob
-```
-
-```ts
-// payload.config.ts
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-
-export default buildConfig({
-  // ...
-  plugins: [
-    vercelBlobStorage({
-      collections: {
-        [Media.slug]: true,
-      },
-      token: process.env.BLOB_READ_WRITE_TOKEN || '',
-    }),
-  ],
-  // ...
-```
-
-There is also a simplified [one click deploy](https://github.com/payloadcms/payload/tree/3.x/templates/with-vercel-postgres) to Vercel should you need it.
-
-### Self-hosting
-
-Before deploying your app, you need to:
-
-1. Ensure your app builds and serves in production. See [Production](#production) for more details.
-2. You can then deploy Payload as you would any other Node.js or Next.js application either directly on a VPS, DigitalOcean's Apps Platform, via Coolify or more. More guides coming soon.
-
-You can also deploy your app manually, check out the [deployment documentation](https://payloadcms.com/docs/production/deployment) for full details.
-
-## Questions
-
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+- **`src/utilities/routes.ts` is the single source of truth for document URLs.** Never interpolate a
+  path inline — hand-built paths have historically disagreed with the real routes.
+- **CSS cascade layers decide which styles win.** The admin-selectable `.vf-*` presets and the ported
+  design-reference CSS are in different layers, and unlayered rules beat layered ones regardless of
+  specificity. This is the single most common reason an admin control appears to do nothing.
