@@ -1,6 +1,6 @@
 import type { GlobalAfterChangeHook } from 'payload'
 
-import { revalidateTag } from 'next/cache'
+import { safeRevalidateTag as revalidateTag } from '@/utilities/safeRevalidate'
 
 // Shared afterChange hook for simple globals: revalidates the cache tag that
 // getCachedGlobal(slug) reads from, so edits show up without a rebuild. Mirrors

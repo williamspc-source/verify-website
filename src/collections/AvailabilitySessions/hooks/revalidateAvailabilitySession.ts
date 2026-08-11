@@ -4,14 +4,16 @@ import type {
   Payload,
 } from 'payload'
 
-import { revalidatePath } from 'next/cache'
+import { safeRevalidatePath as revalidatePath } from '@/utilities/safeRevalidate'
 
 import type { AvailabilitySession } from '../../../payload-types'
+import { docPath } from '@/utilities/routes'
 
-// Deep-scan a page's layout for an `availability` block. The block can sit at the
-// top level of a page or nested inside a Section/Row/Tabs container, so rather than
-// track every nesting key we just look for any node whose `blockType` is
-// 'availability' anywhere in the structure.
+// Deep-scan a page doc for an `availability` block. The block can sit at the top
+// level of a page's layout or nested inside a Section/Row/Tabs container, so rather
+// than track every nesting key we look for any node whose `blockType` is
+// 'availability' anywhere in the structure. Scanning the whole doc (not just
+// `layout`) future-proofs against the block appearing under any other field.
 const containsAvailabilityBlock = (value: unknown): boolean => {
   if (Array.isArray(value)) return value.some(containsAvailabilityBlock)
   if (value && typeof value === 'object') {
@@ -37,8 +39,8 @@ const revalidateAvailabilityPages = async (payload: Payload): Promise<void> => {
   })
 
   for (const page of docs) {
-    if (!containsAvailabilityBlock((page as { layout?: unknown }).layout)) continue
-    const path = page.slug === 'home' ? '/' : `/${page.slug}`
+    if (!containsAvailabilityBlock(page)) continue
+    const path = docPath(page)
     payload.logger.info(`Revalidating availability page at path: ${path}`)
     revalidatePath(path)
   }

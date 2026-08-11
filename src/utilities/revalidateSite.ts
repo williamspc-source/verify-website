@@ -1,6 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath } from 'next/cache'
+import { safeRevalidatePath as revalidatePath } from '@/utilities/safeRevalidate'
 
 // Shared revalidation for "content" collections whose docs are rendered across
 // arbitrary pages — as blocks, directory rows, taxonomy filters or archive

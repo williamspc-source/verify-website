@@ -1,8 +1,12 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
+import {
+  safeRevalidatePath as revalidatePath,
+  safeRevalidateTag as revalidateTag,
+} from '@/utilities/safeRevalidate'
 
 import type { Specialist } from '../../../payload-types'
+import { specialistPath } from '@/utilities/routes'
 
 export const revalidateSpecialist: CollectionAfterChangeHook<Specialist> = ({
   doc,
@@ -11,19 +15,18 @@ export const revalidateSpecialist: CollectionAfterChangeHook<Specialist> = ({
 }) => {
   if (!context.disableRevalidate) {
     if (doc._status === 'published') {
-      const path = `/specialists/${doc.slug}`
-
-      payload.logger.info(`Revalidating specialist at path: ${path}`)
-
-      revalidatePath(path)
+      const path = specialistPath(doc.slug)
+      if (path) {
+        payload.logger.info(`Revalidating specialist at path: ${path}`)
+        revalidatePath(path)
+      }
       revalidateTag('specialists-sitemap', 'max')
     }
 
-    if (previousDoc?._status === 'published' && doc._status !== 'published') {
-      const oldPath = `/specialists/${previousDoc.slug}`
-
+    // Slug change or unpublish: purge the previous path too.
+    const oldPath = specialistPath(previousDoc?.slug)
+    if (oldPath && oldPath !== specialistPath(doc.slug)) {
       payload.logger.info(`Revalidating old specialist at path: ${oldPath}`)
-
       revalidatePath(oldPath)
       revalidateTag('specialists-sitemap', 'max')
     }
@@ -36,7 +39,8 @@ export const revalidateDelete: CollectionAfterDeleteHook<Specialist> = ({
   req: { context },
 }) => {
   if (!context.disableRevalidate) {
-    revalidatePath(`/specialists/${doc?.slug}`)
+    const path = specialistPath(doc?.slug)
+    if (path) revalidatePath(path)
     revalidateTag('specialists-sitemap', 'max')
   }
 

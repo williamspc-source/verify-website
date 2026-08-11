@@ -1,9 +1,97 @@
-import type { CollectionConfig } from 'payload'
+import type {
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook,
+  CollectionBeforeChangeHook,
+  CollectionConfig,
+} from 'payload'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
+import { safeRevalidateTag as revalidateTag } from '@/utilities/safeRevalidate'
+
+/**
+ * Purge the `primary-office` cache tag.
+ *
+ * Two things every revalidation hook in this repo has to do, and these two were
+ * the only ones not doing them:
+ *
+ *  - Honour `context.disableRevalidate`. The seed sets it to avoid a revalidation
+ *    storm while it writes dozens of documents.
+ *  - Survive being called outside a request scope. `revalidateTag` throws when
+ *    there is no Next request context — a `payload migrate`, a scheduled job, a
+ *    script. Payload runs `afterChange` *inside the transaction*, so an unguarded
+ *    throw does not just log: it rolls the write back. The office would appear to
+ *    save and then silently not exist.
+ */
+const purgePrimaryOfficeTag = (disabled: unknown, log: (msg: string) => void) => {
+  if (disabled) return
+  try {
+    revalidateTag('primary-office', 'max')
+  } catch (err) {
+    log(
+      `Offices: could not revalidate the primary-office cache tag (${
+        err instanceof Error ? err.message : String(err)
+      }). The write itself succeeded; the footer's contact details may serve stale until the next purge.`,
+    )
+  }
+}
+
+const revalidatePrimaryOffice: CollectionAfterChangeHook = ({
+  doc,
+  req: { payload, context },
+}) => {
+  purgePrimaryOfficeTag(context.disableRevalidate, (m) => payload.logger.warn(m))
+  return doc
+}
+
+const revalidatePrimaryOfficeOnDelete: CollectionAfterDeleteHook = ({
+  doc,
+  req: { payload, context },
+}) => {
+  purgePrimaryOfficeTag(context.disableRevalidate, (m) => payload.logger.warn(m))
+  return doc
+}
+
+/**
+ * Keep `isPrimary` unique. When an office is saved with the box ticked, clear it
+ * on every other office first.
+ *
+ * Runs on the incoming `data` rather than after the write so there is never a
+ * moment where two rows claim to be primary. `req` is threaded through so the
+ * clears join the same transaction as the save.
+ */
+const clearOtherPrimaryOffices: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
+  if (!data?.isPrimary) return data
+
+  const others = await req.payload.find({
+    collection: 'offices',
+    where: {
+      isPrimary: { equals: true },
+      ...(originalDoc?.id ? { id: { not_equals: originalDoc.id } } : {}),
+    },
+    limit: 100,
+    depth: 0,
+    req,
+  })
+
+  for (const other of others.docs) {
+    await req.payload.update({
+      collection: 'offices',
+      id: other.id,
+      data: { isPrimary: false },
+      depth: 0,
+      req,
+      context: { disableRevalidate: true },
+    })
+    req.payload.logger.info(
+      `— Cleared "Primary office" on ${other.title} (superseded by ${data.title ?? 'this office'})`,
+    )
+  }
+
+  return data
+}
 
 // Full office records that drive the "Where to Find Us" module on the Contact and
 // For-Claimants pages (address, hours, transport, parking, embedded map). Distinct
@@ -28,6 +116,16 @@ export const Offices: CollectionConfig = {
       type: 'text',
       required: true,
       admin: { description: 'e.g. "Brisbane (Head Office)".' },
+    },
+    {
+      name: 'isPrimary',
+      type: 'checkbox',
+      label: 'Primary office',
+      defaultValue: false,
+      admin: {
+        description:
+          'The office whose phone, email, address and hours the site falls back to — the footer and any "Use global contact details" block. Tick exactly one. Leave the matching Footer fields empty to follow this office; fill one in to override it there.',
+      },
     },
     {
       name: 'address',
@@ -122,7 +220,16 @@ export const Offices: CollectionConfig = {
     }),
   ],
   hooks: {
-    afterChange: [revalidateSiteOnChange],
-    afterDelete: [revalidateSiteOnDelete],
+    // Exactly one office is the fallback for the footer and every "use global
+    // contact details" block. Without this, ticking a second one left two rows
+    // claiming to be primary and `primaryOffice()` picked whichever the query
+    // returned first — so the footer's phone number changed depending on sort
+    // order, with nothing in the admin to explain it.
+    beforeChange: [clearOtherPrimaryOffices],
+    // `primary-office` is its own cache tag: the footer and every "use global
+    // contact details" block now read the primary office, and those are cached
+    // independently of the page-level purge revalidateSiteOnChange performs.
+    afterChange: [revalidatePrimaryOffice, revalidateSiteOnChange],
+    afterDelete: [revalidatePrimaryOfficeOnDelete, revalidateSiteOnDelete],
   },
 }

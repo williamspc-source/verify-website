@@ -1,8 +1,12 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache'
+import {
+  safeRevalidatePath as revalidatePath,
+  safeRevalidateTag as revalidateTag,
+} from '@/utilities/safeRevalidate'
 
 import type { Team } from '../../../payload-types'
+import { teamPath, TEAM_INDEX_PATH } from '@/utilities/routes'
 
 export const revalidateTeam: CollectionAfterChangeHook<Team> = ({
   doc,
@@ -11,17 +15,19 @@ export const revalidateTeam: CollectionAfterChangeHook<Team> = ({
 }) => {
   if (!context.disableRevalidate) {
     if (doc._status === 'published') {
-      const path = `/about/team/${doc.slug}`
-
-      payload.logger.info(`Revalidating team member at path: ${path}`)
-
-      revalidatePath(path)
-      revalidatePath('/about/meet-the-team')
+      const path = teamPath(doc.slug)
+      if (path) {
+        payload.logger.info(`Revalidating team member at path: ${path}`)
+        revalidatePath(path)
+      }
+      revalidatePath(TEAM_INDEX_PATH)
       revalidateTag('team-sitemap', 'max')
     }
 
-    if (previousDoc?._status === 'published' && doc._status !== 'published') {
-      revalidatePath(`/about/team/${previousDoc.slug}`)
+    const oldPath = teamPath(previousDoc?.slug)
+    if (oldPath && oldPath !== teamPath(doc.slug)) {
+      revalidatePath(oldPath)
+      revalidatePath(TEAM_INDEX_PATH)
       revalidateTag('team-sitemap', 'max')
     }
   }
@@ -33,7 +39,9 @@ export const revalidateDelete: CollectionAfterDeleteHook<Team> = ({
   req: { context },
 }) => {
   if (!context.disableRevalidate) {
-    revalidatePath(`/about/team/${doc?.slug}`)
+    const path = teamPath(doc?.slug)
+    if (path) revalidatePath(path)
+    revalidatePath(TEAM_INDEX_PATH)
     revalidateTag('team-sitemap', 'max')
   }
 

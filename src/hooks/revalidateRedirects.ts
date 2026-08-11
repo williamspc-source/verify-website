@@ -1,11 +1,19 @@
-import type { CollectionAfterChangeHook } from 'payload'
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidateTag } from 'next/cache'
+import { safeRevalidateTag as revalidateTag } from '@/utilities/safeRevalidate'
 
-export const revalidateRedirects: CollectionAfterChangeHook = ({ doc, req: { payload } }) => {
-  payload.logger.info(`Revalidating redirects`)
-
-  revalidateTag('redirects', 'max')
+// Refresh the cached `redirects` tag that PayloadRedirects reads. Registered on
+// both afterChange and afterDelete so removing a redirect stops serving it, not
+// just editing one. Typed to satisfy either hook signature; honours
+// context.disableRevalidate like every other hook (e.g. during seeding).
+export const revalidateRedirects: CollectionAfterChangeHook & CollectionAfterDeleteHook = ({
+  doc,
+  req: { payload, context },
+}) => {
+  if (!context.disableRevalidate) {
+    payload.logger.info(`Revalidating redirects`)
+    revalidateTag('redirects', 'max')
+  }
 
   return doc
 }
