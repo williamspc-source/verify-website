@@ -39,9 +39,19 @@ import { DesignSystem } from './DesignSystem/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { emailNotSentAdapter } from './email/emailNotSentAdapter'
+import { assertProductionEnv } from './utilities/assertProductionEnv'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+// Required-environment check. The authoritative, boot-time copy runs in
+// `src/instrumentation.ts`; this call covers the paths Next's instrumentation
+// hook never reaches — the Payload CLI (`payload migrate`, `generate:types`) and
+// anything that imports this config directly. See the docstring in
+// src/utilities/assertProductionEnv.ts for why it gates on NEXT_PHASE and what
+// LOCAL_PROD_REPRO is for.
+assertProductionEnv()
 
 export default buildConfig({
   admin: {
@@ -83,26 +93,30 @@ export default buildConfig({
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   // Email: powers Form Builder notification emails (each form sets its own
-  // recipient via the "Emails" tab). Uses SMTP when SMTP_HOST is configured
-  // (production); otherwise Payload falls back to a console mock so local dev and
-  // migrations never depend on a mail server.
-  ...(process.env.SMTP_HOST
-    ? {
-        email: nodemailerAdapter({
-          defaultFromName: process.env.SMTP_FROM_NAME || 'VERIFY Medico-Legal Solutions',
-          defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'no-reply@vmls.com.au',
-          transportOptions: {
-            host: process.env.SMTP_HOST,
-            port: Number(process.env.SMTP_PORT || 587),
-            secure: process.env.SMTP_SECURE === 'true',
-            auth:
-              process.env.SMTP_USER && process.env.SMTP_PASS
-                ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-                : undefined,
-          },
-        }),
-      }
-    : {}),
+  // recipient via the "Emails" tab) and admin password resets. Uses SMTP when
+  // SMTP_HOST is configured.
+  //
+  // When it isn't, we do NOT fall through to Payload's default: its
+  // `consoleEmailAdapter` logs at info level and resolves successfully, so a
+  // notification that was never sent looks exactly like one that was. Use an
+  // adapter that says so at error level on every send instead — see
+  // src/email/emailNotSentAdapter.ts. Combined with the boot check above, a
+  // misconfigured deploy cannot both boot and go quiet.
+  email: process.env.SMTP_HOST
+    ? nodemailerAdapter({
+        defaultFromName: process.env.SMTP_FROM_NAME || 'VERIFY Medico-Legal Solutions',
+        defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'no-reply@vmls.com.au',
+        transportOptions: {
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT || 587),
+          secure: process.env.SMTP_SECURE === 'true',
+          auth:
+            process.env.SMTP_USER && process.env.SMTP_PASS
+              ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+              : undefined,
+        },
+      })
+    : emailNotSentAdapter,
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
