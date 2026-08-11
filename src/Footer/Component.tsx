@@ -1,4 +1,5 @@
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getPrimaryOffice } from '@/utilities/primaryOffice'
 import Link from 'next/link'
 import React from 'react'
 
@@ -42,6 +43,13 @@ const EmailIcon = () => (
     <path d="m2 7 10 7 10-7" />
   </svg>
 )
+const ClockIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+    <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+)
+
 const PinIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="15" height="15" aria-hidden>
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -50,7 +58,10 @@ const PinIcon = () => (
 )
 
 export async function Footer() {
-  const footer = await getCachedGlobal('footer', 1)()
+  // Depth 2 for the same reason as the Header: a footer link to a Post needs the
+  // Post's `stream` populated for postPath() to build a URL, and that is one
+  // relationship deeper than the link itself. See src/Header/Component.tsx.
+  const footer = await getCachedGlobal('footer', 2)()
   const settings = await getCachedGlobal('site-settings', 1)()
 
   const columns = footer?.columns || []
@@ -58,6 +69,21 @@ export async function Footer() {
   const social = footer?.social || []
   const legalLinks = footer?.legalLinks || []
   const year = new Date().getFullYear()
+
+  // Offices is the source of truth; the Footer's own contact fields are
+  // overrides. Empty field -> fall back to the primary office, so a number
+  // changed on the office record actually reaches the footer instead of the two
+  // quietly disagreeing. `footer.hours` was declared and never rendered at all.
+  const office = await getPrimaryOffice()
+  const phone = contact?.phone || office?.phone || null
+  const email = contact?.email || office?.email || null
+  const address = contact?.address || office?.address || null
+  // Only honour the override href when the number it belongs to is the one being
+  // displayed. Otherwise clearing the footer's phone (to follow the office) while
+  // leaving phoneHref set showed the office's number and dialled the footer's.
+  const phoneHref = contact?.phone ? contact?.phoneHref || null : null
+  const hours =
+    (Array.isArray(footer?.hours) && footer.hours.length ? footer.hours : office?.hours) || []
 
   const logoSrc =
     (typeof settings?.logoFooter === 'object' && settings?.logoFooter?.url) ||
@@ -108,35 +134,49 @@ export async function Footer() {
             </div>
           ))}
 
-          {contact ? (
+          {phone || email || address || hours.length ? (
             <div className="footer-col">
               <h4 className="footer-col-heading">Contact</h4>
               <address className="footer-address">
-                {contact.phone ? (
+                {phone ? (
                   <a
-                    href={contact.phoneHref || `tel:${contact.phone.replace(/\s+/g, '')}`}
+                    href={phoneHref || `tel:${phone.replace(/\s+/g, '')}`}
                     className="footer-contact-item"
                   >
                     <div className="footer-contact-icon">
                       <PhoneIcon />
                     </div>
-                    <span>{contact.phone}</span>
+                    <span>{phone}</span>
                   </a>
                 ) : null}
-                {contact.email ? (
-                  <a href={`mailto:${contact.email}`} className="footer-contact-item">
+                {email ? (
+                  <a href={`mailto:${email}`} className="footer-contact-item">
                     <div className="footer-contact-icon">
                       <EmailIcon />
                     </div>
-                    <span>{contact.email}</span>
+                    <span>{email}</span>
                   </a>
                 ) : null}
-                {contact.address ? (
+                {address ? (
                   <div className="footer-contact-item">
                     <div className="footer-contact-icon">
                       <PinIcon />
                     </div>
-                    <span style={{ whiteSpace: 'pre-line' }}>{contact.address}</span>
+                    <span style={{ whiteSpace: 'pre-line' }}>{address}</span>
+                  </div>
+                ) : null}
+                {hours.length ? (
+                  <div className="footer-contact-item">
+                    <div className="footer-contact-icon">
+                      <ClockIcon />
+                    </div>
+                    <span>
+                      {hours.map((h, i) => (
+                        <span key={i} style={{ display: 'block' }}>
+                          {[h?.days, h?.time].filter(Boolean).join(' ')}
+                        </span>
+                      ))}
+                    </span>
                   </div>
                 ) : null}
               </address>

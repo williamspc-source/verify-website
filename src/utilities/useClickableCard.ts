@@ -4,13 +4,18 @@ import type { RefObject } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
 
+/**
+ * Refs are returned directly rather than wrapped in `{ card: { ref } }`.
+ *
+ * The nesting made call sites write `ref={card.ref}`, and reading a property off
+ * a ref-carrying object during render is what `react-hooks/refs` flags — the
+ * compiler cannot tell that `.ref` is the ref object itself rather than its
+ * contents. Handing back the refs unwrapped says the same thing with less
+ * ceremony and no rule violation.
+ */
 type UseClickableCardType<T extends HTMLElement> = {
-  card: {
-    ref: RefObject<T | null>
-  }
-  link: {
-    ref: RefObject<HTMLAnchorElement | null>
-  }
+  cardRef: RefObject<T | null>
+  linkRef: RefObject<HTMLAnchorElement | null>
 }
 
 interface Props {
@@ -95,14 +100,7 @@ function useClickableCard<T extends HTMLElement>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [card, link, router])
 
-  return {
-    card: {
-      ref: card,
-    },
-    link: {
-      ref: link,
-    },
-  }
+  return { cardRef: card, linkRef: link }
 }
 
 export default useClickableCard

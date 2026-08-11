@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import type { Header } from '@/payload-types'
 
@@ -19,10 +19,18 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, logo }) => {
   const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
 
-  // Close the mobile menu whenever the route changes.
-  useEffect(() => {
+  // Close the mobile menu whenever the route changes — including on Back/Forward,
+  // which an onClick on the links would miss.
+  //
+  // Adjusted during render rather than in an effect. React documents this exact
+  // pattern ("adjusting state when a prop changes"): the extra render happens
+  // before the browser paints, so the menu is never briefly visible on the new
+  // page. The effect version rendered the open menu once, then closed it.
+  const [renderedPath, setRenderedPath] = useState(pathname)
+  if (renderedPath !== pathname) {
+    setRenderedPath(pathname)
     setMenuOpen(false)
-  }, [pathname])
+  }
 
   const cta = data?.cta
 

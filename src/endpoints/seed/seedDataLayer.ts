@@ -13,6 +13,31 @@ import { plainTextToLexical } from './data/richText'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
+/**
+ * Narrows a candidate patch to the fields the stored doc has left blank.
+ *
+ * The taxonomy "enrich" passes below used to write their code fixtures on every
+ * run, so an editor who reworded a specialty description or reordered the claim
+ * types had it silently reverted the next time the seed ran. Enriching means
+ * filling in what is missing — never overwriting what someone chose.
+ */
+const onlyBlank = <T extends Record<string, unknown>>(
+  existing: unknown,
+  patch: T,
+): Partial<T> => {
+  const doc = (existing ?? {}) as Record<string, unknown>
+  const out: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(patch)) {
+    const current = doc[key]
+    const isBlank =
+      current == null ||
+      current === '' ||
+      (Array.isArray(current) && current.length === 0)
+    if (isBlank) out[key] = value
+  }
+  return out as Partial<T>
+}
+
 // Blog ("In the Loop") categories — the taxonomy behind posts. Colours map to the
 // per-category chip styling in the design reference; all editable in the admin.
 const BLOG_CATEGORIES: { title: string; slug: string; color: string }[] = [
@@ -249,18 +274,20 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
     const id = specialtyMap.get(sp.slug)
     const categoryId = sp.category ? specialtyCategoryMap.get(sp.category) : undefined
     if (!id) continue
+    const current = await payload.findByID({ collection: 'specialties', id, depth: 0, req })
+    const data = onlyBlank(current, {
+      ...(categoryId ? { category: categoryId } : {}),
+      ...(sp.description ? { description: sp.description } : {}),
+      ...(sp.keyAreas?.length ? { keyAreas: sp.keyAreas.map((area) => ({ area })) } : {}),
+      ...(sp.order != null ? { order: sp.order } : {}),
+    })
+    if (!Object.keys(data).length) continue
     await payload.update({
       collection: 'specialties',
       id,
       req,
       context: { disableRevalidate: true },
-      data: {
-        ...(categoryId ? { category: categoryId } : {}),
-        ...(sp.description ? { description: sp.description } : {}),
-        ...(sp.keyAreas?.length ? { keyAreas: sp.keyAreas.map((area) => ({ area })) } : {}),
-        ...(sp.order != null ? { order: sp.order } : {}),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
+      data: data as any,
     })
   }
   payload.logger.info('— Specialty categories + key areas enriched')
@@ -270,16 +297,18 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   for (const ct of CLAIM_TYPES) {
     const id = claimMap.get(ct.slug)
     if (!id) continue
+    const current = await payload.findByID({ collection: 'claim-types', id, depth: 0, req })
+    const data = onlyBlank(current, {
+      ...(ct.description ? { description: ct.description } : {}),
+      ...(ct.order != null ? { order: ct.order } : {}),
+    })
+    if (!Object.keys(data).length) continue
     await payload.update({
       collection: 'claim-types',
       id,
       req,
       context: { disableRevalidate: true },
-      data: {
-        ...(ct.description ? { description: ct.description } : {}),
-        ...(ct.order != null ? { order: ct.order } : {}),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
+      data: data as any,
     })
   }
 
@@ -287,13 +316,15 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   for (const at of ASSESSMENT_TYPES) {
     const id = assessmentMap.get(at.slug)
     if (!id || !at.description) continue
+    const current = await payload.findByID({ collection: 'assessment-types', id, depth: 0, req })
+    const data = onlyBlank(current, { description: at.description })
+    if (!Object.keys(data).length) continue
     await payload.update({
       collection: 'assessment-types',
       id,
       req,
       context: { disableRevalidate: true },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data: { description: at.description } as any,
+      data: data as any,
     })
   }
   payload.logger.info('— Claim + assessment type descriptions enriched')

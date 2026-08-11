@@ -8,10 +8,6 @@ type Ctx = { payload: Payload; req: PayloadRequest }
 const custom = (url: string, label: string, extra: Record<string, unknown> = {}): any => ({
   link: { type: 'custom', url, label, newTab: false, ...extra },
 })
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const enquiry = (label: string): any => ({
-  link: { type: 'enquiry', label, url: null, newTab: false },
-})
 
 // ── Minimal Lexical builders for archive `introContent` section headers ──
 // (the shared plainTextToLexical only emits paragraphs; an archive section
@@ -214,7 +210,44 @@ const eventsArchive = (opts: {
  *    otherwise; no nodes are created).
  * Every section stays editable in the admin.
  */
+/**
+ * Idempotently returns the id of the "Newsletter Signup" form the newsletter
+ * band posts into. The band's `form` relationship is required precisely so a
+ * signup can never be accepted with nowhere to store it, so the seed has to
+ * supply one.
+ */
+const ensureNewsletterForm = async ({ payload, req }: Ctx): Promise<string | number> => {
+  const existing = await payload.find({
+    collection: 'forms',
+    where: { title: { equals: 'Newsletter Signup' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  if (existing.docs[0]?.id) return existing.docs[0].id
+
+  const created = await payload.create({
+    collection: 'forms',
+    depth: 0,
+    req,
+    context: { disableRevalidate: true },
+    data: {
+      title: 'Newsletter Signup',
+      fields: [
+        { blockType: 'email', name: 'email', label: 'Email Address', width: 100, required: true },
+      ],
+      confirmationType: 'message',
+      confirmationMessage: plainTextToLexical(
+        'Thanks — you are subscribed. Watch your inbox for the next issue of In the Loop.',
+      ),
+    },
+  })
+  return created.id
+}
+
 export const seedHubs = async (ctx: Ctx): Promise<void> => {
+  const newsletterFormId = await ensureNewsletterForm(ctx)
+
   // Seed a few scaffold resources so the In-the-Loop resources grid isn't empty
   // (admins can replace copy / attach real files later).
   await ensureResource(ctx, {
@@ -331,7 +364,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         heading: 'Upcoming Webinars & [[Training]]',
         desc: 'Complimentary, CPD-eligible education for legal, medical, and insurance professionals.',
         cssClass: ['ni-section', 'bg-white'],
-        viewAll: '/upcoming-events',
+        viewAll: '/events/upcoming-events',
         viewAllLabel: 'View All Events',
       }),
       // Industry Insights — "Practice Guide" / "Legal Framework" / "Clinical" chips.
@@ -394,6 +427,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       // Newsletter
       {
         blockType: 'newsletter',
+        form: newsletterFormId,
         eyebrow: 'Stay in the Loop',
         heading: 'Be the First to Know About [[VERIFY & AAMLE Updates]]',
         subheading:

@@ -25,6 +25,9 @@ const relTitles = (rels: unknown): string[] =>
 const specialtyTitle = (s: Specialist['specialty']): string | null =>
   s && typeof s === 'object' ? (s.title ?? null) : null
 
+const specialtySlug = (s: Specialist['specialty']): string | null =>
+  s && typeof s === 'object' ? (s.slug ?? null) : null
+
 export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
   const {
     eyebrow,
@@ -91,6 +94,7 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
       photoFocus: photo.focus,
       photoZoom: photo.zoom,
       specialty: specialtyTitle(s.specialty),
+      specialtySlug: specialtySlug(s.specialty),
       locations: relTitles(s.locations),
       accreditations: relTitles(s.accreditations),
     }

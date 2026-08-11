@@ -3,14 +3,6 @@ import type { Payload, PayloadRequest } from 'payload'
 type Ctx = { payload: Payload; req: PayloadRequest }
 
 // ── Link helpers (copied verbatim from seedAbout) ──
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const custom = (url: string, label: string, extra: Record<string, unknown> = {}): any => ({
-  link: { type: 'custom', url, label, newTab: false, ...extra },
-})
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const enquiry = (label: string): any => ({
-  link: { type: 'enquiry', label, url: null, newTab: false },
-})
 
 // ── Minimal Lexical helpers ──
 // The shared plainTextToLexical helper only emits paragraphs, but the legal pages

@@ -1,12 +1,35 @@
 'use client'
 
 import Link from 'next/link'
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useSyncExternalStore } from 'react'
 
 import { Icon } from '@/components/Icon'
 import { initialsOf } from '@/components/PersonCard'
 import { accentText } from '@/utilities/accentText'
 import { focalImgStyle } from '@/utilities/focalPoint'
+import { specialistPath } from '@/utilities/routes'
+
+/**
+ * The page's query string, as an external store.
+ *
+ * Read this way rather than through Next's `useSearchParams()` on purpose:
+ * that hook requires a `<Suspense>` boundary and opts its subtree out of static
+ * rendering, and this block can be placed on any page in the CMS. This reads the
+ * same information without changing how any page is rendered.
+ *
+ * The server snapshot is `null` — the server genuinely does not know the query
+ * string for a statically rendered page, and saying so keeps SSR and the first
+ * client render in agreement.
+ */
+const subscribeToLocation = (onChange: () => void): (() => void) => {
+  if (typeof window === 'undefined') return () => {}
+  window.addEventListener('popstate', onChange)
+  return () => window.removeEventListener('popstate', onChange)
+}
+// Returns the same string instance for the same URL, so it is a stable snapshot.
+const getSearch = (): string =>
+  typeof window === 'undefined' ? '' : window.location.search
+const getSearchServer = (): string | null => null
 
 // Plain, serialisable shape passed down from the server component.
 export type DirectorySpecialist = {
@@ -18,6 +41,7 @@ export type DirectorySpecialist = {
   photoFocus: string | null
   photoZoom: number | null
   specialty: string | null
+  specialtySlug: string | null
   locations: string[]
   accreditations: string[]
 }
@@ -61,7 +85,7 @@ const Card: React.FC<{
   secondaryCtaHref: string
   locationsLabel: string
 }> = ({ data, ctaLabel, secondaryCtaLabel, secondaryCtaHref, locationsLabel }) => {
-  const profileHref = data.slug ? `/specialists/${data.slug}` : null
+  const profileHref = specialistPath(data.slug)
 
   return (
     <div className="spec-card">
@@ -137,9 +161,30 @@ export const DirectoryClient: React.FC<Props> = ({
   locationGroupLabel,
 }) => {
   const [search, setSearch] = useState('')
-  const [specialty, setSpecialty] = useState('')
   const [accreditation, setAccreditation] = useState('')
   const [location, setLocation] = useState('')
+
+  // Deep-link support: /…?specialty=<slug> (emitted by the SpecialtyGrid block)
+  // pre-selects the matching specialty. The filter matches on title, so resolve
+  // the slug to its title via the loaded data.
+  //
+  // Derived during render from the URL, with the visitor's own choice taking
+  // precedence, rather than pushed into state by an effect. The effect version
+  // was declared `[specialists]` despite its comment saying "runs once on mount",
+  // so any re-render carrying a new `specialists` array re-applied the deep link
+  // and silently overwrote the filter the visitor had just changed (and undid
+  // "Clear filters").
+  //
+  // `null` means "visitor has not chosen"; `''` is a deliberate choice of "All".
+  const [specialtyChoice, setSpecialtyChoice] = useState<string | null>(null)
+  const queryString = useSyncExternalStore(subscribeToLocation, getSearch, getSearchServer)
+  const deepLinked = useMemo(() => {
+    const wanted = queryString ? new URLSearchParams(queryString).get('specialty') : null
+    if (!wanted) return ''
+    return specialists.find((s) => s.specialtySlug === wanted)?.specialty ?? ''
+  }, [queryString, specialists])
+  const specialty = specialtyChoice ?? deepLinked
+  const setSpecialty = setSpecialtyChoice
 
   const specialtyOptions = useMemo(
     () => uniqueSorted(specialists.map((s) => s.specialty ?? '')),
@@ -184,6 +229,9 @@ export const DirectoryClient: React.FC<Props> = ({
 
   const resetFilters = () => {
     setSearch('')
+    // '' not null: an explicit "show all", which must also override a deep link.
+    // Passing null here would fall back to the ?specialty= value and the Clear
+    // button would appear to do nothing on a deep-linked page.
     setSpecialty('')
     setAccreditation('')
     setLocation('')

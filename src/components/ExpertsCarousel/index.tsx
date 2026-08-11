@@ -1,8 +1,9 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 
 import { ExpertCard, type PersonCardData } from '@/components/PersonCard'
 import { cn } from '@/utilities/ui'
+import { usePrefersReducedMotion } from '@/utilities/usePrefersReducedMotion'
 
 type Direction = 'left' | 'right'
 
@@ -21,16 +22,12 @@ export const ExpertsCarousel: React.FC<{
   className?: string
   cardClassName?: string
 }> = ({ cards, speed, startDirection = 'left', showArrows = true, className, cardClassName }) => {
-  const [ready, setReady] = useState(false)
   const [direction, setDirection] = useState<Direction>(startDirection || 'left')
 
-  useEffect(() => {
-    const reduce =
-      typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!reduce) setReady(true)
-  }, [])
+  // `is-ready` is what starts the CSS marquee. Derived from the live media query
+  // rather than latched once on mount, so toggling "Reduce motion" in system
+  // settings now stops and restarts the animation without a reload.
+  const ready = !usePrefersReducedMotion()
 
   if (!cards || cards.length === 0) return null
   const duration = `${speed || 30}s`

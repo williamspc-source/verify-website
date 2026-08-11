@@ -29,15 +29,6 @@ const paragraph = (t: string) => ({
   textFormat: 0,
   version: 1,
 })
-const heading = (t: string, tag: 'h2' | 'h3' = 'h3') => ({
-  type: 'heading',
-  tag,
-  children: [text(t)],
-  direction: 'ltr',
-  format: '',
-  indent: 0,
-  version: 1,
-})
 const richText = (children: unknown[]) => ({
   root: { type: 'root', children, direction: 'ltr' as const, format: '' as const, indent: 0, version: 1 },
 })
@@ -392,7 +383,10 @@ export const seedShowcase = async ({
   const data = {
     title: 'Style Guide',
     slug: 'style-guide',
-    _status: 'published' as const,
+    // Draft, as the log line below has always claimed. This is an internal
+    // review artifact: published, it was publicly reachable and indexable, and
+    // it appeared in the pages sitemap alongside real content.
+    _status: 'draft' as const,
     hero: heroForShowcase(),
     layout: buildLayout(mediaId),
   }
