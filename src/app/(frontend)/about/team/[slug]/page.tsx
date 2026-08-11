@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import Link from 'next/link'
 import React, { cache } from 'react'
 
 import RichText from '@/components/RichText'
@@ -12,7 +11,10 @@ import { Icon } from '@/components/Icon'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
+import { teamPath } from '@/utilities/routes'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { getCrumbSettings, teamCrumbs } from '@/utilities/breadcrumbs'
 
 import type { Team } from '@/payload-types'
 
@@ -20,7 +22,6 @@ import type { Team } from '@/payload-types'
 // we read locally and cast defensively.
 type TeamSettingsShape = {
   labels?: {
-    breadcrumbHomeLabel?: string | null
     breadcrumbSectionLabel?: string | null
     roleLabel?: string | null
     qualificationLabel?: string | null
@@ -29,6 +30,10 @@ type TeamSettingsShape = {
 } | null
 
 type Args = { params: Promise<{ slug?: string }> }
+
+// Time-based safety net: a stale member page self-heals within the hour even if
+// an on-demand revalidation hook is missed.
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -53,6 +58,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
 
   const settings = (await getCachedGlobal('team-settings' as never, 0)()) as TeamSettingsShape
   const labels = settings?.labels
+  const crumbSettings = await getCrumbSettings()
 
   const m = member as Team & Record<string, unknown>
   const photo = typeof m.photo === 'object' ? m.photo : null
@@ -71,15 +77,13 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
       <PayloadRedirects disableNotFound url={`/about/team/${decodedSlug}`} />
 
       {/* Hero */}
-      <section className="staff-hero">
+      <section className="staff-hero vf-on-dark">
         <div className="container">
-          <nav className="staff-hero-breadcrumb" aria-label="Breadcrumb">
-            <Link href="/">{labels?.breadcrumbHomeLabel || 'Home'}</Link>
-            <span aria-hidden>›</span>
-            <Link href="/meet-the-team">{labels?.breadcrumbSectionLabel || 'Meet the Team'}</Link>
-            <span aria-hidden>›</span>
-            <strong>{m.title}</strong>
-          </nav>
+          <Breadcrumbs
+            items={teamCrumbs(m, { home: crumbSettings.homeLabel, section: labels?.breadcrumbSectionLabel })}
+            separator={crumbSettings.separator}
+            label={crumbSettings.navLabel}
+          />
           <div className="staff-hero-content">
             <h1 className="staff-hero-name">{m.title}</h1>
             {m.role ? <p className="staff-hero-role">{m.role}</p> : null}
@@ -164,7 +168,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
   const member = await queryMemberBySlug({ slug: decodeURIComponent(slug) })
-  return generateMeta({ doc: member as never })
+  return generateMeta({ doc: member as never, url: teamPath(member?.slug) })
 }
 
 const queryMemberBySlug = cache(async ({ slug }: { slug: string }) => {

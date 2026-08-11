@@ -1,36 +1,32 @@
 import { PreviewSearchParams } from '@/app/(frontend)/next/preview/route'
-import { PayloadRequest, CollectionSlug } from 'payload'
-
-const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
-  posts: '/posts',
-  pages: '',
-}
 
 type Props = {
-  collection: keyof typeof collectionPrefixMap
-  slug: string
-  req: PayloadRequest
-  // Full nested path (e.g. /services/medico-legal/ime) for nested-docs pages.
-  // When provided it takes precedence over the collection-prefix + slug form.
+  /**
+   * The path the preview should render, from src/utilities/routes.ts.
+   *
+   * This used to be a `collection` + `slug` pair resolved through a local
+   * collection→prefix map — the last surviving copy of the map that
+   * src/utilities/routes.ts replaced everywhere else. It still said posts live at
+   * `/posts/<slug>`, which is now a redirect stub rather than the article route,
+   * so Preview and Live Preview for a Post landed on the stub and 404'd.
+   *
+   * Callers pass an already-resolved path instead, so this can never drift from
+   * the real routes again. `null` means the document has no previewable URL yet
+   * (no slug, or a Post with no stream) — the admin then shows no preview button
+   * rather than one that leads somewhere broken.
+   */
   path?: string | null
 }
 
-export const generatePreviewPath = ({ collection, slug, path }: Props) => {
-  if (slug === undefined || slug === null) {
-    return null
-  }
+export const generatePreviewPath = ({ path }: Props) => {
+  if (!path) return null
 
-  // Prefer an explicit nested path; otherwise build from the collection prefix + slug.
-  const resolvedPath = path
-    ? '/' + path.split('/').filter(Boolean).map(encodeURIComponent).join('/')
-    : `${collectionPrefixMap[collection]}/${encodeURIComponent(slug)}`
+  const encoded = '/' + path.split('/').filter(Boolean).map(encodeURIComponent).join('/')
 
   const encodedParams = new URLSearchParams({
-    path: resolvedPath,
+    path: encoded || '/',
     previewSecret: process.env.PREVIEW_SECRET || '',
   } satisfies PreviewSearchParams)
 
-  const url = `/next/preview?${encodedParams.toString()}`
-
-  return url
+  return `/next/preview?${encodedParams.toString()}`
 }

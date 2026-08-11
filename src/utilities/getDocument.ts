@@ -12,6 +12,12 @@ async function getDocument(collection: Collection, slug: string, depth = 0) {
   const page = await payload.find({
     collection,
     depth,
+    // `collection` is a parameter, so this helper can be pointed at any
+    // draft-enabled collection. The Local API defaults to overrideAccess: true,
+    // which would serve an unpublished document to an anonymous visitor through
+    // a cached entry. This helper has no notion of draft mode, so the only
+    // correct default is the public one.
+    overrideAccess: false,
     where: {
       slug: {
         equals: slug,

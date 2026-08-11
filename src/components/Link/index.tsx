@@ -4,7 +4,7 @@ import { Icon } from '@/components/Icon'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Page, Post } from '@/payload-types'
+import { referencePath, type LinkableCollection } from '@/utilities/routes'
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']
@@ -14,8 +14,10 @@ type CMSLinkType = {
   label?: string | null
   newTab?: boolean | null
   reference?: {
-    relationTo: 'pages' | 'posts'
-    value: Page | Post | string | number
+    relationTo: LinkableCollection
+    // `unknown` on purpose: Payload generates a discriminated union with one
+    // arm per collection, and referencePath() narrows by `relationTo` anyway.
+    value: unknown
   } | null
   size?: ButtonProps['size'] | null
   type?: 'custom' | 'reference' | 'enquiry' | null
@@ -63,23 +65,32 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   }
 
   let href = url
-  if (type === 'reference' && typeof reference?.value === 'object' && reference.value.slug) {
-    if (reference.relationTo === 'pages') {
-      // Pages are nested (nested-docs): prefer the full breadcrumb path, fall
-      // back to the bare slug if breadcrumbs aren't populated in this context.
-      const breadcrumbs = (reference.value as { breadcrumbs?: ({ url?: string | null } | null)[] })
-        .breadcrumbs
-      const nestedUrl =
-        Array.isArray(breadcrumbs) && breadcrumbs.length
-          ? breadcrumbs[breadcrumbs.length - 1]?.url
-          : undefined
-      href = nestedUrl || `/${reference.value.slug}`
-    } else {
-      href = `/${reference.relationTo}/${reference.value.slug}`
-    }
+  if (type === 'reference' && typeof reference?.value === 'object') {
+    // One resolver for every linkable collection (src/utilities/routes.ts).
+    // This used to be `pages` vs everything-else-is-a-post, which meant a link
+    // to a specialist resolved through postPath() and came back null.
+    href = referencePath(reference.relationTo, reference.value) ?? undefined
   }
 
-  if (!href) return null
+  // No resolvable destination — an unsaved reference, a collection with no public
+  // route, or a Post whose stream has not been populated by the caller's query
+  // depth. Render the label as plain text rather than returning null.
+  //
+  // Returning null made the link *vanish*: a "Latest articles" item in the header
+  // disappeared entirely, so the nav looked deliberately short rather than broken,
+  // and nothing anywhere said why. Visible-but-inert is the honest rendering — it
+  // shows the editor exactly which link needs attention, and `data-link-unresolved`
+  // gives the guard suite and anyone debugging something to grep for.
+  if (!href) {
+    if (!label && !children) return null
+    return (
+      <span className={cn(className)} data-link-unresolved="true">
+        {iconEl}
+        {label}
+        {children}
+      </span>
+    )
+  }
 
   const size = appearance === 'link' ? 'clear' : sizeFromProps
   const newTabProps = newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}

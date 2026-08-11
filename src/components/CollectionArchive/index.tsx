@@ -18,7 +18,9 @@ export const CollectionArchive: React.FC<Props> = (props) => {
             if (typeof result === 'object' && result !== null) {
               return (
                 <div className="col-span-4" key={index}>
-                  <Card className="h-full" doc={result} relationTo="posts" showCategories />
+                  {/* Search results carry a canonical `uri` spanning posts/specialists/
+                      events; pass it so each card links to the right place. */}
+                  <Card className="h-full" doc={result} href={result.uri ?? undefined} showCategories />
                 </div>
               )
             }

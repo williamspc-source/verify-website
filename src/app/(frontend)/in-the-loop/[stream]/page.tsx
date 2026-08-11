@@ -10,14 +10,20 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { PageHero } from '@/heros/PageHero'
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
+import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getCrumbSettings, streamCrumbs } from '@/utilities/breadcrumbs'
 
-import type { Stream } from '@/payload-types'
+import type { ArticleSetting, Stream } from '@/payload-types'
 
 type Args = { params: Promise<{ stream?: string }> }
 
 // Staff narratives use the author-led narrative card; every other stream uses the
 // standard image-led post card.
 const NARRATIVE_STREAMS = new Set(['staff-narratives'])
+
+// Time-based safety net: a stale stream listing self-heals within the hour even
+// if an on-demand revalidation hook is missed.
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -42,6 +48,14 @@ export default async function StreamIndexPage({ params: paramsPromise }: Args) {
 
   const isNarrative = NARRATIVE_STREAMS.has(slug)
 
+  const articleSettings = (await getCachedGlobal('article-settings', 0)()) as ArticleSetting | null
+  const labels = articleSettings?.labels
+  const crumbSettings = await getCrumbSettings()
+  const crumbs = streamCrumbs(stream, {
+    home: crumbSettings.homeLabel,
+    section: labels?.breadcrumbSectionLabel,
+  })
+
   // Reuse the In-the-Loop hub's ArchiveBlock so cards match the hub exactly; here
   // it lists EVERY published post in the stream (the hub only shows a preview).
   const archiveProps = {
@@ -60,32 +74,24 @@ export default async function StreamIndexPage({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
       <PayloadRedirects disableNotFound url={`/in-the-loop/${slug}`} />
 
+      {/* The trail lives in the hero now, not in a separate bar beneath it. Its
+          middle crumb already reads "In the Loop", so the eyebrow that used to
+          say the same thing is gone. */}
       <PageHero
         {...({
           type: 'pageHero',
           theme: 'dark',
           align: 'left',
           showShield: false,
-          eyebrow: 'In the Loop',
           heading: stream.title,
-          subtitle: stream.description || 'Browse every article in this stream.',
+          subtitle: stream.description || labels?.streamFallbackSubtitle,
+          crumbs,
+          crumbSeparator: crumbSettings.separator,
+          crumbNavLabel: crumbSettings.navLabel,
         } as React.ComponentProps<typeof PageHero>)}
       />
 
-      {/* Breadcrumb bar — mirrors the article page's `.art-meta-bar`. */}
-      <div className="art-meta-bar">
-        <div className="container">
-          <nav aria-label="Breadcrumb" className="art-breadcrumb">
-            <a href="/">Home</a>
-            <span className="art-breadcrumb-sep">›</span>
-            <a href="/in-the-loop">In the Loop</a>
-            <span className="art-breadcrumb-sep">›</span>
-            <strong>{stream.title}</strong>
-          </nav>
-        </div>
-      </div>
-
-      <section className="ni-section bg-white">
+      <section className="ni-section bg-background">
         <ArchiveBlock {...archiveProps} />
       </section>
     </article>

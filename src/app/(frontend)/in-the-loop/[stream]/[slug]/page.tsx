@@ -14,6 +14,9 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { mediaFocal, focalImgStyle } from '@/utilities/focalPoint'
+import { postPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { getCrumbSettings, postCrumbs } from '@/utilities/breadcrumbs'
 import { ArticleToc } from './ArticleToc'
 
 import type { ArticleSetting, Category, Post, Stream } from '@/payload-types'
@@ -56,11 +59,14 @@ const tocFromContent = (post: Post): { id: string; text: string }[] => {
     .filter((i) => i.text)
 }
 
-// Resolve the URL for an In-the-Loop post (uses its stream folder when present).
-const postHref = (post: Pick<Post, 'slug' | 'stream'>): string => {
-  const stream = typeof post.stream === 'object' && post.stream ? post.stream : null
-  return stream?.slug ? `/in-the-loop/${stream.slug}/${post.slug}` : `/in-the-loop/${post.slug}`
-}
+// Resolve the URL for an In-the-Loop post; a stream-less legacy post has no
+// canonical article path, so link to the hub rather than a URL that 404s.
+const postHref = (post: Pick<Post, 'slug' | 'stream'>): string =>
+  postPath(post) ?? IN_THE_LOOP_PATH
+
+// Time-based safety net: a stale article self-heals within the hour even if an
+// on-demand revalidation hook is missed.
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -92,17 +98,16 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
 
   const stream = typeof post.stream === 'object' && post.stream ? post.stream : null
   const streamTitle = stream?.title
-  const streamSlug = stream?.slug
-  // The hub's sticky section ids use short forms for three streams; map so the
-  // breadcrumb's "/in-the-loop#<stream>" anchor lands on the right hub section.
-  const streamHubAnchor =
-    (
-      {
-        'news-updates': 'news',
-        'industry-insights': 'insights',
-        'specialist-spotlights': 'spotlights',
-      } as Record<string, string>
-    )[streamSlug || ''] || streamSlug
+
+  // The trail ends on the stream, still linked — the reference does this on 23 of
+  // its 24 article pages, and it keeps the crumb from repeating the <h1> directly
+  // beneath it. It links to the stream's own listing rather than an anchor into
+  // the hub, which is why the old hub-anchor mapping is gone.
+  const crumbSettings = await getCrumbSettings()
+  const crumbs = postCrumbs(stream, {
+    home: crumbSettings.homeLabel,
+    section: labels.breadcrumbSectionLabel,
+  })
 
   const heroImage = typeof post.heroImage === 'object' ? post.heroImage : null
 
@@ -144,7 +149,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
       <PayloadRedirects disableNotFound url={url} />
 
       {/* ── Hero ──────────────────────────────────────────── */}
-      <div className="art-hero">
+      <div className="art-hero vf-on-dark">
         {heroImage ? (
           <Media
             resource={heroImage}
@@ -155,7 +160,17 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
         <div className="art-hero-overlay" />
         <div className="art-hero-content">
           <div className="container">
-            {streamTitle ? (
+            {/* The trail sits in the hero rather than in a bar below it, and it
+                replaces the stream pill: the pill named the stream unlinked, the
+                trail's last crumb names it linked. Stacking both would print the
+                same word twice within 40px. */}
+            {crumbs.length >= 2 ? (
+              <Breadcrumbs
+                items={crumbs}
+                separator={crumbSettings.separator}
+                label={crumbSettings.navLabel}
+              />
+            ) : streamTitle ? (
               <div className="art-hero-tag">
                 {stream?.icon ? <Icon name={stream.icon} className="size-3" /> : null}
                 {streamTitle}
@@ -170,19 +185,6 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
       <div className="art-meta-bar">
         <div className="container">
           <div className="art-meta-inner">
-            <nav aria-label="Breadcrumb" className="art-breadcrumb">
-              <a href="/">{labels.breadcrumbHomeLabel || 'Home'}</a>
-              <span className="art-breadcrumb-sep">›</span>
-              <a href="/in-the-loop">{labels.breadcrumbSectionLabel || 'In the Loop'}</a>
-              {streamTitle ? (
-                <>
-                  <span className="art-breadcrumb-sep">›</span>
-                  <a href={streamSlug ? `/in-the-loop#${streamHubAnchor}` : '/in-the-loop'}>
-                    {streamTitle}
-                  </a>
-                </>
-              ) : null}
-            </nav>
             <div className="art-meta-right">
               {authorName ? (
                 <div className="art-meta-author">
@@ -235,6 +237,28 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
           {/* CENTRE: article body */}
           <article className="art-body">
             <RichText data={post.content} enableGutter={false} enableProse={false} />
+
+            {/* "Downloads / attachments" — the field existed and nothing rendered
+                it, so an editor could attach a PDF that no reader could reach. */}
+            {Array.isArray(post.attachments) && post.attachments.length ? (
+              <div className="art-attachments">
+                <h2 className="art-attachments__heading">{labels.attachmentsHeading || 'Downloads'}</h2>
+                <ul className="art-attachments__list">
+                  {post.attachments.map((a, i) => {
+                    const file = a?.file && typeof a.file === 'object' ? a.file : null
+                    if (!file?.url) return null
+                    return (
+                      <li key={i}>
+                        <a href={file.url} className="art-attachment" download>
+                          <Icon name="file-text" className="size-5" />
+                          <span>{a?.label || file.filename || 'Download'}</span>
+                        </a>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ) : null}
 
             {tags.length ? (
               <div className="art-tags-footer">
@@ -309,13 +333,13 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
                   ) : null}
                   <h4>{card.heading}</h4>
                   {card.body ? <p>{card.body}</p> : null}
+                  {/* Spread the whole link rather than naming props: listing them
+                      individually silently dropped `icon`, so Article Settings'
+                      per-card link Icon picker did nothing here while working
+                      everywhere else. */}
                   <CMSLink
                     className={dark ? 'art-cta-btn' : 'art-cta-btn-2'}
-                    type={card.link?.type}
-                    reference={card.link?.reference}
-                    url={card.link?.url}
-                    label={card.link?.label}
-                    newTab={card.link?.newTab}
+                    {...card.link}
                   />
                 </div>
               )
@@ -330,7 +354,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
   const post = await queryPostBySlug({ slug: decodeURIComponent(slug) })
-  return generateMeta({ doc: post as never })
+  return generateMeta({ doc: post as never, url: postPath(post) })
 }
 
 // The [stream] segment is only for the URL folder — the post is looked up by slug.

@@ -2,9 +2,12 @@ import { getServerSideSitemap } from 'next-sitemap'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { unstable_cache } from 'next/cache'
-import { postPath } from '@/utilities/routes'
+import { specialistPath } from '@/utilities/routes'
 
-const getPostsSitemap = unstable_cache(
+// Consumes the `specialists-sitemap` cache tag that revalidateSpecialist already
+// purges — previously that tag had no route, so specialist profiles never appeared
+// in any sitemap.
+const getSpecialistsSitemap = unstable_cache(
   async () => {
     const payload = await getPayload({ config })
     const SITE_URL =
@@ -13,47 +16,35 @@ const getPostsSitemap = unstable_cache(
       'https://example.com'
 
     const results = await payload.find({
-      collection: 'posts',
+      collection: 'specialists',
       overrideAccess: false,
       draft: false,
-      // depth 1 populates `stream` so postPath can build the canonical
-      // /in-the-loop/<stream>/<slug> URL rather than the legacy /posts/<slug>.
-      depth: 1,
+      depth: 0,
       limit: 1000,
       pagination: false,
-      where: {
-        _status: {
-          equals: 'published',
-        },
-      },
-      select: {
-        slug: true,
-        stream: true,
-        updatedAt: true,
-      },
+      where: { _status: { equals: 'published' } },
+      select: { slug: true, updatedAt: true },
     })
 
     const dateFallback = new Date().toISOString()
 
-    const sitemap = results.docs
+    return results.docs
       ? results.docs
-          .map((post) => {
-            const path = postPath(post)
-            return path ? { loc: `${SITE_URL}${path}`, lastmod: post.updatedAt || dateFallback } : null
+          .map((doc) => {
+            const path = specialistPath(doc?.slug)
+            return path ? { loc: `${SITE_URL}${path}`, lastmod: doc.updatedAt || dateFallback } : null
           })
           .filter((entry): entry is { loc: string; lastmod: string } => entry !== null)
       : []
-
-    return sitemap
   },
-  ['posts-sitemap'],
+  ['specialists-sitemap'],
   {
-    tags: ['posts-sitemap'],
+    tags: ['specialists-sitemap'],
   },
 )
 
 export async function GET() {
-  const sitemap = await getPostsSitemap()
+  const sitemap = await getSpecialistsSitemap()
 
   return getServerSideSitemap(sitemap)
 }

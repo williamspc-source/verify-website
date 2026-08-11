@@ -22,6 +22,7 @@ import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { cn } from '@/utilities/ui'
 import { accentText } from '@/utilities/accentText'
+import { referencePath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 
 type NodeTypes =
   | DefaultNodeTypes
@@ -32,16 +33,17 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   if (typeof value !== 'object') {
     throw new Error('Expected value to be an object')
   }
-  const slug = value.slug
-  if (relationTo === 'posts') {
-    // Posts live under /in-the-loop/{stream}/{slug}; fall back to a bare
-    // /in-the-loop/{slug} when the linked post's stream isn't populated.
-    const stream = (value as { stream?: unknown }).stream
-    const streamSlug =
-      stream && typeof stream === 'object' ? (stream as { slug?: string }).slug : undefined
-    return streamSlug ? `/in-the-loop/${streamSlug}/${slug}` : `/in-the-loop/${slug}`
-  }
-  return `/${slug}`
+  // Same single resolver CMSLink uses. Previously this branched on `posts` and
+  // fell through to docPath() for everything else, so a rich-text link to a
+  // specialist produced a top-level `/<slug>` that 404s.
+  //
+  // `referencePath` returns null in more cases than one: a Post with no stream, a
+  // document with no slug, and any `relationTo` outside LINKABLE_COLLECTIONS. The
+  // Lexical link converter has to return a string, so there is no "render it
+  // unlinked" option here as there is in CMSLink — the hub is the least-wrong
+  // destination for an editor-authored internal link we cannot resolve, and it is
+  // a real page rather than a 404.
+  return referencePath(relationTo, value) ?? IN_THE_LOOP_PATH
 }
 
 // Lexical text-format bitmask (bold/italic/etc.), mirrored so we can re-wrap

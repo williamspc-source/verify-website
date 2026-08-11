@@ -2,6 +2,7 @@ import { getServerSideSitemap } from 'next-sitemap'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { unstable_cache } from 'next/cache'
+import { docPath } from '@/utilities/routes'
 
 const getPagesSitemap = unstable_cache(
   async () => {
@@ -25,6 +26,7 @@ const getPagesSitemap = unstable_cache(
       },
       select: {
         slug: true,
+        breadcrumbs: true,
         updatedAt: true,
       },
     })
@@ -46,8 +48,11 @@ const getPagesSitemap = unstable_cache(
       ? results.docs
           .filter((page) => Boolean(page?.slug))
           .map((page) => {
+            // docPath yields the nested breadcrumb URL (/services/medico-legal/ime),
+            // not the flat slug, so the sitemap advertises canonical URLs.
+            const path = docPath(page)
             return {
-              loc: page?.slug === 'home' ? `${SITE_URL}/` : `${SITE_URL}/${page?.slug}`,
+              loc: path === '/' ? `${SITE_URL}/` : `${SITE_URL}${path}`,
               lastmod: page.updatedAt || dateFallback,
             }
           })

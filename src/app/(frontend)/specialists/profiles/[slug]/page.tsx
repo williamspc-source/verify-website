@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
-import Link from 'next/link'
 import React, { cache } from 'react'
 
 import RichText from '@/components/RichText'
@@ -13,6 +12,9 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { specialistPath } from '@/utilities/routes'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { getCrumbSettings, specialistCrumbs } from '@/utilities/breadcrumbs'
 
 import type { Specialist } from '@/payload-types'
 
@@ -36,6 +38,10 @@ const initials = (name: string): string =>
     .join('')
     .toUpperCase()
 
+// Time-based safety net: a stale profile self-heals within the hour even if an
+// on-demand revalidation hook is missed.
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const res = await payload.find({
@@ -55,12 +61,13 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   const decodedSlug = decodeURIComponent(slug)
   const specialist = await querySpecialistBySlug({ slug: decodedSlug })
 
-  if (!specialist) return <PayloadRedirects url={`/specialists/${decodedSlug}`} />
+  if (!specialist) return <PayloadRedirects url={specialistPath(decodedSlug) ?? `/specialists/profiles/${decodedSlug}`} />
 
   const settings = await getCachedGlobal('specialist-profile', 1)()
   const portal = (settings as { portalCta?: Record<string, unknown> })?.portalCta ?? {}
   const labels = (settings as { labels?: Record<string, string> })?.labels ?? {}
   const breadcrumb = (settings as { breadcrumb?: Record<string, string> })?.breadcrumb ?? {}
+  const crumbSettings = await getCrumbSettings()
   const portalEnquirySubject =
     (settings as { portalEnquirySubject?: string })?.portalEnquirySubject ||
     'VERIFY Booking Portal Access Request'
@@ -71,6 +78,15 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   const portalTiles = Array.isArray(portal.tiles)
     ? (portal.tiles as { icon?: string | null; label?: string | null }[]).filter((t) => t?.label)
     : []
+  const profileLabels = (portal ?? {}) as {
+    bookingLabel?: string | null
+    cvLabel?: string | null
+    sampleReportLabel?: string | null
+  }
+  const asFileUrl = (v: unknown): string | null =>
+    v && typeof v === 'object' && 'url' in v ? ((v as { url?: string | null }).url ?? null) : null
+  const cvUrl = asFileUrl(specialist.cv)
+  const sampleReportUrl = asFileUrl(specialist.sampleReport)
   const enquiryLabel = (portal.enquiryLabel as string) || 'Send Enquiry'
   const enquiryEmail = (portal.enquiryEmail as string) || ''
   const enquiryHref = enquiryEmail
@@ -97,7 +113,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   return (
     <article>
       {draft && <LivePreviewListener />}
-      <PayloadRedirects disableNotFound url={`/specialists/${decodedSlug}`} />
+      <PayloadRedirects disableNotFound url={specialistPath(decodedSlug) ?? `/specialists/profiles/${decodedSlug}`} />
 
       {/* Hero */}
       <section className="profile-hero">
@@ -111,13 +127,15 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
               )}
             </div>
             <div className="profile-info">
-              <nav className="profile-breadcrumb" aria-label="Breadcrumb">
-                <Link href={breadcrumb.breadcrumbParentHref || '/specialist-panel'}>
-                  {breadcrumb.breadcrumbParentLabel || 'Specialist Panel'}
-                </Link>
-                <span aria-hidden>›</span>
-                <strong>{breadcrumb.breadcrumbCurrentLabel || 'Specialist Profile'}</strong>
-              </nav>
+              <Breadcrumbs
+                items={specialistCrumbs(s, {
+                  home: crumbSettings.homeLabel,
+                  section: breadcrumb.breadcrumbParentLabel,
+                  sectionHref: breadcrumb.breadcrumbParentHref,
+                })}
+                separator={crumbSettings.separator}
+                label={crumbSettings.navLabel}
+              />
               <h1 className="profile-name">{s.title}</h1>
               {specialtyTitle ? <p className="profile-specialty">{specialtyTitle}</p> : null}
               <div className="profile-hero-meta">
@@ -258,6 +276,29 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
                 >
                   {enquiryLabel}
                 </a>
+                {/* Booking link and the two document uploads were all editable
+                    and rendered nowhere — a specialist could have a CV attached
+                    that no visitor could reach. */}
+                {specialist.bookingUrl ? (
+                  <a
+                    className="opt-btn-white"
+                    href={specialist.bookingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {profileLabels.bookingLabel || 'Book an appointment'}
+                  </a>
+                ) : null}
+                {cvUrl ? (
+                  <a className="opt-btn-white" href={cvUrl} download>
+                    {profileLabels.cvLabel || 'Download CV'}
+                  </a>
+                ) : null}
+                {sampleReportUrl ? (
+                  <a className="opt-btn-white" href={sampleReportUrl} download>
+                    {profileLabels.sampleReportLabel || 'Sample report'}
+                  </a>
+                ) : null}
               </div>
             </div>
           </div>
@@ -270,7 +311,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
   const specialist = await querySpecialistBySlug({ slug: decodeURIComponent(slug) })
-  return generateMeta({ doc: specialist as never })
+  return generateMeta({ doc: specialist as never, url: specialistPath(specialist?.slug) })
 }
 
 const querySpecialistBySlug = cache(async ({ slug }: { slug: string }) => {

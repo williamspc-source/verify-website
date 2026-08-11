@@ -9,38 +9,39 @@ import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { referencePath } from '@/utilities/routes'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | VERIFY Medico-Legal Solutions` : 'VERIFY Medico-Legal Solutions'
 }
 
-// Collection-aware canonical URL. Pages are nested (nested-docs → breadcrumbs);
-// the content collections each live under their own path prefix.
-const collectionUrlPrefix: Record<string, string> = {
-  posts: '/posts',
-  specialists: '/specialists',
-  events: '/events',
-  team: '/about/team',
-}
-
+/**
+ * URL shown in the admin's SEO tab preview (the little search-result mock).
+ *
+ * Scope: this powers the plugin's Preview component only. The plugin stores no
+ * `url` field, and the `og:url` a visitor's browser actually sees is built by
+ * src/utilities/generateMeta.ts from the path each route passes in. So a wrong
+ * value here misleads an editor; it does not emit a wrong canonical tag.
+ *
+ * It used to keep its own collection→prefix map, which had drifted to
+ * `/posts/<slug>` while the real article route is `/in-the-loop/<stream>/<slug>`.
+ * `referencePath` is the single source of truth (src/utilities/routes.ts).
+ *
+ * `doc` here is the admin form's current data, posted to the plugin's
+ * generate-url endpoint — so a `hasMany: false` relationship is a bare id, not a
+ * populated document. For a Post that means `stream` is a number and `postPath`
+ * correctly returns null. Return an empty string in that case: an empty preview
+ * reads as "not determined yet", whereas falling back to the bare origin
+ * confidently told the editor that every article's canonical URL is the site
+ * root.
+ */
 const generateURL: GenerateURL<Post | Page> = ({ collectionSlug, doc }) => {
-  const url = getServerSideURL()
-  const slug = (doc as { slug?: string | null })?.slug
-  if (!slug) return url
-
-  if (collectionSlug === 'pages') {
-    if ('breadcrumbs' in doc && Array.isArray(doc.breadcrumbs) && doc.breadcrumbs.length) {
-      const path = doc.breadcrumbs[doc.breadcrumbs.length - 1]?.url
-      if (path) return `${url}${path}`
-    }
-    return `${url}/${slug}`
-  }
-
-  const prefix = collectionSlug ? collectionUrlPrefix[collectionSlug] : undefined
-  return `${url}${prefix ?? ''}/${slug}`
+  const path = referencePath(collectionSlug, doc)
+  return path ? `${getServerSideURL()}${path}` : ''
 }
 
 export const plugins: Plugin[] = [
@@ -64,6 +65,9 @@ export const plugins: Plugin[] = [
       },
       hooks: {
         afterChange: [revalidateRedirects],
+        // Deleting a redirect must also drop it from the cached `redirects` tag,
+        // else PayloadRedirects keeps serving the removed rule.
+        afterDelete: [revalidateRedirects],
       },
     },
   }),
@@ -82,6 +86,14 @@ export const plugins: Plugin[] = [
     },
     formOverrides: {
       admin: { group: 'Forms' },
+      // Forms render inside pages via FormBlock (fields, labels, confirmation
+      // message), but the form docs live in their own collection with no hooks of
+      // their own — so editing a form never refreshed the pages hosting it. Purge
+      // the whole layout on any form change/delete; pages regenerate lazily.
+      hooks: {
+        afterChange: [revalidateSiteOnChange],
+        afterDelete: [revalidateSiteOnDelete],
+      },
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
           if ('name' in field && field.name === 'confirmationMessage') {
