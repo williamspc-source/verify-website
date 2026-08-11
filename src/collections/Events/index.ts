@@ -61,7 +61,8 @@ export const Events: CollectionConfig<'events'> = {
                   admin: {
                     width: '50%',
                     date: { pickerAppearance: 'dayAndTime' },
-                    description: 'Start date & time. Drives the upcoming/past split.',
+                    description:
+                      'Start date & time. Decides whether the event shows as Upcoming or Past — it counts as upcoming for the whole of its day.',
                   },
                 },
                 {
@@ -106,6 +107,16 @@ export const Events: CollectionConfig<'events'> = {
                   },
                 },
               ],
+            },
+            {
+              name: 'registrationClosesAt',
+              type: 'date',
+              label: 'Registrations close',
+              admin: {
+                date: { pickerAppearance: 'dayAndTime' },
+                description:
+                  'When registrations / expressions of interest stop being accepted. After this the button changes from "Register Your Interest" to "Contact Us". Leave empty to close at the event\'s start time. Set it later to keep registrations open once the event has begun, or earlier to close them in advance. This is separate from the Upcoming/Past badge, which follows the start date.',
+              },
             },
             {
               type: 'row',
@@ -205,8 +216,40 @@ export const Events: CollectionConfig<'events'> = {
       hasMany: true,
       admin: {
         position: 'sidebar',
-        description: 'Optional — link to specialist or team presenters.',
+        description:
+          'Presenters who are on the panel or the team. They render as linked cards on the event page. For an outside speaker, use “Guest presenters” below instead.',
       },
+    },
+    {
+      // Additive companion to `presenters`, which can only hold Specialists and
+      // Team members. Without this there was no way to credit an external
+      // speaker — and `presenters` itself rendered nowhere at all.
+      name: 'guestPresenters',
+      type: 'array',
+      label: 'Guest presenters',
+      labels: { singular: 'Guest presenter', plural: 'Guest presenters' },
+      admin: {
+        position: 'sidebar',
+        description: 'Speakers who are not on the VERIFY panel or team.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'name', type: 'text', required: true, admin: { width: '50%' } },
+            {
+              name: 'role',
+              type: 'text',
+              admin: { width: '50%', placeholder: 'e.g. Barrister' },
+            },
+          ],
+        },
+        {
+          name: 'organisation',
+          type: 'text',
+          admin: { placeholder: 'e.g. Queensland Law Society' },
+        },
+      ],
     },
     slugField(),
   ],

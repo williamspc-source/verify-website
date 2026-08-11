@@ -10,8 +10,14 @@ import { Icon } from '@/components/Icon'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
+import { PersonCard, type PersonCardData } from '@/components/PersonCard'
+import { mediaFocal } from '@/utilities/focalPoint'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { cn } from '@/utilities/ui'
+import { EVENTS_INDEX_PATH, eventPath, specialistPath, teamPath } from '@/utilities/routes'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { eventCrumbs, getCrumbSettings } from '@/utilities/breadcrumbs'
+import { eventTiming } from '@/utilities/eventTiming'
 
 import type { Event, EventsSetting } from '@/payload-types'
 
@@ -27,6 +33,8 @@ type EventLabels = {
   cpdEligibleLabel?: string | null
   concludedFallback?: string | null
   backToEventsLabel?: string | null
+  breadcrumbSectionLabel?: string | null
+  presentersHeading?: string | null
 }
 
 // Human-readable labels for the event type, matching the Events collection options.
@@ -52,6 +60,13 @@ const isRichTextEmpty = (data: unknown): boolean => {
   const children = (data as { root?: { children?: unknown[] } } | null)?.root?.children
   return !Array.isArray(children) || children.length === 0
 }
+
+// Time-based safety net: a stale event page self-heals even if an on-demand
+// revalidation hook is missed. 15 minutes rather than an hour because the page
+// now decides, server-side, whether registrations are still open — so this is the
+// window in which a closed event can still show "Register Your Interest".
+// Regeneration is lazy, so pages nobody visits cost nothing.
+export const revalidate = 900
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -79,11 +94,19 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   const host = (settings?.[hostKey] ?? {}) as NonNullable<EventsSetting['aamle']>
   const labels = ((settings as { labels?: EventLabels } | null)?.labels ?? {}) as EventLabels
 
-  // Upcoming vs past is derived at render time from the event date.
-  const eventTime = new Date(event.date).getTime()
-  const isPast = !Number.isNaN(eventTime) && eventTime < Date.now()
+  // `isPast` (badge, recap heading) and `registrationOpen` (the CTA) are separate
+  // questions and are allowed to disagree — an event can be under way, or have
+  // finished this morning, and still be taking expressions of interest. See
+  // src/utilities/eventTiming.ts. Both are resolved server-side; `revalidate`
+  // above bounds how stale they can get.
+  const { isPast, registrationOpen } = eventTiming(event)
 
   const typeLabel = EVENT_TYPE_LABELS[event.eventType ?? ''] || 'Event'
+  const crumbSettings = await getCrumbSettings()
+  const crumbs = eventCrumbs(event, {
+    home: crumbSettings.homeLabel,
+    section: (settings as { labels?: EventLabels } | null)?.labels?.breadcrumbSectionLabel,
+  })
   const metaParts = [formatDate(event.date), event.timeLabel, event.location].filter(
     (p): p is string => Boolean(p),
   )
@@ -99,10 +122,12 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   // Register / contact CTA. External registration link takes priority; otherwise
   // open the site-wide enquiry drawer via the [data-enquiry-panel] hook.
   const registerHref = event.registrationUrl?.trim() || ''
-  const ctaLabel = isPast
-    ? event.registrationLabel || host.contactLabel || 'Contact Us'
-    : event.registrationLabel || host.registerLabel || 'Register Your Interest'
-  const ctaClass = cn('btn', isPast ? 'btn-outline' : 'btn-primary')
+  // Keyed on registrationOpen, not isPast: "can I still register?" is what this
+  // button answers, and an editor sets that per event via `registrationClosesAt`.
+  const ctaLabel = registrationOpen
+    ? event.registrationLabel || host.registerLabel || 'Register Your Interest'
+    : event.registrationLabel || host.contactLabel || 'Contact Us'
+  const ctaClass = cn('btn', registrationOpen ? 'btn-primary' : 'btn-outline')
   const cta = registerHref ? (
     <a className={ctaClass} href={registerHref} target="_blank" rel="noopener noreferrer">
       {ctaLabel}
@@ -117,6 +142,37 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
     ? host.recapHeading || 'Event Recap'
     : host.attendHeading || 'How to Attend'
 
+  // Presenters: linked cards for panel/team members, plain cards for outside
+  // speakers. Both were previously unrenderable — `presenters` had no consumer
+  // at all, and there was no field for a guest.
+  const presentersHeading =
+    (settings as { labels?: EventLabels } | null)?.labels?.presentersHeading || 'Presenters'
+  const presenterCards: PersonCardData[] = [
+    ...(Array.isArray(event.presenters) ? event.presenters : []).flatMap((rel) => {
+      if (!rel || typeof rel !== 'object' || typeof rel.value !== 'object') return []
+      const person = rel.value as { title?: string | null; slug?: string | null; position?: string | null; role?: string | null; photo?: unknown }
+      const photo = mediaFocal(person.photo)
+      return [
+        {
+          name: person.title ?? '',
+          position: person.position ?? person.role ?? null,
+          photoUrl: photo.url,
+          photoFocus: photo.focus,
+          photoZoom: photo.zoom,
+          href:
+            rel.relationTo === 'specialists'
+              ? specialistPath(person.slug)
+              : teamPath(person.slug),
+        },
+      ]
+    }),
+    ...(Array.isArray(event.guestPresenters) ? event.guestPresenters : []).map((g) => ({
+      name: g?.name ?? '',
+      position: [g?.role, g?.organisation].filter(Boolean).join(', ') || null,
+      href: null,
+    })),
+  ].filter((c) => c.name)
+
   return (
     <article>
       {draft && <LivePreviewListener />}
@@ -125,7 +181,18 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
       {/* Hero */}
       <section className="page-hero page-hero--light page-hero--center">
         <div className="container">
-          <div className="section-label">{typeLabel}</div>
+          {/* The trail replaces the type kicker — same slot, same texture, and
+              the reference never stacks the two. Tone and centring are inherited
+              from page-hero--light / --center, so no props are needed. */}
+          {crumbs.length >= 2 ? (
+            <Breadcrumbs
+              items={crumbs}
+              separator={crumbSettings.separator}
+              label={crumbSettings.navLabel}
+            />
+          ) : (
+            <div className="section-label">{typeLabel}</div>
+          )}
           <h1>{event.title}</h1>
           {metaParts.length ? (
             <p className="event-hero-meta">{metaParts.join(' · ')}</p>
@@ -177,6 +244,17 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             </div>
           ) : null}
 
+          {presenterCards.length ? (
+            <div className="event-presenters">
+              <h2 className="event-presenters__heading">{presentersHeading}</h2>
+              <div className="spec-grid" style={{ '--vf-cols': 3 } as React.CSSProperties}>
+                {presenterCards.map((c, i) => (
+                  <PersonCard key={i} {...c} />
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           {event.location ? <div className="map-tile event-map">{event.location}</div> : null}
         </div>
       </section>
@@ -207,7 +285,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
           </div>
 
           <p className="event-back-wrap">
-            <a className="event-back" href="/events">
+            <a className="event-back" href={EVENTS_INDEX_PATH}>
               <Icon name="caret-left" className="size-4" /> {labels.backToEventsLabel ||
                 'Back to all events'}
             </a>
@@ -221,7 +299,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = '' } = await paramsPromise
   const event = await queryEventBySlug({ slug: decodeURIComponent(slug) })
-  return generateMeta({ doc: event as never })
+  return generateMeta({ doc: event as never, url: eventPath(event?.slug) })
 }
 
 const queryEventBySlug = cache(async ({ slug }: { slug: string }): Promise<Event | null> => {

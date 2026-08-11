@@ -1,7 +1,9 @@
 'use client'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { Icon } from '@/components/Icon'
+import { eventPath } from '@/utilities/routes'
+import { isEventPast, startOfDay } from '@/utilities/eventTiming'
 
 // Plain, serialisable event shape passed from the server component.
 export type EventItem = {
@@ -48,15 +50,32 @@ type Props = {
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-const eventUrl = (e: EventItem): string => `/events/event/${e.slug}`
+const eventUrl = (e: EventItem): string => eventPath(e.slug) ?? '/events'
 
-// Local midnight (ms) of a given time — matches the reference's date-only compare
-// so an event stays "upcoming" for the whole of its day.
-const startOfDay = (ms: number): number => {
-  const d = new Date(ms)
-  d.setHours(0, 0, 0, 0)
-  return d.getTime()
-}
+/**
+ * "Today", as the visitor's browser sees it — never the server.
+ *
+ * This page is statically rendered, so reading the clock during render would bake
+ * a build-time "today" into the HTML and mis-sort every event until the next
+ * regeneration (and mismatch on hydration). It used to be a `useState(null)` plus
+ * an effect that set the real value after mount; `useSyncExternalStore` expresses
+ * the same thing directly, with `null` as the explicit server snapshot that drives
+ * the "Loading events…" first paint.
+ *
+ * The client snapshot must be referentially stable — React calls it on every
+ * render and re-renders if the value changed — and `startOfDay(Date.now())`
+ * already is: it returns the identical number for every call within the same
+ * local day. A module-level memo was tried first and was actively wrong, because
+ * it froze "today" for the lifetime of the JS bundle, which outlives a page (
+ * client-side navigation does not re-evaluate modules). A tab left open overnight
+ * would never have re-bucketed. Computing it fresh is both stable and
+ * self-correcting at midnight.
+ */
+const getToday = (): number => startOfDay(Date.now())
+const getTodayServer = (): null => null
+// Nothing to subscribe to: the value only changes at midnight, and it is re-read
+// on every render anyway. The unsubscribe is a no-op.
+const subscribeToNothing = (): (() => void) => () => {}
 
 const dayOf = (iso: string): string => String(new Date(iso).getDate())
 const monOf = (iso: string): string => MONTHS[new Date(iso).getMonth()] || ''
@@ -154,7 +173,7 @@ const EventRow: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, cta
           <img
             src={event.image}
             alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--vf-radius-card)' }}
           />
         </div>
       ) : (
@@ -193,7 +212,11 @@ const EventRow: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, cta
 }
 
 // A single upcoming/past group: optional label, paginated list of rows, and its
-// own pagination. Page resets to 1 whenever the underlying list changes.
+// own pagination.
+//
+// If the list shrinks under the current page (the visitor searches while on page
+// 4 of 5), `safePage` below clamps it during render — it does not reset to 1.
+// An earlier version of this comment claimed it reset to 1; it never did.
 const EventGroup: React.FC<{
   label?: string
   list: EventItem[]
@@ -204,15 +227,14 @@ const EventGroup: React.FC<{
   const [page, setPage] = useState(1)
   const boxRef = useRef<HTMLDivElement | null>(null)
 
+  // `safePage` is the clamp. There used to be an effect here doing
+  // `if (page > totalPages) setPage(totalPages)`, which was dead code: every
+  // consumer below already reads `safePage`, never `page`, so the effect only
+  // wrote a derived value back into state and triggered a second render.
   const totalPages = Math.max(1, Math.ceil(list.length / pageSize))
   const safePage = Math.min(Math.max(page, 1), totalPages)
   const start = (safePage - 1) * pageSize
   const pageList = list.slice(start, start + pageSize)
-
-  // Keep the page in range if the filtered list shrinks.
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages)
-  }, [page, totalPages])
 
   const goToPage = (next: number) => {
     setPage(next)
@@ -252,7 +274,7 @@ export const EventsExplorerClient: React.FC<Props> = ({
   showSearch,
   labels,
 }) => {
-  const [now, setNow] = useState<number | null>(null)
+  const now = useSyncExternalStore(subscribeToNothing, getToday, getTodayServer)
   const [query, setQuery] = useState('')
 
   // Resolve editable strings once, falling back to the original literals when a
@@ -273,10 +295,6 @@ export const EventsExplorerClient: React.FC<Props> = ({
     searchButton: labels?.searchButtonLabel || 'Search',
   }
 
-  useEffect(() => {
-    setNow(startOfDay(Date.now()))
-  }, [])
-
   const q = query.trim().toLowerCase()
 
   const filtered = useMemo(() => {
@@ -292,10 +310,13 @@ export const EventsExplorerClient: React.FC<Props> = ({
     if (now === null) return { upcoming: [] as EventItem[], past: [] as EventItem[] }
     const up: EventItem[] = []
     const pa: EventItem[] = []
+    // Same resolver the detail page uses, passed this browser's clock. Before
+    // this the two disagreed: the listing compared start-of-day (so an event was
+    // "upcoming" all day) while the detail page compared the exact start time, so
+    // the same event read Upcoming here and "Past Event" on its own page.
     filtered.forEach((e) => {
-      const t = startOfDay(new Date(e.date).getTime())
-      if (Number.isNaN(t) || t >= now) up.push(e)
-      else pa.push(e)
+      if (isEventPast(e, now)) pa.push(e)
+      else up.push(e)
     })
     up.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // soonest first
     pa.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // most recent first
