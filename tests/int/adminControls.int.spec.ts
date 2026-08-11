@@ -1,0 +1,567 @@
+/**
+ * Guards against admin controls that look editable but do nothing.
+ *
+ * These exist because nobody will be reviewing code after the handover, and the
+ * audit that prompted them found ~118 verified cases of exactly these shapes.
+ *
+ * ── Every guard here must be provable ───────────────────────────────────────
+ * An earlier version of this file carried the note "a crude test that runs is
+ * worth more than an accurate one that rots". That licensed three patterns that
+ * could not fail on the defect they named, and the suite was reported as
+ * evidence the work was sound:
+ *
+ *   - Pattern B collected failures into an array it never wrote to.
+ *   - Pattern C's regex omitted `appearance`, the only one of its three
+ *     advertised props that anything actually violated.
+ *   - Pattern A matched field names as bare words against one concatenated blob
+ *     of the whole `src/` tree, so `hours`, `phone`, `email` and `address` — the
+ *     exact orphans the audit had to find by hand — all passed coincidentally.
+ *
+ * So: **a guard that has never failed is not evidence.** Each pattern below
+ * records the deliberate break that was used to prove it goes red. If you change
+ * one, re-run its break and confirm it still fails, or you have replaced a guard
+ * with a decoration.
+ *
+ *     zsh tests/int/prove-guards.sh
+ *
+ * applies each break in turn, checks the matching test goes red, and restores
+ * every file it touched. All five must report PASS.
+ *
+ * When one of these fails, the fix is almost always to wire the control up. If it
+ * genuinely should not be wired, add it to the allowlist WITH a reason.
+ */
+import { describe, expect, it } from 'vitest'
+import { readFileSync, readdirSync, existsSync } from 'node:fs'
+import { join, relative } from 'node:path'
+
+const SRC = join(process.cwd(), 'src')
+const BLOCKS = join(SRC, 'blocks')
+const GLOBALS_CSS = readFileSync(join(SRC, 'app/(frontend)/globals.css'), 'utf8')
+
+const rel = (f: string) => relative(process.cwd(), f)
+
+/** Every `.ts`/`.tsx` under `dir`, recursively. */
+const walkFiles = (dir: string, out: string[] = []): string[] => {
+  if (!existsSync(dir)) return out
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name)
+    if (entry.isDirectory()) walkFiles(full, out)
+    else if (/\.tsx?$/.test(entry.name)) out.push(full)
+  }
+  return out
+}
+
+const blockDirs = readdirSync(BLOCKS, { withFileTypes: true })
+  .filter((d) => d.isDirectory() && existsSync(join(BLOCKS, d.name, 'config.ts')))
+  .map((d) => d.name)
+
+/** Every source file in a block folder that could consume a field. */
+const blockSources = (name: string): string => {
+  const dir = join(BLOCKS, name)
+  return readdirSync(dir)
+    .filter((f) => /\.(tsx|ts)$/.test(f) && f !== 'config.ts')
+    .map((f) => readFileSync(join(dir, f), 'utf8'))
+    .join('\n')
+}
+
+/**
+ * Does `haystack` actually *read* a field called `field`?
+ *
+ * Not a bare word-boundary match. `\bhours\b` is satisfied by a local variable, a
+ * comment, a CSS class or an unrelated import, which is how four real orphans
+ * passed. Require one of the shapes that genuinely reads a property:
+ *
+ *   doc.hours          member access
+ *   doc?.hours         optional member access
+ *   doc['hours']       computed access
+ *   const { hours }    destructuring (start of pattern, or after a comma)
+ *   { hours: renamed } destructuring with rename
+ *   { hours = [] }     destructuring with default
+ *   hours={...}        JSX prop being passed on
+ */
+const readsField = (haystack: string, field: string): boolean => {
+  const f = field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(
+    [
+      `\\.\\s*${f}\\b`, // .field  /  ?.field
+      `\\[\\s*['"\`]${f}['"\`]\\s*\\]`, // ['field']
+      `[{,]\\s*${f}\\s*[,}:=]`, // { field } / { field: x } / { field = x }
+      `\\b${f}=\\{`, // JSX: field={...}
+    ].join('|'),
+  ).test(haystack)
+}
+
+/**
+ * Fields a block config declares but its components legitimately never name.
+ * Each entry needs a reason — an unexplained entry is how a real dead control
+ * gets normalised.
+ */
+const ALLOWED_UNREAD: Record<string, Record<string, string>> = {
+  // Shared helpers are spread into the config and consumed by <Section>, which
+  // receives them as props rather than by name inside the block component.
+  '*': {
+    anchorId: 'passed to <Section id>',
+    background: 'passed to <Section background>',
+    containerWidth: 'passed to <Section containerWidth>',
+    motion: 'passed to <Section motion>',
+    hoverEffect: 'passed to <Section hoverEffect>',
+    shadow: 'passed to <Section shadow>',
+    cssClass: 'applied via toClassName()',
+    blockName: 'Payload built-in admin label',
+  },
+}
+
+describe('admin controls are wired', () => {
+  /**
+   * Pattern A — "field mounted, nobody reads it" (blocks).
+   *
+   * Proven red by: replacing `{item.text}` with `{null}` in
+   * src/blocks/IconList/Component.tsx → reports `text` as unread.
+   */
+  it.each(blockDirs)('%s: every field name is read by the block components', (name) => {
+    const config = readFileSync(join(BLOCKS, name, 'config.ts'), 'utf8')
+    const src = blockSources(name)
+    if (!src.trim()) return // config-only block (e.g. re-exported elsewhere)
+
+    const declared = [...config.matchAll(/\bname:\s*'([a-zA-Z][\w]*)'/g)].map((m) => m[1])
+    const allowed = ALLOWED_UNREAD['*']
+
+    const unread = [...new Set(declared)].filter(
+      (field) => !allowed[field] && !readsField(src, field),
+    )
+
+    expect(unread, `${name}: declared but never read — wire up or remove`).toEqual([])
+  })
+
+  /**
+   * Pattern B — "the class an option names does not exist".
+   *
+   * The previous version declared a `missing` array, never pushed to it, and
+   * asserted it was empty. Its only live assertions checked that a class *family*
+   * had at least one rule anywhere — which says nothing about whether the specific
+   * value an editor can pick has one.
+   *
+   * This resolves the actual option values from the field definitions and checks
+   * each produced class individually.
+   *
+   * Proven red by: adding `{ label: 'Tilt', value: 'tilt' }` to
+   * `hoverEffectField.options` in src/fields/blockFields.ts with no matching CSS
+   * → reports `.vf-hover-tilt`.
+   */
+  it('every vf-* modifier class an option can produce exists in globals.css', () => {
+    const blockFields = readFileSync(join(SRC, 'fields/blockFields.ts'), 'utf8')
+    const section = readFileSync(join(SRC, 'components/Section/index.tsx'), 'utf8')
+
+    /** Pull the `value:` list out of a named select field in blockFields.ts. */
+    const optionValues = (fieldName: string): string[] => {
+      const start = blockFields.indexOf(`name: '${fieldName}'`)
+      expect(start, `blockFields.ts declares no field named '${fieldName}'`).toBeGreaterThan(-1)
+      const optionsAt = blockFields.indexOf('options: [', start)
+      const end = blockFields.indexOf(']', optionsAt)
+      const body = blockFields.slice(optionsAt, end)
+      const values = [...body.matchAll(/value:\s*'([a-z0-9-]+)'/g)].map((m) => m[1])
+      expect(values.length, `could not parse options for '${fieldName}'`).toBeGreaterThan(0)
+      return values
+    }
+
+    const missing: string[] = []
+
+    // `vf-hover-<value>`: every value emits a class, including 'none'.
+    for (const value of optionValues('hoverEffect')) {
+      if (!new RegExp(`\\.vf-hover-${value}\\b`).test(GLOBALS_CSS)) {
+        missing.push(`.vf-hover-${value} (hoverEffect option "${value}")`)
+      }
+    }
+
+    // `vf-shadow-<value>`: 'default' deliberately emits nothing (see Section).
+    for (const value of optionValues('shadow')) {
+      if (value === 'default') continue
+      if (!new RegExp(`\\.vf-shadow-${value}\\b`).test(GLOBALS_CSS)) {
+        missing.push(`.vf-shadow-${value} (shadow option "${value}")`)
+      }
+    }
+
+    // Backgrounds and container widths go through lookup maps in Section rather
+    // than string interpolation, so read the classes the map actually emits.
+    const mapClasses = (mapName: string): string[] => {
+      const start = section.indexOf(`export const ${mapName}`)
+      expect(start, `Section exports no map named ${mapName}`).toBeGreaterThan(-1)
+      const end = section.indexOf('}', section.indexOf('{', start))
+      return [...section.slice(start, end).matchAll(/'([^']*vf-[^']*)'/g)]
+        .flatMap((m) => m[1].split(/\s+/))
+        .filter((c) => c.startsWith('vf-'))
+    }
+
+    for (const cls of mapClasses('bgClasses')) {
+      if (!new RegExp(`\\.${cls}\\b`).test(GLOBALS_CSS)) {
+        missing.push(`.${cls} (emitted by Section's bgClasses)`)
+      }
+    }
+
+    expect(missing, 'an editor can select this, and no rule defines it').toEqual([])
+  })
+
+  /**
+   * Pattern C — "the editor's Appearance choice is discarded".
+   *
+   * `CMSLink` destructures `appearance`, so a literal written AFTER a `{...link}`
+   * spread wins and whatever the editor stored is thrown away. That is only a bug
+   * when the editor was offered the choice in the first place, so this checks the
+   * component against its own config: either the config passes
+   * `appearances: false` (no control exists), or the component reads
+   * `.appearance` and translates it itself.
+   *
+   * The previous version's regex listed `icon|newTab` — neither of which anything
+   * violates — while its title promised `appearance`. It matched 0 files.
+   *
+   * Proven red by: removing `appearances: false` from
+   * src/blocks/GatewayCards/config.ts → reports GatewayCards/Component.tsx.
+   */
+  it('a hardcoded appearance= never overrides a choice the editor was offered', () => {
+    // Components outside src/blocks, mapped to the config that defines their links.
+    const EXTRA: Record<string, string> = {
+      'src/Header/Nav/index.tsx': 'src/Header/config.ts',
+      'src/Header/Component.client.tsx': 'src/Header/config.ts',
+      'src/Footer/Component.tsx': 'src/Footer/config.ts',
+      'src/heros/HomeHero/index.tsx': 'src/heros/config.ts',
+      'src/heros/PageHero/index.tsx': 'src/heros/config.ts',
+    }
+
+    // Blocks whose Appearance control is inert but documented as such in the
+    // field's admin description, so the editor is told rather than misled.
+    // Preferred fix is still `appearances: false`; that drops a populated column,
+    // which this schema has deliberately kept additive.
+    const DOCUMENTED_INERT: Record<string, string> = {
+      Callout:
+        'linkGroup description: "Callout links all render in the same style, so a link’s Appearance … makes no difference here."',
+      MapEmbed:
+        'linkGroup description explains Appearance applies on the standard map layout only',
+    }
+
+    const SPREAD_APPEARANCE = /\{\.\.\.[A-Za-z_.?[\]0-9]+\}\s*(?:\n\s*)?appearance=/
+
+    const offenders: string[] = []
+
+    const check = (componentFile: string, configFile: string, allowKey?: string) => {
+      if (!existsSync(componentFile) || !existsSync(configFile)) return
+      const component = readFileSync(componentFile, 'utf8')
+      if (!SPREAD_APPEARANCE.test(component)) return
+      if (allowKey && DOCUMENTED_INERT[allowKey]) return
+
+      const config = readFileSync(configFile, 'utf8')
+
+      // No `link()` / `linkGroup()` helper means no Appearance select was ever
+      // generated — e.g. IconList declares its own `link` group holding a single
+      // `url`. Nothing is being discarded there.
+      const usesLinkHelper = /\b(link|linkGroup)\s*\(/.test(config)
+      if (!usesLinkHelper) return
+
+      const noControl = /appearances:\s*false/.test(config)
+      const honoursIt = /\.\s*appearance\b/.test(component)
+      if (!noControl && !honoursIt) {
+        offenders.push(
+          `${rel(componentFile)} hardcodes appearance= after a spread, but ${rel(
+            configFile,
+          )} still offers the Appearance select and the component never reads it`,
+        )
+      }
+    }
+
+    for (const name of blockDirs) {
+      const dir = join(BLOCKS, name)
+      for (const f of readdirSync(dir).filter((f) => f.endsWith('.tsx'))) {
+        check(join(dir, f), join(dir, 'config.ts'), name)
+      }
+    }
+    for (const [component, config] of Object.entries(EXTRA)) {
+      check(join(process.cwd(), component), join(process.cwd(), config))
+    }
+
+    expect(offenders, 'the stored Appearance value is silently discarded').toEqual([])
+  })
+
+  /**
+   * Pattern D — "query without access control leaks drafts".
+   *
+   * The previous version searched a fixed 400-character window after
+   * `payload.find({`, so a longer query simply produced no match and no assertion
+   * — the queries with the most surface were the ones it silently skipped. It also
+   * walked `src/blocks` only, missing all 13 calls under `src/app/(frontend)`, and
+   * `continue`d past any call whose `collection:` was a variable.
+   *
+   * This brace-matches the real extent of each call, walks the route handlers too,
+   * and FAILS on a call it cannot classify rather than ignoring it.
+   *
+   * Proven red by: removing `overrideAccess: false` from the specialists query in
+   * src/app/(frontend)/specialists/profiles/[slug]/page.tsx.
+   */
+  it('queries against draft-enabled collections are access-controlled', () => {
+    // Only collections with drafts enabled can leak an unpublished document.
+    // Taxonomy lookups (specialties, services, testimonials…) have no _status.
+    const DRAFT_COLLECTIONS = ['events', 'pages', 'posts', 'specialists', 'team']
+
+    // Call sites that legitimately read drafts, each with the reason.
+    const ALLOWED = [
+      // Sitemaps and the legacy redirect gate on draftMode() / _status themselves.
+      'src/endpoints/', // seed runs as an authenticated admin request
+    ]
+
+    /** Extract the full `payload.find({...})` argument by matching braces. */
+    const findCalls = (text: string): string[] => {
+      const out: string[] = []
+      const re = /payload\.find\(\s*\{/g
+      let m: RegExpExecArray | null
+      while ((m = re.exec(text))) {
+        let depth = 1
+        let i = m.index + m[0].length
+        while (i < text.length && depth > 0) {
+          const ch = text[i]
+          if (ch === '{') depth++
+          else if (ch === '}') depth--
+          i++
+        }
+        // depth > 0 means an unbalanced call — report it rather than skip it.
+        out.push(depth === 0 ? text.slice(m.index, i) : `UNBALANCED:${text.slice(m.index, m.index + 80)}`)
+      }
+      return out
+    }
+
+    const offenders: string[] = []
+    const files = [
+      ...walkFiles(BLOCKS),
+      ...walkFiles(join(SRC, 'app')),
+      ...walkFiles(join(SRC, 'utilities')),
+      ...walkFiles(join(SRC, 'components')),
+      ...walkFiles(join(SRC, 'heros')),
+    ]
+
+    for (const file of files) {
+      if (ALLOWED.some((a) => rel(file).startsWith(a))) continue
+      const text = readFileSync(file, 'utf8')
+
+      for (const call of findCalls(text)) {
+        if (call.startsWith('UNBALANCED:')) {
+          offenders.push(`${rel(file)}: could not parse the extent of a payload.find call`)
+          continue
+        }
+
+        const guarded =
+          /overrideAccess:\s*(false|draft|isEnabled)/.test(call) || /_status/.test(call)
+
+        const literal = call.match(/collection:\s*'([a-z-]+)'/)?.[1]
+        if (!literal) {
+          // A non-literal `collection:` cannot be classified statically. The old
+          // version silently `continue`d here, which is precisely how a real leak
+          // stays invisible: no match, no assertion, green. Demand that such a
+          // call states its access intent explicitly instead.
+          if (/collection[,:]/.test(call) && !guarded) {
+            offenders.push(
+              `${rel(file)}: payload.find uses a non-literal collection — this guard cannot ` +
+                `tell whether it targets a draft-enabled collection. Inline the slug, or add ` +
+                `an explicit overrideAccess.`,
+            )
+          }
+          continue
+        }
+        if (!DRAFT_COLLECTIONS.includes(literal)) continue
+
+        if (!guarded) {
+          offenders.push(
+            `${rel(file)}: payload.find({ collection: '${literal}' }) has no overrideAccess and no _status filter`,
+          )
+        }
+      }
+    }
+
+    expect(offenders, 'Local API defaults to overrideAccess: true and will serve drafts').toEqual(
+      [],
+    )
+  })
+})
+
+describe('documented style hooks exist', () => {
+  // The manual calls its class list "a published API"; 15 entries did not exist,
+  // and three shipped Custom Styles presets were written against them.
+  it('every class in HOOKS.md §6 is emitted somewhere in src/', () => {
+    const hooks = readFileSync(join(SRC, 'Styles/HOOKS.md'), 'utf8')
+    const section = (hooks.split('## 6. Hook classes')[1]?.split('\n---')[0] ?? '')
+      .split('\n')
+      // Drop blockquotes: those document the classes that were REMOVED for not
+      // existing, so scanning them would re-report exactly what was just fixed.
+      .filter((line) => !line.trimStart().startsWith('>'))
+      .join('\n')
+    const classes = [...section.matchAll(/`\.(vf-[a-z0-9_-]+)`/g)].map((m) => m[1])
+
+    const sources: string[] = []
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name)
+        if (entry.isDirectory()) walk(full)
+        else if (/\.(tsx?|css)$/.test(entry.name) && !full.endsWith('HOOKS.md')) {
+          sources.push(readFileSync(full, 'utf8'))
+        }
+      }
+    }
+    walk(SRC)
+    const haystack = sources.join('\n')
+
+    const missing = [...new Set(classes)].filter(
+      (c) => !new RegExp(`[.\`"'\\s]${c}\\b`).test(haystack),
+    )
+    expect(missing, 'documented as a stable hook but nothing emits it').toEqual([])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Pattern A, extended to globals and collections.
+//
+// The block-level check above missed this whole surface, which is exactly where
+// the longest-lived orphans hid — an editable "Office hours" the footer never
+// rendered, phone/email on Offices while the real ones lived in the Footer.
+//
+// The haystack is scoped PER CONFIG to the files that actually reference that
+// collection or global. The previous version searched one blob of the entire
+// `src/` tree for a bare word, so 52 of 117 declared field names matched
+// something unrelated somewhere — including `hours`, `phone`, `email` and
+// `address`, the very orphans it was written to catch.
+// ---------------------------------------------------------------------------
+
+const GLOBAL_CONFIGS = [
+  'Header', 'Footer', 'SiteSettings', 'ArticleSettings', 'EventsSettings',
+  'TeamSettings', 'SpecialistProfile', 'SpecialistAvailability', 'DesignSystem', 'Styles',
+].map((d) => join(SRC, d, 'config.ts')).filter((f) => existsSync(f))
+
+const collectionConfigs = (): string[] => {
+  const dir = join(SRC, 'collections')
+  const out: string[] = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.ts')) out.push(join(dir, entry.name))
+    else if (entry.isDirectory() && existsSync(join(dir, entry.name, 'index.ts'))) {
+      out.push(join(dir, entry.name, 'index.ts'))
+    }
+  }
+  return out
+}
+
+/**
+ * Every file that could consume a global/collection field, read once.
+ *
+ * Excludes exactly the config files under test — not the whole `collections/`
+ * tree, which is where the collection hooks live. `Posts.authors` is read by
+ * `collections/Posts/hooks/populateAuthors.ts`, and blanket-excluding the
+ * directory reported it as an orphan.
+ *
+ * `src/endpoints` is excluded on purpose. The seed *writes* these fields
+ * (`{ hoursNote: '...' }`), which looks identical to reading one and is the
+ * opposite of what this test asks. Including it made every seeded field appear
+ * consumed — measured: with `endpoints` in the list, deleting the only renderer
+ * of `Offices.hoursNote` still passed.
+ */
+const CONFIG_FILE_PATHS = new Set<string>()
+
+const CONSUMER_FILES: { path: string; text: string }[] = [
+  'app', 'components', 'blocks', 'heros', 'utilities', 'search',
+  'Footer', 'Header', 'plugins', 'collections', 'hooks',
+]
+  .flatMap((d) => walkFiles(join(SRC, d)))
+  .filter((f) => !f.endsWith('payload-types.ts'))
+  .map((path) => ({ path, text: readFileSync(path, 'utf8') }))
+
+/**
+ * ── Why this is not scoped per collection ───────────────────────────────────
+ * The obvious tightening — only search files that mention the collection's slug
+ * — was tried and rejected: it produces false positives wherever a consumer
+ * reaches the data through a helper. `Footer/Component.tsx` renders
+ * `office?.phone` but never contains the string `'offices'`; only
+ * `utilities/primaryOffice.ts` does. Chasing that needs the import graph walked
+ * in both directions, whose transitive closure is most of the app anyway.
+ *
+ * The load-bearing fix is `readsField` instead of a bare `\b<name>\b` match. The
+ * old version's false negatives came from matching *any* token: `hours`, `phone`,
+ * `email` and `address` each occur as a local variable, a CSS class or a comment
+ * somewhere in `src/`, so four real orphans passed. Requiring an actual property
+ * read (`x.hours`, `{ hours }`, `hours={…}`) removes that whole class.
+ */
+for (const f of [...GLOBAL_CONFIGS, ...collectionConfigs()]) CONFIG_FILE_PATHS.add(f)
+
+const CONSUMER_HAYSTACK = CONSUMER_FILES.filter((f) => !CONFIG_FILE_PATHS.has(f.path))
+  .map((f) => f.text)
+  .join('\n')
+
+/**
+ * Fields no rendering path reads, each with the reason it is acceptable.
+ *
+ * An entry here is a promise that the field is either consumed by Payload
+ * itself, or deliberately admin-only. Anything else belongs in the code, not
+ * this list — an unexplained entry is how a real dead control gets normalised.
+ */
+const ALLOWED_UNREAD_CONFIG: Record<string, string> = {
+  // Payload/plugin-owned — consumed by the framework, never by our components.
+  slug: 'slugField(); used in queries and routes.ts',
+  slugLock: 'slugField() internal',
+  title: 'useAsTitle / admin list',
+  id: 'Payload primary key',
+  updatedAt: 'Payload timestamp',
+  createdAt: 'Payload timestamp',
+  _status: 'Payload drafts',
+  meta: 'plugin-seo group; read via generateMeta',
+  overview: 'plugin-seo admin-only preview',
+  preview: 'plugin-seo admin-only preview',
+  image: 'plugin-seo meta.image, read via generateMeta',
+  description: 'plugin-seo meta.description on collections with SEO tabs',
+  email: 'Users auth field / Offices contact, read via getPrimaryOffice',
+  password: 'Payload auth',
+  name: 'Users display name; also array-item labels read positionally',
+  blockName: 'Payload built-in block label',
+  // Media `imageSizes` entries. These are not editor controls at all — Payload
+  // generates a derivative per entry on upload and serves them through the
+  // `sizes` object / srcSet. Only `og` is selected by name in our code
+  // (generateMeta). Listed individually rather than pattern-matched so adding a
+  // new size is a deliberate act.
+  thumbnail: 'Media imageSizes name — generated and served by Payload/next-image',
+  square: 'Media imageSizes name — generated and served by Payload/next-image',
+  small: 'Media imageSizes name — generated and served by Payload/next-image',
+  medium: 'Media imageSizes name — generated and served by Payload/next-image',
+  large: 'Media imageSizes name — generated and served by Payload/next-image',
+  xlarge: 'Media imageSizes name — generated and served by Payload/next-image',
+
+  // Structured alternatives to a rendered free-text field. The text field is
+  // what renders today; these are captured for future use and are NOT offered
+  // as if they changed the page.
+  locationRef: 'Events: structured location; the rendered value is the `location` text field',
+  relatedSpecialist: 'Posts: captured for spotlight attribution; the byline renders from `author.source`',
+
+  // Admin-only ordering and grouping. These drive the admin list view, not the
+  // public site, and their descriptions now say so.
+  order: 'admin list ordering (Streams/Offices/Locations); public order is authored per-block',
+  region: 'Locations admin grouping; the directory filter derives from specialist-denormalised titles',
+
+  // Deprecated, hidden from the admin, column retained pending a drop migration.
+  availabilityHighlight: 'deprecated, admin.hidden — superseded by `advertise`',
+  availabilityNote: 'deprecated, admin.hidden — superseded by `advertise`',
+}
+
+describe('globals and collections have no orphan fields', () => {
+  /**
+   * Proven red by: renaming `office.hoursNote` in src/blocks/MapEmbed/Component.tsx
+   * (its only renderer) → reports `hoursNote` on Offices.
+   *
+   * Note on choosing a break: the first attempt removed the `hours` rendering from
+   * the Footer and the guard stayed green — correctly, because `ContactDetails`
+   * reads `office?.hours` too. A field with more than one consumer cannot prove
+   * this test. Pick one with exactly one renderer.
+   */
+  it.each([...GLOBAL_CONFIGS, ...collectionConfigs()])('%s', (file) => {
+    const config = readFileSync(file, 'utf8')
+    const declared = [...config.matchAll(/\bname:\s*'([a-zA-Z][\w]*)'/g)].map((m) => m[1])
+
+    const unread = [...new Set(declared)].filter(
+      (field) => !ALLOWED_UNREAD_CONFIG[field] && !readsField(CONSUMER_HAYSTACK, field),
+    )
+
+    expect(
+      unread,
+      `${rel(file)}: declared but nothing renders it — wire it up, or add it to ALLOWED_UNREAD_CONFIG with a reason`,
+    ).toEqual([])
+  })
+})
