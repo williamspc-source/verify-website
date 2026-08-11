@@ -19,13 +19,59 @@ import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { brandColorStyle } from '@/utilities/brandColorStyle'
-import { designTokenStyle } from '@/utilities/designTokenStyle'
+import { buildTokenCss } from '@/utilities/cssTokens'
+import { getEnquiryFormId } from '@/utilities/enquiryForm'
 
-// VERIFY brand typeface (licensed). One family covers heading + body via its
-// full weight range (Museo weights: 100/300/500/700/900/1000). Loaded locally so
-// it ships with the build; the .woff files live under ./fonts/museo. Editors can
-// still override the font family site-wide via the Design System global.
+// ── Typefaces ───────────────────────────────────────────────────────────────
+// Three faces, matching the design reference (.design-reference/assets/css/styles.css):
+//   headings → Montserrat        (styles.css:23)
+//   body     → Open Sans         (styles.css:24)
+//   display  → MuseoSansRounded  (styles.css:1-8, consumed by .hero-def-word alone)
+// All self-hosted so the build has no network dependency. Which face each role
+// actually uses is decided by --font-heading/--font-body in globals.css, and
+// editors can override those from the Design System global.
+
+// Montserrat and Open Sans are variable fonts: one file spans the whole weight
+// axis, so an editor dialling in any weight is already covered. Latin subset only
+// — next/font/local does no subsetting and its src entries take no unicodeRange,
+// so if latin-ext is ever needed, add a hand-written @font-face with a
+// unicode-range in globals.css against a file in public/ rather than here.
+const montserrat = localFont({
+  src: [
+    { path: './fonts/montserrat/Montserrat-Variable.latin.woff2', weight: '100 900', style: 'normal' },
+  ],
+  variable: '--font-montserrat',
+  display: 'swap',
+  adjustFontFallback: 'Arial',
+  fallback: ['Helvetica Neue', 'Arial', 'sans-serif'],
+})
+
+const openSans = localFont({
+  src: [
+    { path: './fonts/open-sans/OpenSans-Variable.latin.woff2', weight: '300 800', style: 'normal' },
+    {
+      path: './fonts/open-sans/OpenSans-Italic-Variable.latin.woff2',
+      weight: '300 800',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-open-sans',
+  display: 'swap',
+  adjustFontFallback: 'Arial',
+  fallback: ['Helvetica Neue', 'Arial', 'sans-serif'],
+})
+
+// VERIFY brand typeface (licensed — see ./fonts/README.md). Split in two: the 900
+// weight is preloaded because the homepage hero definition word renders it above
+// the fold, while the full range stays available but unpreloaded so an editor can
+// switch the site back to Museo from the Design System global without shipping six
+// font files to every visitor who never sees them.
+const museoDisplay = localFont({
+  src: [{ path: './fonts/museo/MuseoSansRounded900.woff', weight: '900', style: 'normal' }],
+  variable: '--font-museo-display',
+  display: 'swap',
+})
+
 const museo = localFont({
   src: [
     { path: './fonts/museo/MuseoSansRounded100.woff', weight: '100', style: 'normal' },
@@ -40,6 +86,7 @@ const museo = localFont({
   ],
   variable: '--font-museo',
   display: 'swap',
+  preload: false,
 })
 
 // Resolves a Site Settings upload field (populated at depth 1) to a media doc.
@@ -52,16 +99,35 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const settings = await getCachedGlobal('site-settings', 1)()
   const designTokens = await getCachedGlobal('design-system', 0)()
   // Brand colours + editable design-system tokens become CSS vars on :root.
-  const rootStyle = { ...brandColorStyle(settings?.colors), ...designTokenStyle(designTokens) }
+  // Emitted as a real stylesheet rather than an inline style on <html>: an
+  // inline style outranks every selector, which made Custom Styles → Global CSS
+  // unable to override any token. See src/utilities/cssTokens.ts for the
+  // three-layer ordering contract this relies on.
+  const tokenCss = buildTokenCss(settings?.colors, designTokens)
+
+  // Site Settings → Enquiry drawer form, with a logged server-side fallback when
+  // the pointer is empty. See src/utilities/enquiryForm.ts.
+  const enquiryFormId = await getEnquiryFormId()
 
   return (
     <html
-      className={cn(museo.variable, GeistMono.variable)}
+      className={cn(
+        montserrat.variable,
+        openSans.variable,
+        museoDisplay.variable,
+        museo.variable,
+        GeistMono.variable,
+      )}
       lang="en"
-      style={rootStyle}
       suppressHydrationWarning
     >
       <body>
+        {/* Order is load-bearing: CMS token values first, then Custom Styles,
+            so an editor's Global CSS can override any token. Both sit above any
+            painted element, so neither causes a flash of unstyled content. */}
+        {tokenCss ? (
+          <style id="verify-design-tokens" dangerouslySetInnerHTML={{ __html: tokenCss }} />
+        ) : null}
         <CustomCSS />
         <MotionObserver />
         <Providers>
@@ -74,7 +140,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
           {children}
           <Footer />
-          <EnquiryDrawer />
+          <EnquiryDrawer formId={enquiryFormId} />
         </Providers>
       </body>
     </html>

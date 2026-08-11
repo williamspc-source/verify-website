@@ -1,6 +1,10 @@
 import type { Payload, PayloadRequest } from 'payload'
 import { readFileSync } from 'fs'
 import path from 'path'
+import {
+  safeRevalidatePath as revalidatePath,
+  safeRevalidateTag as revalidateTag,
+} from '@/utilities/safeRevalidate'
 
 import { seedDataLayer } from './seed/seedDataLayer'
 import { seedAvailability } from './seed/seedAvailability'
@@ -13,7 +17,8 @@ import { seedSpecialists } from './seed/seedSpecialists'
 import { seedInfoBooking } from './seed/seedInfoBooking'
 import { seedHubs } from './seed/seedHubs'
 import { seedLegal } from './seed/seedLegal'
-import { CONTACT_ROLE_OPTIONS, CONTACT_SERVICE_OPTIONS } from './seed/data/services'
+import { repairServiceLinks } from './seed/seedServiceLinks'
+import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
 
 /* =====================================================================
    Non-destructive scaffold seed for the VERIFY site.
@@ -27,7 +32,22 @@ import { CONTACT_ROLE_OPTIONS, CONTACT_SERVICE_OPTIONS } from './seed/data/servi
    gain a list/archive block rather than a new route.
    ===================================================================== */
 
-// ── Minimal Lexical helpers (matches endpoints/seed/home-static.ts) ──
+// Globals the seed writes, whose cache tags it must purge when it finishes.
+// Keep in step with the globals registered in payload.config.ts.
+const GLOBAL_SLUGS = [
+  'header',
+  'footer',
+  'site-settings',
+  'specialist-availability',
+  'specialist-profile',
+  'article-settings',
+  'events-settings',
+  'team-settings',
+  'custom-styles',
+  'design-system',
+] as const
+
+// ── Minimal Lexical helpers ──
 // `format` is the Lexical inline-format bitmask (1 = bold).
 const textNode = (text: string, format = 0) => ({
   type: 'text',
@@ -152,14 +172,16 @@ const heroFor = (title: string) => ({
   richText: richText([heading(title, 'h1')]),
 })
 
-// A standard page hero (eyebrow + heading + subtitle). Breadcrumb off — the
-// header nav already provides wayfinding, and the design reference has none.
+// A standard page hero (eyebrow + heading + subtitle). The breadcrumb is left to
+// the field's own `defaultValue: true` — an earlier `showBreadcrumb: false` here
+// was wrong on both counts: the design reference does carry a trail on these
+// pages (Contact included), and the header nav gives no sense of depth. Note the
+// eyebrow only renders when the trail doesn't; see PageHero.
 const pageHero = (eyebrow: string, headingText: string, subtitle: string) => ({
   type: 'pageHero' as const,
   eyebrow,
   heading: headingText,
   subtitle,
-  showBreadcrumb: false,
 })
 
 const slugify = (s: string) =>
@@ -380,8 +402,13 @@ const STYLE_PRESETS: { name: string; label: string; description: string; css: st
     name: 'carousel-arrows-overlay',
     label: 'Carousel · Overlay arrows',
     description: 'Places the arrows over the carousel sides.',
-    css: `.carousel-arrows-overlay .vf-carousel__controls { position: absolute; inset: 50% 0 auto 0; transform: translateY(-50%); justify-content: space-between; margin: 0; pointer-events: none; }
-.carousel-arrows-overlay .vf-carousel__arrow { pointer-events: auto; box-shadow: var(--shadow-lg); }`,
+    // Targets .vf-carousel__arrow directly: ExpertsCarousel renders the arrows
+    // as siblings of the viewport with no .vf-carousel__controls wrapper, so the
+    // original selector matched nothing and this preset did nothing at all.
+    css: `.carousel-arrows-overlay { position: relative; }
+.carousel-arrows-overlay .vf-carousel__arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; pointer-events: auto; box-shadow: var(--vf-shadow-lg); }
+.carousel-arrows-overlay .vf-carousel__arrow--prev { left: 0; }
+.carousel-arrows-overlay .vf-carousel__arrow--next { right: 0; }`,
   },
   // Icons / avatars
   {
@@ -394,14 +421,19 @@ const STYLE_PRESETS: { name: string; label: string; description: string; css: st
     name: 'avatar-gradient',
     label: 'Avatars · Gradient initials',
     description: 'Gradient background behind initials avatars.',
-    css: '.avatar-gradient .vf-person-card__avatar-initials { background: linear-gradient(135deg, var(--primary), var(--secondary-2)); color: #fff; }',
+    // The initials element is `.avatar-mono` (PersonCard renders it on both the
+    // team-card and specialist-card treatments). `.vf-person-card__avatar-initials`
+    // was never emitted by anything, so this preset was a no-op.
+    css: '.avatar-gradient .avatar-mono { background: linear-gradient(135deg, var(--primary), var(--secondary-2)); color: var(--white); }',
   },
   // Effects
   {
     name: 'divider-accent',
     label: 'Divider · Bold',
     description: 'Widens/thickens the section-header divider.',
-    css: '.divider-accent .vf-section-header__divider { width: 80px; height: 4px; }',
+    // SectionHeader renders the rule as plain `.divider`, never
+    // `.vf-section-header__divider` — the documented name that never existed.
+    css: '.divider-accent .vf-section-header .divider { width: 80px; height: 4px; }',
   },
   {
     name: 'lift-on-hover',
@@ -422,8 +454,20 @@ export const seedVerify = async ({
 
   const idBySlug = new Map<string, number | string>()
 
-  // Create (or reuse) every page, parents first.
+  // Reads the parent id off a page doc whether the relationship came back as an
+  // object (populated) or a bare id (depth 0).
+  const parentIdOf = (doc: { parent?: unknown }): number | string | null => {
+    const p = doc.parent
+    if (p && typeof p === 'object') return (p as { id: number | string }).id
+    return (p as number | string | null | undefined) ?? null
+  }
+
+  // Create (or reuse) every page, parents first. PAGE_TREE is ordered parents-
+  // before-children, so idBySlug always has the parent id by the time a child is
+  // processed and breadcrumbs cascade correctly.
   for (const node of PAGE_TREE) {
+    const intendedParent = node.parent ? (idBySlug.get(node.parent) ?? null) : null
+
     const existing = await payload.find({
       collection: 'pages',
       where: { slug: { equals: node.slug } },
@@ -433,12 +477,37 @@ export const seedVerify = async ({
     })
 
     if (existing.docs[0]) {
-      idBySlug.set(node.slug, existing.docs[0].id)
-      payload.logger.info(`— Page exists, skipping: /${node.slug}`)
+      const doc = existing.docs[0]
+      idBySlug.set(node.slug, doc.id)
+
+      // Repair pass: production pages predate the nested tree because this branch
+      // used to `continue` without ever setting `parent` (it's only assigned on
+      // create). Re-point such a page so its URL migrates flat → nested
+      // (e.g. /ime → /services/medico-legal/ime). nested-docs recomputes this
+      // page's (and its descendants') breadcrumbs on save.
+      //
+      // Only pages with NO parent are repaired. This used to re-point any page
+      // whose parent merely differed from PAGE_TREE, which meant a deliberate
+      // move by an editor was silently reverted on the next seed — changing a
+      // live URL with no redirect left behind and no revalidation, so the old
+      // path 404'd and the new one stayed uncached. An editor's decision beats
+      // a code fixture.
+      const currentParent = parentIdOf(doc)
+      if (currentParent == null && intendedParent) {
+        await payload.update({
+          collection: 'pages',
+          id: doc.id,
+          depth: 0,
+          req,
+          context: { disableRevalidate: true },
+          data: { parent: intendedParent } as never,
+        })
+        payload.logger.info(`— Repaired parent for /${node.slug} → under ${node.parent}`)
+      } else {
+        payload.logger.info(`— Page exists: /${node.slug}`)
+      }
       continue
     }
-
-    const parentId = node.parent ? idBySlug.get(node.parent) : undefined
 
     const created = await payload.create({
       collection: 'pages',
@@ -451,7 +520,7 @@ export const seedVerify = async ({
         _status: 'published',
         hero: heroFor(node.title),
         layout: placeholderLayout(node.title),
-        ...(parentId ? { parent: parentId } : {}),
+        ...(intendedParent ? { parent: intendedParent } : {}),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
     })
@@ -497,20 +566,23 @@ export const seedVerify = async ({
             pageLink('jme', 'Joint Medical Examination (JME)'),
             {
               ...pageLink('reporting-services', 'Other Reporting Services'),
+              // Canonical nested paths (pages live under /services/medico-legal) so
+              // the in-page anchor survives — a flat /reporting-services#… would
+              // 308-redirect to the nested URL and drop the fragment.
               subSubItems: [
-                customLink('/reporting-services#file-review', 'File Review'),
-                customLink('/reporting-services#supplementary-report', 'Supplementary Report'),
-                customLink('/reporting-services#teleconference', 'Teleconference'),
-                customLink('/reporting-services#expert-evidence', 'Expert Evidence'),
+                customLink('/services/medico-legal/reporting-services#file-review', 'File Review'),
+                customLink('/services/medico-legal/reporting-services#supplementary-report', 'Supplementary Report'),
+                customLink('/services/medico-legal/reporting-services#teleconference', 'Teleconference'),
+                customLink('/services/medico-legal/reporting-services#expert-evidence', 'Expert Evidence'),
               ],
             },
             {
               ...pageLink('admin-services', 'Administrative Services'),
               subSubItems: [
-                customLink('/admin-services#surrogate-assessment', 'Surrogate Assessment Service'),
-                customLink('/admin-services#interpreter-booking', 'Interpreter Booking Service'),
-                customLink('/admin-services#brief-reduction', 'Brief Reduction Service'),
-                customLink('/admin-services#letter-of-instruction-review', 'Letter of Instruction Review'),
+                customLink('/services/medico-legal/admin-services#surrogate-assessment', 'Surrogate Assessment Service'),
+                customLink('/services/medico-legal/admin-services#interpreter-booking', 'Interpreter Booking Service'),
+                customLink('/services/medico-legal/admin-services#brief-reduction', 'Brief Reduction Service'),
+                customLink('/services/medico-legal/admin-services#letter-of-instruction-review', 'Letter of Instruction Review'),
               ],
             },
           ],
@@ -817,12 +889,20 @@ export const seedVerify = async ({
   // ── Enquiry drawer form + Join-panel EOI form (per-form recipient email) ──
   {
     const RECIPIENT = 'admin@vmls.com.au'
+    /**
+     * Returns the form's id in BOTH branches — created and already-existing.
+     *
+     * It used to return `void` and bail early when the form existed, so anything
+     * built on top of it (like the Site Settings pointer below) could only ever
+     * run on a virgin database. Repairs that live inside a create branch never
+     * repair anything; that is the same trap the `authorPage` early-return set.
+     */
     const ensureForm = async (
       title: string,
       fields: unknown[],
       submitButtonLabel: string,
       subject: string,
-    ): Promise<void> => {
+    ): Promise<number | string> => {
       const existing = await payload.find({
         collection: 'forms',
         where: { title: { equals: title } },
@@ -832,9 +912,9 @@ export const seedVerify = async ({
       })
       if (existing.docs[0]) {
         payload.logger.info(`— ${title} form already exists, skipping`)
-        return
+        return existing.docs[0].id
       }
-      await payload.create({
+      const created = await payload.create({
         collection: 'forms',
         depth: 0,
         req,
@@ -858,11 +938,13 @@ export const seedVerify = async ({
         } as any,
       })
       payload.logger.info(`— Created ${title} form (recipient ${RECIPIENT})`)
+      return created.id
     }
 
-    // The site-wide slide-out drawer looks this up by title "Enquiry" — field
-    // names must match the drawer inputs.
-    await ensureForm(
+    // Field names must match the drawer inputs exactly: EnquiryDrawer refuses to
+    // submit when a filled-in field has no slot on the form, rather than storing
+    // a partial enquiry that looks complete in the admin list.
+    const enquiryFormId = await ensureForm(
       'Enquiry',
       [
         { blockType: 'text', name: 'first_name', label: 'First Name', width: 50, required: true },
@@ -912,6 +994,36 @@ export const seedVerify = async ({
       'Send Enquiry',
       'New expert-panel expression of interest',
     )
+
+    // Point the site-wide enquiry drawer at the form. This is what makes the
+    // drawer usable at all: with `site-settings.enquiryForm` empty the drawer
+    // initialises to 'unavailable' and its Send button is disabled on every page.
+    //
+    // Runs UNCONDITIONALLY, outside `ensureForm`'s early-return, so it also
+    // repairs a database that was seeded before this field existed. Only writes
+    // when the value would actually change, so a re-seed doesn't churn the global
+    // (and doesn't stomp a deliberate choice of a different form).
+    const currentSettings = await payload.findGlobal({ slug: 'site-settings', depth: 0, req })
+    const currentEnquiryForm = currentSettings?.enquiryForm
+    const currentEnquiryFormId =
+      currentEnquiryForm && typeof currentEnquiryForm === 'object'
+        ? currentEnquiryForm.id
+        : currentEnquiryForm
+
+    if (currentEnquiryFormId == null) {
+      await payload.updateGlobal({
+        slug: 'site-settings',
+        depth: 0,
+        req,
+        context: { disableRevalidate: true },
+        data: { enquiryForm: enquiryFormId as number },
+      })
+      payload.logger.info(`— Pointed Site Settings → Enquiry drawer form at form ${enquiryFormId}`)
+    } else {
+      payload.logger.info(
+        `— Site Settings → Enquiry drawer form already set (form ${currentEnquiryFormId}), leaving it`,
+      )
+    }
   }
 
   // ── Content globals: Specialist Profile CTA, Article sidebar, Events host copy ──
@@ -922,7 +1034,7 @@ export const seedVerify = async ({
     const settings = await payload.findGlobal({ slug: 'site-settings', depth: 0, req })
 
     if (settings?.logo) {
-      payload.logger.info('— Site settings already has a logo, skipping branding seed')
+      payload.logger.info('— Site settings already has a logo, skipping logo upload')
     } else {
       const publicDir = path.resolve(process.cwd(), 'public')
       const logoFile = readFileSync(path.join(publicDir, 'verify-logo.png'))
@@ -961,19 +1073,56 @@ export const seedVerify = async ({
           siteName: 'VERIFY Medico-Legal Solutions',
           logo: logoDoc.id,
           favicon: faviconDoc.id,
-          colors: {
-            primary: '#1c75bc',
-            primaryStrong: '#155fa0',
-            text: '#414042',
-            mutedText: '#737373',
-            accent: '#cbe5fa',
-            border: '#c6c6c6',
-          },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
       })
 
-      payload.logger.info('— Uploaded logo + favicon and populated site settings')
+      payload.logger.info('— Uploaded logo + favicon')
+    }
+
+    // Brand palette repair. Runs unconditionally: the logo check above used to
+    // guard this too, so any site that already had a logo never received colour
+    // fixes. Stored values are inlined onto <html> and outrank the globals.css
+    // defaults, so a stale value here silently defeats a CSS-level correction.
+    //
+    // Only fills what is empty, plus retires known-stale values — an admin's own
+    // choices are left alone, and re-running is a no-op.
+    const current = (settings?.colors ?? {}) as Record<string, string | null | undefined>
+    const STALE = { mutedText: ['#737373'] } as Record<string, string[]>
+    const DEFAULTS: Record<string, string> = {
+      primary: '#1c75bc',
+      primaryStrong: '#155fa0',
+      text: '#414042',
+      // Design reference styles.css:20. Was #737373, which put secondary copy
+      // well below the reference's contrast on every page.
+      mutedText: '#222222',
+      accent: '#cbe5fa',
+      border: '#c6c6c6',
+      textOnDark: '#ffffff',
+      mutedTextOnDark: 'rgba(255,255,255,0.82)',
+      accentOnDark: '#93d0f7',
+      borderOnDark: 'rgba(255,255,255,0.35)',
+    }
+
+    const repaired: Record<string, string> = {}
+    for (const [key, value] of Object.entries(DEFAULTS)) {
+      const stored = current[key]?.trim()
+      if (!stored || STALE[key]?.includes(stored.toLowerCase())) repaired[key] = value
+    }
+
+    if (Object.keys(repaired).length) {
+      await payload.updateGlobal({
+        slug: 'site-settings',
+        depth: 0,
+        req,
+        // Deliberately NOT disableRevalidate: these colours are read through
+        // getCachedGlobal and inlined onto <html>, so without purging the tag the
+        // repair sits in the database while every page keeps serving the old
+        // palette. It's a single write, so there's no revalidation storm to avoid.
+        data: { colors: { ...current, ...repaired } },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)
+      payload.logger.info(`— Brand colours repaired: ${Object.keys(repaired).join(', ')}`)
     }
   } catch (e) {
     payload.logger.error({ err: e, message: 'Branding seed skipped (public asset files missing?)' })
@@ -1009,6 +1158,20 @@ export const seedVerify = async ({
       payload.logger.error({ err: e, message: `Page group ${name} failed — skipping` })
     }
   }
+
+  // Point every service card at its canonical nested destination. Runs after the
+  // page groups so all service docs exist; unconditional (unlike seedHomepage,
+  // which early-returns on an already-authored homepage) so it repairs live data.
+  await repairServiceLinks({ payload, req })
+
+  // Every write above passes `disableRevalidate: true` so the seed doesn't fire
+  // hundreds of individual purges — correct, but it left nothing to purge at the
+  // end. Pages self-healed within the hour; the globals did not (their cache
+  // entries carry a 1-year TTL), so seeded nav, branding and settings stayed
+  // invisible until someone happened to save unrelated content. Purge once here.
+  revalidatePath('/', 'layout')
+  for (const slug of GLOBAL_SLUGS) revalidateTag(`global_${slug}`, 'max')
+  payload.logger.info('— Revalidated site layout + global cache tags')
 
   payload.logger.info('VERIFY scaffold seed complete.')
 }

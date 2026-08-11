@@ -4,6 +4,16 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 type Field = { name: string }
 
+export type EnquiryDrawerProps = {
+  /**
+   * Payload Forms id, from Site Settings → Enquiry drawer form. Resolved on the
+   * server so the drawer never has to guess: it used to look the form up by the
+   * literal title "Enquiry", which meant renaming the form in admin silently
+   * routed every enquiry into the "no form seeded" branch below.
+   */
+  formId?: string | null
+}
+
 const ENQUIRY_TYPES = [
   'Medico-Legal Services',
   'Educational Services (AAMLE)',
@@ -15,36 +25,56 @@ const ENQUIRY_TYPES = [
 
 /**
  * Site-wide slide-out enquiry drawer. Opens on any `[data-enquiry-panel]`
- * click (the hook the CMSLink "enquiry" action emits). Submits to the
- * Payload "Enquiry" form (captured in admin + email) when it exists,
- * otherwise degrades to a local confirmation.
+ * click (the hook the CMSLink "enquiry" action emits) and submits to the
+ * Payload form chosen in Site Settings → Enquiry drawer form.
+ *
+ * ── This component must never claim success it cannot prove ─────────────────
+ * It previously fell through to `setStatus('sent')` whenever the form lookup
+ * had not resolved, had thrown, or matched nothing — so a visitor saw "your
+ * enquiry has been sent" and the enquiry was discarded. There is no acceptable
+ * local-acknowledgement branch for a lead-capture form: every path below either
+ * gets a 2xx from Payload or tells the visitor it failed.
  */
-export const EnquiryDrawer: React.FC = () => {
+export const EnquiryDrawer: React.FC<EnquiryDrawerProps> = ({ formId }) => {
   const [open, setOpen] = useState(false)
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [status, setStatus] = useState<
+    'idle' | 'loading' | 'sending' | 'sent' | 'error' | 'unavailable'
+  >(formId ? 'loading' : 'unavailable')
   const [presetType, setPresetType] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
   const formMeta = useRef<{ id: string; fields: Set<string> } | null>(null)
 
-  // Look up the Enquiry form once (id + valid field names).
+  // Fetch the chosen form's field names so we can detect a config mismatch
+  // before submitting. The id itself comes from the server, so a failure here
+  // is a genuine outage rather than "not seeded yet".
+  //
+  // `attempt` is bumped when the drawer is opened while unavailable, so a single
+  // transient failure (a 502 from a restarting server, a dropped connection on a
+  // flaky mobile network) doesn't disable enquiries for the whole lifetime of the
+  // page. Without it the first fetch was the only one that ever ran.
+  const [attempt, setAttempt] = useState(0)
+
   useEffect(() => {
+    if (!formId) return
     let active = true
-    fetch('/api/forms?where[title][equals]=Enquiry&limit=1&depth=0')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        const doc = data?.docs?.[0]
-        if (active && doc?.id) {
-          formMeta.current = {
-            id: String(doc.id),
-            fields: new Set((doc.fields || []).map((f: Field) => f.name).filter(Boolean)),
-          }
+    fetch(`/api/forms/${formId}?depth=0`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`forms ${r.status}`))))
+      .then((doc) => {
+        if (!active) return
+        if (!doc?.id) throw new Error('form not found')
+        formMeta.current = {
+          id: String(doc.id),
+          fields: new Set((doc.fields || []).map((f: Field) => f.name).filter(Boolean)),
         }
+        setStatus('idle')
       })
-      .catch(() => {})
+      .catch(() => {
+        if (active) setStatus('unavailable')
+      })
     return () => {
       active = false
     }
-  }, [])
+  }, [formId, attempt])
 
   const close = useCallback(() => {
     setOpen(false)
@@ -59,7 +89,16 @@ export const EnquiryDrawer: React.FC = () => {
         e.preventDefault()
         const t = trigger.getAttribute('data-enquiry-type')
         if (t) setPresetType(t)
-        setStatus('idle')
+        // Only clear a previous send result — never overwrite 'loading' or
+        // 'unavailable', which describe whether the drawer can submit at all.
+        setStatus((s) => (s === 'sent' || s === 'error' ? 'idle' : s))
+        // Retry the form lookup if it previously failed. Guarded on `formMeta`
+        // rather than on status alone: when the server resolved no form at all
+        // there is nothing to retry, and 'unavailable' is the honest final answer.
+        if (!formMeta.current && formId) {
+          setStatus('loading')
+          setAttempt((n) => n + 1)
+        }
         setOpen(true)
         document.body.style.overflow = 'hidden'
       }
@@ -73,38 +112,56 @@ export const EnquiryDrawer: React.FC = () => {
       document.removeEventListener('click', onClick)
       document.removeEventListener('keydown', onKey)
     }
-  }, [close])
+  }, [close, formId])
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = formRef.current
     if (!form) return
-    const fd = new FormData(form)
-    setStatus('sending')
-
     const meta = formMeta.current
-    if (meta) {
-      const submissionData = Array.from(fd.entries())
-        .filter(([k]) => meta.fields.has(k))
-        .map(([field, value]) => ({ field, value: String(value) }))
-      try {
-        const res = await fetch('/api/form-submissions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ form: meta.id, submissionData }),
-        })
-        if (!res.ok) throw new Error('submit failed')
-        setStatus('sent')
-        form.reset()
-        return
-      } catch {
-        setStatus('error')
-        return
-      }
+    if (!meta) {
+      setStatus('unavailable')
+      return
     }
-    // No form seeded yet — acknowledge locally.
-    setStatus('sent')
-    form.reset()
+
+    const fd = new FormData(form)
+    const entries = Array.from(fd.entries()).map(
+      ([field, value]) => [field, String(value)] as const,
+    )
+
+    // A field the visitor filled in that the Payload form has no slot for would
+    // be dropped on the floor by a filtered submit. Renaming a field in admin
+    // is enough to cause it, so refuse the whole submission rather than store a
+    // partial enquiry that looks complete in the admin list.
+    const dropped = entries.filter(([field, value]) => value !== '' && !meta.fields.has(field))
+    if (dropped.length) {
+      console.error(
+        `[EnquiryDrawer] Payload form ${meta.id} has no field named ${dropped
+          .map(([f]) => `"${f}"`)
+          .join(', ')} — refusing to submit a partial enquiry. Add the field(s) to the form in admin.`,
+      )
+      setStatus('error')
+      return
+    }
+
+    setStatus('sending')
+    try {
+      const res = await fetch('/api/form-submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          form: meta.id,
+          submissionData: entries
+            .filter(([field]) => meta.fields.has(field))
+            .map(([field, value]) => ({ field, value })),
+        }),
+      })
+      if (!res.ok) throw new Error(`form-submissions ${res.status}`)
+      setStatus('sent')
+      form.reset()
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -171,15 +228,24 @@ export const EnquiryDrawer: React.FC = () => {
                 required
               />
             </div>
-            <button type="submit" className="enquiry-panel-submit" disabled={status === 'sending'}>
-              {status === 'sending' ? 'Sending…' : 'Send Enquiry'}
+            <button
+              type="submit"
+              className="enquiry-panel-submit"
+              disabled={status === 'sending' || status === 'loading' || status === 'unavailable'}
+            >
+              {status === 'sending' ? 'Sending…' : status === 'loading' ? 'Loading…' : 'Send Enquiry'}
             </button>
             <div className={`enquiry-panel-confirm${status === 'sent' ? ' is-visible' : ''}`}>
               Thank you — your enquiry has been sent. We&apos;ll be in touch shortly.
             </div>
             {status === 'error' ? (
-              <div className="enquiry-panel-confirm is-visible" style={{ color: '#c0392b' }}>
+              <div className="enquiry-panel-confirm is-visible vf-form-error">
                 Something went wrong. Please email admin@vmls.com.au directly.
+              </div>
+            ) : null}
+            {status === 'unavailable' ? (
+              <div className="enquiry-panel-confirm is-visible vf-form-error">
+                This form is temporarily unavailable. Please email admin@vmls.com.au directly.
               </div>
             ) : null}
           </form>
