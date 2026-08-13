@@ -15,8 +15,8 @@ import { docPath } from '@/utilities/routes'
 // would keep a stale nav link until the global is re-saved. Purge the nav tags on
 // structural changes so nav hrefs and dead items refresh immediately.
 const revalidateNavGlobals = () => {
-  revalidateTag('global_header', 'max')
-  revalidateTag('global_footer', 'max')
+  revalidateTag('global_header')
+  revalidateTag('global_footer')
 }
 
 export const revalidatePage: CollectionAfterChangeHook<Page> = ({
@@ -31,7 +31,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
     if (doc._status === 'published') {
       payload.logger.info(`Revalidating page at path: ${path}`)
       revalidatePath(path)
-      revalidateTag('pages-sitemap', 'max')
+      revalidateTag('pages-sitemap')
     }
 
     // Purge the previous URL when a published page moved (slug/parent change) or
@@ -39,7 +39,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
     if (previousDoc?._status === 'published' && prevPath && prevPath !== path) {
       payload.logger.info(`Revalidating old page at path: ${prevPath}`)
       revalidatePath(prevPath)
-      revalidateTag('pages-sitemap', 'max')
+      revalidateTag('pages-sitemap')
     }
 
     // Nav depends on the page's URL and its published state — refresh it when
@@ -54,7 +54,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { context } }) => {
   if (!context.disableRevalidate) {
     revalidatePath(docPath(doc))
-    revalidateTag('pages-sitemap', 'max')
+    revalidateTag('pages-sitemap')
     // A deleted page may still be linked from the nav; drop the cached globals so
     // the dead item disappears.
     revalidateNavGlobals()

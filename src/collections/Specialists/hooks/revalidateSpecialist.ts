@@ -20,7 +20,7 @@ export const revalidateSpecialist: CollectionAfterChangeHook<Specialist> = ({
         payload.logger.info(`Revalidating specialist at path: ${path}`)
         revalidatePath(path)
       }
-      revalidateTag('specialists-sitemap', 'max')
+      revalidateTag('specialists-sitemap')
     }
 
     // Slug change or unpublish: purge the previous path too.
@@ -28,7 +28,7 @@ export const revalidateSpecialist: CollectionAfterChangeHook<Specialist> = ({
     if (oldPath && oldPath !== specialistPath(doc.slug)) {
       payload.logger.info(`Revalidating old specialist at path: ${oldPath}`)
       revalidatePath(oldPath)
-      revalidateTag('specialists-sitemap', 'max')
+      revalidateTag('specialists-sitemap')
     }
   }
   return doc
@@ -41,7 +41,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Specialist> = ({
   if (!context.disableRevalidate) {
     const path = specialistPath(doc?.slug)
     if (path) revalidatePath(path)
-    revalidateTag('specialists-sitemap', 'max')
+    revalidateTag('specialists-sitemap')
   }
 
   return doc

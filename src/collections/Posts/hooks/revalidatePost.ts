@@ -31,14 +31,14 @@ const revalidatePostRoutes = (post: Post | null | undefined, payload: Payload) =
 
   revalidatePath(IN_THE_LOOP_PATH)
   revalidatePath(`/posts/${post.slug}`)
-  revalidateTag('posts-sitemap', 'max')
+  revalidateTag('posts-sitemap')
 
   // The Header/Footer link field can point at a Post (src/fields/link.ts), and an
   // article's URL is derived from its stream — so reassigning a stream changes a
   // nav href. Those globals are read through unstable_cache, which revalidatePath
   // does not touch, so purge their tags the same way revalidatePage does.
-  revalidateTag('global_header', 'max')
-  revalidateTag('global_footer', 'max')
+  revalidateTag('global_header')
+  revalidateTag('global_footer')
 }
 
 export const revalidatePost: CollectionAfterChangeHook<Post> = ({

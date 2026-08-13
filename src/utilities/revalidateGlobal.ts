@@ -10,7 +10,7 @@ export const revalidateGlobal =
   ({ doc, req: { payload, context } }) => {
     if (!context.disableRevalidate) {
       payload.logger.info(`Revalidating global ${slug}`)
-      revalidateTag(`global_${slug}`, 'max')
+      revalidateTag(`global_${slug}`)
     }
     return doc
   }

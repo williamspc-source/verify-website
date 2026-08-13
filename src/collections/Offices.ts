@@ -28,7 +28,7 @@ import { safeRevalidateTag as revalidateTag } from '@/utilities/safeRevalidate'
 const purgePrimaryOfficeTag = (disabled: unknown, log: (msg: string) => void) => {
   if (disabled) return
   try {
-    revalidateTag('primary-office', 'max')
+    revalidateTag('primary-office')
   } catch (err) {
     log(
       `Offices: could not revalidate the primary-office cache tag (${

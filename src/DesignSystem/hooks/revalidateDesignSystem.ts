@@ -9,7 +9,7 @@ export const revalidateDesignSystem: GlobalAfterChangeHook = ({
   if (!context.disableRevalidate) {
     payload.logger.info(`Revalidating design system`)
 
-    revalidateTag('global_design-system', 'max')
+    revalidateTag('global_design-system')
   }
 
   return doc

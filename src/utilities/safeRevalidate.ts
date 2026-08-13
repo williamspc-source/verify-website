@@ -53,15 +53,46 @@ export const safeRevalidatePath = (
   }
 }
 
-// Next 16 requires a cacheLife profile alongside the tag; every call site in this
-// repo passes 'max', so that is the default rather than something to remember.
-export const safeRevalidateTag = (
-  tag: string,
-  profile: 'max' | 'default' = 'max',
-  logger?: Logger,
-): void => {
+/**
+ * Purge a cache tag **now**.
+ *
+ * ── Why there is no `profile` parameter ─────────────────────────────────────
+ * There used to be one, defaulting to `'max'`, and every call site passed it.
+ * That was close to the opposite of a purge. Traced through `next@16.2.6`:
+ *
+ *   1. the built-in `max` profile is `{ stale: 300, revalidate: 2592000,
+ *      expire: 31536000 }` — `server/config-shared.js`
+ *   2. given *any* profile, `FileSystemCache.revalidateTag` sets
+ *      `stale = now` and `expired = now + expire * 1000` — so a **year** into
+ *      the future. Given **no** profile it sets `expired = now`
+ *      — `server/lib/incremental-cache/file-system-cache.js:53-74`
+ *   3. `areTagsExpired` requires `expiredAt <= now`, which a year in the future
+ *      never satisfies — `.../tags-manifest.external.js`
+ *
+ * So the entry was only ever marked *stale*, never *expired*: stale-while-
+ * revalidate. Measured under `next start` on 2026-08-13, editing a Design
+ * System token through the admin and watching `--vf-text-scale` in the served
+ * HTML:
+ *
+ *   edit -> t+2s reload = OLD value   <- what the editor sees
+ *           t+7s reload = new value
+ *
+ * The first reload after every save showed the previous value, and under
+ * several quick edits the page ran two versions behind. An editor changes a
+ * brand colour, reloads, sees no change, and concludes the save did not work —
+ * the "appears to work when it doesn't" failure the invariants exist to stop.
+ *
+ * `{ expire: 0 }` gives `expired = now + 0` — an immediate, *hard* expiry,
+ * matching the legacy one-argument behaviour without its deprecation warning.
+ * A named profile can never be passed again, because the parameter is gone.
+ *
+ * Note this only reaches the tag manifest of the process that calls it. A write
+ * made from a CLI script (`payload run`, a migration) runs its hooks in *that*
+ * process and cannot purge a separately running server — see CLAUDE.md.
+ */
+export const safeRevalidateTag = (tag: string, logger?: Logger): void => {
   try {
-    revalidateTag(tag, profile)
+    revalidateTag(tag, { expire: 0 })
   } catch (err) {
     report(logger, `tag ${tag}`, err)
   }

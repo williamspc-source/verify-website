@@ -9,7 +9,7 @@ export const revalidateSpecialistAvailability: GlobalAfterChangeHook = ({
   if (!context.disableRevalidate) {
     payload.logger.info(`Revalidating specialist availability settings`)
 
-    revalidateTag('global_specialist-availability', 'max')
+    revalidateTag('global_specialist-availability')
   }
 
   return doc

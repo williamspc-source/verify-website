@@ -1170,7 +1170,7 @@ export const seedVerify = async ({
   // entries carry a 1-year TTL), so seeded nav, branding and settings stayed
   // invisible until someone happened to save unrelated content. Purge once here.
   revalidatePath('/', 'layout')
-  for (const slug of GLOBAL_SLUGS) revalidateTag(`global_${slug}`, 'max')
+  for (const slug of GLOBAL_SLUGS) revalidateTag(`global_${slug}`)
   payload.logger.info('— Revalidated site layout + global cache tags')
 
   payload.logger.info('VERIFY scaffold seed complete.')

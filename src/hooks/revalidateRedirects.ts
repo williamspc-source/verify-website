@@ -12,7 +12,7 @@ export const revalidateRedirects: CollectionAfterChangeHook & CollectionAfterDel
 }) => {
   if (!context.disableRevalidate) {
     payload.logger.info(`Revalidating redirects`)
-    revalidateTag('redirects', 'max')
+    revalidateTag('redirects')
   }
 
   return doc

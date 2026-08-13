@@ -28,14 +28,14 @@ export const revalidateEvent: CollectionAfterChangeHook<Event> = ({
         revalidatePath(path)
       }
       revalidateListings()
-      revalidateTag('events-sitemap', 'max')
+      revalidateTag('events-sitemap')
     }
 
     if (previousDoc?._status === 'published' && doc._status !== 'published') {
       const oldPath = eventPath(previousDoc.slug)
       if (oldPath) revalidatePath(oldPath)
       revalidateListings()
-      revalidateTag('events-sitemap', 'max')
+      revalidateTag('events-sitemap')
     }
   }
   return doc
@@ -49,7 +49,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Event> = ({
     const path = eventPath(doc?.slug)
     if (path) revalidatePath(path)
     revalidateListings()
-    revalidateTag('events-sitemap', 'max')
+    revalidateTag('events-sitemap')
   }
 
   return doc

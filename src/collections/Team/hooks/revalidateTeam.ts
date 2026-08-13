@@ -21,14 +21,14 @@ export const revalidateTeam: CollectionAfterChangeHook<Team> = ({
         revalidatePath(path)
       }
       revalidatePath(TEAM_INDEX_PATH)
-      revalidateTag('team-sitemap', 'max')
+      revalidateTag('team-sitemap')
     }
 
     const oldPath = teamPath(previousDoc?.slug)
     if (oldPath && oldPath !== teamPath(doc.slug)) {
       revalidatePath(oldPath)
       revalidatePath(TEAM_INDEX_PATH)
-      revalidateTag('team-sitemap', 'max')
+      revalidateTag('team-sitemap')
     }
   }
   return doc
@@ -42,7 +42,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Team> = ({
     const path = teamPath(doc?.slug)
     if (path) revalidatePath(path)
     revalidatePath(TEAM_INDEX_PATH)
-    revalidateTag('team-sitemap', 'max')
+    revalidateTag('team-sitemap')
   }
 
   return doc
