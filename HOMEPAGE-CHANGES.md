@@ -10,11 +10,17 @@ the reason) or `Deferred` (logged in `OUTSTANDING.md` with its cost).
 Read the three lists after the table too: **new/removed admin controls**, **database changes that
 will not travel with a git push**, and **what was left undone**.
 
-> **A second pass followed on the same day** and closed three of the deferred items — including one
-> that turned out to be a live site-wide bug, not a homepage issue. It has its own section:
-> [Second pass — the deferred items, closed](#second-pass--the-deferred-items-closed). Where the
+> **Three further passes followed**, each with its own section at the end of this file. Where the
 > first pass's text below has been overtaken, it is marked rather than rewritten, so the record
 > stays a history and not just a snapshot.
+>
+> 1. [Second pass — the deferred items, closed](#second-pass--the-deferred-items-closed). Three
+>    deferred items, including one that turned out to be a live site-wide bug rather than a homepage
+>    issue.
+> 2. [Third pass — every image uploadable from the admin](#third-pass--every-image-uploadable-from-the-admin).
+>    Closes B14, and fixes a shield that followed Site Settings on the homepage and nowhere else.
+> 3. [Fourth pass — centred section titles were wrapping at 720px](#fourth-pass--centred-section-titles-were-wrapping-at-720px).
+>    One un-ported `max-width` was breaking 10 headings across 8 pages.
 
 ---
 
@@ -50,7 +56,7 @@ will not travel with a git push**, and **what was left undone**.
 | **B11** | Hero | Definition panel offset 48px down; 24px internal gap (`index.html:48`, `styles.css:520-528`) | No offset; 16px gap plus a −6px pull | Restored | Homepage → the definition panel sits lower than the heading, with more room inside | Fixed |
 | **B12** | AAMLE panel | Panel 2's pill is brighter (`styles.css:1334`) | The brighter style existed but nothing could apply it | New **Badge emphasis** control (Plain / Highlight) on each step | Educational Services → "CPD Eligible" stands out. Admin → Process Steps → a step → **Badge emphasis** | Fixed |
 | **B13** | Featured Specialists | `#f0f2f4` (`styles.css:1647`) | `#f5f6f8` — and this can't be fixed by retuning the shared token, because the reference genuinely uses the lighter grey for the cards band above | New **Band · Deeper grey** preset, applied to that section | Homepage → the specialists band is a touch deeper than the cards band | Fixed |
-| **B14** | Who We Are | Plain sentence-case placeholder label, no icon, plus a vignette | An icon above an uppercase label | **Not done** — see below | — | Deliberate |
+| **B14** | Who We Are | Plain sentence-case placeholder label, no icon, plus a vignette | An icon above an uppercase label | Deferred at the time; **done in the third pass** — icon dropped, 0.85rem sentence-case label, radial vignette, shared with `.who-image-main` | Homepage → Who We Are, and every Split Feature row awaiting a photo | Fixed |
 | **B15** | AAMLE sponsor | 36×40 padding, icon top-aligned, no hover | 30×36, icon centred, and it inherited a blue bar that wiped across on hover — on a panel that isn't a link | Corrected; hover artefact removed | Educational Services → the sponsorship callout doesn't animate on hover | Fixed |
 
 ### Deliberate — left different from the reference, on purpose
@@ -140,7 +146,7 @@ them applied by hand in the admin.
 | # | Item | Why | Logged | Status |
 |---|---|---|---|---|
 | 1 | **Bold/italic inside a process-step description** — the AAMLE panel loses two emphasised phrases | Needs the field to become rich text: a `varchar → jsonb` column change affecting **26 descriptions across 6 blocks in 4 files**, and this repo has already had a destructive schema change hang the local server. Two emphasised phrases on one panel did not justify that risk in the same pass as the visual work | ~~`OUTSTANDING.md` §7~~ | **Done in the second pass** |
-| 2 | **Split-feature image placeholder** typography | **16 rows** across the site use it, and every one is scaffolding awaiting a real photograph — the moment an image is uploaded, none of it renders. Restyling temporary content in 16 places is churn | `OUTSTANDING.md` §6 (renumbered) | Still outstanding |
+| 2 | **Split-feature image placeholder** typography | **16 rows** across the site use it, and every one is scaffolding awaiting a real photograph — the moment an image is uploaded, none of it renders. Restyling temporary content in 16 places is churn | ~~`OUTSTANDING.md` §6 (renumbered)~~ | **Done in the third pass** |
 | 3 | Two hardcoded colours in the enquiry drawer (`#155a8f` is gone, but `#2e9e5a` on the confirmation message remains) | Out of scope for a homepage styling pass; changing it shifts a visible green | mentioned here | **Done in the second pass** |
 
 ### One thing found that is bigger than the homepage
@@ -318,3 +324,137 @@ Settings field. The green shifts very slightly (to `#16a34a`) and becomes editab
 
 The homepage's own AAMLE panel is **not** in that diff, because it lives inside an inactive tab that
 is not server-rendered — which is itself one of the new traps. It was checked in a browser instead.
+
+---
+
+# Third pass — every image uploadable from the admin
+
+The site ships before its photography exists, so the question was not "are the placeholders pretty"
+but "can the person taking this over add all 20 photographs from `/admin`, with no developer".
+
+**The capability was already there, with one exception.** All four blocks that draw a placeholder
+(`SplitFeature`, `AamleEducation`, `LeadershipSpotlight`, `WhyVerify`) have a Media upload field, and
+in every one an uploaded image *wins* over the placeholder. The bundled logo and footer logo are
+fallbacks behind Site Settings, not hardcoding.
+
+## 1. The brand shield followed Site Settings on the homepage and nowhere else
+
+Not in the register — found while auditing. The shield read from **Site Settings → Shield** on the
+home hero, but was a hardcoded CSS background on `.page-hero-shield` (behind **every** interior page
+hero) and on the Contact page's portal cards. Uploading a new shield changed the homepage and left
+the rest of the site on the old one.
+
+Fixed by emitting a `--vf-shield-url` token from the same field, so all three surfaces follow it.
+Because editor-supplied values land inside a `<style>` tag *and* inside `url("…")`, the new
+`safeUrlToken()` in `src/utilities/cssTokens.ts` rejects any URL containing `'`, `"`, `(`, `)` or a
+backslash rather than trusting Payload's filename normalisation.
+
+**Proven in a browser, not in the database:** uploaded a distinct image, watched all three surfaces
+change, cleared it, watched all three revert.
+
+## 2. The split-feature placeholder, finished (B14 / register §2)
+
+Brought to the reference's `.who-image-main` treatment: no icon, 0.85rem sentence-case label at
+weight 600, radial vignette, 135° gradient. Written once and shared by both selectors.
+
+**One correction to the register's framing.** It said the 145° gradient was wrong. It is not: the
+reference uses 135° for the photo box but **145° for specialist avatars**, and
+`--vf-grad-image-tint` has nine consumers, all avatar-type tints. Retuning it would have pushed
+eight surfaces *away* from the reference. The placeholder takes an explicit 135° gradient instead,
+still built from Site Settings brand colours.
+
+## 3. Two guards so it stays true
+
+The build now fails if a brand asset is referenced straight from a CSS rule instead of through a
+Site Settings token (this is what would have caught the shield), or if a block draws an image
+placeholder without offering an upload to replace it.
+
+---
+
+# Fourth pass — centred section titles were wrapping at 720px
+
+Reported: **"Comprehensive Medico-Legal Services"** and **"Medico-Legal Support, Tailored to You"**
+render on two lines here and one line in the design reference.
+
+## The cause
+
+One declaration, with no counterpart in the reference. Everything else in that heading stack was
+ported faithfully — `.section-title` is byte-identical to `styles.css:56-64`, and `.container`
+matches at 1180px/24px. But `SectionHeader` wraps centred headers in a div the reference does not
+have:
+
+```css
+.vf-section-header--centered { max-width: var(--vf-measure, 720px); }
+```
+
+The reference puts the same headings in `.what-header` / `.audience-gateway-intro`, neither of which
+sets a width, so the `<h2>` gets the container's full **1132px**. Only the *subtitle* is narrowed
+there (600px / 640px) — and both of those rules **were** ported. The 720px came from the component's
+old inline styles.
+
+Measured at 1440px: the two headings need **808px** and **798px**, and were given 720px. Below a
+~1130px viewport the `3vw` clamp shrinks the type enough that they fit anyway, which is why this
+only showed on desktop.
+
+| | Before | After |
+|---|---|---|
+| Centred section headers site-wide | 37 | 37 |
+| Wrapping at 1440px | 13 | **3** |
+| Wrapping at 768px | 0 | 0 |
+
+The three that still wrap are limited by their own column, not by the cap: the enquiry panel's
+heading (445px), the JME FAQ's (380px), and `/services` "Coordinated Support for Every Matter",
+whose header is a `.svc-admin-split` grid giving the title a 620px track.
+
+## What changed
+
+- `max-width` removed from `.vf-section-header--centered`, with a comment at the rule recording why
+  it must not come back.
+- `--vf-measure: 720px` deleted — that rule was its only consumer repo-wide. `--vf-measure-narrow`
+  stays; `ContactDetails` reads it.
+- **No `text-wrap: balance`.** The reference sets it only on `.hero-heading`.
+
+## New guard
+
+`tests/e2e/frontend.e2e.spec.ts` — *"centred section headers do not narrow themselves into a wrap"*,
+over `/`, `/about`, `/services` and `/services/medico-legal/admin-services`.
+
+It states the fault as a causal claim rather than a width comparison: neutralise the header's own
+`max-width`, and if a two-line title collapses to one, the header did that to itself. That framing
+is what exempts the legitimate cases without an allowlist — and the first version, which compared
+natural width against the nearest `.container`, got it wrong and reported `/services` as broken.
+
+## Verification — fourth pass
+
+| Check | Result |
+|---|---|
+| `pnpm lint` · `pnpm exec tsc --noEmit` | Clean · Clean |
+| `pnpm test:int` | **114/114** |
+| `pnpm build` | Passes |
+| `pnpm test:e2e` | **12/12** (was 8; the new guard adds 4) |
+| New guard proven RED | 2 violations on `/`, 1 on `/about`, 2 on admin-services — and `/services` correctly stays green |
+| Page sweep, 29 pages × 4 viewports | 13 wraps → 3 at 1440/1280/1024; 0 → 0 at 768. **No title anywhere gained a line**, and **no subtitle changed width** |
+| Computed-style diff vs a baseline captured before the change | **72 nodes changed, all 72 classified**, node count identical (6454 → 6454) |
+| CSS actually reached the browser | `getComputedStyle` reports `max-width: none` and a 1132px header, with `nav.site-nav → position: sticky` as a positive control |
+
+**The 72 changed nodes, classified:**
+
+| Count | What |
+|---|---|
+| 45 | Header and auto-width children, `720px → 1132px` |
+| 6 | Same, in a narrower band: `720px → 772px` |
+| 23 | `−50px` height — one 50px line removed from an unwrapped heading, and its ancestors |
+| 3 | `−100px` height — `/`'s body, main and article, which each contain two unwrapped headings |
+| 3 | Scroll-reveal animation frames (sub-pixel `matrix()`, opacity 0.998 → 1) — the known signature |
+
+## Also found while verifying
+
+The computed-style harness had **two dead routes**: `/about-verify` and `/legal/privacy-policy` both
+404, and since `capture` never checked status it banked the not-found page as a baseline twice
+(178 nodes each — identical counts, which is how it was spotted) while `/about` and
+`/privacy-policy` went unmeasured. Corrected, and `capture` now refuses any non-200. Coverage went
+6454 → 6675 nodes.
+
+`README.md` also warned that the harness does **not** measure `width`, `height`,
+`grid-template-columns` or `transform`. All four had been added; the warning argued against trusting
+the one gate that catches exactly this class of bug. Corrected.

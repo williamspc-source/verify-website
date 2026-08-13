@@ -86,6 +86,93 @@ test.describe('Frontend', () => {
     })
   }
 
+  /**
+   * A centred section header must not narrow itself into a line break.
+   *
+   * `.vf-section-header--centered` used to carry `max-width: var(--vf-measure,
+   * 720px)`, inherited from the component's old inline styles and with no
+   * counterpart in the design reference, where the same headings get the
+   * container's full 1132px. Measured at 1440px it wrapped 10 titles across 8
+   * pages, including the homepage's "Comprehensive Medico-Legal Services"
+   * (needs 808px) and "Medico-Legal Support, Tailored to You" (798px).
+   *
+   * The test states that as a causal claim rather than a width comparison: take
+   * away the header's OWN `max-width`, and if a title that was on two lines
+   * collapses to one, the header did that to itself.
+   *
+   * Framing it that way is what makes it exempt the legitimate cases without an
+   * allowlist, and the first version of this test — natural width vs. the
+   * nearest `.container` — got that wrong. It reported `/services` as broken:
+   * that header is `display: grid` (`.svc-admin-split`), so its title correctly
+   * occupies a 620px track of a 1132px container and neutralising `max-width`
+   * changes nothing. Same for a title in a narrow column (the enquiry panel's,
+   * the JME FAQ's) and for one that genuinely outruns the full container.
+   *
+   * The `<br>` skip is load-bearing: `accentText()` turns an editor-typed
+   * newline in the heading field into a `<br>`, so two lines there are the
+   * editor's decision, not a layout fault.
+   *
+   * Proven red by restoring `max-width: var(--vf-measure, 720px)` on
+   * `.vf-section-header--centered` in `src/app/(frontend)/globals.css` (and
+   * `--vf-measure: 720px` in `:root`) — a guard that has never failed is not
+   * evidence. With that restored it reports 2 violations on `/`, 1 on `/about`
+   * and 2 on `/services/medico-legal/admin-services`, and still none on
+   * `/services`.
+   */
+  for (const path of ['/', '/about', '/services', '/services/medico-legal/admin-services']) {
+    test(`${path} centred section headers do not narrow themselves into a wrap`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 1440, height: 900 })
+      await page.goto(path)
+
+      const measured = await page.evaluate(() => {
+        const rows: { text: string; before: number; after: number; capped: string }[] = []
+
+        document
+          .querySelectorAll<HTMLElement>('.vf-section-header--centered')
+          .forEach((header) => {
+            const title = header.querySelector<HTMLElement>('.section-title')
+            if (!title || title.querySelector('br')) return
+
+            const lineHeight = parseFloat(getComputedStyle(title).lineHeight)
+            if (!lineHeight) return
+            const lines = () => Math.round(title.getBoundingClientRect().height / lineHeight)
+
+            const before = lines()
+            const capped = getComputedStyle(header).maxWidth
+
+            // Neutralise only the header's own max-width, then put it back.
+            const inline = header.style.maxWidth
+            header.style.maxWidth = 'none'
+            const after = lines()
+            header.style.maxWidth = inline
+
+            rows.push({ text: title.textContent?.trim().slice(0, 60) ?? '', before, after, capped })
+          })
+
+        return rows
+      })
+
+      // A positive control. Without it, "no violations" would be vacuously true
+      // the moment the selector stopped matching — the shape of failure that made
+      // three earlier guards in this repo meaningless.
+      expect(
+        measured.length,
+        'should have found centred section headers to measure',
+      ).toBeGreaterThan(0)
+
+      const selfInflicted = measured.filter((m) => m.after < m.before)
+
+      expect(
+        selfInflicted,
+        `these headers wrapped their own title by capping their width:\n${selfInflicted
+          .map((m) => `  "${m.text}" — ${m.before} lines at max-width ${m.capped}, ${m.after} without`)
+          .join('\n')}`,
+      ).toEqual([])
+    })
+  }
+
   test('the enquiry drawer opens and can be submitted', async ({ page }) => {
     await page.goto('/')
 

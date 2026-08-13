@@ -140,8 +140,18 @@ When one fails, wire the control up; if it genuinely should not be wired, add it
 **with a reason**.
 
 `tests/visual/computedSnapshot.mjs` captures computed styles across the site so a CSS change can be
-diffed. Note its limits before trusting a clean run: it measures 30 properties that do **not**
-include `width`, `height`, `grid-template-columns` or `transform`, and it never triggers `:hover`.
+diffed. It measures 34 properties, including `width`, `height`, `grid-template-columns` and
+`transform` — which is what lets it catch a layout change and not just a repaint. Two real limits
+remain: it never triggers `:hover`, and it visits 14 routes, not all 29 pages, so a clean run says
+nothing about the rest.
+
+> This paragraph used to claim those four layout properties were **absent**. They had been added
+> after the harness returned a falsely clean diff on exactly the changes most likely to break a page
+> (see the comment at `computedSnapshot.mjs:27`), and the warning here was never updated — so it
+> argued against trusting the one gate that catches a wrap or a reflow. Two of the 14 routes were
+> also dead (`/about-verify`, `/legal/privacy-policy`): both 404, and the harness snapshotted the
+> not-found page twice — 178 nodes each — while `/about` and `/privacy-policy` went unmeasured.
+> `capture` now refuses any non-200.
 
 ## Images and where to upload them
 

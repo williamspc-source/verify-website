@@ -65,9 +65,17 @@ const PROPS = [
   'transform',
 ]
 
+/**
+ * Two of these used to be `/about-verify` and `/legal/privacy-policy`, which are
+ * not routes on this site — both 404. The harness does not check status, so it
+ * snapshotted the 404 page twice (178 nodes each, an identical count, which is
+ * how it was spotted) and reported 14 routes of coverage while measuring 12.
+ * `capture` now fails on any non-200 rather than quietly banking a 404 as a
+ * baseline.
+ */
 const ROUTES = [
   '/',
-  '/about-verify',
+  '/about',
   '/about/meet-the-team',
   '/services',
   '/specialists',
@@ -75,7 +83,7 @@ const ROUTES = [
   '/events',
   '/contact',
   '/search',
-  '/legal/privacy-policy',
+  '/privacy-policy',
   '/information-centre/for-clients',
   '/information-centre/for-claimants',
   '/make-a-booking',
@@ -108,7 +116,12 @@ const normalise = (s) =>
     .trim()
 
 const capture = async (page, url) => {
-  await page.goto(BASE + url, { waitUntil: 'networkidle' })
+  const response = await page.goto(BASE + url, { waitUntil: 'networkidle' })
+  // A 404 has a body and computes styles perfectly happily, so without this the
+  // harness banks the not-found page as a baseline and reports coverage it does
+  // not have. See the note above ROUTES.
+  const status = response?.status() ?? 0
+  if (status !== 200) throw new Error(`expected 200, got ${status}`)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.waitForTimeout(400)
   return page.evaluate((props) => {

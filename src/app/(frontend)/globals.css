@@ -252,8 +252,10 @@
   --vf-radius-pill: 999px;
   --vf-radius-circle: 50%;
 
-  /* Comfortable reading width for centred section headers. */
-  --vf-measure: 720px;
+  /* Narrow reading width, read inline by ContactDetails. There used to be a
+     wider `--vf-measure: 720px` beside this, whose only consumer was the
+     max-width on `.vf-section-header--centered` — see the note at that rule for
+     why it is gone. */
   --vf-measure-narrow: 560px;
   --vf-avatar-size: 104px;
 
@@ -10901,9 +10903,21 @@
    already re-points the text tokens, and the hardcoded values were simply
    defeating it.
    ===================================================================== */
+/* There is deliberately NO `max-width` here, and re-adding one is a regression.
+   This rule carried `max-width: var(--vf-measure, 720px)`, inherited from the
+   component's old inline styles and with no counterpart in the design
+   reference: there the same headings sit in `.what-header` /
+   `.audience-gateway-intro` (styles.css:830, :2271), which set no width at all,
+   so the `<h2>` gets the container's full 1132px. Only the SUBTITLE is narrowed
+   in the reference (styles.css:68 600px, :833 640px) — and both of those rules
+   are ported, below and at `.vf-tabs .vf-section-header .section-subtitle`.
+   Measured at 1440px, the cap wrapped 10 centred titles across 8 pages that fit
+   on one line in the reference: "Comprehensive Medico-Legal Services" needs
+   808px and "Medico-Legal Support, Tailored to You" 798px, against 720px given.
+   Guarded by "centred section headers do not narrow themselves into a wrap" in
+   tests/e2e/frontend.e2e.spec.ts. */
 .vf-section-header--centered {
   margin-inline: auto;
-  max-width: var(--vf-measure, 720px);
 }
 .vf-section-header--centered .divider {
   margin-inline: auto;
