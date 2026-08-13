@@ -14618,7 +14618,7 @@ export interface SiteSetting {
    */
   favicon?: (number | null) | Media;
   /**
-   * The brand shield used as the watermark on the home hero’s definition panel. Falls back to the bundled VERIFY shield when empty. (The home hero’s “Show VERIFY shield watermark” toggle controls whether it appears at all.)
+   * The brand shield. Used in three places: the watermark on the home hero’s definition panel, the large mark behind every interior page hero, and the small mark on the Contact page’s portal cards. Falls back to the bundled VERIFY shield when empty. (The home hero’s “Show VERIFY shield watermark” toggle controls whether the first of those appears at all.)
    */
   shield?: (number | null) | Media;
   /**

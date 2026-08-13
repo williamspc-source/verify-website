@@ -4,6 +4,7 @@ import {
   __tokenNames,
   buildTokenCss,
   safeTokenValue,
+  safeUrlToken,
   stripStyleClose,
 } from '@/utilities/cssTokens'
 import type { DesignSystem } from '@/payload-types'
@@ -105,6 +106,38 @@ describe('cssTokens', () => {
       'x'.repeat(201),
     ]) {
       expect(safeTokenValue(value), value).toBeNull()
+    }
+  })
+
+  /**
+   * `safeUrlToken` exists because a URL lands INSIDE `url("…")`, one level
+   * deeper than a colour. `UNSAFE_TOKEN_VALUE` alone does not reject a quote or
+   * a closing paren, so a filename containing either would end the CSS function
+   * early and leave the remainder parsed as CSS.
+   */
+  it('wraps a media URL as a url() token', () => {
+    expect(safeUrlToken('/api/media/file/shield.png')).toBe('url("/api/media/file/shield.png")')
+    // Hyphens, spaces and a cache-busting query are all legitimate in real
+    // filenames and must survive — rejecting them would silently fall back to
+    // the bundled default and look like the upload did nothing.
+    expect(safeUrlToken('/api/media/file/VERIFY Shield-2026.png?2026-08-13')).toBe(
+      'url("/api/media/file/VERIFY Shield-2026.png?2026-08-13")',
+    )
+  })
+
+  it('rejects a URL that could escape url("…")', () => {
+    for (const value of [
+      '/media/a".png',
+      "/media/a'.png",
+      '/media/a).png',
+      '/media/a(.png',
+      '/media/a\\.png',
+      '/media/a.png</style>',
+      '/media/' + 'x'.repeat(220),
+      '',
+      null,
+    ]) {
+      expect(safeUrlToken(value as string | null), String(value)).toBeNull()
     }
   })
 

@@ -103,7 +103,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // inline style outranks every selector, which made Custom Styles → Global CSS
   // unable to override any token. See src/utilities/cssTokens.ts for the
   // three-layer ordering contract this relies on.
-  const tokenCss = buildTokenCss(settings?.colors, designTokens)
+  // The shield rides along as a token because two of its three consumers are
+  // CSS-only (`.page-hero-shield`, the contact portal cards) and used to hardcode
+  // the bundled asset — so a new upload changed the home hero alone.
+  const shield = asMedia(settings?.shield)
+  const tokenCss = buildTokenCss(
+    settings?.colors,
+    designTokens,
+    shield?.url ? getMediaUrl(shield.url, shield.updatedAt) : null,
+  )
 
   // Site Settings → Enquiry drawer form, with a logged server-side fallback when
   // the pointer is empty. See src/utilities/enquiryForm.ts.

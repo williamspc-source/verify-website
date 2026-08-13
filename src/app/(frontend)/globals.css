@@ -265,6 +265,11 @@
   --vf-grad-hero: linear-gradient(160deg, var(--gradient-start) 0%, var(--primary) 100%);
   --vf-grad-avatar: linear-gradient(145deg, #f2f9ff, #d8eefc);
 
+  /* The brand shield, as a token so the CSS-only consumers follow Site Settings →
+     Shield like the home hero already does. This default is the bundled mark and
+     is what renders until something is uploaded. */
+  --vf-shield-url: url('/assets/images/VERIFY Shield.png');
+
   /* Semantic status colours. Kept out of the brand ramp on purpose: a warning
      has to keep reading as a warning after a rebrand. */
   --form-error: #c0392b;
@@ -4085,7 +4090,7 @@
   width: 340px;
   height: 400px;
   opacity: 0.8;
-  background: url('/assets/images/VERIFY Shield.png') no-repeat center / contain;
+  background: var(--vf-shield-url) no-repeat center / contain;
   filter: drop-shadow(0 6px 24px color-mix(in srgb, var(--white) 30%, transparent));
 }
 @media (max-width: 900px) {
@@ -9623,7 +9628,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 46px;
-  background: url('/assets/images/VERIFY Shield.png') no-repeat center / contain;
+  background: var(--vf-shield-url) no-repeat center / contain;
 }
 /* Portal body copy under each uppercase label. */
 .ct-page .ct-enquiry-grid .ct-portal-card__text { margin-top: 4px; }

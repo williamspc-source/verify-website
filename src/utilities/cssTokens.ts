@@ -43,6 +43,32 @@ export const safeTokenValue = (value?: string | null): string | null => {
   return v
 }
 
+/**
+ * A token whose value lands **inside** `url(...)`, which needs a stricter check
+ * than `safeTokenValue`.
+ *
+ * A colour sits between `:` and `;`, so the characters that can break out are
+ * the ones `UNSAFE_TOKEN_VALUE` already rejects. A URL sits inside a CSS
+ * function *and* a quoted string, so a `"`, a `\` or a `)` escapes one more
+ * level than that regex is looking for — `url("…")` closed early would leave the
+ * rest of the filename parsed as CSS. Payload normalises upload filenames, but
+ * this is the wrong thing to take on trust: the value is derived from a name an
+ * editor chose.
+ *
+ * Spaces are allowed because the double quotes make them safe (the bundled
+ * default is literally "VERIFY Shield.png"). Anything else suspicious falls back
+ * to null, and the caller's `:root` default in globals.css takes over.
+ */
+export const safeUrlToken = (url?: string | null): string | null => {
+  const v = url?.trim()
+  if (!v || v.length > 200) return null
+  // Quotes, parens and backslashes escape `url("…")`. Hyphens and spaces are
+  // fine inside the quotes and appear in real filenames, so they are kept.
+  if (/['"()\\]/.test(v)) return null
+  if (UNSAFE_TOKEN_VALUE.test(v)) return null
+  return `url("${v}")`
+}
+
 /** Last-resort guard for any assembled CSS string bound for dangerouslySetInnerHTML. */
 export const stripStyleClose = (css: string): string => css.replace(/<\/style/gi, '')
 
@@ -255,11 +281,27 @@ const addDesignTokens = (map: TokenMap, tokens?: DesignSystem | null): void => {
   map.set('--transition', tokens.effects?.transition)
 }
 
-/** The CSS text for the `verify-design-tokens` <style> tag. Empty string = render nothing. */
-export const buildTokenCss = (colors: BrandColors, tokens?: DesignSystem | null): string => {
+/**
+ * The CSS text for the `verify-design-tokens` <style> tag. Empty string = render
+ * nothing.
+ *
+ * `shieldUrl` is the resolved Site Settings → Shield media URL. It is emitted as
+ * a token rather than read by each component because two of its three consumers
+ * are pure CSS — `.page-hero-shield` on every interior page and the contact
+ * page's portal cards — and both used to hardcode the bundled asset. So
+ * uploading a new shield changed the home hero and nothing else. Passing it here
+ * keeps those two as CSS with no markup change, and `globals.css` holds the
+ * bundled default for when nothing is uploaded.
+ */
+export const buildTokenCss = (
+  colors: BrandColors,
+  tokens?: DesignSystem | null,
+  shieldUrl?: string | null,
+): string => {
   const map = new TokenMap()
   addBrandColors(map, colors)
   addDesignTokens(map, tokens)
+  map.set('--vf-shield-url', safeUrlToken(shieldUrl))
   return stripStyleClose(map.toCss())
 }
 
