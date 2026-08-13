@@ -114,7 +114,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
     title: 'File Review',
     category: 'medico-legal',
     serviceGroup: 'reporting',
-    icon: 'file-magnifying-glass',
+    icon: 'clipboard-text',
     shortDescription:
       "A specialist reviews the claimant's medical records without a physical examination — ideal where attendance is not possible or a paper-based opinion is sufficient.",
     order: 3,
@@ -146,7 +146,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
     title: 'Teleconference',
     category: 'medico-legal',
     serviceGroup: 'reporting',
-    icon: 'video-camera',
+    icon: 'phone',
     shortDescription:
       'Facilitated expert sessions for matters requiring specialist input without a formal written report.',
     order: 6,
@@ -156,7 +156,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
     title: 'Expert Evidence',
     category: 'medico-legal',
     serviceGroup: 'reporting',
-    icon: 'headset',
+    icon: 'gavel',
     shortDescription:
       'Full coordination for specialists providing oral expert evidence in court or tribunal — from report preparation to hearing logistics.',
     order: 31,
@@ -815,26 +815,26 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           {
             title: 'Joint Agreement',
             description:
-              'Both parties agree to engage a single specialist and submit a joint letter of instruction to VERIFY.',
+              plainTextToLexical('Both parties agree to engage a single specialist and submit a joint letter of instruction to VERIFY.'),
           },
           {
             title: 'Specialist Selection',
             description:
-              'VERIFY presents suitable specialists for consideration. Both parties confirm their agreed choice.',
+              plainTextToLexical('VERIFY presents suitable specialists for consideration. Both parties confirm their agreed choice.'),
           },
           {
             title: 'Brief & Scheduling',
             description:
-              'VERIFY coordinates the brief, manages all scheduling, and handles claimant communication and logistics.',
+              plainTextToLexical('VERIFY coordinates the brief, manages all scheduling, and handles claimant communication and logistics.'),
           },
           {
             title: 'Assessment',
-            description: 'The jointly-instructed specialist conducts the examination and prepares their report.',
+            description: plainTextToLexical('The jointly-instructed specialist conducts the examination and prepares their report.'),
           },
           {
             title: 'QA & Delivery',
             description:
-              "VERIFY's QA team reviews the report before it is simultaneously released to both parties.",
+              plainTextToLexical("VERIFY's QA team reviews the report before it is simultaneously released to both parties."),
           },
         ],
       },
@@ -1062,22 +1062,22 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           {
             title: 'Submit Your Request',
             description:
-              "Contact VERIFY's team with details of your matter and the administrative service required.",
+              plainTextToLexical("Contact VERIFY's team with details of your matter and the administrative service required."),
           },
           {
             title: 'VERIFY Confirms',
             description:
-              'We confirm the service details, logistics, and any requirements specific to your matter.',
+              plainTextToLexical('We confirm the service details, logistics, and any requirements specific to your matter.'),
           },
           {
             title: 'We Coordinate',
             description:
-              'VERIFY manages all logistics — scheduling, briefing, documentation, and communication.',
+              plainTextToLexical('VERIFY manages all logistics — scheduling, briefing, documentation, and communication.'),
           },
           {
             title: 'Seamless Delivery',
             description:
-              'The service is completed and confirmed, with any relevant documentation delivered to your office.',
+              plainTextToLexical('The service is completed and confirmed, with any relevant documentation delivered to your office.'),
           },
         ],
       },

@@ -115,7 +115,22 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
           {tiles.map((t) => (
             <li key={t.id}>
               <span className="claim-arrow" aria-hidden>
-                →
+                {/* The reference draws this as a stroked SVG rather than a "→"
+                    glyph (index.html:343): the glyph's weight and baseline vary
+                    by font, and it sat uncoloured and top-aligned here. */}
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
               </span>
               <span className="claim-name">{t.label}</span>
             </li>

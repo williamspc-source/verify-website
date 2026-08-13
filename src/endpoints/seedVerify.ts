@@ -384,6 +384,18 @@ const STYLE_PRESETS: { name: string; label: string; description: string; css: st
     css: '.band-gradient-blue.vf-section { background: linear-gradient(135deg, #eef9ff, #d9efff); }',
   },
   {
+    name: 'band-flat-blue',
+    label: 'Band · Flat light blue',
+    description: 'Solid pale-blue background — the reference’s enquiry band, with no gradient.',
+    css: '.band-flat-blue.vf-section { background: #e6f4ff; }',
+  },
+  {
+    name: 'band-grey-deep',
+    label: 'Band · Deeper grey',
+    description: 'A slightly deeper grey than the standard Muted band.',
+    css: '.band-grey-deep.vf-section { background: #f0f2f4; }',
+  },
+  {
     name: 'band-gradient-dark',
     label: 'Band · Dark blue gradient',
     description: 'Dark brand gradient with light text.',

@@ -1,4 +1,9 @@
 import type { Block, Field } from 'payload'
+import {
+  FixedToolbarFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
 
 import { iconOptions } from '@/components/Icon'
 
@@ -138,10 +143,14 @@ export const sectionHeaderFields: Field[] = [
     admin: { description: 'Small uppercase label above the heading (optional).' },
   },
   {
+    // A textarea, not a text input, purely so a line break is typable — see the
+    // note in src/utilities/accentText.tsx. Same varchar column either way.
     name: 'heading',
-    type: 'text',
+    type: 'textarea',
     admin: {
-      description: 'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".',
+      rows: 2,
+      description:
+        'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.',
     },
   },
   { name: 'subheading', type: 'textarea' },
@@ -448,6 +457,30 @@ export const iconColorField: Field = {
     { label: 'Inherit (text colour)', value: 'inherit' },
   ],
 }
+
+/**
+ * A rich-text body field with the standard toolbars.
+ *
+ * The five-line `lexicalEditor({ features: … })` literal below is repeated in a
+ * dozen block configs; new fields should use this instead of adding another
+ * copy. No feature list is passed on purpose — `defaultLexical`
+ * (`src/fields/defaultLexical.ts`, wired in `payload.config.ts`) already limits
+ * `rootFeatures` to paragraph, bold, italic, underline and link, which is the
+ * right vocabulary for body copy inside a block.
+ */
+export const richBodyField = (name: string, overrides: Partial<Field> = {}): Field =>
+  ({
+    name,
+    type: 'richText',
+    editor: lexicalEditor({
+      features: ({ rootFeatures }) => [
+        ...rootFeatures,
+        FixedToolbarFeature(),
+        InlineToolbarFeature(),
+      ],
+    }),
+    ...overrides,
+  }) as Field
 
 // The nested-blocks field that makes Section/Row containers recursive. The caller
 // passes the allowed child blocks (atoms + rich blocks) — kept generic here to

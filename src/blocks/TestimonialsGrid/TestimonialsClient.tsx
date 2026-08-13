@@ -7,8 +7,6 @@ export type TestimonialCard = {
   quote: string
   position?: string | null
   orgLoc?: string | null
-  name?: string | null
-  avatar?: string | null
 }
 
 const Chevron: React.FC<{ dir: 'prev' | 'next' }> = ({ dir }) => (
@@ -22,7 +20,9 @@ export const TestimonialsClient: React.FC<{
   cards: TestimonialCard[]
   visible?: number
   showArrows?: boolean
-}> = ({ cards, visible = 3, showArrows = true }) => {
+  /** Preset class(es) from the block's "Element styles → Cards" picker. */
+  cardClassName?: string
+}> = ({ cards, visible = 3, showArrows = true, cardClassName }) => {
   const [perView, setPerView] = useState(visible)
   const [index, setIndex] = useState(0)
 
@@ -63,7 +63,9 @@ export const TestimonialsClient: React.FC<{
         <div className="testimonials-track" style={{ transform: `translateX(${shift})` }}>
           {cards.map((t, i) => (
             <div
-              className="testimonial-card"
+              className={['testimonial-card', 'vf-card', cardClassName]
+                .filter(Boolean)
+                .join(' ')}
               key={i}
               style={{ flex: `0 0 ${basis}`, minWidth: 0 }}
             >
@@ -73,7 +75,6 @@ export const TestimonialsClient: React.FC<{
               </div>
               <div className="testimonial-text">{t.quote}</div>
               <div className="testimonial-author">
-                {t.name ? <div className="testimonial-position">{t.name}</div> : null}
                 {t.position ? <div className="testimonial-position">{t.position}</div> : null}
                 {t.orgLoc ? <div className="testimonial-org-loc">{t.orgLoc}</div> : null}
               </div>

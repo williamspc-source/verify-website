@@ -130,7 +130,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     title: 'Expert Evidence',
     category: 'medico-legal',
     serviceGroup: 'reporting',
-    icon: 'headset',
+    icon: 'gavel',
     shortDescription:
       'Full coordination for specialists providing oral expert evidence in court or tribunal — from report preparation to hearing logistics.',
     order: 31,
@@ -165,6 +165,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
           services: serviceIds,
           columns: '4',
           hideDescription: true,
+          cardAlign: 'center',
           linkToService: false,
           footerLinks: [custom('/services', 'View Medico-Legal Services')],
         }
@@ -175,6 +176,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
           columns: '4',
           limit: 8,
           hideDescription: true,
+          cardAlign: 'center',
           linkToService: false,
           footerLinks: [custom('/services', 'View Medico-Legal Services')],
         }
@@ -194,7 +196,9 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
 
   const hero = {
     type: 'homeHero',
-    heading: 'Ensuring [[Accuracy,]] [[Empowering Justice]]',
+    // Two-line lockup, accent on the second line only (index.html:31-32). The
+    // newline is rendered as a <br> by accentText().
+    heading: 'Ensuring Accuracy,\n[[Empowering Justice]]',
     subtitle:
       'With a commitment to excellence, accuracy, and timely reporting, we strive to deliver unparalleled service, helping you navigate the complexities of medico-legal matters with the confidence and trust.',
     showShield: true,
@@ -342,23 +346,31 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
               variant: 'edu-panels',
               background: 'white',
               eyebrow: 'What AAMLE Offers',
-              heading: 'Complimentary Education [[for Industry Professionals]]',
+              heading: 'Complimentary Education\n[[for Industry Professionals]]',
+              // `introRich` supersedes `subheading` for this variant so the
+              // reference's bolded academy name (index.html:246) survives.
+              // `subheading` is left populated as the documented fallback — an
+              // editor who clears the rich field gets plain copy, not a gap.
               subheading:
                 'In 2025, VERIFY expanded its commitment to education with the creation of the Australian Academy of Medico-Legal Education (AAMLE). Under the banner of AAMLE, VERIFY provides a range of complimentary educational offerings across the medico-legal industry.',
+              introRich: plainTextToLexical(
+                'In 2025, VERIFY expanded its commitment to education with the creation of the **Australian Academy of Medico-Legal Education (AAMLE)**. Under the banner of AAMLE, VERIFY provides a range of complimentary educational offerings across the medico-legal industry.',
+              ),
               steps: [
                 {
                   icon: 'users',
                   badge: 'Free to Join',
                   title: 'Free Membership & Events',
                   description:
-                    'Membership is free and facilitates access to complimentary educational events and resources to support continuous learning and professional development across the medico-legal industry.',
+                    plainTextToLexical('Membership is free and facilitates access to complimentary educational events and resources to support continuous learning and professional development across the medico-legal industry.'),
                 },
                 {
                   icon: 'graduation-cap',
                   badge: 'CPD Eligible',
+                  badgeStyle: 'accent',
                   title: 'Non-accredited, CPD-eligible Training',
                   description:
-                    'AAMLE provides non-accredited, CPD-eligible training on various medico-legal topics, including:',
+                    plainTextToLexical('AAMLE provides non-accredited, CPD-eligible training on various medico-legal topics, including:'),
                   bullets: [
                     {
                       text: 'Bimonthly webinars featuring insights from guest speakers with extensive medico-legal industry experience',
@@ -372,8 +384,13 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
                   icon: 'book-open',
                   badge: 'AAMLE Exclusive',
                   title: 'Access to Discounted IME Training',
-                  description:
-                    'AAMLE maintain a training partnership with Brigham and Associates, Inc. (‘Brigham & Associates’)—the unparalleled provider of comprehensive and focused courses on the AMA Guides to the Evaluation of Permanent Impairment (‘the AMA Guides’). Access AAMLE-exclusive discounted training in the AMA Guides, including the Certified Impairment Rater (CIR) Exam.',
+                  // Blank line = paragraph break; `**bold**` / `*italic*` are
+                  // parsed by plainTextToLexical. Matches the reference exactly
+                  // (index.html:297), which bolds the partner name and italicises
+                  // the publication title.
+                  description: plainTextToLexical(
+                    'AAMLE maintain a training partnership with **Brigham and Associates, Inc.** (‘Brigham & Associates’)—the unparalleled provider of comprehensive and focused courses on the AMA *Guides to the Evaluation of Permanent Impairment* (‘the AMA Guides’).\n\nAccess AAMLE-exclusive discounted training in the AMA Guides, including the Certified Impairment Rater (CIR) Exam.',
+                  ),
                 },
               ],
             },
@@ -460,10 +477,16 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
       subheading:
         'VERIFY works with a variety of highly skilled medical experts who are well-versed in legal procedures and understand the importance of their role in supporting the justice system.',
       background: 'muted',
+      // Reference .experts is #f0f2f4 (styles.css:1647) — a shade deeper than
+      // --band-muted (#f5f6f8), which is correct for the gateway band above.
+      cssClass: ['band-grey-deep'],
       source: 'specialists',
       layout: 'carousel',
       limit: 8,
       linkProfiles: true,
+      // The reference homepage marquee has no arrow controls and loops in 60s
+      // (styles.css:1667; index.html:359-449 has no control buttons).
+      carouselOptions: { showArrows: false, speed: 60 },
       footerLinks: [
         custom('/specialists/specialist-panel', 'View Full Panel'),
         custom('/specialists/join-expert-panel', 'Join Expert Panel'),
@@ -488,7 +511,9 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
       blockType: 'section',
       background: 'accent',
       anchorId: 'contact',
-      cssClass: ['vf-home-enquiry'],
+      // band-flat-blue: reference .contact is a flat #e6f4ff (styles.css:1910-1913),
+      // where the `accent` band preset is a three-stop gradient.
+      cssClass: ['vf-home-enquiry', 'band-flat-blue'],
       content: [
         {
           blockType: 'row',

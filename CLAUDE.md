@@ -31,6 +31,7 @@ Every rule below is here because that failure already happened once in this repo
 | **Globals whose links can point at Posts are read at depth 2.** A Post's `stream` is one relationship deeper than the link itself. | At depth 1 `postPath` returned null and `CMSLink` returned null, so a header nav item to an article rendered as *nothing* — the nav just looked short. |
 | **Seed `ensure*` helpers return their id in both branches**; repairs go outside the early-return. | `ensureForm` returned `void` and bailed when the form existed, so any repair built on it could only ever run on a virgin database. `site-settings.enquiryForm` was never set, and the enquiry drawer was disabled site-wide on every install. |
 | **Never call `revalidatePath`/`revalidateTag` from `next/cache` directly.** Use `safeRevalidatePath` / `safeRevalidateTag` from `src/utilities/safeRevalidate.ts`, and honour `context.disableRevalidate`. | Next 16 throws when either is called outside a Server Action or route handler, and Payload runs `afterChange` *inside the transaction*. Building the **Create New** form state tripped it, so `/admin/collections/pages/create` rendered the sidebar and **no form at all** — zero inputs, HTTP 200, nothing in the browser console. No page or post could be created. Same for CLI and job writes, where the throw rolls the write back. |
+| **Never pass a named cacheLife profile to a tag purge.** `safeRevalidateTag(tag)` takes no profile and always sends `{ expire: 0 }`. Guarded by `adminControls.int.spec.ts`. | Every purge in the repo used to pass `'max'`. Given *any* profile Next sets `stale = now` but `expired = now + expire*1000` — and `max`'s expire is a **year**, which `areTagsExpired` (`expiredAt <= now`) never satisfies. So the tag went stale-while-revalidate instead of expiring. Measured under `next start`: after saving a Design System token, the editor's **first reload served the old value**, and three quick edits left the page two versions behind. Related: a tag purge only reaches the manifest of the process that calls it, so a `payload run` script cannot purge a separately running server. |
 | **`308` only for moves that will never change again.** Anything whose destination an editor can change is `307`. | `/posts/<slug>` 308'd to a stream-derived URL; browsers cache that forever, so reassigning an article's stream stranded everyone who had followed the old link. |
 | **A component that hardcodes `appearance="inline"` must have `appearances: false` in its config**, or read `.appearance` itself. | `CMSLink` destructures `appearance`, so a literal after `{...link}` wins and the editor's stored choice is discarded. |
 | **Queries against draft-enabled collections pass `overrideAccess` explicitly.** The Local API defaults to `overrideAccess: true`. | A legacy `/specialists/<slug>` URL matched *unpublished* specialists and 308'd to a profile that 404s — while its own comment claimed it checked for published ones. |
@@ -234,6 +235,35 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
 - **Breaking one consumer does not prove an orphan-field guard works** if the field has two
   consumers. Pick a field with exactly one renderer (`Offices.hoursNote`), not one with several
   (`Offices.hours`, read by both the Footer and ContactDetails).
+- **Every negative result needs a positive control.** Before believing "not found", make the same
+  check find something you already know is there. Each of these produced a confident, wrong "no":
+  `grep --include=*` (unquoted, so zsh ate the glob and grep errored per-iteration) reported all 13
+  dead-CSS candidates absent — acting on it would have deleted live CSS; searching for
+  `safeRevalidateTag(` found **zero** of its 27 call sites, because every one imports it *aliased*
+  as `revalidateTag`; grepping rendered HTML for Phosphor icon slugs could only ever say "absent",
+  since Phosphor emits `<path>` data and never the slug; and a `LIKE '%"format":1%'` check on a
+  `jsonb` column always fails, because Postgres re-serialises with a space after the colon (query
+  the structure with `jsonb_array_elements`, not the text).
+- **A Playwright probe that never logged in reports every page as broken.** `waitForURL('**/admin**')`
+  matches `/admin/login`, so the probe sailed on unauthenticated and read the login form's two
+  inputs as "the create form is empty" — the exact signature of a real past bug. Wait for a URL that
+  *excludes* `/login`, and assert something only an authenticated page has.
+- **A write script that exits 0 may have written nothing.** `pnpm payload run` produced no output,
+  made no changes, and succeeded. Assert the write in the store afterwards; never trust the exit code.
+- **Verify at the layer the visitor sees.** Two Custom Styles presets were in the database and the
+  REST API returned all 27, while the served page still had 25. The database being right proves
+  nothing about the page — that gap was the caching bug in the Invariants table.
+- **A subagent's "dead code" verdict is a candidate, not a finding.** `.who-image-main` was reported
+  dead; it is live in `WhyVerify/Component.tsx`, and deleting it would have broken a page.
+- **A destructive schema change hangs dev-push on a prompt you cannot see.** Dropping two columns
+  left the push waiting on *"Accept warnings and push schema to database? (y/N)"* inside a
+  backgrounded log, and two unrelated new columns silently failed to push for half an hour. Apply
+  that DDL by hand (`psql`) and restart, so the push finds no drift — that is how
+  `ProcessSteps.description` was converted `varchar → jsonb`, prompt-free, in one
+  `ALTER COLUMN … USING`.
+- **Content inside an inactive Tabs pane is not in the HTML.** `curl | grep` for the AAMLE panel
+  found nothing on the homepage and the block was rendering perfectly — only the active tab is
+  server-rendered. Drive a browser and click the tab.
 
 ### CSS token tooling
 

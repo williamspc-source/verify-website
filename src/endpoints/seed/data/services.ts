@@ -16,7 +16,7 @@ export const SERVICES: ServiceSeed[] = [
     slug: 'independent-medical-examination',
     title: 'Independent Medical Examination (IME)',
     category: 'medico-legal',
-    icon: 'clipboard-check',
+    icon: 'first-aid',
     shortDescription:
       'Objective, expert medical assessments for legal and insurance purposes, conducted by qualified specialists.',
     order: 1,
@@ -25,7 +25,7 @@ export const SERVICES: ServiceSeed[] = [
     slug: 'joint-medical-examination',
     title: 'Joint Medical Examination (JME)',
     category: 'medico-legal',
-    icon: 'users',
+    icon: 'users-three',
     shortDescription:
       'Coordinated examinations involving multiple parties, streamlining the medico-legal process efficiently.',
     order: 2,
@@ -34,7 +34,7 @@ export const SERVICES: ServiceSeed[] = [
     slug: 'file-review',
     title: 'File Review',
     category: 'medico-legal',
-    icon: 'file-text',
+    icon: 'clipboard-text',
     shortDescription:
       'Thorough review of medical records and documentation to support legal and insurance assessments.',
     order: 3,
@@ -43,7 +43,7 @@ export const SERVICES: ServiceSeed[] = [
     slug: 'supplementary-report',
     title: 'Supplementary Report',
     category: 'medico-legal',
-    icon: 'book-open',
+    icon: 'file-plus',
     shortDescription:
       'Clear, concise supplementary reports to update, clarify, or expand on existing medico-legal opinions where further review is required.',
     order: 4,
@@ -61,7 +61,7 @@ export const SERVICES: ServiceSeed[] = [
     slug: 'teleconference-expert-evidence',
     title: 'Teleconference & Expert Evidence',
     category: 'medico-legal',
-    icon: 'video',
+    icon: 'phone',
     shortDescription:
       'Remote consultations and expert evidence preparation for court and tribunal proceedings.',
     order: 6,
@@ -79,7 +79,7 @@ export const SERVICES: ServiceSeed[] = [
     slug: 'brief-reduction-loi-review',
     title: 'Brief Reduction & LOI Review Service',
     category: 'administrative',
-    icon: 'search',
+    icon: 'file-text',
     shortDescription:
       'Expert review and streamlining of briefs to reduce unnecessary costs and improve clarity for specialists.',
     order: 8,

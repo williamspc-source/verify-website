@@ -72,6 +72,7 @@ type BrandColors =
       secondary?: string | null
       secondaryText?: string | null
       secondaryBright?: string | null
+      steel?: string | null
       gradientStart?: string | null
       navy?: string | null
       definitionBlue?: string | null
@@ -163,6 +164,7 @@ const addBrandColors = (map: TokenMap, colors: BrandColors): void => {
   map.set('--secondary', colors.secondary)
   map.set(['--secondary-foreground', '--accent-foreground'], colors.secondaryText)
   map.set('--secondary-bright', colors.secondaryBright)
+  map.set('--steel', colors.steel)
   map.set('--gradient-start', colors.gradientStart)
   map.set('--navy', colors.navy)
   map.set('--definition-blue', colors.definitionBlue)

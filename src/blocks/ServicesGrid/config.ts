@@ -115,6 +115,20 @@ export const ServicesGrid: Block = {
       admin: { description: 'Reference home-page style: a tidy icon + title grid with no blurb.' },
     },
     {
+      name: 'cardAlign',
+      type: 'select',
+      defaultValue: 'left',
+      label: 'Card alignment',
+      admin: {
+        description:
+          'Centred gives the reference home-page treatment — icon and title stacked and centred, with an equal minimum card height. Best paired with “Hide card descriptions”; a long blurb reads poorly centred.',
+      },
+      options: [
+        { label: 'Left', value: 'left' },
+        { label: 'Centred', value: 'center' },
+      ],
+    },
+    {
       name: 'servicePathPrefix',
       type: 'text',
       defaultValue: '/services',

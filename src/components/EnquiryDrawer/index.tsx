@@ -228,9 +228,14 @@ export const EnquiryDrawer: React.FC<EnquiryDrawerProps> = ({ formId }) => {
                 required
               />
             </div>
+            {/* Same classes as the in-page FormBlock submit
+                (src/blocks/Form/Component.tsx). This used to be a private
+                `.enquiry-panel-submit` that re-implemented the primary button,
+                so the .vf-btn--* sizes, the glow ladder and any Custom Styles
+                preset written against .btn silently skipped it. */}
             <button
               type="submit"
-              className="enquiry-panel-submit"
+              className="btn btn-primary form-submit"
               disabled={status === 'sending' || status === 'loading' || status === 'unavailable'}
             >
               {status === 'sending' ? 'Sending…' : status === 'loading' ? 'Loading…' : 'Send Enquiry'}

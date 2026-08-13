@@ -33,6 +33,18 @@ echo "--- B: an option value with no matching CSS rule ---"
 run_case "B-options" "src/fields/blockFields.ts" "every vf-\* modifier class" \
   "perl -0pi -e \"s/\\{ label: 'Accent bar', value: 'accent-bar' \\}/{ label: 'Accent bar', value: 'accent-bar' }, { label: 'Tilt', value: 'tilt' }/\" src/fields/blockFields.ts"
 
+echo "--- B2: a code-defined picker class with no matching CSS rule ---"
+run_case "B2-picker" "src/fields/codeDefinedClasses.ts" "the CSS-class picker offers" \
+  "perl -0pi -e \"s/^\\]/  { name: 'vf-home-nope', label: 'x' },\\n]/m\" src/fields/codeDefinedClasses.ts"
+
+echo "--- E1: a call site that passes a named cacheLife profile (via its ALIAS) ---"
+run_case "E1-profile-arg" "src/Styles/hooks/revalidateStyles.ts" "named cacheLife profile" \
+  "perl -0pi -e \"s/revalidateTag\\('global_custom-styles'\\)/revalidateTag('global_custom-styles', 'max')/\" src/Styles/hooks/revalidateStyles.ts"
+
+echo "--- E2: the wrapper itself regressing to a profile name ---"
+run_case "E2-wrapper" "src/utilities/safeRevalidate.ts" "named cacheLife profile" \
+  "perl -0pi -e \"s/revalidateTag\\(tag, \\{ expire: 0 \\}\\)/revalidateTag(tag, 'max')/\" src/utilities/safeRevalidate.ts"
+
 echo "--- C: an Appearance select the component discards ---"
 run_case "C-appearance" "src/blocks/GatewayCards/config.ts" "hardcoded appearance" \
   "perl -0pi -e 's/appearances: false//' src/blocks/GatewayCards/config.ts"

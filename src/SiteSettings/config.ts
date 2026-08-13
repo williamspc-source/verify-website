@@ -205,6 +205,16 @@ export const SiteSettings: GlobalConfig = {
             {
               type: 'row',
               fields: [
+                // The reference's muted blue-grey (its own `--secondary`). This
+                // build repurposed `--secondary` as the light-blue surface, so
+                // the quick-link arrows on the audience cards inherited an ice
+                // blue that measured ~1.2:1 on white — effectively invisible.
+                colorField('steel', 'Muted blue-grey', '#93abbf'),
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
                 colorField('navy', 'Navy', '#1a3a5c'),
                 colorField('definitionBlue', 'Definition panel blue', '#5ba3d9'),
               ],

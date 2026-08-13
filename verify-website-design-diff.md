@@ -10,6 +10,13 @@
 
 ## Comparison 1: Home Page (submitted 2026-07-04)
 
+> **STATUS 2026-08-13 — superseded.** The homepage was audited section by section against
+> `.design-reference/index.html` and the gaps closed; see `HOMEPAGE-CHANGES.md` for the itemised
+> record. Several notes below were already stale when that audit ran — items 5 and 8 describe the
+> "Claims We Support" band and the enquiry section as missing, and both had since shipped. Treat
+> this comparison as history, not as a to-do list, and re-verify against the build before acting
+> on any line of it.
+
 ### 1. Hero Section
 No differences — heading, subtext, and buttons match.
 

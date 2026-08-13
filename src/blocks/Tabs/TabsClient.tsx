@@ -66,11 +66,12 @@ export const TabsClient: React.FC<{
 
   return (
     <div className="vf-tabs__wrap">
-      {/* Pills are centered (inline-flex inside a centered bar); underline stays left-aligned. */}
+      {/* Pills are centered (inline-flex inside a centered bar); underline stays left-aligned.
+          Centring and the gap below live in globals.css — as inline styles they
+          outranked every stylesheet, so the spacing could not be corrected or
+          overridden by a Custom Styles preset. */}
       {isPills ? (
-        <div className="vf-tabs__tabbar" style={{ textAlign: 'center', marginBottom: 'var(--gap-normal)' }}>
-          {tablist}
-        </div>
+        <div className="vf-tabs__tabbar">{tablist}</div>
       ) : (
         tablist
       )}

@@ -212,6 +212,9 @@ export interface Page {
      * Small uppercase label above the heading.
      */
     eyebrow?: string | null;
+    /**
+     * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour. Press Enter to force a line break.
+     */
     heading?: string | null;
     subtitle?: string | null;
     /**
@@ -2966,7 +2969,7 @@ export interface FAQBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -3146,7 +3149,7 @@ export interface GatewayCardsBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -3622,7 +3625,7 @@ export interface FeatureGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -3931,7 +3934,7 @@ export interface ProcessStepsBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -3943,6 +3946,24 @@ export interface ProcessStepsBlock {
    * Layout. "Cards" = numbered card grid. "Two-row process" = connected numbered rows (01–03 blue, 04+ dark) matching the reference Our Process. "Claimant step list" = left intro + a compact numbered list on the right (reference Your Examination Step by Step).
    */
   variant?: ('cards' | 'two-row' | 'claimant' | 'edu-panels') | null;
+  /**
+   * Replaces the plain Subheading for this variant, adding bold and italic. Leave empty to keep using Subheading.
+   */
+  introRich?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * How many steps per row on desktop (Cards + Two-row variants).
    */
@@ -4061,10 +4082,31 @@ export interface ProcessStepsBlock {
          */
         badge?: string | null;
         /**
+         * Highlight brightens the pill so one step stands out from the others.
+         */
+        badgeStyle?: ('plain' | 'accent') | null;
+        /**
          * Optional — leave empty for a number-only step.
          */
         title?: string | null;
-        description?: string | null;
+        /**
+         * Body copy for the step. Bold and italic are available — the reference AAMLE panel bolds an organisation name and italicises a publication title.
+         */
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         /**
          * Optional bulleted list under the description.
          */
@@ -4132,7 +4174,7 @@ export interface SpecialtyGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -4570,7 +4612,7 @@ export interface PeopleGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -4833,7 +4875,7 @@ export interface ServicesGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -4872,6 +4914,10 @@ export interface ServicesGridBlock {
    * Reference home-page style: a tidy icon + title grid with no blurb.
    */
   hideDescription?: boolean | null;
+  /**
+   * Centred gives the reference home-page treatment — icon and title stacked and centred, with an equal minimum card height. Best paired with “Hide card descriptions”; a long blurb reads poorly centred.
+   */
+  cardAlign?: ('left' | 'center') | null;
   /**
    * Links become <prefix>/<slug>.
    */
@@ -5240,7 +5286,7 @@ export interface TestimonialsGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -5313,21 +5359,13 @@ export interface Testimonial {
    */
   quote: string;
   /**
-   * e.g. "Senior Associate, Legal Firm — Brisbane".
+   * Line 1 of the attribution — the position, e.g. "Senior Associate".
    */
   authorRole: string;
   /**
-   * Optional — many testimonials are anonymous.
-   */
-  authorName?: string | null;
-  /**
-   * Optional organisation name.
+   * Line 2 of the attribution, e.g. "Personal Injury Law Firm — Brisbane, QLD". Leave empty to show the position alone.
    */
   org?: string | null;
-  /**
-   * Optional. Falls back to a placeholder avatar on the frontend.
-   */
-  avatar?: (number | null) | Media;
   /**
    * Star rating (1–5).
    */
@@ -5353,7 +5391,7 @@ export interface StatsBandBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -5422,7 +5460,7 @@ export interface TabsBlockType {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -6061,7 +6099,7 @@ export interface SplitFeatureBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -6992,7 +7030,7 @@ export interface ContactDetailsBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -7145,7 +7183,7 @@ export interface IconListBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -7295,7 +7333,7 @@ export interface MapEmbedBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -7571,7 +7609,7 @@ export interface LeadershipSpotlightBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -8201,7 +8239,7 @@ export interface VideoEmbedBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -8761,7 +8799,7 @@ export interface SpecialistDirectoryBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -8841,7 +8879,7 @@ export interface SpecialtyDirectoryBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -8881,7 +8919,7 @@ export interface ResourcesGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -9087,7 +9125,7 @@ export interface AppointmentGuideBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -9592,7 +9630,7 @@ export interface MissionPillarsBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   /**
@@ -9638,7 +9676,7 @@ export interface ValueCardsBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -9686,7 +9724,7 @@ export interface WhyVerifyBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -9848,7 +9886,7 @@ export interface AudiencePathwaysBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -10353,7 +10391,7 @@ export interface CostGridBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -10638,7 +10676,7 @@ export interface EventsExplorerBlock {
    */
   eyebrow?: string | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]".
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
    */
   heading?: string | null;
   subheading?: string | null;
@@ -11658,12 +11696,14 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
   subheading?: T;
   background?: T;
   variant?: T;
+  introRich?: T;
   columns?: T;
   steps?:
     | T
     | {
         icon?: T;
         badge?: T;
+        badgeStyle?: T;
         title?: T;
         description?: T;
         bullets?:
@@ -11817,6 +11857,7 @@ export interface ServicesGridBlockSelect<T extends boolean = true> {
   linkToService?: T;
   showEnquire?: T;
   hideDescription?: T;
+  cardAlign?: T;
   servicePathPrefix?: T;
   footerLinks?:
     | T
@@ -13364,9 +13405,7 @@ export interface OfficesSelect<T extends boolean = true> {
 export interface TestimonialsSelect<T extends boolean = true> {
   quote?: T;
   authorRole?: T;
-  authorName?: T;
   org?: T;
-  avatar?: T;
   rating?: T;
   order?: T;
   featured?: T;
@@ -14687,6 +14726,10 @@ export interface SiteSetting {
      */
     gradientStart?: string | null;
     /**
+     * Default: #93abbf. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    steel?: string | null;
+    /**
      * Default: #1a3a5c. Hex, rgb(a) or any CSS colour. Empty = default.
      */
     navy?: string | null;
@@ -15887,6 +15930,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         secondaryText?: T;
         secondaryBright?: T;
         gradientStart?: T;
+        steel?: T;
         navy?: T;
         definitionBlue?: T;
         paleSurface?: T;

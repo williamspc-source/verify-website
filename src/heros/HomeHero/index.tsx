@@ -82,7 +82,10 @@ export const HomeHero = async (props: HomeHeroProps) => {
             ) : null}
           </div>
 
-          <div>
+          {/* The reference offsets the definition panel down the grid
+              (index.html:48, an inline padding-top: 48px). Kept as a class so a
+              Custom Styles preset can change it. */}
+          <div className="vf-home-hero__aside">
             {hasDefinition ? (
               <DefinitionPanel
                 className={cn('hero-panel hero-definition-panel', `hero-definition-panel--${definitionStyle}`, 'vf-home-hero__definition')}

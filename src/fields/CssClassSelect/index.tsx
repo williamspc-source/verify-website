@@ -3,6 +3,7 @@ import { FieldLabel, ReactSelect, useField } from '@payloadcms/ui'
 import React, { useEffect, useState } from 'react'
 
 import { getClientSideURL } from '@/utilities/getURL'
+import { CODE_DEFINED_CLASSES } from '../codeDefinedClasses'
 
 type Option = { label: string; value: string }
 
@@ -45,8 +46,22 @@ export const CssClassSelect: React.FC<Props> = ({ path, field }) => {
     }
   }, [])
 
+  // Options = Custom Styles presets + the layout classes defined in globals.css
+  // (see codeDefinedClasses.ts for why) + anything already stored that neither
+  // list knows about, so no stored value is ever un-reselectable.
+  const known = new Set(options.map((o) => o.value))
+  const codeDefined: Option[] = CODE_DEFINED_CLASSES.filter((c) => !known.has(c.name)).map((c) => ({
+    label: `${c.label} — in code`,
+    value: c.name,
+  }))
+  const listed = new Set([...known, ...codeDefined.map((o) => o.value)])
+  const orphans: Option[] = (value || [])
+    .filter((v) => !listed.has(v))
+    .map((v) => ({ label: v, value: v }))
+  const allOptions: Option[] = [...options, ...codeDefined, ...orphans]
+
   const selected: Option[] = (value || []).map(
-    (v) => options.find((o) => o.value === v) || { label: v, value: v },
+    (v) => allOptions.find((o) => o.value === v) || { label: v, value: v },
   )
 
   const label = field?.label || 'Custom CSS class(es)'
@@ -58,7 +73,7 @@ export const CssClassSelect: React.FC<Props> = ({ path, field }) => {
       <ReactSelect
         isMulti
         isClearable
-        options={options}
+        options={allOptions}
         value={selected}
         noOptionsMessage={() => 'No presets defined yet (Globals → Custom Styles)'}
         onChange={(opt: unknown) => {

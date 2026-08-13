@@ -558,37 +558,37 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
                 icon: 'file-plus',
                 title: 'Enquiry & Referral',
                 description:
-                  'You submit your referral and claimant details through our secure online booking portal or by contacting our team directly. We acknowledge every referral promptly and confirm all key details.',
+                  plainTextToLexical('You submit your referral and claimant details through our secure online booking portal or by contacting our team directly. We acknowledge every referral promptly and confirm all key details.'),
               },
               {
                 icon: 'user-check',
                 title: 'Specialist Matching',
                 description:
-                  'Our team assists in identifying the most appropriate specialist from our expert panel based on the nature of the claim, required speciality, claimant location, and timeframe, before confirming their availability to proceed.',
+                  plainTextToLexical('Our team assists in identifying the most appropriate specialist from our expert panel based on the nature of the claim, required speciality, claimant location, and timeframe, before confirming their availability to proceed.'),
               },
               {
                 icon: 'calendar-check',
                 title: 'Appointment Coordination',
                 description:
-                  'We manage all scheduling, claimant communication, interpreter bookings where required, and brief preparation so the specialist has everything they need before the examination.',
+                  plainTextToLexical('We manage all scheduling, claimant communication, interpreter bookings where required, and brief preparation so the specialist has everything they need before the examination.'),
               },
               {
                 icon: 'user-plus',
                 title: 'Examination & Drafting',
                 description:
-                  'The specialist conducts the assessment in person, via telehealth, or by surrogate, and prepares their medico-legal opinion in line with applicable guidelines and legislative requirements.',
+                  plainTextToLexical('The specialist conducts the assessment in person, via telehealth, or by surrogate, and prepares their medico-legal opinion in line with applicable guidelines and legislative requirements.'),
               },
               {
                 icon: 'check-square',
                 title: 'Quality Assurance Review',
                 description:
-                  'Every report is reviewed by our dedicated QA team before delivery, checked for accuracy, completeness, formatting, and compliance with the referral requirements and relevant legislative framework.',
+                  plainTextToLexical('Every report is reviewed by our dedicated QA team before delivery, checked for accuracy, completeness, formatting, and compliance with the referral requirements and relevant legislative framework.'),
               },
               {
                 icon: 'paper-plane-tilt',
                 title: 'Report Delivery',
                 description:
-                  'The quality-assured report is delivered within the agreed timeframe. We remain available for supplementary reporting, teleconferences, or follow-up queries that arise after delivery.',
+                  plainTextToLexical('The quality-assured report is delivered within the agreed timeframe. We remain available for supplementary reporting, teleconferences, or follow-up queries that arise after delivery.'),
               },
             ],
           },
@@ -782,27 +782,27 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
           {
             title: 'The appointment is booked',
             description:
-              'Your lawyer or insurer refers your matter to VERIFY. We coordinate the specialist appointment and confirm the date, time and location through your lawyer.',
+              plainTextToLexical('Your lawyer or insurer refers your matter to VERIFY. We coordinate the specialist appointment and confirm the date, time and location through your lawyer.'),
           },
           {
             title: 'Paperwork is sent to you or your lawyers',
             description:
-              'VERIFY sends the Claimant Questionnaire and Informed Consent form to you or your lawyers to complete before the examination.',
+              plainTextToLexical('VERIFY sends the Claimant Questionnaire and Informed Consent form to you or your lawyers to complete before the examination.'),
           },
           {
             title: 'The examiner receives the medical brief',
             description:
-              'Before your appointment, the specialist receives the medical brief, records, imaging and instructions prepared for the assessment.',
+              plainTextToLexical('Before your appointment, the specialist receives the medical brief, records, imaging and instructions prepared for the assessment.'),
           },
           {
             title: 'You attend the examination',
             description:
-              'The examiner asks about your injury, symptoms, treatment and daily function, and may complete a physical or clinical assessment.',
+              plainTextToLexical('The examiner asks about your injury, symptoms, treatment and daily function, and may complete a physical or clinical assessment.'),
           },
           {
             title: 'The report is provided to your lawyer',
             description:
-              'The specialist prepares the report, VERIFY completes its quality review, and the report is provided to your lawyer.',
+              plainTextToLexical('The specialist prepares the report, VERIFY completes its quality review, and the report is provided to your lawyer.'),
           },
         ],
       },

@@ -128,23 +128,13 @@ export const ContactDetailsBlock: React.FC<Props & { bare?: boolean }> = async (
             <div>
               <p className="contact-item-label">{label}</p>
               {href ? (
-                <a
-                  href={href}
-                  className="contact-item-value"
-                  style={{ whiteSpace: 'pre-line' }}
-                >
+                <a href={href} className="contact-item-value">
                   {value}
                 </a>
               ) : (
-                <p className="contact-item-value" style={{ whiteSpace: 'pre-line' }}>
-                  {value}
-                </p>
+                <p className="contact-item-value">{value}</p>
               )}
-              {note ? (
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-mid)', marginTop: '2px' }}>
-                  {note}
-                </p>
-              ) : null}
+              {note ? <p className="contact-item-note">{note}</p> : null}
             </div>
           </div>
         ))}

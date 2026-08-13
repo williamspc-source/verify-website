@@ -57,6 +57,10 @@ field → a Custom Styles preset → Global CSS.
 | Retint every shadow at once | Design System → Shadows & glows → **Shadow colour** |
 | Change a gradient's angle | Design System → **Gradients** |
 | Speed up / disable hover animations | Design System → Shadows & glows → **Transition** |
+| Centre the service cards (icon + title, equal height) | that Services Grid block → **Card alignment** → Centred |
+| Make one AAMLE step's pill stand out | that step → **Badge emphasis** → Highlight |
+| Force a line break in a heading | press **Enter** in the heading field (`[[brackets]]` still colour a phrase) |
+| Change the muted blue-grey (card link arrows) | Site Settings → Brand colours → **Muted blue-grey** |
 | Change one block only | that block's **Custom CSS class(es)** + a Custom Styles preset |
 | Change the home hero's band or padding | the Home page → **Hero** tab |
 | Anything not listed above | Custom Styles → **Global CSS** |
@@ -190,9 +194,11 @@ everything listed here as live, and they should not be renamed without updating 
   `.vf-card`, so `.vf-card` styling reaches them.
 - Stats: `.vf-stats-band__stat`, `__number`, `__label`
 - Process: `.vf-process-steps__step`, `__number`
-- Tabs: `.vf-tabs__tablist`, `__tab` (`--active`), `__panel`
-- Specialty grid: `.vf-specialty-grid` on the block, `.vf-checklist` on its checklist variant;
-  each tile is a `.vf-card` with `.vf-card__icon` / `.vf-card__title`
+- Tabs: `.vf-tabs__tablist`, `__tab` (`--active`), `__panel`, `.vf-tabs__tabbar` (the centred pill bar)
+- Specialty grid: `.vf-specialty-grid` on the block, `.vf-checklist` on its checklist variant
+  (rows are `.claims-list li`, the arrow is `.claim-arrow`, the label `.claim-name`);
+  each card-variant tile is a `.vf-card` with `.vf-card__icon` / `.vf-card__title`
+- Services grid: `.services-grid`, plus `.vf-cards--center` when **Card alignment** is Centred
 - FAQ: `.vf-faq__item`, `__question`, `__answer`
 - Callout: `.vf-callout`, `__content`, `__icon`, `__tag`, `__heading`, `__body`, `__links`
 - Heroes: the interior hero root is `.page-hero` (with `.page-hero--light|dark|service`);

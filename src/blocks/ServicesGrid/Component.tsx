@@ -68,6 +68,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
     linkToService,
     showEnquire,
     hideDescription,
+    cardAlign,
     footerLinks,
     servicePathPrefix,
     cssClass,
@@ -192,7 +193,10 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
       bare={bare}
     >
       {header}
-      <div className="services-grid" style={{ '--vf-cols': cols } as React.CSSProperties}>
+      <div
+        className={cn('services-grid', cardAlign === 'center' && 'vf-cards--center')}
+        style={{ '--vf-cols': cols } as React.CSSProperties}
+      >
         {items.map((s) => (
           <Card
             key={s.id}

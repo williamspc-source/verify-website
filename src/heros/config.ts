@@ -67,9 +67,16 @@ export const hero: Field = {
       },
     },
     {
+      // Textarea so the reference's two-line hero lockup is typable; see the
+      // note in src/utilities/accentText.tsx.
       name: 'heading',
-      type: 'text',
-      admin: { condition: isType('pageHero', 'homeHero') },
+      type: 'textarea',
+      admin: {
+        condition: isType('pageHero', 'homeHero'),
+        rows: 2,
+        description:
+          'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour. Press Enter to force a line break.',
+      },
     },
     {
       name: 'subtitle',

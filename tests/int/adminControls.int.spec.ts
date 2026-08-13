@@ -202,6 +202,27 @@ describe('admin controls are wired', () => {
   })
 
   /**
+   * Pattern B2 — "the CSS-class picker offers a class that styles nothing".
+   *
+   * `CODE_DEFINED_CLASSES` exists so page-layout classes that live in globals.css
+   * (rather than in the Custom Styles global) are still selectable — otherwise
+   * removing one from a block was a one-way door. That list is hand-maintained,
+   * so it can drift into advertising a class no rule defines, which is the same
+   * failure in a new place.
+   *
+   * Proven red by: adding `{ name: 'vf-home-nope', label: 'x' }` to
+   * src/fields/codeDefinedClasses.ts → reports `.vf-home-nope`.
+   */
+  it('every class the CSS-class picker offers from code exists in globals.css', () => {
+    const src = readFileSync(join(SRC, 'fields/codeDefinedClasses.ts'), 'utf8')
+    const names = [...src.matchAll(/name:\s*'([a-zA-Z][\w-]*)'/g)].map((m) => m[1])
+    expect(names.length, 'could not parse CODE_DEFINED_CLASSES').toBeGreaterThan(0)
+
+    const missing = names.filter((n) => !new RegExp(`\\.${n}\\b`).test(GLOBALS_CSS))
+    expect(missing, 'offered by the class picker, but no rule defines it').toEqual([])
+  })
+
+  /**
    * Pattern C — "the editor's Appearance choice is discarded".
    *
    * `CMSLink` destructures `appearance`, so a literal written AFTER a `{...link}`
@@ -376,6 +397,70 @@ describe('admin controls are wired', () => {
     expect(offenders, 'Local API defaults to overrideAccess: true and will serve drafts').toEqual(
       [],
     )
+  })
+})
+
+/**
+ * Pattern E — "the save succeeded and the site kept the old value".
+ *
+ * `revalidateTag(tag, profile)` with a *named* cacheLife profile does not purge.
+ * Given any profile, Next sets `stale = now` but `expired = now + expire*1000`;
+ * the built-in `max` profile's `expire` is a year, and `areTagsExpired` requires
+ * `expiredAt <= now`. The entry therefore goes stale-while-revalidate rather
+ * than expiring: measured under `next start`, the first reload after every save
+ * served the PREVIOUS value, and three quick edits left the page two versions
+ * behind. `{ expire: 0 }` is the immediate, hard purge.
+ *
+ * Why this guard reads the *alias*: every call site imports the helper as
+ * `import { safeRevalidateTag as revalidateTag }`. A guard grepping for
+ * `safeRevalidateTag(` matches nothing and can never fail — which is exactly
+ * how the first search for these call sites reported zero of the real 27.
+ *
+ * Proven red by: re-adding `, 'max'` to a call site, and separately by changing
+ * the `{ expire: 0 }` in safeRevalidate.ts back to a named profile.
+ */
+describe('cache purges actually purge', () => {
+  it('no tag purge passes a named cacheLife profile', () => {
+    const wrapperPath = join(SRC, 'utilities/safeRevalidate.ts')
+    const wrapper = readFileSync(wrapperPath, 'utf8')
+
+    // 1. The one place next/cache's revalidateTag is called must use a
+    //    zero-expiry cacheLife object, not a profile name.
+    const call = /\brevalidateTag\(\s*tag\s*,([^)]*)\)/.exec(wrapper)
+    expect(call, 'could not find the revalidateTag call in safeRevalidate.ts').not.toBeNull()
+    expect(
+      call![1].replace(/\s/g, ''),
+      'a named profile never hard-expires the tag; pass { expire: 0 }',
+    ).toBe('{expire:0}')
+
+    // 2. Nothing else may import next/cache's revalidateTag and re-introduce it.
+    const directImporters = walkFiles(SRC)
+      .filter((f) => /\.tsx?$/.test(f) && f !== wrapperPath)
+      .filter((f) => /import\s*\{[^}]*\brevalidateTag\b[^}]*\}\s*from\s*'next\/cache'/.test(
+        readFileSync(f, 'utf8'),
+      ))
+      .map(rel)
+    expect(directImporters, 'must go through safeRevalidateTag').toEqual([])
+
+    // 3. No call site may pass a second argument that is a string literal.
+    //    Resolve each file's local alias for the helper first — they all rename
+    //    it, so matching the exported name would match nothing.
+    const offenders: string[] = []
+    for (const file of walkFiles(SRC).filter((f) => /\.tsx?$/.test(f) && f !== wrapperPath)) {
+      const text = readFileSync(file, 'utf8')
+      const imported = /\bsafeRevalidateTag\s+as\s+(\w+)|\b(safeRevalidateTag)\b\s*[,}]/.exec(text)
+      if (!imported) continue
+      const alias = imported[1] ?? imported[2]
+      const calls = text.matchAll(new RegExp(`\\b${alias}\\(([^)]*)\\)`, 'g'))
+      for (const m of calls) {
+        // Split on top-level commas only; a template literal tag has none.
+        const args = m[1].split(/,(?![^(]*\))/).map((a) => a.trim())
+        if (args.length > 1 && /^['"]/.test(args[1])) {
+          offenders.push(`${rel(file)}: ${alias}(${m[1]})`)
+        }
+      }
+    }
+    expect(offenders, 'a named cacheLife profile leaves the tag unexpired').toEqual([])
   })
 })
 

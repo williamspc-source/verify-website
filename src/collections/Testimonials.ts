@@ -18,8 +18,12 @@ export const Testimonials: CollectionConfig = {
   admin: {
     useAsTitle: 'authorRole',
     group: 'Content',
-    defaultColumns: ['authorRole', 'authorName', 'featured', 'order'],
+    defaultColumns: ['authorRole', 'org', 'featured', 'order'],
   },
+  // The card is two attribution lines — position, then organisation and location
+  // (design reference index.html:472-475). It carries no portrait and no personal
+  // name; these are anonymised client quotes. `authorName` and `avatar` used to
+  // exist here and were removed rather than left as controls that render nothing.
   fields: [
     {
       name: 'quote',
@@ -28,35 +32,21 @@ export const Testimonials: CollectionConfig = {
       admin: { description: 'The testimonial text (no surrounding quotation marks needed).' },
     },
     {
-      type: 'row',
-      fields: [
-        {
-          name: 'authorRole',
-          type: 'text',
-          required: true,
-          admin: {
-            width: '60%',
-            description: 'e.g. "Senior Associate, Legal Firm — Brisbane".',
-          },
-        },
-        {
-          name: 'authorName',
-          type: 'text',
-          admin: { width: '40%', description: 'Optional — many testimonials are anonymous.' },
-        },
-      ],
+      name: 'authorRole',
+      type: 'text',
+      required: true,
+      admin: {
+        description: 'Line 1 of the attribution — the position, e.g. "Senior Associate".',
+      },
     },
     {
       name: 'org',
       type: 'text',
-      label: 'Organisation',
-      admin: { description: 'Optional organisation name.' },
-    },
-    {
-      name: 'avatar',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Optional. Falls back to a placeholder avatar on the frontend.' },
+      label: 'Organisation and location',
+      admin: {
+        description:
+          'Line 2 of the attribution, e.g. "Personal Injury Law Firm — Brisbane, QLD". Leave empty to show the position alone.',
+      },
     },
     {
       type: 'row',

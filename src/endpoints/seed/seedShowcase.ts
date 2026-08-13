@@ -1,5 +1,7 @@
 import type { Payload, PayloadRequest } from 'payload'
 
+import { plainTextToLexical } from './data/richText'
+
 /* =====================================================================
    Seeds a "Style Guide" page (/style-guide) that uses every block + hero
    variant with representative starter content. It is the review/handoff
@@ -117,9 +119,9 @@ const buildLayout = (mediaId?: number | string | null) => [
     background: 'white' as const,
     columns: '3' as const,
     steps: [
-      { icon: 'send', title: 'Enquiry & referral', description: 'Submit your referral and claimant details.' },
-      { icon: 'users', title: 'Specialist matching', description: 'We match the right expert for the claim.' },
-      { icon: 'file-text', title: 'Report delivery', description: 'A QA-reviewed report, on time.' },
+      { icon: 'send', title: 'Enquiry & referral', description: plainTextToLexical('Submit your referral and claimant details.') },
+      { icon: 'users', title: 'Specialist matching', description: plainTextToLexical('We match the right expert for the claim.') },
+      { icon: 'file-text', title: 'Report delivery', description: plainTextToLexical('A QA-reviewed report, on time.') },
     ],
   },
   {

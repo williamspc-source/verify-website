@@ -7,6 +7,7 @@ import {
   elementClassesField,
   gridDisplayFields,
   iconField,
+  richBodyField,
   sectionHeaderFields,
 } from '@/fields/blockFields'
 
@@ -32,6 +33,19 @@ export const ProcessSteps: Block = {
         { label: 'AAMLE education feature panels', value: 'edu-panels' },
       ],
     },
+    // The shared `subheading` above is plain text, and it is one field on a helper
+    // used by 26 blocks — widening it to rich text would touch 58 columns. Only
+    // this variant's intro needs emphasis (the reference bolds "Australian Academy
+    // of Medico-Legal Education (AAMLE)"), so the rich version is scoped to it and
+    // falls back to `subheading` when left empty.
+    richBodyField('introRich', {
+      label: 'Intro copy (rich text)',
+      admin: {
+        condition: (_, sibling) => sibling?.variant === 'edu-panels',
+        description:
+          'Replaces the plain Subheading for this variant, adding bold and italic. Leave empty to keep using Subheading.',
+      },
+    }),
     {
       name: 'columns',
       type: 'select',
@@ -66,11 +80,30 @@ export const ProcessSteps: Block = {
           ],
         },
         {
+          name: 'badgeStyle',
+          type: 'select',
+          defaultValue: 'plain',
+          label: 'Badge emphasis',
+          admin: {
+            condition: (_, sibling: { badge?: string | null } = {}) => Boolean(sibling?.badge),
+            description: 'Highlight brightens the pill so one step stands out from the others.',
+          },
+          options: [
+            { label: 'Plain', value: 'plain' },
+            { label: 'Highlight', value: 'accent' },
+          ],
+        },
+        {
           name: 'title',
           type: 'text',
           admin: { description: 'Optional — leave empty for a number-only step.' },
         },
-        { name: 'description', type: 'textarea' },
+        richBodyField('description', {
+          admin: {
+            description:
+              'Body copy for the step. Bold and italic are available — the reference AAMLE panel bolds an organisation name and italicises a publication title.',
+          },
+        }),
         {
           name: 'bullets',
           type: 'array',
