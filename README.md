@@ -102,6 +102,12 @@ rm -f /tmp/wt/node_modules && git worktree remove --force /tmp/wt
 Production builds and migrates on a remote box: commit and push, then the box pulls, builds and
 migrates against the live database.
 
+> **Current plan: nothing is pushed until the polishing work is finished.** Commits accumulate on
+> `main` locally; the migration is generated once, at the end, against whatever the schema has
+> become by then. `OUTSTANDING.md` §1 holds the full detail — what it will add, the **five columns
+> it drops**, the two type changes a generated migration gets wrong, and the pre-flight check to run
+> on the box before any of it. Read it before you push, not after.
+
 After changing any collection, global or block field:
 
 ```bash
@@ -111,10 +117,15 @@ pnpm payload migrate
 pnpm build
 ```
 
-**Keep the schema additive.** Every migration so far only adds columns. A dropped column is
-irreversible data loss on a live site, and the `migrate:create` prompt that asks "created or renamed
-from another column?" is where that happens by accident — choosing *rename* moves an unrelated
-column's data into the new field.
+**Keep the schema additive.** The only migration in the repo today is the baseline, and it only adds.
+A dropped column is irreversible data loss on a live site, and the `migrate:create` prompt that asks
+"created or renamed from another column?" is where that happens by accident — choosing *rename*
+moves an unrelated column's data into the new field.
+
+The pending migration is the exception, and a deliberate one: it drops five columns whose data has
+either moved elsewhere or stopped being rendered. Each is named and justified in `OUTSTANDING.md`
+§1, with the SQL to check whether the box actually holds anything in them. **If a generated
+migration ever drops a column that file does not list, stop.**
 
 Three environment variables are required in production and the app refuses to boot without them:
 `SMTP_HOST`, `NEXT_PUBLIC_SERVER_URL`, `PREVIEW_SECRET`. Each fails *silently* rather than loudly
