@@ -272,6 +272,18 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   rule you know works (`nav.site-nav` → `position: sticky`). Do not try to read `document.styleSheets`
   — cross-sheet access throws, and a `try/catch` around it reports zero matches for *every* selector,
   including ones that are plainly applied.
+- **Never run `pnpm build` while `pnpm dev` is running.** They share `.next`, and the production
+  build overwrites what the dev server is serving from. Measured: a hover rule that had just been
+  confirmed working (`.audience-card:hover` → `translateY(-6px)`) started computing to `none` on
+  every run, while `:hover` still matched and `elementFromPoint` was inside the card — the signature
+  of correct CSS that never arrived. Four reproductions in a row made it look like a real,
+  deterministic defect in the *test*, not the environment. `./stop.sh && rm -rf .next && ./start.sh`
+  restored it, source unchanged. Run `pnpm test` first and `pnpm build` last, then restart dev.
+- **Hover measurements need the pointer parked somewhere harmless first.** Playwright's mouse is
+  stationary while `scrollIntoViewIfNeeded` moves the page underneath it, so the element you are
+  about to measure "at rest" can already be hovered. That read the same transform for rest and hover
+  and made a positive control pass while proving nothing. `page.mouse.move(4, 4)` before every
+  resting reading.
 - **Assert both states of a two-state behaviour, or the guard passes on the degenerate one.** The
   skip-link test checked only "on-screen when focused" (`top >= 0`) — trivially true of an unstyled
   element sitting statically at the top of the page, so it went green while the link was visibly

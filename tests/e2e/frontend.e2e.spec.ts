@@ -173,6 +173,110 @@ test.describe('Frontend', () => {
     })
   }
 
+  /**
+   * A testimonial card highlights on hover without moving.
+   *
+   * `.testimonials-viewport` is `overflow: hidden` and exactly the card's height,
+   * so it has no slack at all. The block's `hoverEffect` field defaults to
+   * `lift` and the seed never sets it, so Payload stored `lift` by itself and
+   * `.vf-hover-lift .vf-card:hover` translated the card up 4px — which put its
+   * top edge and rounded corners outside the viewport and cut them off. The
+   * design reference gives these cards a colour-only hover.
+   *
+   * Two clauses beyond "did not move", both load-bearing:
+   *
+   *  - the border colour must *change*, or "no movement" is also satisfied by a
+   *    hover that never registered at all;
+   *  - a gateway card, in a section with no clipping ancestor, must still lift —
+   *    a positive control that proves `:hover` works in this harness and that
+   *    the fix is scoped to testimonials rather than having killed card motion
+   *    everywhere.
+   *
+   * Three deliberate breaks were applied to `src/app/(frontend)/globals.css`,
+   * and what each one did is worth recording, including the one that did not
+   * fail:
+   *
+   *  1. Delete `.testimonial-card:hover { transform: none; }` → RED, on the
+   *     main assertion: `matrix(1, 0, 0, 1, 0, -4)`.
+   *  2. Widen it to `.testimonial-card:hover, .vf-card:hover` → still green,
+   *     and correctly so. `.audience-card:hover` is unlayered at the same
+   *     (0,2,0) and declared later, so the gateway card kept its lift; nothing
+   *     regressed, so nothing should fail. This control detects a hover that is
+   *     not registering, not every over-broad selector one could write.
+   *  3. Neutralise `.audience-card:hover`'s own `translateY(-6px)`, so hover
+   *     becomes undetectable → RED, on the positive control, which is the
+   *     scenario it exists for.
+   */
+  test('a testimonial card highlights on hover without moving', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/')
+
+    // Park the pointer somewhere harmless before every resting reading.
+    // `scrollIntoViewIfNeeded` moves the page under a stationary cursor, so a
+    // card can end up hovered before it is measured — that is how the first
+    // draft of the positive control below read the same transform at rest and
+    // on hover, and would have passed no matter what the CSS said.
+    const restPointer = () => page.mouse.move(4, 4)
+
+    const settle = async (locator: ReturnType<typeof page.locator>) => {
+      await locator.scrollIntoViewIfNeeded()
+      await restPointer()
+      // Cards animate over `--transition`, and the scroll-reveal has its own
+      // 0.6s; read only once both have finished.
+      await page.waitForTimeout(900)
+    }
+
+    const transformOf = (locator: ReturnType<typeof page.locator>) =>
+      locator.evaluate((el) => getComputedStyle(el).transform)
+
+    const card = page.locator('.testimonial-card').first()
+    await settle(card)
+
+    const atRest = await card.evaluate((el) => ({
+      transform: getComputedStyle(el).transform,
+      borderColor: getComputedStyle(el).borderTopColor,
+    }))
+    expect(atRest.transform, 'a testimonial card should be untransformed at rest').toBe('none')
+
+    await card.hover()
+    await page.waitForTimeout(700)
+
+    const hovered = await card.evaluate((el) => {
+      const viewport = el.closest('.testimonials-viewport')
+      return {
+        transform: getComputedStyle(el).transform,
+        borderColor: getComputedStyle(el).borderTopColor,
+        clippedAbove: viewport
+          ? viewport.getBoundingClientRect().top - el.getBoundingClientRect().top
+          : 0,
+      }
+    })
+
+    expect(hovered.transform, 'a testimonial card must not move on hover').toBe('none')
+    expect(
+      hovered.clippedAbove,
+      'a testimonial card must not be clipped by its carousel viewport',
+    ).toBeLessThanOrEqual(0)
+    expect(hovered.borderColor, 'the hover highlight must still happen').not.toBe(
+      atRest.borderColor,
+    )
+
+    // Positive control — a card in a section with no clipping ancestor must
+    // still move, so "did not move" above cannot be satisfied by a hover that
+    // never landed, and the fix is shown to be scoped to testimonials.
+    const gateway = page.locator('.vf-gateway-cards .vf-card').first()
+    await settle(gateway)
+    const gatewayAtRest = await transformOf(gateway)
+
+    await gateway.hover()
+    await page.waitForTimeout(700)
+
+    expect(
+      await transformOf(gateway),
+      'gateway cards should still lift on hover — if this matches their resting transform, hover is not registering and the assertions above prove nothing',
+    ).not.toBe(gatewayAtRest)
+  })
+
   test('the enquiry drawer opens and can be submitted', async ({ page }) => {
     await page.goto('/')
 

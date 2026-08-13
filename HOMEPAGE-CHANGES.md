@@ -10,7 +10,7 @@ the reason) or `Deferred` (logged in `OUTSTANDING.md` with its cost).
 Read the three lists after the table too: **new/removed admin controls**, **database changes that
 will not travel with a git push**, and **what was left undone**.
 
-> **Three further passes followed**, each with its own section at the end of this file. Where the
+> **Four further passes followed**, each with its own section at the end of this file. Where the
 > first pass's text below has been overtaken, it is marked rather than rewritten, so the record
 > stays a history and not just a snapshot.
 >
@@ -21,6 +21,12 @@ will not travel with a git push**, and **what was left undone**.
 >    Closes B14, and fixes a shield that followed Site Settings on the homepage and nowhere else.
 > 3. [Fourth pass — centred section titles were wrapping at 720px](#fourth-pass--centred-section-titles-were-wrapping-at-720px).
 >    One un-ported `max-width` was breaking 10 headings across 8 pages.
+> 4. [Fifth pass — testimonial cards lifted on hover and got clipped](#fifth-pass--testimonial-cards-lifted-on-hover-and-got-clipped).
+>    A field default nobody chose, moving cards inside a viewport with no room for it.
+>
+> A pattern worth naming across passes 3–5: each began as "this one thing on the homepage looks
+> wrong" and each turned out to be a global — a hardcoded asset, an un-ported width cap, a field
+> default — reaching well beyond the page it was noticed on.
 
 ---
 
@@ -458,3 +464,93 @@ The computed-style harness had **two dead routes**: `/about-verify` and `/legal/
 `README.md` also warned that the harness does **not** measure `width`, `height`,
 `grid-template-columns` or `transform`. All four had been added; the warning argued against trusting
 the one gate that catches exactly this class of bug. Corrected.
+
+---
+
+# Fifth pass — testimonial cards lifted on hover and got clipped
+
+Reported: the testimonials section moves up when highlighted, the top gets cut off, and it should
+just highlight.
+
+## The cause
+
+Not the card's CSS. `.testimonial-card:hover` (globals.css:3009) is a faithful port of
+`styles.css:1856` and is **colour only**:
+
+```css
+.testimonial-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+```
+
+Nothing in the reference's testimonials translates or scales a card — the only transforms there are
+the track's `translateX` and `scale(1.08)` on the nav arrows.
+
+The movement came from a CMS-only global. `TestimonialsGrid` spreads `gridDisplayFields`, whose
+`hoverEffectField` has **`defaultValue: 'lift'`**, and the homepage seed never sets `hoverEffect` —
+so Payload stored `lift` on its own, `Section` emitted `vf-hover-lift`, and
+`.vf-hover-lift .vf-card:hover { transform: translateY(-4px) }` applied. The ported rule is
+unlayered so it won on colour, but it declares no `transform`, so nothing opposed the lift.
+
+**Why it looked broken rather than just different:** `.testimonials-viewport` is `overflow: hidden`
+and *exactly* the card's height — 407.64px viewport, 407.64px card, zero padding. Measured at
+1440px:
+
+| | Rest | Hover (before) | Hover (after) |
+|---|---|---|---|
+| `transform` | `none` | `matrix(1, 0, 0, 1, 0, -4)` | `none` |
+| Card top vs viewport top | flush | **4px above — clipped** | flush |
+| `box-shadow` | `none` | `0 4px 24px rgba(28,117,188,.1)` — **clipped away entirely** | — |
+| `border-top-color` | `rgb(198, 198, 198)` | `rgb(28, 117, 188)` | `rgb(28, 117, 188)` |
+
+So the lift bought nothing: its shadow was invisible and its movement only shaved the card's top
+edge and corners.
+
+## What changed
+
+One unlayered rule beside the ported one — `.testimonial-card:hover { transform: none; }` — so it
+beats `@layer components` with no `!important` and without editing the port. The highlight is now
+what the reference specifies: the border turning brand blue.
+
+**It neutralises `lift` only.** `.vf-hover-zoom`, `-glow`, `-accent-bar` and `-none` are unlayered
+at higher specificity and still win, so four of the block's five Hover effect options keep working.
+`src/Styles/HOOKS.md` records the exception, so the editor's manual does not promise a Lift that a
+testimonials block will not perform.
+
+Of the three homepage sections carrying `vf-hover-lift`, only two have a clipping ancestor, and the
+experts carousel already gives itself `padding-top: 6px` — enough for its 4px lift. It was not
+touched.
+
+## New guard
+
+`tests/e2e/frontend.e2e.spec.ts` — *"a testimonial card highlights on hover without moving"*. It
+asserts no movement, no clipping, **and that the border colour changed** — without that last clause
+"did not move" is also satisfied by a hover that never landed. A gateway card is hovered in the same
+test as a positive control.
+
+Three breaks were applied, and the one that stayed green is worth recording too:
+
+| Break | Result |
+|---|---|
+| Delete the new rule | **RED** — `matrix(1, 0, 0, 1, 0, -4)` |
+| Widen it to `.vf-card:hover` | Green, correctly: `.audience-card:hover` is unlayered at the same specificity and declared later, so nothing regressed |
+| Neutralise `.audience-card:hover`'s own lift, making hover undetectable | **RED** on the positive control — the case it exists for |
+
+## Verification — fifth pass
+
+| Check | Result |
+|---|---|
+| `pnpm lint` · `pnpm exec tsc --noEmit` | Clean · Clean |
+| `pnpm test` | **114/114** int, **13/13** e2e (was 12) |
+| `pnpm build` | Passes |
+| Computed-style diff vs a baseline captured before the change | **3 nodes — the known scroll-reveal animation frames, and nothing else.** The harness never triggers `:hover`, so a hover-only change must leave every resting style untouched; it did |
+| Browser, at 1440px | Testimonial `none → none`, border `#c6c6c6 → #1c75bc`, `clippedAbove: 0`. Gateway card `none → -6px`, still lifting |
+
+## Two traps this pass added to `CLAUDE.md`
+
+- **`pnpm build` while `pnpm dev` is running poisons the dev server** — they share `.next`. A hover
+  rule confirmed working minutes earlier began computing to `none` on every run while `:hover` still
+  matched, which reproduced four times and looked exactly like a deterministic defect in the new
+  test. `rm -rf .next` and a restart fixed it with the source unchanged.
+- **Park the pointer before reading a "resting" style.** Playwright's mouse stays put while
+  `scrollIntoViewIfNeeded` moves the page under it, so an element can already be hovered when it is
+  measured at rest. That made the first draft of the positive control read the same value twice and
+  pass while proving nothing.

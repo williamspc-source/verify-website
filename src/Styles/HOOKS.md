@@ -239,6 +239,11 @@ Every block exposes **Background**, **Container width**, **Motion**, and grid bl
 **Hover effect** and **Card shadow**. Layout primitives add padding, gap, columns/span and
 alignment. The home hero adds background, width and padding. Reach for CSS only after these.
 
+> **One exception: Testimonials ignores Hover effect → Lift.** Those cards deliberately do not move
+> on hover — they highlight by turning their border brand blue, which is what the design calls for.
+> The carousel crops tightly to the card, so anything that moved a card cut its top edge off. Glow,
+> Zoom, Accent bar and None all still work on that block.
+
 ---
 
 ## 8. Five-minute recipes
