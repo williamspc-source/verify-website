@@ -26,3 +26,10 @@ tsconfig.tsbuildinfo
 # Local dev server runtime (start.sh / stop.sh)
 .dev.pid
 .dev.log
+
+# Computed-style baselines. Throwaway by design: they are keyed by structural
+# index path, so ANY content change invalidates them — a checked-in baseline
+# would be stale on arrival and would only ever produce a diff nobody can read.
+# Capture one immediately before a change, compare immediately after, discard.
+# Left untracked but un-ignored they reached 29MB, one `git add -A` from the repo.
+tests/visual/__snapshots__/

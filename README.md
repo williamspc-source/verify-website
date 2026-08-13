@@ -59,19 +59,43 @@ is still reported as `[EMAIL NOT SENT]` at error level. **Never set it on the se
 
 In order. Each step catches something the next one would hide.
 
+> **`pnpm build` goes after the tests, not before them.** `pnpm build` and `pnpm dev` both write
+> `.next`, so building while the dev server is up replaces the bundle it is serving — and
+> `pnpm test:e2e` reuses that same running server. Do it in the wrong order and e2e runs against a
+> half-replaced build. That has already happened here: a hover rule confirmed working minutes
+> earlier computed to `none` on four consecutive runs, and it read like a real defect in the test
+> rather than a poisoned server. `rm -rf .next` and a restart fixed it with the source untouched.
+> If you must build mid-session, `./stop.sh` first and `./start.sh` after.
+
 1. `pnpm exec tsc --noEmit`
-2. `pnpm test:int` — includes the admin-control guards below
-3. `pnpm build` — must pass without `LOCAL_PROD_REPRO`; building needs no deploy secrets
+2. `pnpm test` — lint, then integration, then e2e. Playwright reuses a dev server on `:3000` and
+   starts one if none is up. Includes the admin-control guards and the browser guards below
+3. `./stop.sh` (if a dev server is up), then `pnpm build` — must pass without `LOCAL_PROD_REPRO`;
+   building needs no deploy secrets
 4. `pnpm dev:prod` and click through: submit the enquiry drawer and confirm a row appears under
    **Form Submissions**; open a draft post's **Preview**; check the header and footer nav links
    resolve
-5. `pnpm test:e2e`
-6. On the box, after any field change: `pnpm payload generate:types` →
+5. On the box, after any field change: `pnpm payload generate:types` →
    `pnpm payload migrate:create <name>` → `pnpm payload migrate` → `pnpm build`
-7. After any bulk content import or seed: **Admin → System → Search → Reindex**. Search results
+6. After any bulk content import or seed: **Admin → System → Search → Reindex**. Search results
    store their own canonical URL (`uri`), written on save — documents that predate a change to
    that logic keep whatever they had, and a result with no `uri` renders unlinked. On the local
    database only 7 of 66 search documents had one until it was reindexed.
+
+## Committing
+
+**Every commit must typecheck on its own**, not merely at the end of the branch. When one pass is
+split into several commits, a file touched by more than one of them gets staged in part — and it is
+easy to leave a commit whose code refers to something a later commit introduces. `git log` then
+holds a revision that does not build, which breaks `git bisect` and any deploy pinned to it.
+
+This has already cost a rewind of two commits here. Check it the cheap way, per commit:
+
+```bash
+git worktree add /tmp/wt <sha> && ln -s "$PWD/node_modules" /tmp/wt/node_modules
+(cd /tmp/wt && pnpm exec tsc --noEmit)
+rm -f /tmp/wt/node_modules && git worktree remove --force /tmp/wt
+```
 
 ## Deploying
 
@@ -123,6 +147,28 @@ wrote to, another omitted the only property anything actually violated. The suit
 meant nothing. Each test now records, in a comment above it, the deliberate break used to prove it
 goes red, and `zsh tests/int/prove-guards.sh` applies each in turn and restores the tree.
 **If you change a test, re-run that script — all ten cases must report PASS.**
+
+### The browser guards
+
+Three things in `tests/e2e/frontend.e2e.spec.ts` cannot be checked by reading source, because each
+is about what the page *computes*, not what the CSS says. Each carries the deliberate break that
+proves it red; `prove-guards.sh` drives `pnpm test:int` only, so these are re-proved by hand.
+
+| Guard | Catches |
+|---|---|
+| The `<main>` landmark and its skip link | The link rendering unstyled — asserted **offscreen before focus** as well as on-screen after, because the on-screen half alone is trivially true of an unstyled element |
+| Centred section headers do not narrow themselves into a wrap | A width cap on a heading box breaking a title that its container had room for. Ten headings across eight pages were wrapping this way |
+| A testimonial card highlights on hover without moving | A card motion preset firing inside a viewport with no room for it, clipping the card |
+
+Two habits make the difference between these and the guards that rotted:
+
+- **State the fault as a cause, not as a number.** The first version of the heading guard compared
+  natural width against the nearest container and flagged `/services`, whose header is deliberately
+  a two-column grid. A numeric threshold needs an exception list, and the exception list is where
+  the next false positive hides.
+- **Carry a positive control in the same test.** The hover guard also hovers a card elsewhere on the
+  page and requires *that* one to still move. Without it, "the testimonial did not move" is equally
+  satisfied by a hover that never registered — and the whole test passes for the wrong reason.
 
 `pnpm lint` runs as part of `pnpm test`. It is enforced, not advisory: it had been crashing on an
 obsolete config shim and so had never run at all, which is how ten React Compiler errors — two of

@@ -14,6 +14,24 @@ fixed, each with measured impact and the cost of fixing it. Check it before assu
 oversight — and keep it true: delete an entry when it is fixed, add one whenever you knowingly leave
 something undone.
 
+## The records, and the rule for all of them
+
+Five documents describe this repo to someone who was not there. **A change lands in all the ones it
+touches, in the same pass, or the set starts lying** — and a reader cannot tell which one is stale.
+
+| File | Holds | Reader |
+|---|---|---|
+| `CLAUDE.md` | Architecture, invariants, traps | Whoever changes the code |
+| `OUTSTANDING.md` | What is knowingly imperfect, and what fixing it costs | Whoever inherits it |
+| `README.md` | Running, testing, deploying, and where images go | Whoever maintains it |
+| `src/Styles/HOOKS.md` | Every editable control and where it lives | The non-technical editor |
+| `HOMEPAGE-CHANGES.md` | Design-reference audit, pass by pass | Whoever asked for the work |
+
+This has failed once already, and quietly: the image pass was written up in its published artifact
+but **not** in `HOMEPAGE-CHANGES.md`, which went on claiming two finished items were "still
+outstanding" until someone re-read it. If a pass is mirrored to a published artifact, update the
+file and the artifact together — the artifact is a copy, never the source.
+
 ## Invariants
 
 > **Nothing fails silently. Nothing appears to work when it doesn't.**
@@ -47,8 +65,9 @@ Every rule below is here because that failure already happened once in this repo
 pnpm dev                  # http://localhost:3000 (admin at /admin), binds 0.0.0.0
 ./start.sh / ./stop.sh    # same server backgrounded → .dev.log / .dev.pid (LAN-shareable)
 pnpm dev:prod             # clean build + start — needs LOCAL_PROD_REPRO=1 in .env (see Local development)
+pnpm build                # ./stop.sh FIRST — build and dev share .next (see Verifying a change)
 pnpm lint                 # eslint (pnpm lint:fix to autofix)
-pnpm test                 # int + e2e
+pnpm test                 # lint → int → e2e, in that order; stops at the first failure
 pnpm test:int             # vitest, tests/int/**/*.int.spec.ts
 pnpm test:e2e             # playwright, tests/e2e/ — starts/reuses a dev server on :3000
 pnpm generate:types       # → src/payload-types.ts   (after ANY collection/global/block field change)
@@ -290,6 +309,27 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   broken on every page. Adding the other half — offscreen *before* focus — is what makes it fail.
   Same shape as the orphan-field guard: a check that only looks at the "working" end of a behaviour
   cannot distinguish working from absent.
+- **Run a new guard against something that is deliberately fine before trusting it.** Proving a guard
+  goes red on a real defect is only half the job; the other half is proving it stays green on a
+  lookalike. The first heading-wrap guard compared each title's natural width against the nearest
+  `.container` and reported `/services` as broken — that header is `display: grid`
+  (`.svc-admin-split`), so its title correctly occupies a 620px track of a 1132px container. Acting
+  on that would have "fixed" a section that was right. The rewrite states the fault causally
+  (neutralise the header's own `max-width`; if a two-line title collapses to one, the header did it
+  to itself), which exempts every legitimate case without an allowlist. **Prefer a guard that
+  measures cause over one that compares numbers** — the numeric version needs an exception list, and
+  an exception list is where the next false positive hides.
+- **A break that stays green is a result worth recording, not a failure of the exercise.** Widening
+  the testimonial fix to `.vf-card:hover` did not fail its guard, and should not have: the gateway
+  card's own unlayered `:hover` is declared later at equal specificity, so nothing regressed. Write
+  down what each attempted break *did*, including the ones that did nothing, or the next person
+  re-derives it — and knows which failure the guard actually covers.
+- **A harness silently covers less than it claims.** `computedSnapshot.mjs` listed two routes that do
+  not exist (`/about-verify`, `/legal/privacy-policy`); both 404, `capture` never checked status, so
+  it banked the not-found page as a baseline **twice** — 178 nodes each, an identical count, which is
+  the only reason it was noticed — while two real pages went unmeasured. It now refuses any non-200.
+  Whenever a checker takes a list of inputs, assert the inputs resolve; a tool that quietly measures
+  the wrong thing reads exactly like a tool that found nothing wrong.
 
 ### CSS token tooling
 
@@ -299,6 +339,12 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   gate against a running `:3000`, keyed by structural index path rather than class name (class
   names are what the migrations change). Token replacements are value-preserving by
   construction, so the expected diff is empty; any diff is a real bug, not a tolerance.
+  It measures **34** properties over **14** routes — `width`/`height`/`gridTemplateColumns`/
+  `transform` are in that set, which is what makes it catch a reflow and not just a repaint, but
+  14 routes is 14 of the site's 29 pages and it never triggers `:hover`. Capture immediately
+  before a change and compare immediately after; baselines are gitignored because any content
+  change invalidates them. `capture` refuses a non-200 — it used to bank the 404 page as a
+  baseline for two routes that do not exist.
 - `node tests/visual/tokenise.mjs <4a|4b|4c|4d> [--dry]` and
   `node tests/visual/tokeniseShape.mjs <radius|gradient> [--dry]` — one-shot codemods over
   `globals.css` (colour literals → `var()`/`color-mix()`, radius/gradient literals → tokens).
