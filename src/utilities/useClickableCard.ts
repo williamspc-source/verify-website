@@ -54,8 +54,10 @@ function useClickableCard<T extends HTMLElement>({
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router, card, link, timeDown],
+    // Genuinely empty: the body reads only refs and the event. The previous list
+    // named three refs (stable, so the rule flags them as pointless) and a
+    // `router` this callback never touches.
+    [],
   )
 
   const handleMouseUp = useCallback(
@@ -76,8 +78,11 @@ function useClickableCard<T extends HTMLElement>({
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router, card, link, timeDown],
+    // `external`, `newTab` and `scroll` are props this closes over. The old list
+    // held only stable values, so the callback never changed identity and kept
+    // the mount-time props for the life of the card — harmless today because the
+    // one caller passes no options, wrong the moment any caller passes a live one.
+    [external, newTab, router, scroll],
   )
 
   useEffect(() => {
@@ -97,8 +102,9 @@ function useClickableCard<T extends HTMLElement>({
     return () => {
       abortController.abort()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [card, link, router])
+    // Re-bind when either handler changes identity. Omitting them meant even a
+    // correctly-rebuilt `handleMouseUp` would never reach the DOM node.
+  }, [handleMouseDown, handleMouseUp])
 
   return { cardRef: card, linkRef: link }
 }
