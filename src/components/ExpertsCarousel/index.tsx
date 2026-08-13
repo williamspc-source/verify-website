@@ -22,7 +22,15 @@ export const ExpertsCarousel: React.FC<{
   className?: string
   cardClassName?: string
 }> = ({ cards, speed, startDirection = 'left', showArrows = true, className, cardClassName }) => {
-  const [direction, setDirection] = useState<Direction>(startDirection || 'left')
+  // `null` means "the visitor has not clicked an arrow", so the editor's
+  // Start direction still wins. Seeding state from the prop instead latched it:
+  // live preview reconciles the tree in place and deliberately preserves client
+  // state, so an editor changing Start direction saw speed and the arrows update
+  // while the scroll direction stayed wrong until a hard reload. Same
+  // choice-overrides-prop shape as the specialty filter in
+  // `SpecialistDirectory/DirectoryClient.tsx`.
+  const [directionChoice, setDirectionChoice] = useState<Direction | null>(null)
+  const direction = directionChoice ?? startDirection ?? 'left'
 
   // `is-ready` is what starts the CSS marquee. Derived from the live media query
   // rather than latched once on mount, so toggling "Reduce motion" in system
@@ -43,7 +51,7 @@ export const ExpertsCarousel: React.FC<{
           className="experts-carousel-control experts-carousel-control--prev vf-carousel__arrow vf-carousel__arrow--prev"
           aria-label="Scroll specialists right"
           aria-pressed={direction === 'right'}
-          onClick={() => setDirection('right')}
+          onClick={() => setDirectionChoice('right')}
         >
           <span aria-hidden>‹</span>
         </button>
@@ -66,7 +74,7 @@ export const ExpertsCarousel: React.FC<{
           className="experts-carousel-control experts-carousel-control--next vf-carousel__arrow vf-carousel__arrow--next"
           aria-label="Scroll specialists left"
           aria-pressed={direction === 'left'}
-          onClick={() => setDirection('left')}
+          onClick={() => setDirectionChoice('left')}
         >
           <span aria-hidden>›</span>
         </button>
