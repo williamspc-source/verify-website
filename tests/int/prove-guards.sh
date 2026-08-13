@@ -37,6 +37,14 @@ echo "--- B2: a code-defined picker class with no matching CSS rule ---"
 run_case "B2-picker" "src/fields/codeDefinedClasses.ts" "the CSS-class picker offers" \
   "perl -0pi -e \"s/^\\]/  { name: 'vf-home-nope', label: 'x' },\\n]/m\" src/fields/codeDefinedClasses.ts"
 
+echo "--- F1: a brand asset hardcoded in a CSS rule instead of a token ---"
+run_case "F1-hardcoded-asset" "src/app/(frontend)/globals.css" "bundled brand asset" \
+  "perl -0pi -e \"s{background: var\\(--vf-shield-url\\) no-repeat center / contain;}{background: url('/assets/images/VERIFY Shield.png') no-repeat center / contain;}\" 'src/app/(frontend)/globals.css'"
+
+echo "--- F2: a block that draws a placeholder but offers no upload ---"
+run_case "F2-no-upload" "src/blocks/WhyVerify/config.ts" "image placeholder has an upload" \
+  "perl -0pi -e \"s/      name: 'image',\\n      type: 'upload',\\n      relationTo: 'media',/      name: 'image',\\n      type: 'text',/\" src/blocks/WhyVerify/config.ts"
+
 echo "--- E1: a call site that passes a named cacheLife profile (via its ALIAS) ---"
 run_case "E1-profile-arg" "src/Styles/hooks/revalidateStyles.ts" "named cacheLife profile" \
   "perl -0pi -e \"s/revalidateTag\\('global_custom-styles'\\)/revalidateTag('global_custom-styles', 'max')/\" src/Styles/hooks/revalidateStyles.ts"

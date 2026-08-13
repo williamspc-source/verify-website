@@ -108,7 +108,11 @@ that reports every enquiry notification and password-reset email as sent. See `.
    Appearance choice, so the editor's stored value is discarded,
 4. a query against a draft-enabled collection has no `overrideAccess` and no `_status` filter,
    leaking unpublished documents onto the public site,
-5. `HOOKS.md` documents a style hook class that nothing emits.
+5. `HOOKS.md` documents a style hook class that nothing emits,
+6. a cache purge passes a named `cacheLife` profile, which marks the tag stale instead of expiring
+   it — the editor's first reload after saving then serves the *previous* value,
+7. a brand asset is referenced straight from a CSS rule instead of through a Site Settings token, or
+   a block draws an image placeholder without offering an upload to replace it.
 
 These exist because a 2026 audit found ~118 verified cases of exactly those shapes.
 
@@ -117,19 +121,20 @@ with "a crude test that runs beats an accurate one that rots", and under that li
 four patterns could not fail on the defect they named — one collected results into an array it never
 wrote to, another omitted the only property anything actually violated. The suite reported 94/94 and
 meant nothing. Each test now records, in a comment above it, the deliberate break used to prove it
-goes red, and `zsh tests/int/prove-guards.sh` applies all five in turn and restores the tree.
-**If you change a test, re-run that script — all five must report PASS.**
+goes red, and `zsh tests/int/prove-guards.sh` applies each in turn and restores the tree.
+**If you change a test, re-run that script — all ten cases must report PASS.**
 
 `pnpm lint` runs as part of `pnpm test`. It is enforced, not advisory: it had been crashing on an
 obsolete config shim and so had never run at all, which is how ten React Compiler errors — two of
 them real bugs (a `prefers-reduced-motion` check that never reacted, and a directory filter that
 overwrote the visitor's own selection) — sat unnoticed.
 
-Those ten were fixed by changing the code, not by suppressing the rules: **no `react-hooks/*`
-disable exists outside `useClickableCard.ts`**, which carries three pre-existing
-`exhaustive-deps` ones. The other `eslint-disable` comments in `src/` are `@next/next/no-img-element`
-(deliberate `<img>` use) and `@typescript-eslint/no-explicit-any` (seed fixtures). Reach for a code
-change before a disable — these rules have already earned their keep.
+Those ten were fixed by changing the code, not by suppressing the rules, and **there is now no
+`react-hooks/*` disable anywhere in `src/`**. The last three lived in `useClickableCard.ts` and were
+removed by fixing the dependency arrays they were hiding — two of them concealed real omissions. The
+remaining `eslint-disable` comments in `src/` are `@next/next/no-img-element` (deliberate `<img>`
+use) and `@typescript-eslint/no-explicit-any` (seed fixtures). Reach for a code change before a
+disable — these rules have already earned their keep.
 
 When one fails, wire the control up; if it genuinely should not be wired, add it to the allowlist
 **with a reason**.
@@ -137,6 +142,61 @@ When one fails, wire the control up; if it genuinely should not be wired, add it
 `tests/visual/computedSnapshot.mjs` captures computed styles across the site so a CSS change can be
 diffed. Note its limits before trusting a clean run: it measures 30 properties that do **not**
 include `width`, `height`, `grid-template-columns` or `transform`, and it never triggers `:hover`.
+
+## Images and where to upload them
+
+**The site ships before its photography does.** Every image slot is empty and showing a placeholder,
+and every one of them is fillable from `/admin` — no code change, no deploy. This is the map.
+
+Nothing here is hardcoded: where a bundled file appears (the logo, the shield), it is a *fallback*
+that only shows while the corresponding field is empty. Two guards in
+`tests/int/adminControls.int.spec.ts` keep it that way — one fails the build if a brand asset is
+referenced straight from CSS, the other if a block draws a placeholder without offering an upload.
+
+### Site-wide — **Admin → Globals → Site Settings**
+
+| Field | Where it appears | If left empty |
+| --- | --- | --- |
+| Logo | Header, and the footer if no footer logo is set | Bundled VERIFY wordmark |
+| Footer logo | Footer only | Falls back to Logo, then the bundled wordmark |
+| Favicon | Browser tab | `public/favicon.png` |
+| Social image | Link previews when a page is shared | No preview image |
+| Shield / seal mark | Home hero watermark, the mark behind **every** interior page hero, and the Contact page's portal cards | Bundled VERIFY shield |
+
+### People and content — **Admin → Collections**
+
+| Collection | Field | If left empty |
+| --- | --- | --- |
+| Specialists | Photo (also CV, Sample report) | The person's initials on a plain avatar |
+| Team | Photo | The person's initials on a plain avatar |
+| Services | Photo | In the accordion layout, a blue gradient tile with the service icon and “Image Placeholder” |
+| Events | Image | Card renders without an image |
+| Posts | Hero image, Author photo | Article header renders with no image behind it |
+| Resources | File | The resource has nothing to download |
+
+### Inside a page — **Admin → Pages → *page* → Layout**
+
+Add or open the block, then use its upload field.
+
+| Block | Field | If left empty |
+| --- | --- | --- |
+| Split Feature | Row → Image | Grey placeholder box, if that row's "Show a grey image placeholder" is ticked; otherwise the row goes full width |
+| Why VERIFY | Image | Labelled gradient box |
+| AAMLE Education | Image | Labelled gradient box, if the row's placeholder is ticked |
+| Leadership Spotlight | Photo | Labelled box with a person icon |
+| FAQ | Item → Image | Split layout only, and only the **first** item that has one is used; with none, the FAQ renders full width |
+| Slide Carousel · Image · Media | Image / Media | Nothing renders for that slide or block |
+| Page hero (Hero tab) | Media | Hero renders without an image panel |
+
+### Two things worth knowing before you start
+
+- **Uploading always wins.** If a block shows a placeholder and you attach an image, the image
+  replaces it — you never need to untick anything first. The placeholder toggles only decide what
+  happens while the slot is still *empty*.
+- **Fix a bad crop with the focal point, not a new file.** Uploads live in the **Media** collection,
+  which stores alt text plus a focal point and zoom. If a portrait crops through someone's face,
+  open the image in Media and move the focal point — every place that image is used re-crops around
+  it.
 
 ## Architecture
 

@@ -21,7 +21,6 @@ Related: `CLAUDE.md` → **Invariants** (the rules these were judged against) an
 | # | Issue | Live today? | User impact | Effort | Recommendation |
 |---|---|---|---|---|---|
 | 1 | Migration not yet created on the box | — | **Blocks deploy** | ~15 min | **Required** |
-| 2 | Split-feature image placeholder diverges from reference | Yes | Cosmetic, on temporary content | ~20 min | Optional |
 
 ---
 
@@ -118,17 +117,3 @@ file.
 
 
 ---
-
-## 2. The split-feature image placeholder diverges from the reference
-
-`SplitFeature`'s placeholder renders a 48px picture icon above an uppercase 0.72rem label; the
-reference is a plain sentence-case 0.85rem label with no icon, plus a radial vignette
-(`.design-reference/assets/css/styles.css:749-770`). The gradient is also 145deg where the
-reference is 135deg.
-
-**Why it was left.** **Measured:** 16 rows across the site currently set `imagePlaceholder`. Every
-one of them is scaffolding waiting for a real photograph — the moment an image is uploaded, none of
-this renders at all. Restyling temporary content across 16 places was judged churn, not value.
-
-Note the gradient is a Design System token (`--vf-grad-image-tint`), so the angle is editable
-without code.

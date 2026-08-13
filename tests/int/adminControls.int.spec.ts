@@ -419,6 +419,73 @@ describe('admin controls are wired', () => {
  * Proven red by: re-adding `, 'max'` to a call site, and separately by changing
  * the `{ expire: 0 }` in safeRevalidate.ts back to a named profile.
  */
+/**
+ * Pattern F — "the photo can't be changed from the admin".
+ *
+ * The site ships before its photography does, so every image slot is standing
+ * empty behind a placeholder and someone who does not write code has to be able
+ * to fill them all in later. Two ways that quietly stops being true, one of
+ * which had already happened.
+ */
+describe('every image is uploadable from the admin', () => {
+  /**
+   * A brand asset referenced straight from CSS cannot be changed by an editor.
+   *
+   * This is the one that had already gone wrong: `.page-hero-shield` (every
+   * interior page) and the contact page's portal cards both hardcoded
+   * `url('/assets/images/VERIFY Shield.png')`, while the *same* shield on the
+   * home hero read from Site Settings. Uploading a new shield changed one page
+   * and silently left the rest.
+   *
+   * The `:root` token default is the one legitimate use — that is the fallback
+   * for "nothing uploaded yet" — so the rule is not "never reference the file",
+   * it is "only a custom-property declaration may".
+   *
+   * Proven red by: pointing `.page-hero-shield` back at the file directly.
+   */
+  it('no rule references a bundled brand asset directly', () => {
+    const offenders = GLOBALS_CSS.split('\n')
+      .map((line, i) => ({ line: line.trim(), n: i + 1 }))
+      .filter(({ line }) => /url\(\s*['"]?\/assets\/images\//.test(line))
+      // A `--vf-*: url(...)` declaration is the documented default behind a
+      // Site Settings upload. Anything else is a hardcoded asset.
+      .filter(({ line }) => !/^--[\w-]+\s*:/.test(line))
+      .map(({ line, n }) => `globals.css:${n}  ${line}`)
+
+    expect(offenders, 'reference it through a token fed by Site Settings').toEqual([])
+  })
+
+  /**
+   * A block that draws a placeholder must offer a way to replace it.
+   *
+   * Keyed on `placeholderLabel` / `placeholderIcon` — the two props that mark an
+   * *image* placeholder in this codebase. Matching the bare word `placeholder`
+   * would drag in every text input (Newsletter, the Form blocks, the directory
+   * search) and demand they accept uploads.
+   *
+   * Proven red by: removing the `image` upload field from WhyVerify/config.ts.
+   */
+  it('a block that renders an image placeholder has an upload field', () => {
+    const offenders: string[] = []
+
+    for (const name of blockDirs) {
+      const src = blockSources(name)
+      if (!/placeholderLabel|placeholderIcon/.test(src)) continue
+      const config = readFileSync(join(BLOCKS, name, 'config.ts'), 'utf8')
+      if (!/type:\s*'upload'/.test(config)) {
+        offenders.push(`${name}: draws a placeholder but its config offers no upload`)
+      }
+    }
+
+    // Guard the guard: if the prop names are ever renamed this finds nothing and
+    // silently passes, which is the failure mode the whole file exists to avoid.
+    const covered = blockDirs.filter((n) => /placeholderLabel|placeholderIcon/.test(blockSources(n)))
+    expect(covered.length, 'no block matched — has the placeholder prop been renamed?').toBeGreaterThanOrEqual(4)
+
+    expect(offenders, 'a placeholder with no upload cannot be replaced by an editor').toEqual([])
+  })
+})
+
 describe('cache purges actually purge', () => {
   it('no tag purge passes a named cacheLife profile', () => {
     const wrapperPath = join(SRC, 'utilities/safeRevalidate.ts')
