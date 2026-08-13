@@ -122,6 +122,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <body>
+        {/* First focusable thing on the page, and invisible until it is focused.
+            Without it a keyboard or screen-reader user traverses the whole nav on
+            every page. The label is editable (Site Settings → Accessibility) but
+            the link itself is not optional, so an empty value falls back rather
+            than removing the only way past the navigation. */}
+        <a className="skip-link" href="#main-content">
+          {settings?.accessibility?.skipLinkLabel || 'Skip to content'}
+        </a>
         {/* Order is load-bearing: CMS token values first, then Custom Styles,
             so an editor's Global CSS can override any token. Both sit above any
             painted element, so neither causes a flash of unstyled content. */}
@@ -138,7 +146,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
 
           <Header />
-          {children}
+          {/* The site's main landmark. It lives here rather than on each page's
+              own <article> because /search has no <article> at all, and a landmark
+              that most pages have is the kind of gap an audit finds. The footer
+              keeps `mt-auto` as a direct flex child of <body>, so the sticky
+              footer is unaffected by this wrapper. */}
+          <main id="main-content">{children}</main>
           <Footer />
           <EnquiryDrawer formId={enquiryFormId} />
         </Providers>

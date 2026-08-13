@@ -317,6 +317,27 @@ export const SiteSettings: GlobalConfig = {
         },
       ],
     },
+    {
+      name: 'accessibility',
+      label: 'Accessibility',
+      type: 'group',
+      admin: {
+        description:
+          'Wording for the assistive-technology affordances that appear on every page.',
+      },
+      fields: [
+        {
+          name: 'skipLinkLabel',
+          type: 'text',
+          label: 'Skip-link text',
+          defaultValue: 'Skip to content',
+          admin: {
+            description:
+              'The link a keyboard user reaches by pressing Tab once, which jumps past the navigation to the page content. It is invisible until focused. Left empty, “Skip to content” is used — the link is never removed, because it is the only way to bypass the nav.',
+          },
+        },
+      ],
+    },
   ],
   hooks: {
     afterChange: [revalidateSiteSettings],

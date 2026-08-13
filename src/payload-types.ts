@@ -14803,6 +14803,15 @@ export interface SiteSetting {
      */
     navLabel?: string | null;
   };
+  /**
+   * Wording for the assistive-technology affordances that appear on every page.
+   */
+  accessibility?: {
+    /**
+     * The link a keyboard user reaches by pressing Tab once, which jumps past the navigation to the page content. It is invisible until focused. Left empty, “Skip to content” is used — the link is never removed, because it is the only way to bypass the nav.
+     */
+    skipLinkLabel?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -15952,6 +15961,11 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         homeLabel?: T;
         separator?: T;
         navLabel?: T;
+      };
+  accessibility?:
+    | T
+    | {
+        skipLinkLabel?: T;
       };
   updatedAt?: T;
   createdAt?: T;

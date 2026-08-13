@@ -357,6 +357,37 @@
    components using these class names; data stays editable via the CMS.
    ===================================================================== */
 @layer components {
+  /* ── Skip link ───────────────────────────────────────────────── */
+  /* Moved off-screen rather than `display: none`, which would take it out of the
+     tab order and defeat the point. It returns on :focus only.
+     `top` is animated, not `display`, so the reveal is not jarring — but the
+     transition is dropped under reduced-motion. The z-index clears .site-nav,
+     which is sticky at 100. */
+  .skip-link {
+    position: fixed;
+    top: -100px;
+    left: 16px;
+    z-index: 200;
+    padding: 12px 22px;
+    background: var(--primary);
+    color: var(--white);
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: var(--vf-radius-sm);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--primary) 35%, transparent);
+    transition: top var(--transition);
+  }
+  .skip-link:focus {
+    top: 16px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skip-link {
+      transition: none;
+    }
+  }
+
   /* ── Buttons ─────────────────────────────────────────────────── */
   /* Button styles (.btn / .btn-primary / .btn-outline / .btn-white) live once in
      the unlayered "ported design-reference" section below — that copy is
