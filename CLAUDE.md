@@ -264,6 +264,20 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
 - **Content inside an inactive Tabs pane is not in the HTML.** `curl | grep` for the AAMLE panel
   found nothing on the homepage and the block was rendering perfectly — only the active tab is
   server-rendered. Drive a browser and click the tab.
+- **A new rule in `globals.css` may not reach the browser.** A `.skip-link` rule was in the source,
+  and the element rendered completely unstyled — `position: static`, no background — as visible body
+  text above the nav on every page. Turbopack had not recompiled the stylesheet; `rm -rf .next` and a
+  restart fixed it, source unchanged. So a CSS change that "does nothing" is a stale build before it
+  is a bad selector. Confirm with `getComputedStyle` on the element and a **positive control** on a
+  rule you know works (`nav.site-nav` → `position: sticky`). Do not try to read `document.styleSheets`
+  — cross-sheet access throws, and a `try/catch` around it reports zero matches for *every* selector,
+  including ones that are plainly applied.
+- **Assert both states of a two-state behaviour, or the guard passes on the degenerate one.** The
+  skip-link test checked only "on-screen when focused" (`top >= 0`) — trivially true of an unstyled
+  element sitting statically at the top of the page, so it went green while the link was visibly
+  broken on every page. Adding the other half — offscreen *before* focus — is what makes it fail.
+  Same shape as the orphan-field guard: a check that only looks at the "working" end of a behaviour
+  cannot distinguish working from absent.
 
 ### CSS token tooling
 
