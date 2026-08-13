@@ -2031,17 +2031,33 @@
   aspect-ratio: 4/3;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
   border-radius: var(--vf-radius-md);
+  overflow: hidden;
+}
+/* ── The empty-photo treatment (reference styles.css:749-770) ──
+   One definition, two users: the "Who We Are" image block and the Split Feature
+   row placeholder. They are the same thing — a box standing in for a photograph
+   nobody has uploaded yet — and were drifting apart, the split version having
+   picked up a 145deg tint, an icon and an uppercase micro-label.
+
+   Do NOT fold the gradient into `--vf-grad-image-tint`. That token is 145deg and
+   has nine consumers, all avatar/card tints, which is what the reference itself
+   uses 145deg for (.spec-avatar-inner, styles.css:2909). The photo box is 135deg
+   (styles.css:752). Two different surfaces, deliberately. The colours are
+   `var(--accent)`/`var(--accent-light)`, so both still follow Site Settings. */
+.who-image-main,
+.vf-split__media--placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   font-family: var(--font-heading);
   font-size: 0.85rem;
-  color: color-mix(in srgb, var(--primary) 50%, transparent);
   font-weight: 600;
-  position: relative;
-  overflow: hidden;
+  color: color-mix(in srgb, var(--primary) 50%, transparent);
+  text-align: center;
 }
-.who-image-main::after {
+.who-image-main::after,
+.vf-split__media--placeholder::after {
   content: '';
   position: absolute;
   bottom: 0; right: 0;
@@ -7325,30 +7341,14 @@
 .service-enquire:hover { color: var(--primary-strong); }
 
 /* SplitFeature grey image placeholder (reference "PHOTO PLACEHOLDER" boxes). */
-.vf-split__media--placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  /* Reference placeholder is a solid blue gradient (no border), with an image
-     icon above the label. */
-  background: var(--vf-grad-image-tint);
-}
-.vf-split__media--placeholder svg {
-  width: 48px;
-  height: 48px;
-  color: color-mix(in srgb, var(--primary) 40%, transparent);
-}
+/* The placeholder's appearance is defined once, with `.who-image-main`, in the
+   "Who We Are" section above — same treatment, same reference lines. Its base
+   box (4/3, 135deg gradient, radius, overflow) already comes from
+   `.vf-split__media`. Only the label's breathing room is local. */
 .vf-split__media--placeholder span {
-  font-family: var(--font-heading);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--primary) 50%, transparent);
-  text-align: center;
   padding: 0 16px;
+  position: relative;
+  z-index: 1;
 }
 /* Hero heading two-line lockup — the accent phrase drops to its own line
    (reference .hero-heading-primary/.accent both display:block). */

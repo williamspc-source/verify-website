@@ -65,12 +65,9 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
                 <Media resource={row.image} imgClassName="w-full h-full object-cover" />
               </div>
             ) : placeholder ? (
+              /* No icon: the reference's empty-photo box is the label alone
+                 (styles.css:749-770), the same treatment `.who-image-main` uses. */
               <div className="vf-split__media vf-split__media--placeholder" aria-hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <rect x="3" y="4" width="18" height="16" rx="2" />
-                  <circle cx="8.5" cy="9.5" r="1.5" />
-                  <path d="M21 16l-5-5L5 20" />
-                </svg>
                 {placeholderLabel ? <span>{placeholderLabel}</span> : null}
               </div>
             ) : null}
