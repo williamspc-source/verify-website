@@ -14,6 +14,7 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { mediaFocal, focalImgStyle } from '@/utilities/focalPoint'
+import { headingIdAt, headingLabel, type TextishNode } from '@/utilities/headingId'
 import { postPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { getCrumbSettings, postCrumbs } from '@/utilities/breadcrumbs'
@@ -33,30 +34,24 @@ const fmtDate = (value?: string | null): string =>
       })
     : ''
 
-// Slugify a heading label into a stable anchor id for the table of contents.
-const slugify = (s: string): string =>
-  s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
-// Recursively read the plain text out of a Lexical node.
-type LexNode = { type?: string; tag?: string; text?: string; children?: LexNode[] }
-const nodeText = (node: LexNode): string =>
-  node.text ?? (Array.isArray(node.children) ? node.children.map(nodeText).join('') : '')
-
 // Build a table of contents from the top-level h2 headings in the post body.
+//
+// The ids come from `headingIdAt` over the same sibling array the rich-text
+// heading converter walks, so a contents link and the heading it points at
+// cannot disagree — they are one function called twice, not two copies of one.
+// `headingIdAt` also disambiguates two headings with identical words; mapping
+// over the full children array (rather than filtering first) is what keeps the
+// index it needs.
 const tocFromContent = (post: Post): { id: string; text: string }[] => {
   if (post.showToc === false) return []
-  const children = (post.content?.root?.children as LexNode[] | undefined) ?? []
+  const children = (post.content?.root?.children as TextishNode[] | undefined) ?? []
   return children
-    .filter((n) => n.type === 'heading' && n.tag === 'h2')
-    .map((n) => {
-      const text = nodeText(n).trim()
-      return { id: slugify(text), text }
-    })
-    .filter((i) => i.text)
+    .map((n, i) =>
+      n.type === 'heading' && n.tag === 'h2'
+        ? { id: headingIdAt(children, i), text: headingLabel(n) }
+        : null,
+    )
+    .filter((i): i is { id: string; text: string } => Boolean(i?.id && i.text))
 }
 
 // Resolve the URL for an In-the-Loop post; a stream-less legacy post has no
@@ -236,7 +231,10 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
 
           {/* CENTRE: article body */}
           <article className="art-body">
-            <RichText data={post.content} enableGutter={false} enableProse={false} />
+            {/* `headingIds` puts an anchor on every heading in the server HTML,
+                so a pasted …#some-heading URL lands on it. The ids and the
+                contents list above both come from `headingIdAt`. */}
+            <RichText data={post.content} enableGutter={false} enableProse={false} headingIds />
 
             {/* "Downloads / attachments" — the field existed and nothing rendered
                 it, so an editor could attach a PDF that no reader could reach. */}

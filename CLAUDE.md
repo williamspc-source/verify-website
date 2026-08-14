@@ -59,6 +59,7 @@ Every rule below is here because that failure already happened once in this repo
 | **A "read this field" check must not count code that *writes* it.** | The orphan-field guard's haystack included `src/endpoints`, where the seed writes `{ hoursNote: '…' }`. That looks identical to a read, so every seeded field appeared consumed — measured: deleting the only renderer of `Offices.hoursNote` still passed. |
 | **An in-page anchor link is two halves: the link *and* the target.** Fixing one without the other is invisible. Guarded by `tests/e2e/links.e2e.spec.ts`. | The homepage's Videolink link was corrected to `#videolink-appointment` and the guide still opened on In-Person — the anchor ids had never reached the database, because `seedInfoBooking` early-returns on an authored page. The href looked right in every check that read hrefs. |
 | **Content links live in the database, so a seed edit alone fixes nothing.** Pair every link correction with an unconditional repair (`src/endpoints/seed/seedLinkRepairs.ts`, run from `seedVerify`). | The seed had *already* been corrected to canonical paths. Every existing install, the box included, still served the old ones: 30 links across 9 pages on flat legacy paths that only resolved through a 308. |
+| **An id a link can target must be in the server HTML, and the id and the link must come from one function** (`src/utilities/headingId.ts`; opt in per `RichText` with `headingIds`). Assigning ids in a `useEffect` is too late for the browser and too late to be worth doing. | Article heading ids were assigned by `ArticleToc` on mount, so a *pasted* `…/article#section` URL found nothing and stayed at the top — the browser resolves a fragment while parsing. Restoring that mount loop as a test break confirmed it: `scrollY 0`, heading still resting at y=972. The two slugify copies (one for the contents hrefs, one for the ids) were also free to drift, and a drifted pair renders perfectly and does nothing. |
 | **Don't cache a value that is already stable.** For a `useSyncExternalStore` snapshot, prefer a naturally-stable computation over a module-level memo. | `startOfDay(Date.now())` already returns the same number all day. Memoising it in a module variable froze "today" for the life of the JS bundle — which outlives a page, since client-side navigation doesn't re-evaluate modules — so a tab open overnight never re-bucketed events. |
 
 ## Commands
@@ -321,8 +322,12 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
 - **A stale Turbopack build will fake a guard's proof, not just a feature.** Deleting
   `scroll-padding-top` and re-running its test reported PASS — the guard looked incapable of failing.
   The dev server had not recompiled. Confirm the break is *live in the browser*
-  (`getComputedStyle`) before believing a proof run, exactly as you would for the fix itself. This
-  is the second time the same stale build produced a confident wrong answer in one sitting.
+  (`getComputedStyle`) before believing a proof run, exactly as you would for the fix itself.
+  **It also fakes the fix's absence.** A correct heading-id converter served `<h2>` with no id
+  through every reload and cache-buster query; `rm -rf .next` and a restart, source unchanged, and
+  the ids appeared. Four occurrences now, in three sittings — two where it hid a working change and
+  two where it hid a deliberate break. Treat "my edit did nothing" as a stale build first and a bad
+  edit second, and re-prove *both* directions after restarting.
 - **A link crawl cannot see a page nothing links to.** `/posts` was advertised in the pages sitemap
   and returned 404 — a leftover default from the Payload template. No page links to it, so crawling
   from links found nothing; the sitemap-driven test found it immediately. Enumerate from the
@@ -342,6 +347,28 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   card's own unlayered `:hover` is declared later at equal specificity, so nothing regressed. Write
   down what each attempted break *did*, including the ones that did nothing, or the next person
   re-derives it — and knows which failure the guard actually covers.
+- **`page.goto(url + '#frag')` when the page is already on `url` is a *same-document* navigation.**
+  No request is made; the browser scrolls the document it already has, fully hydrated. A test that
+  reads the TOC on a page and then "navigates" to one of its fragments is therefore measuring the
+  hydrated page, not a fresh load — it went green against the unfixed code. Give every state its own
+  `browser.newPage()`.
+- **`javaScriptEnabled: false` is the strongest available proof that server HTML is doing the work,
+  but `waitForFunction` does not work in it.** Playwright implements in-page polling with a script
+  the page runs; `page.evaluate` still works, because that goes over CDP. So poll from Node with
+  repeated `evaluate` calls. Related: `document.fonts.status` is `'loading' | 'loaded'` — there is no
+  `'complete'`, and a settle predicate that waits for one never fires, then silently reads whatever
+  was on screen when the timeout hit.
+- **`parseFloat('auto')` is `NaN`, and `NaN` fails every comparison silently.** Deleting
+  `scroll-padding-top` to prove the deep-link guard red made it fail — with *"no article heading sits
+  below the fold"*, because the candidate filter compared against `NaN`. True, and it named nothing.
+  Where a computed style can be a keyword, assert it is a usable number **as its own precondition**,
+  with the raw string in the message.
+- **A break that behaves differently from the way you wrote it up is the finding.** The deep-link
+  guard's comment claimed that restoring `ArticleToc`'s mount loop would sneak past the browser
+  measurement, so the server-HTML and no-JavaScript checks were what caught it. Measured, it does
+  not: an id assigned on mount produces no jump at all, so every step goes red. The comment now says
+  what happened, and gives the checks' real justification (breadth, and foreclosing a *future* JS
+  corrector). Run your break; do not narrate it.
 - **A harness silently covers less than it claims.** `computedSnapshot.mjs` listed two routes that do
   not exist (`/about-verify`, `/legal/privacy-policy`); both 404, `capture` never checked status, so
   it banked the not-found page as a baseline **twice** — 178 nodes each, an identical count, which is

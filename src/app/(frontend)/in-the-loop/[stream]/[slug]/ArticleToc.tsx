@@ -2,15 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
-// Keep this identical to the server-side slugify in page.tsx so the ids we
-// assign to the rendered <h2> headings line up with the TOC anchor hrefs.
-const slugify = (s: string): string =>
-  s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
 type TocItem = { id: string; text: string }
 
 type Props = {
@@ -21,11 +12,18 @@ type Props = {
 /**
  * Scroll-spy table of contents for the article page.
  *
- * The article body is rendered by the shared <RichText> converter, whose
- * default heading converter emits <h2> without ids — so on mount we slugify
- * each `.art-body h2` and assign the matching id, then watch those headings
- * with an IntersectionObserver to highlight the active TOC link (mirrors the
- * reference `.art-toc-link.is-active` behaviour + smooth-scroll on click).
+ * This component used to *assign* the heading ids on mount, which meant they did
+ * not exist in the server HTML: clicking a contents link worked, but a pasted
+ * `…/article#some-heading` URL landed at the top of the page, because the
+ * browser resolves a fragment while parsing and nothing had run yet. The ids now
+ * come from the rich-text heading converter (`headingIdAt`), so this component
+ * only reads them — to highlight the active link as the reader scrolls (the
+ * reference's `.art-toc-link.is-active` behaviour).
+ *
+ * The links are plain anchors on purpose. Native fragment navigation honours
+ * `scroll-padding-top` and `scroll-behavior`, and it puts the fragment in the
+ * address bar — so a reader who clicks a contents item can copy a URL that
+ * works, which is the same defect from the other end.
  */
 export const ArticleToc: React.FC<Props> = ({ items, label }) => {
   const [activeId, setActiveId] = useState<string>(items[0]?.id ?? '')
@@ -34,22 +32,9 @@ export const ArticleToc: React.FC<Props> = ({ items, label }) => {
   useEffect(() => {
     if (!items.length) return
 
-    const body = document.querySelector('.art-body')
-    if (!body) return
-
-    const wanted = new Set(items.map((i) => i.id))
-
-    // Assign ids to the body headings so the anchors resolve and the observer
-    // has stable targets to watch.
-    const headings = Array.from(body.querySelectorAll<HTMLHeadingElement>('h2'))
-    const targets: HTMLHeadingElement[] = []
-    headings.forEach((h) => {
-      const id = h.id || slugify(h.textContent ?? '')
-      if (id && wanted.has(id)) {
-        if (!h.id) h.id = id
-        targets.push(h)
-      }
-    })
+    const targets = items
+      .map((i) => document.getElementById(i.id))
+      .filter((el): el is HTMLElement => el !== null)
 
     if (!targets.length) return
 
@@ -66,12 +51,9 @@ export const ArticleToc: React.FC<Props> = ({ items, label }) => {
     return () => observer.disconnect()
   }, [items])
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault()
-    const target = document.getElementById(id)
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    setActiveId(id)
-  }
+  // The browser does the scrolling; this only moves the highlight ahead of the
+  // observer so the clicked item lights up immediately.
+  const handleClick = (id: string) => setActiveId(id)
 
   return (
     <aside ref={navRef} aria-label="Article navigation" className="art-toc">
@@ -82,7 +64,7 @@ export const ArticleToc: React.FC<Props> = ({ items, label }) => {
             <a
               className={`art-toc-link${item.id === activeId ? ' is-active' : ''}`}
               href={`#${item.id}`}
-              onClick={(e) => handleClick(e, item.id)}
+              onClick={() => handleClick(item.id)}
             >
               {item.text}
             </a>

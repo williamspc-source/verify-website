@@ -161,17 +161,19 @@ goes red, and `zsh tests/int/prove-guards.sh` applies each in turn and restores 
 
 ### The browser guards
 
-Three things in `tests/e2e/frontend.e2e.spec.ts` cannot be checked by reading source, because each
-is about what the page *computes*, not what the CSS says. Each carries the deliberate break that
-proves it red; `prove-guards.sh` drives `pnpm test:int` only, so these are re-proved by hand.
+Four things across `tests/e2e/frontend.e2e.spec.ts` and `tests/e2e/links.e2e.spec.ts` cannot be
+checked by reading source, because each is about what the page *computes* or what the browser
+*does*, not what the CSS says. Each carries the deliberate break that proves it red;
+`prove-guards.sh` drives `pnpm test:int` only, so these are re-proved by hand.
 
 | Guard | Catches |
 |---|---|
 | The `<main>` landmark and its skip link | The link rendering unstyled — asserted **offscreen before focus** as well as on-screen after, because the on-screen half alone is trivially true of an unstyled element |
 | Centred section headers do not narrow themselves into a wrap | A width cap on a heading box breaking a title that its container had room for. Ten headings across eight pages were wrapping this way |
 | A testimonial card highlights on hover without moving | A card motion preset firing inside a viewport with no room for it, clipping the card |
+| A pasted article deep link lands on its heading | An anchor target that only exists after JavaScript runs. Checked three ways: the id is in the **raw server HTML** of all 24 articles; the heading lands exactly on the computed `scroll-padding-top` line on a fresh load; and the same holds with **JavaScript disabled**, which no client-side workaround can fake |
 
-Two habits make the difference between these and the guards that rotted:
+Three habits make the difference between these and the guards that rotted:
 
 - **State the fault as a cause, not as a number.** The first version of the heading guard compared
   natural width against the nearest container and flagged `/services`, whose header is deliberately
@@ -180,6 +182,10 @@ Two habits make the difference between these and the guards that rotted:
 - **Carry a positive control in the same test.** The hover guard also hovers a card elsewhere on the
   page and requires *that* one to still move. Without it, "the testimonial did not move" is equally
   satisfied by a hover that never registered — and the whole test passes for the wrong reason.
+- **Write up the break after running it, not before.** The deep-link guard's comment described an
+  asymmetry between its three checks that turned out not to exist: the break it predicted would slip
+  past the browser measurement is caught by it. The comment now records what the break actually did.
+  A confident, wrong explanation in a test comment outlives the person who wrote it.
 
 `pnpm lint` runs as part of `pnpm test`. It is enforced, not advisory: it had been crashing on an
 obsolete config shim and so had never run at all, which is how ten React Compiler errors — two of

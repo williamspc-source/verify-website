@@ -349,7 +349,7 @@
        Set on `html` rather than as `scroll-margin-top` per target: the offset is
        a property of the masthead, not of any one section, and a per-target rule
        has to be remembered on every future anchor. Guarded by the anchor-landing
-       test in tests/e2e/frontend.e2e.spec.ts. */
+       tests in tests/e2e/links.e2e.spec.ts. */
     scroll-padding-top: var(--vf-scroll-offset, 96px);
     /* "Overall size" (Design System → Typography). Scaling the root font size
        scales every rem-based value on the site — type and the spacing around it
@@ -357,6 +357,15 @@
        Media-query `rem` resolves against the initial 16px per spec, so the
        breakpoints are deliberately unaffected. */
     font-size: calc(100% * var(--vf-text-scale, 1));
+  }
+  /* A fragment jump scrolls with `auto`, which resolves to the scroller's own
+     `scroll-behavior` — so `smooth` above animates the landing for a reader who
+     asked for no motion, including on a hard load of `…/article#heading`. The
+     jump still happens; it just arrives instead of travelling. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;

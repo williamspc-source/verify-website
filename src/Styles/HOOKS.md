@@ -313,3 +313,25 @@ box but nothing is stored, the chosen form is missing a field named `email` — 
 
 Both of these are deliberate. Neither will ever show a working-looking box that throws the
 submission away.
+
+### Article headings each have a shareable link — and renaming one changes it
+
+Every **Heading 2** in an In the Loop article automatically gets a link of its own, built from the
+heading's own words: *"A Simple Pre-Send Check"* becomes
+`…/five-common-errors…#a-simple-pre-send-check`. There is nothing to fill in, and the same words
+appear in the **In This Article** list down the left of the page.
+
+Two things follow from that:
+
+- **Clicking a contents item now puts that link in the address bar**, so you can copy it straight
+  out and send someone to that exact section.
+- **Rewording a heading changes its link.** Anyone who saved or shared the old one lands at the top
+  of the article instead — the article still opens, nothing 404s, they just have to scroll. Worth a
+  thought before renaming a heading in an article you have circulated.
+
+`[[Double brackets]]` work in article headings the same way they do everywhere else, and they are
+tidied out of both the contents list and the link — `Preparing the [[Claimant]]` reads
+*"Preparing the Claimant"* in the sidebar and links as `#preparing-the-claimant`.
+
+If two headings in one article are worded identically, the second gets `-2` on the end so both stay
+reachable.

@@ -22,25 +22,33 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | # | Issue | Live today? | User impact | Effort | Recommendation |
 |---|---|---|---|---|---|
 | 1 | Migration not yet created on the box | — | **Blocks deploy** | ~20 min + a careful read | **Required, immediately before the push** |
-| 2 | Article heading ids are assigned client-side | Yes, minor | A *pasted* article URL with a `#section` lands at the top instead of jumping | ~1 hr | Worth doing; not urgent |
+| 2 | The admin e2e spec is flaky under a loaded dev server | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine | ~10 min | Worth doing before handover |
 
 ---
 
-## 2. Article deep links do not jump on a fresh load
+## 2. `admin.e2e.spec.ts` fails intermittently, and only in a full run
 
-In-article contents links work: click one and the page scrolls. But the heading ids are assigned by
-`ArticleToc` on mount (`ArticleToc.tsx:44-49`), so on a **fresh load** the browser looks for the id
-before React runs, finds nothing, and stays at the top. Measured: opening
-`…/in-the-loop/qa-insights/…#preparing-the-claimant` directly leaves `scrollY` at 0.
+Found while verifying the article deep-link pass, not caused by it — the change touches no admin
+code, and the spec passes on the pre-change tree too.
 
-Nothing on the site links that way, so no on-site link is broken and the link audit passes. It only
-affects a URL someone copies out of the address bar and shares — which for an article is a normal
-thing to do.
+**Measured:** across six full `pnpm test:e2e` runs, *"Admin Panel › can navigate to dashboard"*
+failed twice with `expect(locator).toBeVisible() failed` on `span[title="Dashboard"]`. It passes
+every time in isolation (`pnpm test:e2e tests/e2e/admin.e2e.spec.ts` → 3 passed, 17s). When it
+fails, Playwright's serial mode skips the two admin tests behind it, so the run reports
+`1 failed, 14 passed` out of 17 — two of the "missing" tests never ran rather than passing.
 
-**The fix** is to emit the ids server-side in the rich-text heading converter, using the same
-`slugify` the TOC already uses (`ArticleToc.tsx:7`) so the two cannot drift — one function, both
-sides. Deferred from the link pass because it is a rich-text renderer change with its own blast
-radius across all 24 articles, and nothing reported it.
+**The cause is a default timeout, not the admin.** Both `tests/helpers/login.ts` and the dashboard
+test wait on the Dashboard element with Playwright's default 5-second `expect` timeout, against a
+**dev server** that compiles the admin bundle on demand. The admin spec runs immediately after the
+site-wide link crawl, which has just walked 114 pages through that same server. Five seconds is a
+generous budget for a rendered page and a thin one for a cold Turbopack compile under load.
+
+**The fix** is to give those two assertions their own timeout (`{ timeout: 30_000 }`), or to warm
+`/admin` once in `beforeAll` before starting the clock. Not a longer global timeout — that would
+slow every genuine failure in the suite to a crawl.
+
+Left alone because it is a test-harness fault with no user-facing effect, and widening the scope of
+a content-rendering pass into the admin suite is how unrelated changes get bundled into one commit.
 
 ---
 
@@ -63,6 +71,10 @@ identity of the five drops are settled, but **the counts will move** if more fie
 before you generate — the commands are in the next section.
 
 ### Measured drift — and how to re-measure it
+
+The article heading-id pass (2026-08-14) added **no** columns — it changes how rich text is
+rendered, not what is stored — so the figures below still stand. Re-measure anyway; that is cheaper
+than trusting this sentence.
 
 Measured **2026-08-14** (re-measured after the link pass), checked-in baseline
 (`src/migrations/20260705_105320_baseline.json`) against the local `verify_cms` schema:

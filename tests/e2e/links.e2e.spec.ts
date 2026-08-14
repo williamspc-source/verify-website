@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * Site-wide link audit.
@@ -14,9 +14,10 @@ import { test, expect } from '@playwright/test'
  * ## The timing trap this test is built around
  *
  * The first version of this audit read the DOM at `domcontentloaded` and reported
- * **65 dead anchors**. Every one was a false positive. Ids on article headings are
- * assigned by `ArticleToc` on mount, and other sections stream in, so checking
- * early sees a half-built page.
+ * **65 dead anchors**. Every one was a false positive: article heading ids were
+ * assigned by `ArticleToc` on mount (they are server-rendered now — see the last
+ * test in this file), and other sections stream in, so checking early sees a
+ * half-built page.
  *
  * The control used at the time — `#main-content` — could not catch it: it lives in
  * the root layout and is in the first byte, so it passed in exactly the runs that
@@ -25,6 +26,8 @@ import { test, expect } from '@playwright/test'
  * than reading once after a delay — a fixed delay is wrong in both directions,
  * too short during the audit and flaky under load — and the crawl collects
  * failures rather than asserting per page so one bad route cannot mask the rest.
+ * The poll is still needed: several targets (accordion panels, the appointment
+ * guide) genuinely are built by client components.
  */
 
 const LEGACY_PATHS = [
@@ -234,6 +237,214 @@ test.describe('Links', () => {
         r.titleTop!,
         `#${id}: "${r.title}" is behind the ${r.navH}px sticky nav at y=${r.titleTop}`,
       ).toBeGreaterThanOrEqual(r.navH)
+    }
+  })
+
+  /**
+   * A pasted article deep link lands on its heading.
+   *
+   * Article heading ids used to be assigned by `ArticleToc` on mount, so they were
+   * not in the server HTML: clicking a contents link worked, but opening
+   * `…/article#some-heading` in a fresh tab left the reader at the top of the page
+   * (measured: `scrollY` 0). The browser resolves a fragment while parsing, long
+   * before React runs. Copying an article URL out of the address bar is a normal
+   * thing to do, so this was a real, silent failure.
+   *
+   * ## Why this test is shaped the way it is
+   *
+   * **Step 1 measures the cause.** Whether the id is in the *server* HTML is the
+   * actual claim; a browser reading can be satisfied by client-side JavaScript
+   * putting it there afterwards, which is exactly the bug.
+   *
+   * **Step 3 removes JavaScript entirely.** With page script off there is no
+   * `ArticleToc`, no hydration and no corrector of any kind, so a jump can only
+   * have come from the server HTML plus the browser.
+   *
+   * **Every state gets a fresh page.** `page.goto(url + '#frag')` when the page is
+   * already on `url` is a *same-document* navigation — the browser scrolls the
+   * hydrated document it already has, where the old mount loop had long since
+   * assigned the ids. A version of this test that reused the page went green
+   * against the unfixed code.
+   *
+   * **Both states are asserted.** Without the no-fragment half, "the heading is at
+   * the top of the viewport" is also true of a page that never needed to scroll.
+   *
+   * ## The breaks, and what each one actually did
+   *
+   *  1. **Drop `headingIds` from the article's `<RichText>`** → red at step 1
+   *     (no `<h2 id>` in the server HTML) and at step 3 (the element does not
+   *     exist at all, so the settle times out).
+   *  2. **The same, plus `ArticleToc`'s old mount loop restored** — written up in
+   *     an earlier draft of this comment as the case that would sneak past step 2.
+   *     It does not: measured `scrollY 0`, heading resting at y=972, i.e. no jump.
+   *     Assigning an id after mount is too late to matter, which is the original
+   *     bug exactly. Step 2 catches this one too. Steps 1 and 3 still earn their
+   *     place for different reasons: step 1 checks **all** 55 contents links with
+   *     a message naming each article, where step 2 measures at most three; and
+   *     step 3 forecloses a *future* `useEffect` that re-scrolls on the hash,
+   *     which would make step 2 pass over server HTML that is still wrong.
+   *  3. **Delete `scroll-padding-top` from `html`** → red. The first version of
+   *     this test reported it as "no article heading sits below the fold", because
+   *     `parseFloat('auto')` is `NaN` and `NaN > 200` is false, so every candidate
+   *     was silently skipped: a true statement that named nothing. Hence the
+   *     explicit precondition below.
+   *
+   * Stays green on `/services/medico-legal/reporting-services#file-review` and
+   * `#expert-evidence`, and `/information-centre/for-claimants#videolink-appointment`
+   * — ids that come from block `anchorId`s and were never client-assigned. All
+   * three land at y=96 on the scroll line. If this helper turns those red, the
+   * helper is wrong and not the page.
+   */
+  test('a pasted article deep link lands on its heading, with or without JavaScript', async ({
+    browser,
+    baseURL,
+  }) => {
+    const base = baseURL!
+
+    // ── 1. Cause: the id is in the server HTML, on every article ───────────
+    const xml = await (await fetch(`${base}/posts-sitemap.xml`)).text()
+    const articles = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname)
+    expect(articles.length, 'the posts sitemap should list articles to check').toBeGreaterThan(5)
+
+    type Candidate = { path: string; frag: string }
+    const candidates: Candidate[] = []
+    const missing: string[] = []
+    let fragmentsChecked = 0
+
+    for (const path of articles) {
+      const html = await (await fetch(base + path)).text()
+      const frags = [...html.matchAll(/class="art-toc-link[^"]*"\s+href="#([^"]+)"/g)].map(
+        (m) => m[1],
+      )
+      if (!frags.length) continue
+      for (const frag of frags) {
+        fragmentsChecked++
+        // Anchored to a heading tag, so an id on some other element cannot
+        // satisfy a contents link that promises to reach a heading.
+        if (new RegExp(`<h[1-6][^>]*\\sid="${frag}"`).test(html)) {
+          candidates.push({ path, frag })
+        } else {
+          missing.push(`${path}#${frag}`)
+        }
+      }
+    }
+
+    // Positive controls: a regex that matched nothing must not read as a pass.
+    expect(fragmentsChecked, 'articles should have contents links to check').toBeGreaterThan(10)
+    expect(
+      missing,
+      `contents links whose heading id is absent from the SERVER html — a pasted\nURL with this fragment will not jump:\n  ${missing.join('\n  ')}`,
+    ).toEqual([])
+
+    // ── 2. Behaviour, both states, each on its own fresh page ──────────────
+    const read = (page: Page, id: string) =>
+      page.evaluate((anchor) => {
+        const el = document.getElementById(anchor)
+        const nav = document.querySelector('nav.site-nav')
+        if (!el || !nav) return null
+        return {
+          ready: document.readyState,
+          // FontFaceSet reports 'loading' | 'loaded'; there is no 'complete'.
+          fonts: document.fonts ? document.fonts.status : 'loaded',
+          top: Math.round(el.getBoundingClientRect().top),
+          scrollY: Math.round(window.scrollY),
+          // Read the offset rather than hardcoding 96, so retuning
+          // --vf-scroll-offset in the Design System cannot turn this red for the
+          // wrong reason. Keep the raw value too: with no rule at all this is
+          // the string "auto", and parseFloat('auto') is NaN — which silently
+          // poisons every comparison it touches.
+          padTop: parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop),
+          padTopRaw: getComputedStyle(document.documentElement).scrollPaddingTop,
+          navH: Math.round(nav.getBoundingClientRect().height),
+          maxScroll: Math.round(document.documentElement.scrollHeight - window.innerHeight),
+        }
+      }, id)
+
+    // Poll from Node rather than with `waitForFunction`: Playwright implements
+    // in-page polling with a script the page runs, which cannot happen in the
+    // JavaScript-disabled context below. Stabilise on the *measured* quantity —
+    // `scrollY` settling does not prove the target stopped moving, since a late
+    // font swap or image load shifts the element while the scroll offset holds.
+    // The landing is not instant: `html { scroll-behavior: smooth }` means the
+    // browser animates it, measured at ~600ms on a warm dev server.
+    const settle = async (page: Page, id: string) => {
+      const deadline = Date.now() + 20_000
+      let last: number | null = null
+      let stable = 0
+      let sample: Awaited<ReturnType<typeof read>> = null
+      while (Date.now() < deadline) {
+        sample = await read(page, id)
+        if (sample && sample.ready === 'complete' && sample.fonts !== 'loading') {
+          if (sample.top === last) {
+            if (++stable >= 5) return sample
+          } else {
+            stable = 0
+            last = sample.top
+          }
+        }
+        await page.waitForTimeout(100)
+      }
+      throw new Error(`#${id} never settled: ${JSON.stringify(sample)}`)
+    }
+
+    // `.art-layout` collapses to one column at ≤860px, which moves every
+    // heading — so fix the viewport before navigating, not after.
+    const viewport = { width: 1440, height: 900 }
+
+    const chosen: { path: string; frag: string; rest: number }[] = []
+    const tooShort: string[] = []
+    const ctx = await browser.newContext({ viewport })
+    for (const c of candidates) {
+      const page = await ctx.newPage()
+      await page.goto(base + c.path, { waitUntil: 'load' })
+      const a = await settle(page, c.frag)
+      expect(a.scrollY, `${c.path} should open at the top of the page`).toBe(0)
+      // Precondition, stated as its own cause: without a scroll offset that
+      // clears the masthead every anchor on the site lands behind it. Assert it
+      // here rather than letting NaN propagate — parseFloat('auto') poisons the
+      // candidate arithmetic below and the test then fails saying it could not
+      // find an article, which is true and useless.
+      expect(
+        a.padTop,
+        `html { scroll-padding-top } computes to "${a.padTopRaw}", which does not clear the ${a.navH}px sticky nav`,
+      ).toBeGreaterThanOrEqual(a.navH)
+      // The two states have to be distinguishable, and the heading has to be
+      // able to reach the line — a heading in the last viewport of a short
+      // article clamps at the document bottom. State the reason and move on
+      // rather than loosening the assertion into an allowlist.
+      if (a.top - a.padTop > 200 && a.top - a.padTop <= a.maxScroll) {
+        chosen.push({ ...c, rest: a.top })
+      } else {
+        tooShort.push(`${c.path}#${c.frag} (rest y=${a.top}, max scroll ${a.maxScroll})`)
+      }
+      await page.close()
+      if (chosen.length >= 3) break
+    }
+    await ctx.close()
+    expect(
+      chosen.length,
+      `no article heading both sits below the fold and can reach the scroll line, so\nthis test would prove nothing. Skipped:\n  ${tooShort.join('\n  ')}`,
+    ).toBeGreaterThan(0)
+
+    // ── 3. With JavaScript, and then without it ────────────────────────────
+    for (const javaScriptEnabled of [true, false]) {
+      const context = await browser.newContext({ viewport, javaScriptEnabled })
+      for (const c of chosen) {
+        const page = await context.newPage()
+        await page.goto(`${base}${c.path}#${c.frag}`, { waitUntil: 'load' })
+        const b = await settle(page, c.frag)
+        const where = `${c.path}#${c.frag} (javaScript ${javaScriptEnabled ? 'on' : 'off'})`
+        expect(
+          Math.abs(b.top - b.padTop),
+          `${where}: heading landed at y=${b.top}, not on the ${b.padTop}px scroll line (it rests at y=${c.rest})`,
+        ).toBeLessThanOrEqual(4)
+        expect(
+          b.top,
+          `${where}: heading is behind the ${b.navH}px sticky nav at y=${b.top}`,
+        ).toBeGreaterThanOrEqual(b.navH)
+        await page.close()
+      }
+      await context.close()
     }
   })
 })

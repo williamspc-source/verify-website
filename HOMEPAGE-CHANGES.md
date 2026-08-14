@@ -639,3 +639,86 @@ All three are now in `CLAUDE.md`.
 **`/posts` was advertised in the sitemap and returned 404** — a leftover default from the Payload
 template. Nothing on the site links to it, so a link crawl could never see it; only search engines
 would have. Removed.
+
+---
+
+# Seventh pass — article deep links, closing the register
+
+The sixth pass left one item deferred: article heading ids were assigned by JavaScript after the
+page loaded, so a **pasted** article URL with a `#section` opened the article at the top instead of
+jumping to the section. Clicking an item in the *In This Article* list worked, which is why nobody
+had reported it — the fault only shows when a URL is copied out of the address bar and shared, which
+for an article is a normal thing to do.
+
+That was the last open entry in `OUTSTANDING.md` besides the migration. It is now fixed.
+
+## What was wrong
+
+The browser resolves a `#fragment` while it is still reading the page — long before any JavaScript
+runs. The ids were being attached afterwards, so at the moment it mattered there was nothing on the
+page with that name. Measured on a fresh load: the page stayed at the very top.
+
+Two copies of the same naming function were also in play — one building the contents list's links,
+one attaching the ids. Nothing was wrong with either, but two copies of a function are two things
+that can drift apart, and if they ever had, every contents link on the site would have quietly
+stopped working while still rendering perfectly.
+
+## What changed
+
+**The ids are written into the page itself now**, by the same function that builds the contents
+list — one function called twice, so the link and the thing it points at cannot disagree. There is
+no new field and nothing for an editor to fill in.
+
+**Clicking a contents item now puts that section's link in the address bar**, so it can be copied
+and shared. Previously the address bar never changed, so there was no working link to copy — the
+same defect from the other end.
+
+**Two smaller things fixed on the way:**
+
+- `[[Bracket]]` accent markers are now tidied out of the contents list. No article heading uses one
+  today, so nobody had seen the brackets print literally in the sidebar — but they would have.
+- A reader who has asked their computer for reduced motion now gets an instant jump rather than an
+  animated scroll. The site honoured that setting in four other places and not this one.
+
+Documented for editors in `src/Styles/HOOKS.md` — including the one thing worth knowing:
+**rewording a heading changes its link**, so a previously shared link lands at the top of the
+article rather than at that section.
+
+## New guard
+
+`tests/e2e/links.e2e.spec.ts` gained a test that checks the same thing three ways, because each
+catches something the others cannot:
+
+1. The id is present in the **raw page as the server sends it** — across all 24 articles and all 55
+   contents links. This is the actual claim; a browser reading can be satisfied by JavaScript
+   putting the id there afterwards, which was the bug.
+2. On a **fresh load**, the heading lands exactly on the site's scroll line, clear of the sticky
+   menu — and the same article opened *without* a fragment sits at the top, so the two states are
+   distinguishable. Without that second half, "the heading is at the top of the screen" is also true
+   of a page that never scrolled.
+3. The same, with **JavaScript switched off entirely**. Nothing client-side can fake that one.
+
+**Measured after the change:** 55 of 55 contents links have their target in the server HTML; the
+heading lands at 96px on the scroll line with a 72px menu above it, identically with JavaScript on
+and off. Blocks whose anchors were never affected — the service accordions, the appointment guide —
+were re-measured and land the same way, so the new check measures the page and not itself.
+
+## Two measurement errors, again
+
+1. **I wrote up a break before running it.** The new test's comment claimed one of its three checks
+   would slip past the others. I then ran that break: it does not — every check catches it. The
+   comment now records what the break actually did, and gives the honest reason the other two checks
+   earn their place. A confident, wrong explanation in a comment outlives whoever wrote it.
+2. **A stale build hid a working fix.** The change was correct and the served page showed no ids
+   through every reload. Clearing the build cache and restarting, source untouched, and they
+   appeared. This is the fourth time a stale build has produced a confident wrong answer here — but
+   the first time it hid a fix rather than a break. Both directions now recorded in `CLAUDE.md`.
+
+## One thing found while verifying, and deliberately not fixed
+
+The admin panel's own end-to-end test fails intermittently — twice in six full runs — waiting five
+seconds for the dashboard to appear on a development server that is compiling it on demand, right
+after the link crawl has walked 114 pages through that same server. It passes every time on its own,
+and it fails the same way on the code as it was before this change, so it is not a symptom of this
+work. Logged as `OUTSTANDING.md` §2 with the ten-minute fix, rather than folded into a
+content-rendering commit.
