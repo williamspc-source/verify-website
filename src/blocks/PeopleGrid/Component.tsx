@@ -190,7 +190,10 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
       {splitHeader ? (
         <Section
           background={headerBackground as SectionBackground}
-          className={cn('vf-people-grid__header-band', toClassName(cssClass))}
+          // `vf-header-band` is the generic hook — the spacing rules live on it,
+          // so any block that adopts `headerBandField` gets them without a new
+          // rule. The block-specific class stays for Custom Styles authors.
+          className={cn('vf-header-band', 'vf-people-grid__header-band', toClassName(cssClass))}
           containerWidth={containerWidth}
         >
           {header}

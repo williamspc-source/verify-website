@@ -834,9 +834,22 @@ where a block has already inherited its parent's background.
 | Intro — *Our People* | `#eef9ff → #e6f4ff → #d9efff` | **absent** | **exact match** |
 | Photo grid | `#f5f6f8` | `#f5f6f8` ✓ | `#f5f6f8` ✓ |
 
-The band spacing is the site's standard 88px rather than the reference's one-off 72/64. That is
-deliberate — every other band on the site uses the standard rhythm, and side by side the build reads
-slightly more generous rather than wrong.
+**Correction — the spacing below the copy was wrong, and I called it acceptable.** I first shipped the
+band at the site's standard 88px top and bottom and wrote that it "reads slightly more generous rather
+than wrong". You looked at it against the reference and said there was too much space underneath. You
+were right, and there was a real fault behind it, not just a taste difference:
+
+The intro paragraph carries a **48px bottom margin**. That exists so a section header can separate
+itself from the content below it *in the same section* — and it is exactly right there. Alone in its
+own band there is nothing below it, so those 48px became dead space **inside** the blue band. Measured
+136px between the last line of copy and the bottom of the band, where the reference has 64px.
+
+Fixed by dropping the trailing margin on a header band's last element — the same idiom already used
+for the gateway cards — and giving a header-only band the compact bottom preset rather than a full
+section's. Both are tokens, so Design System → Spacing still governs them.
+
+The number that is actually visible is the seam between the copy and the photos: **136px now, against
+the reference's 144px**, down from 176px. The page got 88px shorter.
 
 ## It had to reach the live site, not just a fresh install
 
@@ -867,6 +880,11 @@ Lint and typecheck clean · **123/123** integration · **19/19** end-to-end (was
 passes. Three distinct bands confirmed in a browser at 1440px and compared with the reference side by
 side. The People Grids on the homepage and the JME page were re-checked and render exactly one band,
 unchanged.
+
+After the spacing correction the computed-style comparison isolates it exactly: **six** elements
+changed — the band's bottom padding 88px → 48px, the paragraph's bottom margin 48px → 0, the three
+heights that follow from those, and one known animation frame on another page. A control route was
+byte-identical across all 357 of its measurements.
 
 Computed-style comparison against a pre-change baseline: 343 of the changed elements are on
 `/about/meet-the-team` — expected, since adding a section renumbers everything below it on that page

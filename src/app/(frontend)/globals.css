@@ -3534,6 +3534,20 @@
 .vf-gateway-cards .vf-section-header { margin-bottom: 52px; }
 .vf-gateway-cards .vf-section-header > *:last-child { margin-bottom: 0; }
 
+/* ── A section header alone in its own band (see `headerBandField`) ──────────
+   A header normally sits above content in the same section, so `.section-subtitle`
+   carries `margin-bottom: 48px` to separate itself from what follows. In its own
+   band there is nothing following it, and that margin becomes dead space *inside*
+   the band: measured 136px between the last line of copy and the band's bottom
+   edge, where the reference's `.team-intro` has 64px.
+   So drop the trailing margin, and give the band the compact bottom preset —
+   a header-only band needs less floor than a content section. The number that is
+   actually visible is the seam: 48px here plus the next section's 88px is 136px
+   between the copy and the content below, against the reference's 64+80 = 144px.
+   Both values are tokens, so Design System → Spacing still governs them. */
+.vf-header-band .vf-section-header > *:last-child { margin-bottom: 0; }
+.vf-header-band { padding-bottom: var(--space-compact); }
+
 /* Two-tone card: coloured top panel + white lower panel */
 .audience-card {
   border-radius: var(--vf-radius-panel);
