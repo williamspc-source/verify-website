@@ -4648,6 +4648,10 @@ export interface PeopleGridBlock {
    * Section background colour.
    */
   background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  /**
+   * Give the eyebrow/heading/intro their own coloured band above the rest of the block. Leave as "Same as the section" for one continuous band. The colours themselves come from Design System → Section bands.
+   */
+  headerBackground?: ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   source?: ('specialists' | 'team' | 'manual') | null;
   onlyAdvertised?: boolean | null;
   featuredOnly?: boolean | null;
@@ -11879,6 +11883,7 @@ export interface PeopleGridBlockSelect<T extends boolean = true> {
   heading?: T;
   subheading?: T;
   background?: T;
+  headerBackground?: T;
   source?: T;
   onlyAdvertised?: T;
   featuredOnly?: T;

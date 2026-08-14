@@ -136,22 +136,31 @@ before you generate — the commands are in the next section.
 
 ### Measured drift — and how to re-measure it
 
-The article heading-id pass (2026-08-14) added **no** columns — it changes how rich text is
-rendered, not what is stored — so the figures below still stand. Re-measure anyway; that is cheaper
-than trusting this sentence.
+Two passes have landed since the table below was measured:
+
+- the **article heading-id** pass added no columns — it changes how rich text is rendered, not what
+  is stored;
+- the **Meet the Team header band** pass added **2**: `header_background` on
+  `pages_blocks_people_grid` and `_pages_v_blocks_people_grid`. Additive, nullable, defaulted to an
+  inert sentinel. It changes no enum and drops nothing, so the drop list in §B is untouched.
+
+So the additions are now **+184**, not +182. Re-measure anyway rather than trusting this sentence —
+the commands are below.
 
 Measured **2026-08-14** (re-measured after the link pass), checked-in baseline
 (`src/migrations/20260705_105320_baseline.json`) against the local `verify_cms` schema:
 
 | | Baseline | Now | Change |
 |---|---|---|---|
-| Columns | 3207 | 3384 | **+182, −5** |
+| Columns | 3207 | 3386 | **+184, −5** |
 | Tables | 301 | 303 | **+2** |
 | Indexes | 946 | 1266 | +320 |
 
 The link pass added **49** columns to the previous 3335: an optional `anchor` on every stored link
 (one column per table that uses the `link()` helper, live + version), plus `anchor_id` on
-`appt_guide_types`, `pages_blocks_services_grid` and their version twins. All additive.
+`appt_guide_types`, `pages_blocks_services_grid` and their version twins. All additive. The header
+band pass added the last **2** (`header_background`, live + version). Re-measured 2026-08-14:
+3386 current against 3207 baseline is a net 179, which with the five drops is **+184**.
 
 > **Correction.** An earlier revision of this table said "+131, −3" alongside a list of five dropped
 > columns — the two disagreed, and the column breakdown was the wrong one. 3207 + 133 − 5 = 3335.

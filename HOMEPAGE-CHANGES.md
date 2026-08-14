@@ -792,3 +792,86 @@ passes. Five pages measured against their reference counterparts: all now 800 ag
 computed-style comparison against a pre-change baseline changed **24** elements of 6,675: **21** are
 hero titles and their accent spans going 700 → 800 and nothing else — the boxes did not resize, so
 nothing reflowed — and the other three are the known scroll-animation false positive.
+
+---
+
+# Ninth pass — the Meet the Team intro had lost its blue band
+
+You spotted that *"Our People / Experienced, Dedicated & Client-Focused"* on **About us → Meet the
+Team** should sit on light blue, as the design reference has it, and asked whether that was editable
+from the admin.
+
+## The answer to the question: partly, and not in a way that could produce this
+
+Two of the three pieces were already there:
+
+- **The colour** is editable — Design System → Section bands → *Accent (light blue)*. Its default is
+  **byte-identical** to the reference's, so nothing needed changing there.
+- **The band choice** is editable — the People Grid block has a Background picker with an Accent
+  option.
+
+What was missing is that *"Our People"* and the team photos are **one block**, so they shared one
+background. The reference uses two sections: blue behind the intro, grey behind the photos. An editor
+could make the whole thing blue or the whole thing grey — never blue-then-grey.
+
+So the thing to add was not a colour. It was a way to give a block's heading a band of its own.
+
+## What changed
+
+**A new control: People Grid → Header band.** Leave it on *"Same as the section"* and nothing changes
+— which is how every existing block on the site renders, untouched. Pick a colour and the eyebrow,
+heading and intro move onto their own full-width band above the content.
+
+Two things it deliberately will not do: it renders **no band at all** if the block has no heading
+text (an empty coloured stripe is worse than no stripe), and it does nothing inside a Section or Row,
+where a block has already inherited its parent's background.
+
+**Measured after the change**, against the reference's own declared values:
+
+| Band | Reference | Build before | Build now |
+|---|---|---|---|
+| Hero | dark blue gradient | same ✓ | same ✓ |
+| Intro — *Our People* | `#eef9ff → #e6f4ff → #d9efff` | **absent** | **exact match** |
+| Photo grid | `#f5f6f8` | `#f5f6f8` ✓ | `#f5f6f8` ✓ |
+
+The band spacing is the site's standard 88px rather than the reference's one-off 72/64. That is
+deliberate — every other band on the site uses the standard rhythm, and side by side the build reads
+slightly more generous rather than wrong.
+
+## It had to reach the live site, not just a fresh install
+
+Editing the seed alone would have changed nothing on the box: the page seeds skip a page that already
+has content. That is the trap that left 30 links stale earlier in this project.
+
+So the fix ships in both places — the seed, and an unconditional repair
+(`seedBlockBands.ts`) that runs on every seed and writes only when the stored value actually differs.
+
+**The repair was tested on its own, because the first run proved nothing.** It reported "0 changes" —
+the page seed had already set the value, so the repair had nothing to do. That is exactly the
+"exited 0 having written nothing" trap, so the value was reset and the repair run in isolation:
+**1 change**, value confirmed in the database, and a second run reported **0** (it is idempotent).
+
+## New guard
+
+A test now asserts **both** bands, reading the two expected colours out of the reference page rather
+than hardcoding them. The second half is the one that matters: "the intro is blue" is equally
+satisfied by the entire section going blue, which is the wrong design and was the cheap shortcut this
+work exists to avoid.
+
+Proven able to fail two ways — reverting the stored setting, and making the grid blue as well — each
+confirmed live in a browser first.
+
+## Verification — ninth pass
+
+Lint and typecheck clean · **123/123** integration · **19/19** end-to-end (was 18) · production build
+passes. Three distinct bands confirmed in a browser at 1440px and compared with the reference side by
+side. The People Grids on the homepage and the JME page were re-checked and render exactly one band,
+unchanged.
+
+Computed-style comparison against a pre-change baseline: 343 of the changed elements are on
+`/about/meet-the-team` — expected, since adding a section renumbers everything below it on that page
+— and the only three elsewhere are the known scroll-animation false positive. A control route was
+byte-identical across all 357 of its measurements.
+
+Database cost: **2 added columns**, nullable and defaulted to inert. Nothing dropped, no list of
+allowed values changed. The migration's deliberate drop-count of five is untouched.

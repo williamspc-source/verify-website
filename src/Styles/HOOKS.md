@@ -61,6 +61,7 @@ field → a Custom Styles preset → Global CSS.
 | Make one AAMLE step's pill stand out | that step → **Badge emphasis** → Highlight |
 | Force a line break in a heading | press **Enter** in the heading field (`[[brackets]]` still colour a phrase) |
 | Change the muted blue-grey (card link arrows) | Site Settings → Brand colours → **Muted blue-grey** |
+| Put a block's heading on its own coloured band | that People Grid block → **Header band** (leave as *Same as the section* for one band) |
 | Change one block only | that block's **Custom CSS class(es)** + a Custom Styles preset |
 | Change the home hero's band or padding | the Home page → **Hero** tab |
 | Anything not listed above | Custom Styles → **Global CSS** |
@@ -313,6 +314,30 @@ box but nothing is stored, the chosen form is missing a field named `email` — 
 
 Both of these are deliberate. Neither will ever show a working-looking box that throws the
 submission away.
+
+### Two-tone sections: a heading band above the content
+
+Some designs put the intro on one colour and the content below it on another —
+**About us → Meet the Team** is the example: *"Our People / Experienced, Dedicated & Client-Focused"*
+sits on light blue, the team photos on grey.
+
+That is one block, not two. Open the **People Grid** block and you will see two colour pickers:
+
+- **Background** — the band behind the block's content (the photos).
+- **Header band** — the band behind the eyebrow, heading and intro paragraph.
+
+Leave **Header band** on *"Same as the section"* and everything sits on one colour, exactly as
+before. Pick any other colour and the heading moves onto its own full-width band above the content.
+
+The colours themselves are not set here — they come from **Design System → Section bands**, so
+changing *Accent (light blue)* there restyles every accent band on the site at once.
+
+Two things worth knowing:
+
+- If the block has no eyebrow, heading or intro text, **no band appears** however you set this. An
+  empty coloured stripe is never rendered.
+- Inside a Section or Row, a block already inherits its parent's background, so the setting has no
+  effect there.
 
 ### Article headings each have a shareable link — and renaming one changes it
 

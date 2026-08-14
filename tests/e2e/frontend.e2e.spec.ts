@@ -387,4 +387,110 @@ test.describe('Frontend', () => {
       ).toBe(expected)
     }
   })
+
+  /**
+   * Meet the Team's intro sits on its own light-blue band, above a grey grid.
+   *
+   * The reference models this as two sections — `.team-intro` over
+   * `.team-grid-section` — and the build had folded the intro into the grid's
+   * block, so one block meant one background and the blue band was simply absent.
+   * The People Grid block now has a **Header band** control; this asserts the
+   * stored value still produces the reference's two bands.
+   *
+   * Both halves are asserted, and the second is the one that matters. "The intro
+   * is blue" is equally satisfied by the whole section going blue, which is the
+   * wrong design and was the cheap alternative to this work — so the grid band
+   * must also be measured, and must differ.
+   *
+   * The expected colour is parsed out of the reference page rather than written
+   * here as a gradient. `--band-accent` is an editable Design System token, so a
+   * literal in this file would go stale the moment someone retunes it, and would
+   * be asserting a number rather than the agreement with the reference.
+   *
+   * Proven red by:
+   *   - setting the stored `headerBackground` back to 'default' → one band, the
+   *     intro assertion fires;
+   *   - setting the grid's own `background` to 'accent' as well → both bands blue,
+   *     the "must differ" assertion fires, so it is not vacuous.
+   * Each break confirmed live in the browser before believing the run.
+   * Stays green on `/` and `/jme`, whose People Grids keep the sentinel and must
+   * render exactly one band.
+   */
+  test('the Meet the Team intro sits on its own band, as the reference has it', async ({
+    page,
+  }) => {
+    const { readFileSync } = await import('node:fs')
+
+    // Read from the page's inline <style>: the reference links its shared sheet
+    // root-absolutely, so only the inline half is authoritative here.
+    const referenceBackground = (selector: string): string | null => {
+      const html = readFileSync('.design-reference/about/meet-the-team.html', 'utf8')
+      for (const style of html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+        const rule = style[1].match(new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`))
+        const background = rule?.[1].match(/background:\s*([^;]+);/)
+        if (background) return background[1].trim()
+      }
+      return null
+    }
+
+    // Two colours in, two colours out — a hex the reference declares, as the
+    // browser will report it.
+    const toRgb = (hex: string): string => {
+      const m = hex.trim().match(/^#([0-9a-f]{6})$/i)
+      if (!m) return hex.trim()
+      const n = parseInt(m[1], 16)
+      return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`
+    }
+
+    const introDeclared = referenceBackground('.team-intro')
+    const gridDeclared = referenceBackground('.team-grid-section')
+    // Positive control on the parser: a regex that matched nothing must not read
+    // as a pass.
+    expect(
+      introDeclared,
+      'no .team-intro background found in the reference page — parser broken, or the rule moved out of its inline <style>',
+    ).toBeTruthy()
+    expect(gridDeclared, 'no .team-grid-section background found in the reference page').toBeTruthy()
+
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/about/meet-the-team')
+
+    const bands = await page.evaluate(() => {
+      const read = (section: Element | null | undefined) => {
+        if (!section) return null
+        const cs = getComputedStyle(section)
+        return cs.backgroundImage !== 'none' ? cs.backgroundImage : cs.backgroundColor
+      }
+      const sections = [...document.querySelectorAll('main section')]
+      const intro = sections.find((s) =>
+        s.querySelector('.section-label')?.textContent?.trim().toLowerCase().startsWith('our people'),
+      )
+      const grid = sections.find((s) => s.querySelector('.spec-grid, .vf-people-grid__groups'))
+      return { intro: read(intro), grid: read(grid) }
+    })
+
+    // Control: the page must actually contain both, or every comparison below is
+    // comparing null to null.
+    expect(bands.intro, 'no section on the page carries the "Our People" eyebrow').toBeTruthy()
+    expect(bands.grid, 'no section on the page carries the team grid').toBeTruthy()
+
+    // 1. The intro band is the colour the reference gives `.team-intro`. Compare
+    //    on the colour stops, since the browser normalises hex to rgb() and adds
+    //    an explicit 100% stop the reference leaves implicit.
+    for (const stop of introDeclared!.match(/#[0-9a-f]{6}/gi) ?? []) {
+      expect(
+        bands.intro,
+        `the "Our People" band is ${bands.intro}; the reference declares ${introDeclared}`,
+      ).toContain(toRgb(stop))
+    }
+
+    // 2. …and the grid band is NOT that colour. Without this, one section painted
+    //    entirely blue passes — which is the wrong design, and the shortcut this
+    //    work exists to avoid.
+    expect(
+      bands.grid,
+      `the team grid shares the intro's band (${bands.grid}); the reference gives it ${gridDeclared}`,
+    ).not.toBe(bands.intro)
+    expect(bands.grid, `the team grid band is ${bands.grid}`).toContain(toRgb(gridDeclared!))
+  })
 })

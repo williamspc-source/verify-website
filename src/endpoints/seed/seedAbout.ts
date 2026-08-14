@@ -225,7 +225,11 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
         groupByDepartment: true,
         linkProfiles: true,
         limit: 0,
+        // Two bands, as the reference has them: `.team-intro` light blue over
+        // `.team-grid-section` grey. Mirrored in seedBlockBands.ts, which is what
+        // reaches an install whose page is already authored.
         background: 'muted',
+        headerBackground: 'accent',
       },
       {
         blockType: 'ctaBand',

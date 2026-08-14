@@ -10,22 +10,55 @@ import { iconOptions } from '@/components/Icon'
 // Shared admin field helpers so blocks stay consistent and DRY. Everything a
 // block renders is editable through these fields.
 
+// The section bands, shared by `backgroundField` and `headerBandField` so the two
+// cannot offer different colours. Values map to `.vf-section--*` through
+// `bgClasses` in components/Section, which is what the "every option has a CSS
+// rule" guard checks.
+const BACKGROUND_OPTIONS = [
+  { label: 'White', value: 'white' },
+  { label: 'Light grey', value: 'muted' },
+  { label: 'Light blue accent', value: 'accent' },
+  // Flat fill rather than the `accent` gradient. Added so the home hero's band
+  // could stop being a hardcoded inline colour; available everywhere since it
+  // is a genuinely useful option, not a one-off.
+  { label: 'Light blue (solid)', value: 'accent-solid' },
+  { label: 'Primary (dark blue)', value: 'primary' },
+  { label: 'Dark (charcoal)', value: 'dark' },
+]
+
 export const backgroundField: Field = {
   name: 'background',
   type: 'select',
   defaultValue: 'white',
-  options: [
-    { label: 'White', value: 'white' },
-    { label: 'Light grey', value: 'muted' },
-    { label: 'Light blue accent', value: 'accent' },
-    // Flat fill rather than the `accent` gradient. Added so the home hero's band
-    // could stop being a hardcoded inline colour; available everywhere since it
-    // is a genuinely useful option, not a one-off.
-    { label: 'Light blue (solid)', value: 'accent-solid' },
-    { label: 'Primary (dark blue)', value: 'primary' },
-    { label: 'Dark (charcoal)', value: 'dark' },
-  ],
+  options: BACKGROUND_OPTIONS,
   admin: { description: 'Section background colour.' },
+}
+
+/**
+ * Put a block's heading on its own full-width band, above the block's body.
+ *
+ * The design reference does this wherever an intro sits above a grid — Meet the
+ * Team is `.team-intro` (light blue) over `.team-grid-section` (grey). One block
+ * with one background cannot express that, so the header gets its own band.
+ *
+ * Defaults to the `'default'` sentinel, which emits **no** second band and leaves
+ * the block rendering exactly as it did. Same reasoning as the hero spacing
+ * fields (src/heros/config.ts): a default that silently reshapes every existing
+ * instance of a block is worse than no default at all.
+ *
+ * Exported standalone rather than folded into `sectionHeaderFields`, which 19
+ * blocks share — that would be 38 columns for a capability one page needs today.
+ * Any block can opt in by adding this field.
+ */
+export const headerBandField: Field = {
+  name: 'headerBackground',
+  type: 'select',
+  defaultValue: 'default',
+  options: [{ label: 'Same as the section (no separate band)', value: 'default' }, ...BACKGROUND_OPTIONS],
+  admin: {
+    description:
+      'Give the eyebrow/heading/intro their own coloured band above the rest of the block. Leave as "Same as the section" for one continuous band. The colours themselves come from Design System → Section bands.',
+  },
 }
 
 export const alignField: Field = {

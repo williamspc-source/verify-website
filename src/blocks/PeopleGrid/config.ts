@@ -6,6 +6,7 @@ import {
   cssClassField,
   elementClassesField,
   gridDisplayFields,
+  headerBandField,
   sectionHeaderFields,
 } from '@/fields/blockFields'
 
@@ -20,7 +21,7 @@ export const PeopleGrid: Block = {
   labels: { singular: 'People Grid', plural: 'People Grids' },
   fields: [
     ...sectionHeaderFields,
-    backgroundField,
+    { type: 'row', fields: [backgroundField, headerBandField] },
     {
       name: 'source',
       type: 'select',

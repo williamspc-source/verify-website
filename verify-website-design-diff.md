@@ -123,6 +123,17 @@ No meaningful differences — layout and content match.
 - Heading itself ("The People Behind VERIFY") and shield graphic match.
 
 ### 2. "Our People" intro section
+- **Band colour was missing** — *added 2026-08-14, after this audit, and now fixed.* Target renders
+  this intro as its own `.team-intro` section on a light-blue gradient
+  (`linear-gradient(135deg, #eef9ff 0%, #e6f4ff 48%, #d9efff 100%)`), with the photo grid below it on
+  `.team-grid-section`'s grey `#f5f6f8`. The build had folded the intro into the People Grid block, so
+  one block meant one background and the blue band did not exist — the whole thing was grey.
+  The colour was never the problem: `--band-accent` already defaults to that exact gradient and is
+  editable in Design System → Section bands. What was missing was a way to give a block's *header* a
+  different band from its body. The People Grid now has a **Header band** control
+  (`headerBandField`, `src/fields/blockFields.ts`), set to Accent on this page by
+  `src/endpoints/seed/seedBlockBands.ts`. Guarded in `tests/e2e/frontend.e2e.spec.ts`, which reads
+  both expected colours out of this reference page rather than hardcoding them.
 - **Heading differs**: Target "Experienced, Dedicated & Client-Focused"; Current "Meet the Team."
 - **Subtext copy differs**: Target: "At VERIFY, our team is our greatest strength. Every member plays a vital role in delivering the accuracy, care, and responsiveness our clients and claimants deserve. We are proud of the talented, dedicated individuals who make this possible every day." Current: "The people who coordinate referrals, manage bookings and support every matter through to delivery." — shorter, different.
 

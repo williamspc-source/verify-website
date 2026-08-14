@@ -70,6 +70,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     heading,
     subheading,
     background,
+    headerBackground,
     source = 'specialists',
     onlyAdvertised,
     featuredOnly,
@@ -161,8 +162,42 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
 
   if (cards.length === 0) return null
 
+  const header = (
+    <SectionHeader
+      eyebrow={eyebrow}
+      title={heading}
+      subtitle={subheading}
+      align="center"
+      titleClassName={toClassName(elementClasses?.heading)}
+    />
+  )
+
+  // The header can sit on a band of its own — the reference does this on Meet the
+  // Team, where `.team-intro` is light blue over a grey `.team-grid-section`.
+  //
+  // Three conditions, all load-bearing:
+  //   - 'default' (the sentinel) means one continuous band, i.e. every block that
+  //     predates this field renders unchanged;
+  //   - there has to BE a header, or the band is an empty coloured stripe — a
+  //     control that appears to have worked and produced nothing legible;
+  //   - `bare` blocks are nested inside another Section/Row and have already
+  //     dropped their banding, so a second band there is meaningless.
+  const hasHeader = Boolean(eyebrow || heading || subheading)
+  const splitHeader = Boolean(headerBackground && headerBackground !== 'default' && hasHeader && !bare)
+
   return (
-    <Section
+    <>
+      {splitHeader ? (
+        <Section
+          background={headerBackground as SectionBackground}
+          className={cn('vf-people-grid__header-band', toClassName(cssClass))}
+          containerWidth={containerWidth}
+        >
+          {header}
+        </Section>
+      ) : null}
+
+      <Section
       background={background as SectionBackground}
       className={cn('vf-people-grid', toClassName(cssClass))}
       motion={motion}
@@ -171,13 +206,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
       shadow={shadow}
       bare={bare}
     >
-      <SectionHeader
-        eyebrow={eyebrow}
-        title={heading}
-        subtitle={subheading}
-        align="center"
-        titleClassName={toClassName(elementClasses?.heading)}
-      />
+      {splitHeader ? null : header}
 
       {groups ? (
         <div className="vf-people-grid__groups">
@@ -215,6 +244,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
           ))}
         </div>
       ) : null}
-    </Section>
+      </Section>
+    </>
   )
 }
