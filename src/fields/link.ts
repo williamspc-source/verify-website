@@ -108,6 +108,31 @@ export const link: LinkType = ({
     },
   ]
 
+  // Jump to a section of the linked page. This exists so an anchored link can
+  // still be an *internal* link: before it, `reference` had nowhere to put a
+  // `#fragment`, so the moment a link needed one the editor had to switch to
+  // Custom URL and type the whole path — which is precisely the hand-typed path
+  // the comment above warns about. Every anchored link on the site was written
+  // that way, and eight of them had gone stale onto flat legacy paths that only
+  // still worked because of a redirect.
+  //
+  // Appended by CMSLink to whatever `routes.ts` resolves, so the page can move
+  // and the link follows it. Stored without the `#`.
+  const anchorField: Field = {
+    name: 'anchor',
+    type: 'text',
+    label: 'Jump to section (optional)',
+    admin: {
+      condition: (_, siblingData) => siblingData?.type === 'reference',
+      description:
+        'Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section\'s Anchor ID.',
+    },
+    validate: (val: string | null | undefined) =>
+      !val ||
+      /^[a-z][a-z0-9-]*$/.test(val) ||
+      'Use lowercase letters, numbers and hyphens; must start with a letter.',
+  }
+
   if (!disableLabel) {
     linkTypes.map((linkType) => ({
       ...linkType,
@@ -135,6 +160,10 @@ export const link: LinkType = ({
   } else {
     linkResult.fields = [...linkResult.fields, ...linkTypes]
   }
+
+  // After the type row either way, so it reads as a modifier on the chosen
+  // document rather than as a third kind of destination.
+  linkResult.fields.push(anchorField)
 
   linkResult.fields.push({
     name: 'icon',

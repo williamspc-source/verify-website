@@ -10,7 +10,7 @@ the reason) or `Deferred` (logged in `OUTSTANDING.md` with its cost).
 Read the three lists after the table too: **new/removed admin controls**, **database changes that
 will not travel with a git push**, and **what was left undone**.
 
-> **Four further passes followed**, each with its own section at the end of this file. Where the
+> **Five further passes followed**, each with its own section at the end of this file. Where the
 > first pass's text below has been overtaken, it is marked rather than rewritten, so the record
 > stays a history and not just a snapshot.
 >
@@ -23,6 +23,9 @@ will not travel with a git push**, and **what was left undone**.
 >    One un-ported `max-width` was breaking 10 headings across 8 pages.
 > 4. [Fifth pass — testimonial cards lifted on hover and got clipped](#fifth-pass--testimonial-cards-lifted-on-hover-and-got-clipped).
 >    A field default nobody chose, moving cards inside a viewport with no room for it.
+> 5. [Sixth pass — the link audit](#sixth-pass--the-link-audit). Every link on all 114 pages
+>    measured against the reference, four reported faults fixed, and a guard so it is never asserted
+>    again.
 >
 > A pattern worth naming across passes 3–5: each began as "this one thing on the homepage looks
 > wrong" and each turned out to be a global — a hardcoded asset, an un-ported width cap, a field
@@ -554,3 +557,85 @@ Three breaks were applied, and the one that stayed green is worth recording too:
   `scrollIntoViewIfNeeded` moves the page under it, so an element can already be hovered when it is
   measured at rest. That made the first draft of the positive control read the same value twice and
   pass while proving nothing.
+
+---
+
+# Sixth pass — the link audit
+
+Reported: the Videolink guide went to a video, Upcoming Webinars went to the Events hub, Join Expert
+Panel skipped the form, and the service cards landed on body text. Plus: *"you said they all match,
+except they do not"*. That was fair — it had been asserted, not measured.
+
+## What was measured this time
+
+All **114 pages** from the five sitemaps, **6,177 anchors / 224 unique targets**, every status,
+every fragment re-checked *after hydration*, and **177 link texts across 22 pages** diffed against
+their `.design-reference` counterpart.
+
+| | Before | After |
+|---|---|---|
+| Internal links not returning 200 | 1 | **0** |
+| Dead fragments | 0 of 202 | **0 of 202** |
+| Content links on a redirecting legacy path | 30 | **0** |
+| Pages in a sitemap that 404 | 1 | **0** |
+
+## The four reported faults
+
+| # | Was | Now |
+|---|---|---|
+| Videolink Appointment Guide | `/for-claimants#video-guide` — the YouTube section | opens the guide **on the Videolink type** |
+| Upcoming Webinars & Training | `/events` | `/events/upcoming-events` |
+| Join Expert Panel (gateway CTA) | `/join-expert-panel` | `/specialists/join-expert-panel#join-form` |
+| Service card anchors | title behind the 72px sticky nav | title clears it |
+
+**Videolink needed new capability, not a new URL.** The guide had no anchor field and its toggle
+read nothing from the URL (`useState(0)`), so it could not be deep-linked at all. Each appointment
+type now carries an editable Anchor ID rendered on its button, and the guide reads the hash —
+matching the reference, which puts the same ids on its tab buttons.
+
+**The service cards' anchors were already correct.** There was simply no scroll offset anywhere in
+the repo: measured, `File Review`'s heading landed at y=12 under a 72px nav. One rule on `html`
+fixed all 25 anchor links, including the header's own sub-menu.
+
+## Also fixed
+
+`/legal/terms-conditions` (404 → `/terms-conditions`) · 30 legacy paths → canonical · the Surrogate
+card now targets the whole services section, as the reference does · deep-linked accordion items
+open and scroll to their title · "View Specialist Panel" ×2 → the panel, not the section landing ·
+"View All Events" → the hub · the portal-access email body → the reference's wording.
+
+**Kept deliberately different:** the homepage "Frequently Asked Questions" link keeps its `#faqs`
+jump where the reference has none. Your call, recorded so it does not read as an oversight.
+
+## Why it had drifted, and what stops it now
+
+**Anchored links could not be internal links.** `link()` offered a resolved document *or* a raw
+string, with nowhere to put a `#fragment` — so every anchored link was a hand-typed path, which is
+exactly what goes stale. Links now have a **Jump to section** box that works with a document
+reference, so they follow the page if it moves.
+
+**A seed edit alone fixes nothing.** The seed had *already* been corrected to canonical paths; every
+existing install still served the old ones, because the page seeds early-return on authored pages.
+`seedLinkRepairs.ts` now repairs unconditionally, the same way `repairServiceLinks` does.
+
+**`tests/e2e/links.e2e.spec.ts`** crawls the sitemaps every run and fails the build on a non-200, a
+redirecting legacy path, a fragment with no target, a sitemap page that does not render, or any of
+the four reported faults regressing. Proven red four ways.
+
+## Three measurement errors I made, and what they cost
+
+1. **65 "dead anchors" that were not dead.** I read the DOM at `domcontentloaded`; article heading
+   ids are assigned on mount. All 65 were false positives — including `#join-form`, which I told you
+   was missing. Re-checked properly: 0 of 202.
+2. **My control could not fail.** `#main-content` is in the root layout and arrives in the first
+   byte, so it passed in exactly the runs that were wrong.
+3. **A stale build faked a guard's proof.** Deleting the scroll offset and re-running its test said
+   PASS. The dev server had not recompiled; with the break confirmed live in the browser it went red.
+
+All three are now in `CLAUDE.md`.
+
+## One thing the guard found that I had not
+
+**`/posts` was advertised in the sitemap and returned 404** — a leftover default from the Payload
+template. Nothing on the site links to it, so a link crawl could never see it; only search engines
+would have. Removed.

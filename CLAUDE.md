@@ -57,6 +57,8 @@ Every rule below is here because that failure already happened once in this repo
 | **A guard that has never failed is not evidence.** Every test in `adminControls.int.spec.ts` records the deliberate break used to prove it goes red. Re-run it if you change the test (`zsh tests/int/prove-guards.sh`). | Three of four guard patterns were structurally incapable of failing — one asserted an array it never wrote to — and "94/94 passing" was reported as proof the work was sound. |
 | **A helper takes the narrowest input that answers the question.** Don't accept a wide all-optional shape and return several answers; a caller holding a partial object will get a confident answer to a question it supplied no data for, and TypeScript will not object. | `eventTiming()` accepted `{date?, registrationClosesAt?}` and returned both `isPast` and `registrationOpen`. The events listing passes an `EventItem`, which has no `registrationClosesAt` — it compiled, and a wrong `registrationOpen` sat there waiting to be read. Split out `isEventPast(EventDateInput)`. |
 | **A "read this field" check must not count code that *writes* it.** | The orphan-field guard's haystack included `src/endpoints`, where the seed writes `{ hoursNote: '…' }`. That looks identical to a read, so every seeded field appeared consumed — measured: deleting the only renderer of `Offices.hoursNote` still passed. |
+| **An in-page anchor link is two halves: the link *and* the target.** Fixing one without the other is invisible. Guarded by `tests/e2e/links.e2e.spec.ts`. | The homepage's Videolink link was corrected to `#videolink-appointment` and the guide still opened on In-Person — the anchor ids had never reached the database, because `seedInfoBooking` early-returns on an authored page. The href looked right in every check that read hrefs. |
+| **Content links live in the database, so a seed edit alone fixes nothing.** Pair every link correction with an unconditional repair (`src/endpoints/seed/seedLinkRepairs.ts`, run from `seedVerify`). | The seed had *already* been corrected to canonical paths. Every existing install, the box included, still served the old ones: 30 links across 9 pages on flat legacy paths that only resolved through a 308. |
 | **Don't cache a value that is already stable.** For a `useSyncExternalStore` snapshot, prefer a naturally-stable computation over a module-level memo. | `startOfDay(Date.now())` already returns the same number all day. Memoising it in a module variable froze "today" for the life of the JS bundle — which outlives a page, since client-side navigation doesn't re-evaluate modules — so a tab open overnight never re-bucketed events. |
 
 ## Commands
@@ -309,6 +311,22 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   broken on every page. Adding the other half — offscreen *before* focus — is what makes it fail.
   Same shape as the orphan-field guard: a check that only looks at the "working" end of a behaviour
   cannot distinguish working from absent.
+- **Read the DOM after the page has settled, and pick a control that arrives on the same schedule.**
+  A link audit that checked fragments at `domcontentloaded` reported **65 dead anchors**. All 65 were
+  false positives: `ArticleToc` assigns article heading ids on mount, and other sections stream in.
+  The control used — `#main-content` — is in the root layout and present in the first byte, so it
+  passed in exactly the runs that were wrong. Re-checked with `waitUntil: 'load'` and polling:
+  **0 dead of 202**. Prefer `waitForFunction` over a fixed delay; a fixed delay is wrong in both
+  directions — too short then, flaky under load later.
+- **A stale Turbopack build will fake a guard's proof, not just a feature.** Deleting
+  `scroll-padding-top` and re-running its test reported PASS — the guard looked incapable of failing.
+  The dev server had not recompiled. Confirm the break is *live in the browser*
+  (`getComputedStyle`) before believing a proof run, exactly as you would for the fix itself. This
+  is the second time the same stale build produced a confident wrong answer in one sitting.
+- **A link crawl cannot see a page nothing links to.** `/posts` was advertised in the pages sitemap
+  and returned 404 — a leftover default from the Payload template. No page links to it, so crawling
+  from links found nothing; the sitemap-driven test found it immediately. Enumerate from the
+  sitemaps, not from the link graph.
 - **Run a new guard against something that is deliberately fine before trusting it.** Proving a guard
   goes red on a real defect is only half the job; the other half is proving it stays green on a
   lookalike. The first heading-wrap guard compared each title's natural width against the nearest

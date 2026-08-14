@@ -14,7 +14,7 @@ export const SERVICE_LINK_OVERRIDES: Record<string, string> = {
   'supplementary-report': '/services/medico-legal/reporting-services#supplementary-report',
   'teleconference-expert-evidence': '/services/medico-legal/reporting-services#teleconference',
   'expert-evidence': '/services/medico-legal/reporting-services#expert-evidence',
-  'surrogate-assessment-interpreter-booking': '/services/medico-legal/admin-services#surrogate-assessment',
+  'surrogate-assessment-interpreter-booking': '/services/medico-legal/admin-services#as-services-section',
   'brief-reduction-loi-review': '/services/medico-legal/admin-services#brief-reduction',
 }
 

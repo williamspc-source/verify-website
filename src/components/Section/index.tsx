@@ -88,8 +88,18 @@ export const Section: React.FC<SectionProps> = ({
   const shadowClass = shadow && shadow !== 'default' ? `vf-shadow-${shadow}` : undefined
 
   // Nested inside a Section/Row: no <section> banding, no padding, no container.
+  // `id` is still forwarded — it used to be dropped here, so an Anchor ID set on
+  // any nested block rendered nothing at all and every link to it scrolled
+  // nowhere. The control looked set in the admin and did nothing, which is the
+  // exact failure the orphan-field guard exists to prevent; that guard passed
+  // because `anchorId` is whitelisted as "passed to <Section id>" rather than
+  // checked.
   if (bare) {
-    return <div className={cn('vf-section-bare', hoverClass, shadowClass, className)}>{children}</div>
+    return (
+      <div id={id} className={cn('vf-section-bare', hoverClass, shadowClass, className)}>
+        {children}
+      </div>
+    )
   }
 
   return (

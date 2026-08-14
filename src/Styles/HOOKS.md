@@ -239,6 +239,13 @@ Every block exposes **Background**, **Container width**, **Motion**, and grid bl
 **Hover effect** and **Card shadow**. Layout primitives add padding, gap, columns/span and
 alignment. The home hero adds background, width and padding. Reach for CSS only after these.
 
+> **Linking to a section of another page.** Every link now has a **Jump to section** box under the
+> document picker. Type the section's Anchor ID there — without the `#` — and the link lands on that
+> section instead of the top of the page. It only appears for *Internal link*, and it is the right
+> way to do it: the link still follows the page if the page is ever moved or renamed, which a
+> hand-typed address does not. The Appointment Guide's In-Person / Videolink options each have their
+> own Anchor ID too, so a link can open the guide *on* one of them.
+
 > **One exception: Testimonials ignores Hover effect → Lift.** Those cards deliberately do not move
 > on hover — they highlight by turning their border brand blue, which is what the design calls for.
 > The carousel crops tightly to the card, so anything that moved a card cut its top edge off. Glow,

@@ -101,6 +101,7 @@ export const AppointmentGuideBlock: React.FC<Props & { bare?: boolean }> = ({
   const clientTypes: ClientType[] = types.map((type) => ({
     label: type.label,
     sublabel: type.sublabel,
+    anchorId: type.anchorId,
     iconNode: type.icon ? <Icon name={type.icon} /> : null,
     tabs: (type.tabs || []).map((tab) => ({
       label: tab.label,

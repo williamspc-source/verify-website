@@ -17,6 +17,7 @@ import { seedSpecialists } from './seed/seedSpecialists'
 import { seedInfoBooking } from './seed/seedInfoBooking'
 import { seedHubs } from './seed/seedHubs'
 import { seedLegal } from './seed/seedLegal'
+import { repairLinkTargets } from './seed/seedLinkRepairs'
 import { repairServiceLinks } from './seed/seedServiceLinks'
 import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
 
@@ -1175,6 +1176,7 @@ export const seedVerify = async ({
   // page groups so all service docs exist; unconditional (unlike seedHomepage,
   // which early-returns on an already-authored homepage) so it repairs live data.
   await repairServiceLinks({ payload, req })
+  await repairLinkTargets({ payload, req })
 
   // Every write above passes `disableRevalidate: true` so the seed doesn't fire
   // hundreds of individual purges — correct, but it left nothing to purge at the

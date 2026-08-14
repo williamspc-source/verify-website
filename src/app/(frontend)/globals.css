@@ -257,6 +257,11 @@
      max-width on `.vf-section-header--centered` — see the note at that rule for
      why it is gone. */
   --vf-measure-narrow: 560px;
+
+  /* Sticky-masthead clearance for anchor jumps: the 72px `.nav-inner` height
+     plus 24px of breathing room. Consumed by `html { scroll-padding-top }`.
+     Change this if the masthead's height ever changes. */
+  --vf-scroll-offset: 96px;
   --vf-avatar-size: 104px;
 
   /* Reusable gradient recipes. Their colour stops are `var()`s, so they follow
@@ -333,6 +338,19 @@
   }
   html {
     scroll-behavior: smooth;
+    /* Every anchor jump must clear the sticky masthead. `.site-nav` is
+       `position: sticky; top: 0` at a 72px `.nav-inner` height, and without this
+       the browser scrolls the target's top edge to y=0 — straight under the bar.
+       Measured before this existed: linking to #file-review put its `File Review`
+       heading at y=12 beneath a 72px nav, so the first thing readable was the
+       body copy. Reported as "it navigates to the body, not the title", and it
+       applied to all 25 cross-page anchor links, including the header's own
+       File Review / Teleconference sub-menu items.
+       Set on `html` rather than as `scroll-margin-top` per target: the offset is
+       a property of the masthead, not of any one section, and a per-target rule
+       has to be remembered on every future anchor. Guarded by the anchor-landing
+       test in tests/e2e/frontend.e2e.spec.ts. */
+    scroll-padding-top: var(--vf-scroll-offset, 96px);
     /* "Overall size" (Design System → Typography). Scaling the root font size
        scales every rem-based value on the site — type and the spacing around it
        — in one move. 1 is the designed size, so this is a no-op by default.

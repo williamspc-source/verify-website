@@ -22,6 +22,25 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | # | Issue | Live today? | User impact | Effort | Recommendation |
 |---|---|---|---|---|---|
 | 1 | Migration not yet created on the box | — | **Blocks deploy** | ~20 min + a careful read | **Required, immediately before the push** |
+| 2 | Article heading ids are assigned client-side | Yes, minor | A *pasted* article URL with a `#section` lands at the top instead of jumping | ~1 hr | Worth doing; not urgent |
+
+---
+
+## 2. Article deep links do not jump on a fresh load
+
+In-article contents links work: click one and the page scrolls. But the heading ids are assigned by
+`ArticleToc` on mount (`ArticleToc.tsx:44-49`), so on a **fresh load** the browser looks for the id
+before React runs, finds nothing, and stays at the top. Measured: opening
+`…/in-the-loop/qa-insights/…#preparing-the-claimant` directly leaves `scrollY` at 0.
+
+Nothing on the site links that way, so no on-site link is broken and the link audit passes. It only
+affects a URL someone copies out of the address bar and shares — which for an article is a normal
+thing to do.
+
+**The fix** is to emit the ids server-side in the rich-text heading converter, using the same
+`slugify` the TOC already uses (`ArticleToc.tsx:7`) so the two cannot drift — one function, both
+sides. Deferred from the link pass because it is a rich-text renderer change with its own blast
+radius across all 24 articles, and nothing reported it.
 
 ---
 
@@ -45,14 +64,18 @@ before you generate — the commands are in the next section.
 
 ### Measured drift — and how to re-measure it
 
-Measured **2026-08-14**, checked-in baseline (`src/migrations/20260705_105320_baseline.json`) against
-the local `verify_cms` schema:
+Measured **2026-08-14** (re-measured after the link pass), checked-in baseline
+(`src/migrations/20260705_105320_baseline.json`) against the local `verify_cms` schema:
 
 | | Baseline | Now | Change |
 |---|---|---|---|
-| Columns | 3207 | 3335 | **+133, −5** |
+| Columns | 3207 | 3384 | **+182, −5** |
 | Tables | 301 | 303 | **+2** |
 | Indexes | 946 | 1266 | +320 |
+
+The link pass added **49** columns to the previous 3335: an optional `anchor` on every stored link
+(one column per table that uses the `link()` helper, live + version), plus `anchor_id` on
+`appt_guide_types`, `pages_blocks_services_grid` and their version twins. All additive.
 
 > **Correction.** An earlier revision of this table said "+131, −3" alongside a list of five dropped
 > columns — the two disagreed, and the column breakdown was the wrong one. 3207 + 133 − 5 = 3335.

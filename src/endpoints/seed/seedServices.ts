@@ -1048,6 +1048,10 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
         source: 'manual',
         services: adminServicesAccordion,
         layout: 'accordion',
+        // The homepage card "Surrogate Assessment & Interpreter Booking Service"
+        // names two of these four, so it links to the section rather than to one
+        // item — the reference does the same with #as-services-section.
+        anchorId: 'as-services-section',
       },
       // ── The process ──
       {

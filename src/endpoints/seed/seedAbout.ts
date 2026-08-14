@@ -195,7 +195,7 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
         eyebrow: 'Get Started',
         heading: 'Ready to Refer Your [[Next Matter to VERIFY?]]',
         text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
-        links: [enquiry('Make an Enquiry'), custom('/specialists', 'View Specialist Panel')],
+        links: [enquiry('Make an Enquiry'), custom('/specialists/specialist-panel', 'View Specialist Panel')],
       },
     ],
   )
@@ -232,7 +232,7 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
         eyebrow: 'Get Started',
         heading: 'Ready to Refer Your [[Next Matter to VERIFY?]]',
         text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
-        links: [enquiry('Make an Enquiry'), custom('/specialists', 'View Specialist Panel')],
+        links: [enquiry('Make an Enquiry'), custom('/specialists/specialist-panel', 'View Specialist Panel')],
       },
     ],
   )

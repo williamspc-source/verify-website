@@ -2,6 +2,7 @@ import type { Block } from 'payload'
 
 import { link } from '@/fields/link'
 import {
+  anchorIdField,
   backgroundField,
   cssClassField,
   elementClassesField,
@@ -146,6 +147,10 @@ export const ServicesGrid: Block = {
       admin: { description: 'Optional CTAs under the grid (e.g. "View Medico-Legal Services").' },
       fields: [link({ appearances: false })],
     },
+    // Lets a link target this grid as a whole (e.g. the homepage's combined
+    // "Surrogate Assessment & Interpreter Booking" card, which names two of the
+    // four items and so should land on the section, not on one of them).
+    anchorIdField,
     cssClassField,
     elementClassesField,
     ...gridDisplayFields,

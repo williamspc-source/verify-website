@@ -441,6 +441,10 @@ export interface Page {
             url?: string | null;
             label: string;
             /**
+             * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+             */
+            anchor?: string | null;
+            /**
              * Optional leading icon shown before the label.
              */
             icon?:
@@ -2300,6 +2304,10 @@ export interface ButtonBlock {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -2649,6 +2657,10 @@ export interface ContentBlock {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -2836,6 +2848,10 @@ export interface CallToActionBlock {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -3320,6 +3336,10 @@ export interface GatewayCardsBlock {
                 url?: string | null;
                 label: string;
                 /**
+                 * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+                 */
+                anchor?: string | null;
+                /**
                  * Optional leading icon shown before the label.
                  */
                 icon?:
@@ -3459,6 +3479,10 @@ export interface GatewayCardsBlock {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -4447,6 +4471,10 @@ export interface SpecialtyGridBlock {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -4694,6 +4722,10 @@ export interface PeopleGridBlock {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -4957,6 +4989,10 @@ export interface ServicesGridBlock {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -5067,6 +5103,10 @@ export interface ServicesGridBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -5950,6 +5990,10 @@ export interface AamleEducationBlock {
     url?: string | null;
     label: string;
     /**
+     * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+     */
+    anchor?: string | null;
+    /**
      * Optional leading icon shown before the label.
      */
     icon?:
@@ -6393,6 +6437,10 @@ export interface SplitFeatureBlock {
           url?: string | null;
           label?: string | null;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -6585,6 +6633,10 @@ export interface CTABandBlock {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -6897,6 +6949,10 @@ export interface CalloutBlock {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -7399,6 +7455,10 @@ export interface MapEmbedBlock {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -7798,6 +7858,10 @@ export interface LeadershipSpotlightBlock {
     url?: string | null;
     label: string;
     /**
+     * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+     */
+    anchor?: string | null;
+    /**
      * Optional leading icon shown before the label.
      */
     icon?:
@@ -8106,6 +8170,10 @@ export interface PortalCtaBlock {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -8590,6 +8658,10 @@ export interface ArchiveBlock {
           } | null);
       url?: string | null;
       label?: string | null;
+      /**
+       * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+       */
+      anchor?: string | null;
       /**
        * Optional leading icon shown before the label.
        */
@@ -9244,6 +9316,10 @@ export interface AppointmentGuideBlock {
           | null;
         label: string;
         sublabel?: string | null;
+        /**
+         * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+         */
+        anchorId?: string | null;
         tabs?:
           | {
               icon?:
@@ -9961,6 +10037,10 @@ export interface AudiencePathwaysBlock {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -10259,6 +10339,10 @@ export interface BookingChooserBlock {
                     } | null);
                 url?: string | null;
                 label: string;
+                /**
+                 * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+                 */
+                anchor?: string | null;
                 /**
                  * Optional leading icon shown before the label.
                  */
@@ -11191,6 +11275,7 @@ export interface PagesSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    anchor?: T;
                     icon?: T;
                     appearance?: T;
                   };
@@ -11415,6 +11500,7 @@ export interface ButtonBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -11494,6 +11580,7 @@ export interface ContentBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -11530,6 +11617,7 @@ export interface CallToActionBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -11604,6 +11692,7 @@ export interface GatewayCardsBlockSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    anchor?: T;
                     icon?: T;
                   };
               id?: T;
@@ -11616,6 +11705,7 @@ export interface GatewayCardsBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -11759,6 +11849,7 @@ export interface SpecialtyGridBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         id?: T;
@@ -11810,6 +11901,7 @@ export interface PeopleGridBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -11870,10 +11962,12 @@ export interface ServicesGridBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         id?: T;
       };
+  anchorId?: T;
   cssClass?: T;
   elementClasses?:
     | T
@@ -12045,6 +12139,7 @@ export interface AamleEducationBlockSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+        anchor?: T;
         icon?: T;
       };
   image?: T;
@@ -12093,6 +12188,7 @@ export interface SplitFeatureBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         anchorId?: T;
@@ -12130,6 +12226,7 @@ export interface CTABandBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -12169,6 +12266,7 @@ export interface CalloutBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -12258,6 +12356,7 @@ export interface MapEmbedBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
               appearance?: T;
             };
@@ -12299,6 +12398,7 @@ export interface LeadershipSpotlightBlockSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+        anchor?: T;
         icon?: T;
       };
   cssClass?: T;
@@ -12341,6 +12441,7 @@ export interface PortalCtaBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         id?: T;
@@ -12414,6 +12515,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
       };
@@ -12562,6 +12664,7 @@ export interface AppointmentGuideBlockSelect<T extends boolean = true> {
         icon?: T;
         label?: T;
         sublabel?: T;
+        anchorId?: T;
         tabs?:
           | T
           | {
@@ -12703,6 +12806,7 @@ export interface AudiencePathwaysBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         id?: T;
@@ -12739,6 +12843,7 @@ export interface BookingChooserBlockSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    anchor?: T;
                     icon?: T;
                   };
               id?: T;
@@ -13726,6 +13831,10 @@ export interface Header {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -13868,6 +13977,10 @@ export interface Header {
                 url?: string | null;
                 label: string;
                 /**
+                 * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+                 */
+                anchor?: string | null;
+                /**
                  * Optional leading icon shown before the label.
                  */
                 icon?:
@@ -14009,6 +14122,10 @@ export interface Header {
                           } | null);
                       url?: string | null;
                       label: string;
+                      /**
+                       * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+                       */
+                      anchor?: string | null;
                       /**
                        * Optional leading icon shown before the label.
                        */
@@ -14160,6 +14277,10 @@ export interface Header {
           } | null);
       url?: string | null;
       label: string;
+      /**
+       * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+       */
+      anchor?: string | null;
       /**
        * Optional leading icon shown before the label.
        */
@@ -14316,6 +14437,10 @@ export interface Footer {
                     } | null);
                 url?: string | null;
                 label: string;
+                /**
+                 * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+                 */
+                anchor?: string | null;
                 /**
                  * Optional leading icon shown before the label.
                  */
@@ -14484,6 +14609,10 @@ export interface Footer {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
           /**
            * Optional leading icon shown before the label.
            */
@@ -15218,6 +15347,10 @@ export interface ArticleSetting {
           url?: string | null;
           label: string;
           /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
            * Optional leading icon shown before the label.
            */
           icon?:
@@ -15780,6 +15913,7 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         subItems?:
@@ -15793,6 +15927,7 @@ export interface HeaderSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    anchor?: T;
                     icon?: T;
                   };
               subSubItems?:
@@ -15806,6 +15941,7 @@ export interface HeaderSelect<T extends boolean = true> {
                           reference?: T;
                           url?: T;
                           label?: T;
+                          anchor?: T;
                           icon?: T;
                         };
                     id?: T;
@@ -15826,6 +15962,7 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
       };
@@ -15854,6 +15991,7 @@ export interface FooterSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    anchor?: T;
                     icon?: T;
                   };
               id?: T;
@@ -15893,6 +16031,7 @@ export interface FooterSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         id?: T;
@@ -16064,6 +16203,7 @@ export interface ArticleSettingsSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              anchor?: T;
               icon?: T;
             };
         id?: T;

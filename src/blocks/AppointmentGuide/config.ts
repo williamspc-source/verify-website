@@ -6,7 +6,12 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { cssClassField, iconField, sectionHeaderFields } from '@/fields/blockFields'
+import {
+  anchorIdField,
+  cssClassField,
+  iconField,
+  sectionHeaderFields,
+} from '@/fields/blockFields'
 
 const richBody = {
   name: 'body',
@@ -58,6 +63,13 @@ export const AppointmentGuide: Block = {
             { name: 'sublabel', type: 'text', admin: { width: '40%' } },
           ],
         },
+        // Rendered as the id on this type's toggle button, so a link ending
+        // `#<anchorId>` scrolls here AND selects this type. The design reference
+        // does the same (in-person-appointment / videolink-appointment on its
+        // tab buttons). Read by GuideClient; without it the guide cannot be
+        // deep-linked at all, which is why the homepage's Videolink link used to
+        // point at the separate video section instead.
+        anchorIdField,
         {
           name: 'tabs',
           type: 'array',

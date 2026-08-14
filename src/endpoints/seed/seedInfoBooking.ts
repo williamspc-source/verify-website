@@ -636,7 +636,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         // and "browse our services" (→ /services).
         note: lexParagraphNodes([
           lexTextNode('For full engagement terms, please see our '),
-          lexLink('Standard Terms & Conditions', '/legal/terms-conditions'),
+          lexLink('Standard Terms & Conditions', '/terms-conditions'),
           lexTextNode('. You can also '),
           lexLink('browse our services', '/services'),
           lexTextNode(' for more detail on the support we provide.'),
@@ -846,6 +846,10 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
             icon: 'map-pin',
             label: 'In-Person Appointment',
             sublabel: 'At a clinic or examination centre',
+            // Deep-link target. The homepage's "In-Person Appointment Guide"
+            // link ends #in-person-appointment, which scrolls here and selects
+            // this type — the reference puts the same id on its tab button.
+            anchorId: 'in-person-appointment',
             tabs: [
               {
                 icon: 'calendar-blank',
@@ -951,6 +955,10 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
             icon: 'video-camera',
             label: 'Videolink Appointment',
             sublabel: 'From your home or a private location',
+            // "Videolink Appointment Guide" on the homepage used to point at the
+            // separate YouTube section instead of here, because the guide had no
+            // anchor and its toggle ignored the URL.
+            anchorId: 'videolink-appointment',
             tabs: [
               {
                 icon: 'calendar-blank',

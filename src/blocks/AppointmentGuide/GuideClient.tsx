@@ -1,5 +1,5 @@
 'use client'
-import React, { useId, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 
 import { cn } from '@/utilities/ui'
 
@@ -12,6 +12,7 @@ export type ClientTab = { label: string; iconNode: React.ReactNode; panel: React
 export type ClientType = {
   label: string
   sublabel?: string | null
+  anchorId?: string | null
   iconNode: React.ReactNode
   tabs: ClientTab[]
 }
@@ -23,6 +24,37 @@ export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: string |
   const [typeIdx, setTypeIdx] = useState(0)
   const [tabIdx, setTabIdx] = useState(0)
   const baseId = useId()
+
+  // Deep-linking. Each type carries an editor-set Anchor ID rendered as the id
+  // on its button, so `…/for-claimants#videolink-appointment` both scrolls here
+  // and *selects that type* — matching the design reference, which puts
+  // id="in-person-appointment" / id="videolink-appointment" on its tab buttons.
+  //
+  // Before this, the guide could not be deep-linked at all: the type was plain
+  // `useState(0)` and nothing read the URL, so the homepage's "Videolink
+  // Appointment Guide" link had been pointed at the separate YouTube section
+  // instead — it went to a video rather than to the guide.
+  //
+  // The browser cannot do the scroll itself: these ids only exist after this
+  // component mounts, so a fresh load with a hash finds nothing. Hence the
+  // explicit scrollIntoView, which also honours `html { scroll-padding-top }`.
+  useEffect(() => {
+    const apply = () => {
+      const hash = window.location.hash.replace(/^#/, '')
+      if (!hash) return
+      const i = types.findIndex((t) => t.anchorId && t.anchorId === hash)
+      if (i < 0) return
+      setTypeIdx(i)
+      setTabIdx(0)
+      // Wait for the selection to paint before scrolling to it.
+      requestAnimationFrame(() => {
+        document.getElementById(hash)?.scrollIntoView({ block: 'start' })
+      })
+    }
+    apply()
+    window.addEventListener('hashchange', apply)
+    return () => window.removeEventListener('hashchange', apply)
+  }, [types])
 
   if (!types || types.length === 0) return null
 
@@ -47,6 +79,7 @@ export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: string |
               return (
                 <button
                   key={i}
+                  id={t.anchorId || undefined}
                   type="button"
                   role="tab"
                   aria-selected={selected}

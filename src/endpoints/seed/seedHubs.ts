@@ -364,7 +364,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
         heading: 'Upcoming Webinars & [[Training]]',
         desc: 'Complimentary, CPD-eligible education for legal, medical, and insurance professionals.',
         cssClass: ['ni-section', 'bg-white'],
-        viewAll: '/events/upcoming-events',
+        viewAll: '/events',
         viewAllLabel: 'View All Events',
       }),
       // Industry Insights — "Practice Guide" / "Legal Framework" / "Clinical" chips.

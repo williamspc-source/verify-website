@@ -33,13 +33,16 @@ const getPagesSitemap = unstable_cache(
 
     const dateFallback = new Date().toISOString()
 
+    // Routes with no Pages document behind them, so they cannot come from the
+    // query above. `/posts` used to be listed here too — a leftover from the
+    // Payload template. This site has no /posts index (articles live under
+    // /in-the-loop, and only /posts/<slug> exists as a legacy redirect), so the
+    // sitemap was advertising a 404 to every crawler. Nothing on the site links
+    // to it, which is why a link crawl never found it; the sitemap-driven test
+    // in tests/e2e/links.e2e.spec.ts did.
     const defaultSitemap = [
       {
         loc: `${SITE_URL}/search`,
-        lastmod: dateFallback,
-      },
-      {
-        loc: `${SITE_URL}/posts`,
         lastmod: dateFallback,
       },
     ]

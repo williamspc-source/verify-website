@@ -7,6 +7,7 @@ import React from 'react'
 import { referencePath, type LinkableCollection } from '@/utilities/routes'
 
 type CMSLinkType = {
+  anchor?: string | null
   appearance?: 'inline' | ButtonProps['variant']
   children?: React.ReactNode
   className?: string
@@ -27,6 +28,7 @@ type CMSLinkType = {
 export const CMSLink: React.FC<CMSLinkType> = (props) => {
   const {
     type,
+    anchor,
     appearance = 'inline',
     children,
     className,
@@ -70,6 +72,12 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     // This used to be `pages` vs everything-else-is-a-post, which meant a link
     // to a specialist resolved through postPath() and came back null.
     href = referencePath(reference.relationTo, reference.value) ?? undefined
+
+    // Append the optional section anchor. Deliberately only on the resolved
+    // path and only when the path resolved: appending to `undefined` would turn
+    // an unresolvable link into a bare "#…" that scrolls the *current* page,
+    // which looks like a working link and is worse than the inert span below.
+    if (href && anchor) href = `${href}#${anchor.replace(/^#/, '')}`
   }
 
   // No resolvable destination — an unsaved reference, a collection with no public

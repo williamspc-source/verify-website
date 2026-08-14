@@ -57,6 +57,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
     eyebrow,
     heading,
     subheading,
+    anchorId,
     background,
     source = 'auto',
     category,
@@ -165,6 +166,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
 
     return (
       <Section
+        id={anchorId || undefined}
         background={background as SectionBackground}
         className={cn('vf-services-grid vf-services-accordion', toClassName(cssClass))}
         motion={motion}
@@ -184,6 +186,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
 
   return (
     <Section
+      id={anchorId || undefined}
       background={background as SectionBackground}
       className={cn('vf-services-grid', toClassName(cssClass))}
       motion={motion}
