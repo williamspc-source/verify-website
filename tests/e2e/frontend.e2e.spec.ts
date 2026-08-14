@@ -306,4 +306,85 @@ test.describe('Frontend', () => {
     const response = await page.goto('/posts/does-not-exist-abc123')
     expect([404, 200, 301, 302, 307, 308]).toContain(response?.status() ?? 0)
   })
+
+  /**
+   * The interior hero title is as bold as the reference renders it.
+   *
+   * This exists because the opposite was shipped, deliberately, and written up as
+   * a correction. `verify-website-design-diff.md` §5 lists `.page-hero h1` weight
+   * "800 → 700" among seventeen values "aligned to the reference".
+   *
+   * **The reference holds this rule twice and the two copies disagree.** The
+   * shared sheet (`.design-reference/assets/css/styles.css:2587`) says 700. Every
+   * one of the nine reference pages redeclares `.page-hero h1` in an inline
+   * `<style>` that loads *after* the `<link>`, at equal specificity, and wins with
+   * **800**. The pass read the shared sheet, so its "alignment" moved the build
+   * away from what the reference actually renders — on 59 pages plus every event
+   * detail page. Tellingly it took the *size* from the inline rule and the weight
+   * from the shared one, so it had both copies in front of it.
+   *
+   * So this guard does not hardcode 800. It reads the expected weight out of the
+   * reference page and compares it to what the build computes — the comparison
+   * that pass got wrong. A number in a test would have been just as wrong as the
+   * number in the CSS, and would have locked the mistake in.
+   *
+   * Proven red by setting `.page-hero h1` back to 700 in globals.css — confirmed
+   * live in the browser with `getComputedStyle` before believing the run, because
+   * a stale Turbopack build has faked a proof twice in this repo and hidden a
+   * working change twice more. Stays green on `/` and an article page, whose hero
+   * titles are 800 by different rules and must not be disturbed.
+   */
+  test('interior hero titles are as bold as the reference renders them', async ({ page }) => {
+    const { readFileSync } = await import('node:fs')
+
+    // Read the weight the reference PAGE declares — not the shared stylesheet,
+    // which these pages override. Only the inline <style> is consulted, and only
+    // its `.page-hero h1` rule.
+    const referenceWeight = (file: string): number | null => {
+      const html = readFileSync(`.design-reference/${file}`, 'utf8')
+      for (const style of html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+        const rule = style[1].match(/\.page-hero\s+h1\s*\{([^}]*)\}/)
+        const weight = rule?.[1].match(/font-weight:\s*(\d+)/)
+        if (weight) return Number(weight[1])
+      }
+      return null
+    }
+
+    const pairs = [
+      ['/information-centre/for-claimants', 'information-centre/for-claimants.html'],
+      ['/about', 'about/about-verify.html'],
+      ['/specialists/specialist-panel', 'specialists/specialist-panel.html'],
+    ] as const
+
+    await page.setViewportSize({ width: 1440, height: 900 })
+
+    for (const [builtPath, referenceFile] of pairs) {
+      const expected = referenceWeight(referenceFile)
+      // Positive control on the parser. A regex that matched nothing must not
+      // read as a pass — that mistake has been made four times in this repo.
+      expect(
+        expected,
+        `no .page-hero h1 font-weight found in ${referenceFile} — the parser is broken, or the reference moved the rule out of its inline <style>`,
+      ).not.toBeNull()
+
+      await page.goto(builtPath)
+      const actual = await page.evaluate(() => {
+        const h1 = document.querySelector<HTMLElement>('.page-hero h1')
+        if (!h1) return null
+        return { weight: getComputedStyle(h1).fontWeight, text: h1.textContent?.trim().slice(0, 40) }
+      })
+      expect(actual, `${builtPath} should render a .page-hero h1`).not.toBeNull()
+      // Control the other way: a computed weight must be a number. `normal`
+      // would mean nothing is setting it, which is the impact-hero fault.
+      expect(
+        Number(actual!.weight),
+        `${builtPath}: computed font-weight is "${actual!.weight}", not a number — nothing is setting it`,
+      ).not.toBeNaN()
+
+      expect(
+        Number(actual!.weight),
+        `${builtPath} "${actual!.text}" renders at ${actual!.weight}; ${referenceFile} renders it at ${expected}`,
+      ).toBe(expected)
+    }
+  })
 })

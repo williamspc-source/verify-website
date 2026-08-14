@@ -369,6 +369,27 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   not: an id assigned on mount produces no jump at all, so every step goes red. The comment now says
   what happened, and gives the checks' real justification (breadth, and foreclosing a *future* JS
   corrector). Run your break; do not narrate it.
+- **The design reference declares most rules twice, and the copy that renders is the page's inline
+  `<style>`, not the linked sheet.** `assets/css/styles.css` loads first; each page then redeclares
+  what it needs in a `<style>` block at equal specificity, which therefore wins. Porting from the
+  shared sheet gives you a value the reference does not render: `.page-hero h1` was "aligned" from
+  800 to 700 that way, on 59 pages, and the change was written up in `verify-website-design-diff.md`
+  §5 as a *correction*, which is what stopped anyone re-checking it. Two further consequences —
+  a browser reading of the reference over `file://` only measures the inline half, because the
+  sheet is linked root-absolute (`/assets/css/styles.css`) and silently fails to load, so anything
+  from the shared sheet reads as an unstyled default; and a guard should compare against the value
+  parsed out of the reference *page*, never a number copied into the test, or the port's mistake
+  just moves into the assertion. The sweep for others is done: parsing all three sources and
+  diffing every declaration found **exactly two** cases, `.page-hero h1` and `.contact-form`
+  padding — don't redo it from scratch.
+- **A dev-push failure takes the whole local site down, and the error names the wrong culprit.**
+  Narrowing a select's options narrows a Postgres **enum**, and `pushDevSchema` runs inside
+  `getPayload()` — so `ALTER TABLE … SET DATA TYPE` failing with `22P02 enum_in` makes *every* page
+  500 with a `generateStaticParams` stack trace, not an obvious config error. The cause is rows
+  still holding a removed value, and **`_pages_v` is where they hide**: `pages.hero_type` was clean
+  (59 pageHero, 2 homeHero) while `_pages_v.version_hero_type` held **62 `lowImpact`** rows of
+  template-era history. Count both tables before removing any select option. The failure is atomic —
+  the enum and all 481 rows were intact afterwards — but until the config is reverted nothing serves.
 - **A harness silently covers less than it claims.** `computedSnapshot.mjs` listed two routes that do
   not exist (`/about-verify`, `/legal/privacy-policy`); both 404, `capture` never checked status, so
   it banked the not-found page as a baseline **twice** — 178 nodes each, an identical count, which is

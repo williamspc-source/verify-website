@@ -749,9 +749,28 @@ invisible the moment an editor types one. Both fixed.
 
 ### 5. Per-template drift corrected
 
+> **Correction (2026-08-14): one of the seventeen was wrong, and this entry is how it survived.**
+> `.page-hero h1` weight 800 → 700 was a **regression**, not an alignment, and it has been put back
+> to 800.
+>
+> The reference holds that rule **twice and the two disagree**. `assets/css/styles.css:2587-2593`
+> says `font-weight: 700` with `clamp(2rem, 5vw, 3rem)`; every one of the nine reference pages
+> redeclares `.page-hero h1` in an inline `<style>` that loads *after* the `<link>`, at equal
+> specificity, with **800** and `clamp(2.4rem, 5vw, 3.8rem)`. The inline copy is what those pages
+> render. This pass read the shared sheet for the weight while taking the size from the inline rule,
+> so it had both copies in front of it and mixed them — and then wrote the result up here as
+> "aligned to the reference", which is what made it look settled.
+>
+> Blast radius: every `pageHero` page (59 of 61) plus every `/events/event/*` page.
+> The other sixteen values were re-checked by parsing all three sources — shared sheet, all 108
+> pages' inline blocks, and `globals.css` — and comparing every declaration, not just these
+> seventeen. **Exactly one other** case exists (`.contact-form { padding }`, on a single page;
+> see `OUTSTANDING.md`). Guarded now by the hero-weight test in `tests/e2e/frontend.e2e.spec.ts`,
+> which reads the expected value out of the reference page rather than hardcoding a number.
+
 Seventeen typography values had drifted from the reference and are now aligned:
 `.section-label` 12px → 14px (every eyebrow site-wide), `.page-hero h1` weight 800 →
-700, `.faq-item summary` 600 → 700, `.faq-item .faq-a` line-height 1.7 → 1.8,
+700 *(reverted — see the correction above)*, `.faq-item summary` 600 → 700, `.faq-item .faq-a` line-height 1.7 → 1.8,
 `.spec-card .spec-name` 600 → 700 and 1.1 → 1.15rem, `.spec-card .spec-loc` colour
 `--text-mid` → `--text-dark`, `.service-title` 0.9 → 1rem, `.service-desc` 0.82rem →
 14px, `.service-icon` 1.4 → 1.55rem, `.contact-icon` 1rem → 1.4rem, `.expert-role` 0.8

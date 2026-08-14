@@ -722,3 +722,73 @@ after the link crawl has walked 114 pages through that same server. It passes ev
 and it fails the same way on the code as it was before this change, so it is not a symptom of this
 work. Logged as `OUTSTANDING.md` §2 with the ten-minute fix, rather than folded into a
 content-rendering commit.
+
+---
+
+# Eighth pass — interior hero titles were a step too light
+
+Reported by eye: every interior page's hero title looked less bold than the design reference.
+Measured, it was — the build rendered **700** where the reference renders **800**, at an identical
+61px. Nothing else in the hero differed.
+
+## The cause, and why it had stuck
+
+It was changed to 700 **on purpose**, and written up as a correction. `verify-website-design-diff.md`
+§5 lists it among "seventeen typography values [that] had drifted from the reference and are now
+aligned: … `.page-hero h1` weight 800 → 700".
+
+**The reference declares that rule twice, and the two copies disagree.** Its shared stylesheet says
+700. Every one of its nine real pages then redeclares the rule in the page itself, after the
+stylesheet, and wins with **800**. The pass read the shared sheet. Tellingly it took the *size* from
+the page's copy and the *weight* from the shared one, so both were in front of it.
+
+Being logged as a fix is what kept it: anyone re-checking would have read "aligned to the reference"
+and moved on. That entry has been corrected in place rather than quietly overwritten.
+
+## What changed
+
+One value: `.page-hero h1` back to **800**. It affects **59 of your 61 pages**, plus every event
+detail page. The homepage hero, article headers, specialist profiles and team member pages were
+already 800 and were not touched — re-measured after the change to confirm they had not moved.
+
+## Was anything else ported from the wrong copy?
+
+Checked rather than assumed, since the same method could have hit any of the other sixteen. A script
+compared **every** declaration across all three sources — the shared stylesheet, the inline block of
+all 108 reference pages, and the build — and flagged each one where the pages disagree with the
+shared sheet *and* the build followed the shared sheet.
+
+**Two, in the whole stylesheet.** One was this bug. The other is a contact-form padding on a single
+page, which is too thin an agreement to act on — recorded rather than changed.
+
+## New guard
+
+`tests/e2e/frontend.e2e.spec.ts` now reads the expected weight **out of the reference page** and
+compares it to what the built page computes, over three page pairs. It deliberately does not contain
+the number 800: a number in a test would have been just as wrong as the number in the CSS, and would
+have locked the mistake in. Proven red two ways — reverting the weight, and pointing the parser at a
+page with no such rule so the "found nothing" control fires rather than passing silently.
+
+## Something I got wrong, and reversed
+
+I recommended also removing three unused hero types left over from the Payload template, which
+render their titles at 400. You approved it. **My cost estimate was wrong and I reverted it.**
+
+The hero type is stored as a database enum, so removing options rewrites the type — and it failed:
+62 rows of draft history still hold `lowImpact`, on pages that are ordinary page heroes today. The
+live pages were clean, which is why I missed it; the version history was not. Doing it properly needs
+a data migration over version history, bundled into the single hand-reviewed migration you run before
+deploying, for a tidy-up nobody asked for.
+
+While the config was in that state the local site returned an error on every page. Nothing was
+damaged — the database change is all-or-nothing and rolled back, with the enum and all 481 rows
+intact — but it is recorded, with the row counts and the exact fix, as `OUTSTANDING.md` §3 for after
+the deploy.
+
+## Verification — eighth pass
+
+Lint and typecheck clean · **123/123** integration · **18/18** end-to-end (was 17) · production build
+passes. Five pages measured against their reference counterparts: all now 800 against 800. The
+computed-style comparison against a pre-change baseline changed **24** elements of 6,675: **21** are
+hero titles and their accent spans going 700 → 800 and nothing else — the boxes did not resize, so
+nothing reflowed — and the other three are the known scroll-animation false positive.

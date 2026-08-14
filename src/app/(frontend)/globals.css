@@ -4082,10 +4082,23 @@
 
 .page-hero-eyebrow { margin-bottom: 14px; }
 
+/* 800, and do NOT "align" it to 700.
+   The reference holds this rule twice and the two disagree. The shared sheet
+   (.design-reference/assets/css/styles.css:2587-2593) says `font-weight: 700`
+   with `clamp(2rem, 5vw, 3rem)` — but every one of the nine reference pages
+   redeclares `.page-hero h1` in an inline <style> that loads AFTER the <link>,
+   at equal specificity, with `font-weight: 800` and the larger clamp below.
+   The inline copy is what those pages render; the shared one is dead.
+   This was already got wrong once: a typography pass took the size from the
+   inline rule and the weight from the shared one, logged it as "aligned to the
+   reference" in verify-website-design-diff.md §5, and left every interior hero
+   title (59 pages, plus /events/event/*) a step light. Guarded by the hero
+   weight test in tests/e2e/frontend.e2e.spec.ts, which reads the expected value
+   out of the reference page rather than hardcoding it. */
 .page-hero h1 {
   font-family: var(--font-heading);
   font-size: clamp(2.4rem, 5vw, 3.8rem);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.15;
   margin-bottom: 20px;
   letter-spacing: -0.02em;

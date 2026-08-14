@@ -23,6 +23,8 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 |---|---|---|---|---|---|
 | 1 | Migration not yet created on the box | — | **Blocks deploy** | ~20 min + a careful read | **Required, immediately before the push** |
 | 2 | The admin e2e spec is flaky under a loaded dev server | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine | ~10 min | Worth doing before handover |
+| 3 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** | After the deploy, not before |
+| 4 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min | Only if someone confirms which is intended |
 
 ---
 
@@ -49,6 +51,68 @@ slow every genuine failure in the suite to a crawl.
 
 Left alone because it is a test-harness fault with no user-facing effect, and widening the scope of
 a content-rendering pass into the admin suite is how unrelated changes get bundled into one commit.
+
+---
+
+## 3. The three template hero types render their title at 400
+
+`High impact` / `Medium impact` / `Low impact` are Payload-template heroes that were never designed
+for VERIFY. They render their title through `RichText` with prose enabled, and `tailwind.config.mjs:12`
+sets `h1 { fontWeight: 'normal' }`, so the title computes **400** — visibly unstyled next to the two
+heroes that are designed. No reference page uses one, and **0 of 61 pages** have one selected. But
+the Type dropdown offers them, so an editor can pick one tomorrow.
+
+### Why it was not removed in the hero-weight pass — the interesting part
+
+Removing the three options looks free. It is not, and the attempt is worth recording because the
+cost is invisible until you try it.
+
+`hero.type` is stored as a **Postgres enum** (`enum_pages_hero_type` and
+`enum__pages_v_version_hero_type`), so dropping options rewrites the type on both tables. The dev
+push attempted exactly that and failed:
+
+```
+Failed query: ALTER TABLE "_pages_v" ALTER COLUMN "version_hero_type"
+  SET DATA TYPE "public"."enum__pages_v_version_hero_type" USING …
+22P02  enum_in
+```
+
+**Because rows still hold a removed value, and the live table is not where they are.** Measured:
+
+| Table | Contents |
+|---|---|
+| `pages.hero_type` | 59 `pageHero`, 2 `homeHero` — **clean** |
+| `_pages_v.version_hero_type` | 411 `pageHero`, 8 `homeHero`, **62 `lowImpact`** |
+
+Those 62 are template-era draft history for pages that are `pageHero` today. So the removal needs a
+data migration — `UPDATE _pages_v SET version_hero_type = 'pageHero' WHERE version_hero_type IN
+('highImpact','mediumImpact','lowImpact')` — before the enum can narrow, and the same must run on the
+box, where the count will differ. That is a write over version history bundled into the single
+hand-reviewed pre-deploy migration, in exchange for a tidy-up nobody asked for. Reverted.
+
+The failure is atomic (the enum and all 481 rows were intact afterwards) but not quiet: while the
+config was in that state, `getPayload()` threw on init and **every page 500'd** with a
+`generateStaticParams` stack trace. See the matching trap in `CLAUDE.md`.
+
+**The fix, after the deploy:** count both tables, add the `UPDATE` to the generated migration ahead
+of the enum change, remove the three `options`, delete `src/heros/{HighImpact,MediumImpact,LowImpact}/`
+and their entries in `RenderHero.tsx` (which already returns `null` for an unknown type), and narrow
+the `media` field's condition. Leave `hero.richText` declared with `condition: () => false` unless
+you also want to drop a column that holds data on **26 live pages and 411 version rows** — that is a
+sixth and seventh `DROP COLUMN` and §1B says to stop at five.
+
+---
+
+## 4. `.contact-form` padding follows the reference's superseded rule
+
+Found by the sweep described in `CLAUDE.md` (the design reference declares most rules twice; the
+page's inline `<style>` is the one that renders). The reference's shared sheet and the build both say
+`padding: 40px`; one page's inline block says `28px 24px`.
+
+Left alone deliberately: **one** page is not enough to call the inline value the intended norm, where
+`.page-hero h1` had nine pages agreeing. Someone who knows the design should say which is right. The
+sweep found no third case — it compared every declaration across all three sources, not just the
+seventeen in `verify-website-design-diff.md` §5.
 
 ---
 
