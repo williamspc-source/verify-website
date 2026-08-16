@@ -988,7 +988,109 @@ silently for zero editability gain). Both are now reachable via Global CSS regar
 
 ---
 
+## Comparison 22: Re-audit of the recurring cross-page issues (2026-08-17)
+
+The thirteen recurring issues below were logged on **2026-07-04**. Nine implementation passes have
+landed since (see `HOMEPAGE-CHANGES.md`), and only item 6 had been struck through — so the list had
+been claiming twelve open faults for six weeks without anyone re-checking whether they were still
+true. **Most of them were not.**
+
+**Method.** The reference was served over HTTP on `:4100` (`python3 -m http.server` from
+`.design-reference/`), not opened over `file://` — its stylesheet is linked root-absolute and
+silently fails to load otherwise, which makes every shared-sheet rule read as an unstyled default.
+The build was read from the running `LOCAL_PROD_REPRO` server on `:3000`, so these are production
+bundles, not a Turbopack dev build. 22 page pairs, headless Chromium at 1440×900, DOM read after
+`load` with a font-settle poll, pointer parked at `(4,4)` before any resting measurement.
+
+**Three of my own probes produced confident wrong answers before they produced right ones.** Each is
+recorded because the failure shape is reusable, not because the fix was interesting:
+
+| Probe | Wrong answer | Cause |
+|---|---|---|
+| Literal `[[brackets]]` | "present on **all 26** pages" | Grepped whole documents. Every hit was in the RSC flight payload inside `<script>` — the *unrendered* rich-text JSON. Zero appear in visible markup. |
+| Section heading diff | "**19** missing/extra sections across 9 pages" | `textContent` glues `<br>`-broken headings ("Ready to Refer Your**N**ext Matter"), so a heading present on both sides failed to match itself. `innerText` leaves 2 real differences, on 2 pages. |
+| Breadcrumb trails | "reference trail is one level shorter, on every page" | The selector took `li, a` only. The reference marks the current page with `<strong>`, so every reference trail lost its leaf. 13 of 22 trails are in fact **identical**. |
+
+The shield probe (item 5) additionally found the mark on 1 of 22 pages while `README.md` says it
+sits behind interior heroes generally. That control was too weak to report from, so item 5 was
+re-measured by counting `.page-hero-shield` in the served HTML directly.
+
+### Verified status of the thirteen
+
+| # | Issue | Status as of 2026-08-17 |
+|---|---|---|
+| 1 | Hero heading / shield-graphic overlap | **Resolved.** No `h1` box intersects a shield box on any of the 22 pages. |
+| 2 | Stray horizontal white line above hero headings | **Resolved.** No rule-like element (width > 40px, height ≤ 6px, visible background or top border) sits above the `h1` inside any hero — on the build *or* the reference. |
+| 3 | Breadcrumbs missing or too deep | **Largely resolved.** Present on every interior page; **13 of 22 trails match the reference exactly**. Nine differ, and narrowly — see below. |
+| 4 | Extra hero subtext where Target's hero is heading-only | **Resolved.** Hero paragraph counts are identical on all 22 pages (16 on each side in total). |
+| 5 | Shield shown where Target omits it | **Resolved.** Reporting Services, Administrative Services and In the Loop — the three named pages — render no hero shield. Build and reference agree on all six comparable pages. |
+| 6 | Low-contrast text on dark bands | Resolved in Comparison 19 (unchanged). |
+| 7 | Icon-card rows downgraded to inline bullets | **Not re-verified.** Needs a per-page read; not detectable structurally. |
+| 8 | Stray stuck focus outlines | **Resolved.** No element carries a visible outline at rest on any of the 22 pages. |
+| 9 | Category tags genericised | **Partly open**, and much narrower than logged — only the three *Featured* cards on In the Loop. See below. |
+| 10 | Footer tagline present in Current, absent from Target | **Mischaracterised.** The footers are otherwise identical; the real delta is opening hours. See below. |
+| 11 | Custom bottom CTA sections where Target has none | **Resolved.** Every CTA section matches its reference counterpart. The apparent mismatches were the `<br>` artefact above. |
+| 12 | Literal `[[double bracket]]` rich text | **Resolved.** Zero occurrences in visible markup across 26 pages; `.vf-accent` renders. |
+| 13 | Missing Public Transport / Car Parks detail | **Resolved.** Present on Contact and For Claimants — the same two pages as the reference. |
+
+### What is actually still open
+
+**A. Breadcrumbs — nine trails, three kinds of difference.**
+
+| Page | Build | Reference | Kind |
+|---|---|---|---|
+| `/about/meet-the-team` | Home › **About VERIFY** › Meet the Team | Home › **About Us** › Meet the Team | label |
+| `/services/medico-legal/ime` | … › **Independent Medical Examination (IME)** | … › **IME** | label (build verbose) |
+| `/services/medico-legal/jme` | … › **Joint Medical Examination (JME)** | … › **JME** | label (build verbose) |
+| `/specialists/specialist-panel` | Home › **Specialists** › Specialist Panel | Home › Specialist Panel | depth |
+| `/events/upcoming-events` | Home › **Events & Seminars** › Upcoming Events | Home › Upcoming Events | depth |
+| `/events/past-events` | Home › **Events & Seminars** › Past Events | Home › Past Events | depth |
+| `/specialists/specialist-availability` | Home › Specialists › Specialist Availability | *(none)* | presence |
+| `/privacy-policy` | Home › Privacy Policy | *(none)* | presence |
+| `/terms-conditions` | Home › Terms & Conditions | *(none)* | presence |
+
+The three **depth** rows are a decision, not a defect: **the reference contradicts itself.**
+`specialty-list` and `join-expert-panel` both render `Home › Specialists › …`, while
+`specialist-panel` renders `Home › Specialist Panel`; `/events` renders `Home › Events & Seminars`
+while its own children drop that level. The build is self-consistent and the reference is not, so
+matching it here would mean copying an inconsistency. Left as a question for whoever owns the design.
+
+**B. In the Loop — the three Featured cards carry no topic tag.** Every other tag on the page
+matches. The reference gives each featured card a second, specific tag beside `FEATURED`
+(`INDUSTRY INSIGHTS`, `AAMLE EVENTS`, `EXPERT GUIDANCE`); the build shows `FEATURED` alone. This is
+the surviving remnant of item 9. One card also reads `FEATURED FEATURED`, which looks like a
+duplicated tag and is worth an eye before it is fixed.
+
+**C. `/events` is a directory where the reference hub is a marketing page.** The only substantial
+structural gap left. The build's `/events` lists event titles under *Explore VERIFY & AAMLE Events*;
+`events-seminars.html` instead offers *Four ways VERIFY brings medico-legal learning to life*,
+*Latest Medico-Legal Education Events* and *Recent VERIFY & AAMLE Programs*. The `h1` differs too —
+"Medico-Legal Education Events" against "Medico-Legal Education for Better Practice".
+
+> Note this **supersedes Comparison 15**, whose headline was a page-count mismatch (Target 2 pages,
+> Current 1). The build now has three — `/events`, `/events/upcoming-events`, `/events/past-events` —
+> against the reference's three, and the two child pages align. Comparison 15 §3 also called the
+> four-ways carousel an *extra* not present in either target; it is present in `events-seminars.html`,
+> which that comparison did not look at.
+
+**D. `/contact` has one section the reference does not:** *What you can do in the portal*.
+
+**E. The footer carries opening hours the reference omits.** Identical on all 22 pages otherwise.
+Build: `…Street Brisbane QLD 4000 Monday to Friday 08:30 – 17:00`. Reference: `…Street, Brisbane QLD
+4000`. So item 10's "tagline" framing was wrong — the delta is `Offices.hours` plus a lost comma
+after the street. Both are editable content, not code.
+
+**F. Not re-verified:** item 7 (icon-card rows vs inline bullets). It needs a per-page visual read
+and no structural probe distinguishes it.
+
+---
+
 ## Summary of recurring, cross-page issues
+
+> **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the
+> twelve items left open below are resolved; item 9 survives only on three cards, item 10 was
+> mischaracterised, and item 7 is the one still genuinely unchecked. The entries are left in place
+> because the per-page comparisons above reference them by number.
 
 These patterns showed up on multiple pages throughout this review and are most efficiently fixed once at a shared/template level rather than page-by-page:
 
@@ -1013,4 +1115,8 @@ These patterns showed up on multiple pages throughout this review and are most e
 12. **Broken rich text** rendering literal `[[double bracket]]` syntax instead of styled/colored text — appears on nearly every page's secondary heading.
 13. **Missing "Recommended Public Transport" / "Nearby Car Parks" details** in the shared location/office-info block (Information for Claimants, Contact Us).
 
-Recommend tackling items 1–6 and 12 first, since they're template/component-level and will likely resolve automatically across most pages once fixed in one place.
+~~Recommend tackling items 1–6 and 12 first, since they're template/component-level and will likely resolve automatically across most pages once fixed in one place.~~
+
+**Superseded by Comparison 22 (2026-08-17).** Items 1–6, 8 and 11–13 are verified resolved; that
+recommendation is spent. What remains of this list is item 9 (three Featured cards on In the Loop)
+and item 7 (unverified). The open work is now in Comparison 22 §A–F, not here.
