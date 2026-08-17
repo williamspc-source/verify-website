@@ -98,11 +98,18 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
       id={anchorId || undefined}
       className={cn('events-explorer', toClassName(cssClass))}
     >
+      {/* The same `.events-section-header` the upcoming/past groups use, so this
+          heading matches them by construction rather than by two rules kept in
+          step by hand. It previously rendered in a `.events-explorer-header`
+          that set only a margin, leaving its <h2> at the base reset: 18px/400,
+          against 37.6px/700 for the two headings directly beneath it. */}
       {hasHeader ? (
-        <div className="events-explorer-header">
-          {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-          {heading ? <h2>{accentText(heading)}</h2> : null}
-          {subheading ? <p>{subheading}</p> : null}
+        <div className="events-section-header events-explorer-header">
+          <div>
+            {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
+            {heading ? <h2>{accentText(heading)}</h2> : null}
+            {subheading ? <p>{subheading}</p> : null}
+          </div>
         </div>
       ) : null}
 

@@ -400,6 +400,14 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   (59 pageHero, 2 homeHero) while `_pages_v.version_hero_type` held **62 `lowImpact`** rows of
   template-era history. Count both tables before removing any select option. The failure is atomic —
   the enum and all 481 rows were intact afterwards — but until the config is reverted nothing serves.
+- **A declaration diff is blind to a property neither side declares.** `referenceCssDiff.mjs`
+  reported **zero** for the events family while four headings rendered at `font-weight: 400` against
+  the reference's 700. The reference omits the weight and inherits the browser's `h2 { bold }`; the
+  `@layer base` block at the top of `globals.css` resets `h1…h6` to `font-weight: unset`, which for
+  an inherited property means *inherit*, so a faithful port of that omission takes the body's 400
+  instead. Identical stylesheets, different rendering, nothing for the diff to see. Whenever a port
+  relies on the reference's defaults, **measure the inherited properties in the browser** — weight,
+  size, colour, alignment — because that is exactly where a clean diff lies.
 - **A structural match is not a visual match, and reporting one as the other is how a whole page
   ships wrong.** `/events` was rebuilt, verified, and reported as matching the reference. The check
   compared the `h1` string and the list of `h2` headings — it found four slide titles out of four and

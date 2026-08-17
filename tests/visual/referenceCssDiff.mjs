@@ -36,10 +36,23 @@
  *
  * ── What it does NOT prove ──────────────────────────────────────────────────
  *
- * That a rule is in the file, not that it reached the page. Cascade layers,
- * specificity and a stale build all sit between the two — each has already
- * produced a wrong conclusion in this repo. **Always confirm in the browser
- * with getComputedStyle afterwards.** A zero here is necessary, not sufficient.
+ * 1. That a rule is in the file, not that it reached the page. Cascade layers,
+ *    specificity and a stale build all sit between the two — each has already
+ *    produced a wrong conclusion in this repo.
+ *
+ * 2. **Anything about a property neither side declares.** This compares the
+ *    reference's declarations against ours; where the reference omits a property
+ *    and inherits a browser default, there is nothing to compare and the diff
+ *    stays clean. That is not hypothetical — it reported zero for the events
+ *    family while four headings rendered at `font-weight: 400` against the
+ *    reference's 700. The reference omits the weight and inherits the browser's
+ *    bold; `@layer base` in globals.css resets `h1…h6` to `font-weight: unset`,
+ *    so our port of that same omission inherited 400 instead. Identical
+ *    stylesheets, different rendering, nothing for a declaration diff to see.
+ *
+ * **So always confirm in the browser with getComputedStyle**, and measure the
+ * inherited properties — weight, size, colour, alignment — explicitly. A zero
+ * here is necessary, not sufficient.
  */
 
 import { readFileSync } from 'node:fs'

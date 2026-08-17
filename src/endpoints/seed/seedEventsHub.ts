@@ -52,6 +52,20 @@ const SUPERSEDED_EVENTS_SUBTITLES = [
 const EVENTS_SUBTITLE =
   'VERIFY and AAMLE host practical education, industry briefings, specialist-led seminars, and professional networking events for legal, medical, and insurance professionals.'
 
+/**
+ * Subheadings this seed has written on the hub explorer, all now deleted.
+ *
+ * Both are listed because the first one is what live installs actually hold: a
+ * later pass rewrote the string in the fixture, but the repair only ever FILLS
+ * an empty field, so that edit never reached a database and the original line
+ * kept rendering. Removing a value needs its own exact-match rule; leaving it
+ * out of the fixture does nothing on an existing install.
+ */
+const SUPERSEDED_EXPLORER_SUBHEADINGS = [
+  'Everything coming up and every recent program in one place — upcoming and past are sorted automatically by date.',
+  'Search everything coming up and every recent program — upcoming and past are sorted automatically by date.',
+]
+
 /** All three events pages carry this so the reference's hero treatment applies.
  *  See `.events-pages` in globals.css. */
 const EVENTS_PAGE_SLUGS = ['events', 'upcoming-events', 'past-events']
@@ -141,8 +155,8 @@ export const eventsHubExplorer = () => ({
   cardStyle: 'card' as const,
   eyebrow: 'Events & Seminars',
   heading: 'Explore VERIFY & [[AAMLE Events]]',
-  subheading:
-    'Search everything coming up and every recent program — upcoming and past are sorted automatically by date.',
+  // No subheading. The reference has no equivalent line, and the one that was
+  // here restated what the section below it plainly shows.
   groups: {
     upcomingEyebrow: 'Upcoming Events',
     upcomingHeading: 'Latest Medico-Legal [[Education Events]]',
@@ -305,13 +319,17 @@ export const repairEventsHub = async ({ payload, req }: Ctx): Promise<void> => {
     }
     const needsCard = current.cardStyle !== 'card'
     const needsPageSize = current.pageSize === 8
-    if (needsCard || groupChanged || needsPageSize) {
+    // Deleting a value, unlike filling one, needs an exact match against text
+    // this seed wrote — an editor's own subheading is left in place.
+    const dropSubheading = SUPERSEDED_EXPLORER_SUBHEADINGS.includes(current.subheading as string)
+    if (needsCard || groupChanged || needsPageSize || dropSubheading) {
       layout[explorerAt] = {
         ...current,
         cardStyle: 'card',
         // 8 was the full-listing page size this seed gave the hub before it
         // became a preview. Exact match only, so an editor's own number stands.
         pageSize: current.pageSize === 8 || current.pageSize == null ? wanted.pageSize : current.pageSize,
+        ...(dropSubheading ? { subheading: null } : {}),
         groups: filledGroups,
       }
       data.layout = layout
@@ -321,6 +339,7 @@ export const repairEventsHub = async ({ payload, req }: Ctx): Promise<void> => {
       if (needsCard) changes.push('switched the events list to the reference card layout')
       if (groupChanged) changes.push('filled the section headers')
       if (needsPageSize) changes.push(`set the hub preview to ${wanted.pageSize} per section`)
+      if (dropSubheading) changes.push('removed the superseded explorer subheading')
     }
   }
 

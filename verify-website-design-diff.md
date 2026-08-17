@@ -1224,6 +1224,38 @@ the file is not a rule on the page.
 - **The events hero port is scoped to `.events-pages`**, not `.events-hero`, because widening
   `.page-hero h1` would restyle 25 unrelated pages and break the hero-weight guard.
 
+### Follow-up: four headings at weight 400, and a blind spot in the diff
+
+Reported after the pass above, and worth recording because the tool built to prevent exactly this
+missed it. Four `h2`s on `/events` rendered at **400** where the reference renders **700** — the
+carousel heading, both group headings, and the explorer's own heading. The *sizes* were already
+right, which is what made it look finished.
+
+**`referenceCssDiff.mjs` reported zero throughout**, because it compares declarations that exist on
+both sides and `font-weight` is declared on neither. The reference omits it and inherits the
+browser's `h2 { bold }`; the `@layer base` block at the top of `globals.css` resets `h1…h6` to
+`font-weight: unset` — *inherit*, for an inherited property — so a faithful port of that omission
+takes the body's 400. Identical stylesheets, different rendering, nothing to diff. **A declaration
+diff cannot see a property neither side declares**, and that is now recorded in the tool's header and
+in `CLAUDE.md`.
+
+Measured scope before changing anything: across eight page pairs, headings computing 400 were
+**build 4, reference 0** — all four on `/events`. Not a global fault, and deliberately not fixed
+globally. `.events-offer-toolbar h2` and `.events-section-header h2` now declare `font-weight: 700`;
+the count is 0 on both sides.
+
+The explorer's heading was a second fault in the same place: `.events-explorer-header` set only a
+`margin-bottom`, so its `h2` fell through the reset to **18px/400** beside two 37.6px headings. It
+now renders through the same `.events-section-header` markup the groups use, so it matches by
+construction rather than by two rules kept in step by hand. Only the hub explorer has a header —
+both child pages set no eyebrow, heading or subheading — so nothing else moved.
+
+The explorer's subheading ("Everything coming up and every recent program in one place…") is gone.
+The reference has no equivalent. Note what it took: the string had been rewritten in the fixture an
+earlier pass, but the repair only ever *fills* an empty field, so the edit never reached a database
+and the original line was still what rendered. **Deleting a value needs its own exact-match rule**,
+and it is matched against both superseded strings so an editor's own subheading survives — verified.
+
 ### Still open, found while measuring
 
 The reference sizes heroes **per page family**. `/about` matches ours; `/services` renders at 42.4px

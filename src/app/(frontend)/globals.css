@@ -4704,6 +4704,12 @@
 .events-section-header h2 {
   font-family: var(--font-heading);
   font-size: clamp(1.7rem, 3vw, 2.35rem);
+  /* The reference declares no weight here and inherits the browser's bold. We
+     cannot: `@layer base` at the top of this file resets `h1…h6` to
+     `font-weight: unset`, which for an inherited property means *inherit*, so an
+     unstyled heading takes the body's 400. Porting the reference's omission
+     faithfully is what rendered these at 400 against its 700. */
+  font-weight: 700;
   color: var(--text-dark);
   line-height: 1.18;
   margin-bottom: 10px;
@@ -4803,6 +4809,9 @@
   max-width: 680px;
   font-family: var(--font-heading);
   font-size: clamp(1.5rem, 3vw, 2.2rem);
+  /* Same reason as `.events-section-header h2` above — the reference inherits a
+     browser default this stylesheet resets away. */
+  font-weight: 700;
   line-height: 1.2;
   color: var(--text-dark);
   letter-spacing: 0;
