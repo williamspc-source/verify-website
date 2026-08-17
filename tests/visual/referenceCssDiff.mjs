@@ -69,6 +69,22 @@ const FAMILIES = {
     ],
     match: /^\.(events-|event-card|event-type-tag|event-list|cal-)/,
   },
+  // The /services hub's three middle sections: the IME/JME split rows, the
+  // Reports & Opinions cards and the Administrative cards.
+  //
+  // Unlike every other family, these rules exist ONLY in the page's inline
+  // <style> — `grep svc-feature|reporting|admin` over styles.css returns zero —
+  // so the usual "declared twice, the inline copy wins" caveat does not apply.
+  // styles.css is still listed because `.section-label` / `.section-title` /
+  // `.section-subtitle` inside those sections come from it.
+  //
+  // Deliberately scoped to those three. Widening to /^\.svc-/ would pull in the
+  // hero, the AAMLE band and the closing CTA — worth doing, but a separate job.
+  services: {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/services/services.html'],
+    match: /^\.(svc-feature|reporting-|admin-|admin-link)/,
+  },
 }
 
 /**
@@ -92,6 +108,21 @@ const NOT_PORTED = {
     '.events-offer-tags': 'ditto',
     '.events-offer-tags span': 'ditto',
     '.events-list-page': 'Reference page-level wrapper; our pages set their own background.',
+  },
+  services: {
+    // The reference puts an icon above the IME heading and none above JME.
+    // It never draws: `ph-activity` is not in Phosphor's duotone set, so that
+    // <i> computes width/height 0 and `::before` content `none`, while
+    // `.reporting-card-icon i` on the same page resolves to a real 24px glyph.
+    // Removed by decision, to match what the reference renders.
+    '.svc-feature-icon': 'Reference names `ph-activity`, which Phosphor duotone does not have — measured 0x0 with `::before: none`. Removed rather than ported.',
+    '.svc-feature-icon svg': 'ditto',
+    '.svc-feature-icon i': 'ditto',
+    // Same reason the events family gives for `.events-offer-arrow i`.
+    '.reporting-card-icon i': 'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. `.service-icon svg` carries the sizing.',
+    '.admin-card-icon i': 'ditto',
+    '.svc-feature-img svg':
+      'Our image placeholder renders a label only; the reference also draws a picture glyph inside it. Cosmetic, and the placeholder is replaced the moment an editor uploads an image.',
   },
 }
 
@@ -126,6 +157,93 @@ const IMPLEMENTED_AS = {
     '.events-hero-breadcrumb a:hover': null,
     '.events-hero-breadcrumb span': null,
     '.events-hero-breadcrumb strong': null,
+  },
+  services: {
+    // Split rows (IME / JME).
+    '.svc-features': ['.vf-section', '.vf-section--white'],
+    '.svc-feature-row': ['.vf-split', '.svc-learn-rows .vf-split'],
+    '.svc-feature-row:first-child': '.svc-learn-rows .vf-split:first-child',
+    '.svc-feature-row:last-child': '.svc-learn-rows .vf-split:last-child',
+    '.svc-feature-img': ['.vf-split__media', '.vf-split__media--placeholder', '.svc-learn-rows .vf-split__media'],
+    '.svc-feature-img-label': [
+      '.vf-split__media--placeholder',
+      '.vf-split__media--placeholder span',
+      '.svc-learn-rows .vf-split__media--placeholder span',
+    ],
+    '.svc-feature-content h2': ['.section-title', '.vf-split__title', '.svc-learn-rows .vf-split__title'],
+    '.svc-feature-content p': ['.vf-split__body', '.vf-split__body p', '.svc-learn-rows .vf-split__body p'],
+    '.svc-feature-link': ['.btn', '.svc-learn-rows .vf-split__cta .btn'],
+    '.svc-feature-link:hover': '.svc-learn-rows .vf-split__cta .btn:hover',
+
+    // Reports & Opinions — one shared ServicesGrid, scoped by `.svc-reporting`.
+    '.reporting-section': ['.vf-section', '.vf-section--muted'],
+    '.reporting-header': ['.vf-section-header', '.svc-reporting .vf-section-header'],
+    '.reporting-cards': '.services-grid',
+    '.reporting-card': ['.service-card', '.svc-reporting .service-card'],
+    '.reporting-card:hover': ['.service-card:hover', '.svc-reporting .service-card:hover'],
+    '.reporting-card-icon': ['.service-icon', '.svc-reporting .service-icon'],
+    '.reporting-card-icon svg': ['.service-icon svg', '.svc-reporting .service-icon svg'],
+    '.reporting-card h3': ['.service-title', '.svc-reporting .service-title'],
+    '.reporting-card p': ['.service-desc', '.svc-reporting .service-desc'],
+    '.reporting-card-link': ['.service-enquire', '.svc-reporting .service-enquire'],
+    '.reporting-card-link:hover': ['.service-enquire:hover', '.svc-reporting .service-enquire:hover'],
+
+    // Administrative — the same block again, scoped by `.svc-admin-split`.
+    '.admin-section': ['.vf-section', '.vf-section--primary', '.vf-section.svc-glow-band'],
+    '.admin-section::before': '.vf-section.svc-glow-band::before',
+    '.admin-header': ['.vf-section-header', '.svc-admin-split .vf-section-header'],
+    '.admin-section .section-label': ['.section-label', '.svc-admin-split .vf-section-header__eyebrow'],
+    '.admin-section .section-title': ['.section-title', '.svc-admin-split .vf-section-header__title'],
+    '.admin-section .section-title span': '.svc-admin-split .vf-section-header__title .vf-accent',
+    '.admin-section .section-subtitle': ['.section-subtitle', '.svc-admin-split .vf-section-header__subtitle'],
+    '.admin-cards': '.services-grid',
+    '.admin-card': ['.service-card', '.svc-admin-split .service-card'],
+    '.admin-card:hover': ['.service-card:hover', '.svc-admin-split .service-card:hover'],
+    '.admin-card-icon': ['.service-icon', '.svc-admin-split .service-icon'],
+    '.admin-card-icon svg': ['.service-icon svg', '.svc-admin-split .service-icon svg'],
+    '.admin-card h3': ['.service-title', '.svc-admin-split .service-title'],
+    '.admin-card p': ['.service-desc', '.svc-admin-split .service-desc'],
+    '.admin-link': ['.service-enquire', '.svc-admin-split .service-enquire'],
+    '.admin-link:hover': ['.service-enquire:hover', '.svc-admin-split .service-enquire:hover'],
+  },
+}
+
+/**
+ * Individual declarations that legitimately differ, each with the reason.
+ *
+ * `NOT_PORTED` excuses a whole selector; this excuses ONE property on a selector
+ * we do implement. It exists because three kinds of difference can never be
+ * closed and would otherwise keep the count permanently off zero — a count that
+ * never reaches zero is a count nobody reads:
+ *
+ *   1. A value this repo deliberately made editable (a spacing preset, a brand
+ *      gradient, a column count) where the reference hardcodes a literal.
+ *   2. A declaration that is inert against our markup or our icon set.
+ *   3. Two spellings of the same computed value.
+ *
+ * Same discipline as the other two lists: an entry is a claim that the
+ * difference is intended, and it needs a reason a reader can check. Anything
+ * that is merely awkward to fix belongs in the code, not here. Counted and
+ * printed in the summary so they stay visible.
+ */
+const EXPLAINED = {
+  services: {
+    '.svc-features': { padding: 'Section padding is the editor-controlled `--space-normal` preset (56–88px) rather than a literal 80px. Retuning the site rhythm is a Design System edit, not a per-page one.' },
+    '.reporting-section': { padding: 'ditto — the reference varies 72/80px per section; ours is one preset.' },
+    '.admin-section': {
+      padding: 'ditto.',
+      background: '`--band-primary` is the brand gradient from Site Settings; the reference hardcodes 160deg #14639e→#1c75bc. Ours is 135deg #0d4f85→#1c75bc, editable per install.',
+    },
+    '.reporting-cards': { 'grid-template-columns': 'Column count is the ServicesGrid block\'s `columns` field, emitted as `--vf-cols`. Set to 3 on this page, so the rendered grid matches; hardcoding 3 would take the control away from the editor.' },
+    '.admin-cards': { 'grid-template-columns': 'ditto — `columns` is 4 on this block.' },
+    '.svc-feature-img': {
+      'flex-direction': 'Our placeholder holds a single label element, so a column direction is inert. The reference stacks a glyph above the label; we do not render the glyph (see `.svc-feature-img svg`).',
+      gap: 'ditto — one child, nothing to space.',
+    },
+    '.svc-feature-link': { 'font-family': '`var(--font-heading, inherit)` vs `var(--font-heading)`. The token is always defined, so the fallback never applies and the computed value is identical.' },
+    '.reporting-card-icon svg': { stroke: 'The reference draws stroked inline SVGs. Phosphor duotone icons are FILLED and take `currentColor`, which `.service-icon` already sets to `--primary`; a stroke would add a second outline.' },
+    '.admin-card-icon svg': { stroke: 'ditto.' },
+    '.admin-link': { transition: 'Ours also transitions `color`, because `.service-enquire` has a hover colour the reference\'s `.admin-link` does not. A superset, not a mismatch.' },
   },
 }
 
@@ -176,8 +294,16 @@ function parse(css, media = '') {
       j++
     }
     const body = css.slice(brace + 1, j - 1)
-    if (/^@(media|supports|layer)/.test(prelude)) {
+    if (/^@(media|supports)/.test(prelude)) {
       out.push(...parse(body, media ? `${media} and ${prelude}` : prelude))
+    } else if (/^@layer/.test(prelude)) {
+      // A cascade layer is NOT a conditional group: its rules apply at every
+      // viewport, they just lose priority ties. Lumping it in with @media put
+      // everything in `@layer components` — `.vf-section`, `.vf-split__icon` and
+      // the rest — into the media bucket, which is never compared, so the tool
+      // reported those selectors as ABSENT FROM THE BUILD while they sat in the
+      // file. Recurse with the *inherited* media, not the layer name.
+      out.push(...parse(body, media))
     } else if (!prelude.startsWith('@')) {
       const decls = {}
       for (const part of body.split(';')) {
@@ -276,6 +402,8 @@ const implementedAs = IMPLEMENTED_AS[name] || {}
 // ── Report ──────────────────────────────────────────────────────────────────
 const missingSelectors = []
 const skipped = []
+const explainedLines = []
+let explainedCount = 0
 let differing = 0
 const report = []
 
@@ -299,8 +427,14 @@ for (const [sel, refDecls] of ref) {
     continue
   }
   const aliased = chain.join(' + ') !== sel
+  const explained = (EXPLAINED[name] || {})[sel] || {}
   const lines = []
   for (const [prop, val] of Object.entries(refDecls)) {
+    if (prop in explained) {
+      explainedCount++
+      explainedLines.push(`   ${sel} · ${prop} — ${explained[prop]}`)
+      continue
+    }
     // Layout/positioning props are meaningless across a selector rename.
     // Set elsewhere in our cascade (a theme modifier, or a `margin` shorthand)
     // and verified equal in the browser. Comparing them across a rename reports
@@ -320,8 +454,12 @@ for (const [sel, refDecls] of ref) {
 }
 
 console.log(
-  `Reference selectors: ${ref.size}   ·   build: ${build.size}   ·   deliberately not ported: ${skipped.length}`,
+  `Reference selectors: ${ref.size}   ·   build: ${build.size}   ·   deliberately not ported: ${skipped.length}   ·   explained differences: ${explainedCount}`,
 )
+if (process.argv.includes('--verbose') && explainedLines.length) {
+  console.log('\n── explained differences ──')
+  console.log(explainedLines.join('\n'))
+}
 if (process.argv.includes('--verbose') && skipped.length) {
   console.log('\n── deliberately not ported ──')
   console.log(skipped.join('\n'))

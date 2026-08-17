@@ -1331,6 +1331,77 @@ gallery-only case.
 
 ---
 
+## Comparison 26: /services — two card designs, and an icon the reference never drew (2026-08-17)
+
+Three items raised from a side-by-side. Two were genuine port errors; the third was the opposite of
+how it looked.
+
+### The icon above "Independent Medical Examinations"
+
+Reported as "not present on the reference". **It is** — `services.html:423` is
+`<div class="svc-feature-icon"><i class="ph-duotone ph-activity"></i></div>`, with a 36×36 rule and a
+16px margin, and the JME row below it deliberately has none.
+
+It never draws, because **`ph-activity` is not in Phosphor's duotone set**. Measured in the reference:
+that `<i>` computes `width: 0, height: 0` with `::before` content `none`, while
+`.reporting-card-icon i` on the same page resolves to a real 24px glyph — so the webfont loaded
+(unpkg returned 200) and the icon name is simply wrong. Ours drew one because `Icon` maps `activity`
+→ Phosphor React's `Pulse`, which exists.
+
+Removed by decision, to match what the reference *renders*. It is data
+(`pages_blocks_split_feature_rows.icon`), so the fixture edit was paired with an unconditional repair
+matched exactly against `'activity'`. Proven both ways: a restored `'activity'` is cleared on the next
+seed, and a hand-picked `'shield-check'` survives it.
+
+### The Administrative header
+
+Ours put the intro beside the heading; the reference stacks it. Not a deviation — a port error. The
+reference's `.admin-header` is a **wrapping flex row**, and at our container width it always wraps:
+the heading block measures 788px, the subtitle is capped at 480px, and `788 + 20 + 480 = 1288 > 1132`.
+Our port had frozen that into a `1fr auto` grid at 620+480, which fits inside 1132 and therefore never
+wrapped. Now flex-wrap, with the eyebrow given `flex-basis: 100%` so our flat SectionHeader markup
+reproduces the reference's two-row geometry without changing the shared component.
+
+### The Enquire links
+
+| | Reference | Build before | Build now |
+|---|---|---|---|
+| Reporting cards | 247 / 247 / 247 | ragged | **219 / 219 / 219** |
+| Admin cards | 283 / 264 / 264 / **309** | ragged | **279 ×4** |
+
+The reference aligns only the reporting cards (`flex-direction: column`, `p { flex: 1 }`,
+`link { margin-top: auto }`) and leaves the admin ones genuinely ragged. Aligning both was requested,
+so the admin section is a **deliberate departure**, recorded in the CSS beside the rule.
+
+### Two card designs, not one
+
+The reference has `.reporting-card` (white on grey) and `.admin-card` (translucent on blue); we render
+both with one `.service-card`, which also renders on the homepage and `/for-clients`. Both treatments
+are now ported into the `.svc-reporting` / `.svc-admin-split` scopes, so the shared card is untouched
+elsewhere — confirmed by a computed-style snapshot over 14 routes: **only `/services` changed** (91
+nodes), plus one 0.014px `matrix()` on `/in-the-loop`, which is the scroll-reveal frame signature.
+
+Also caught by enumerating rather than looking: the split-row heading is `clamp(1.3rem, 2.2vw, 1.75rem)`
+in the reference and had been ported at the shared `.section-title` scale of `clamp(1.7rem, 3vw, 2.5rem)`
+— which is why "Independent Medical Examinations" wrapped to two lines at 40px where the reference sets
+one at 28px. And the image-placeholder label is 0.72rem uppercase with 0.1em tracking, against our
+0.85rem mixed case.
+
+### The tool was blind to every layered rule
+
+`referenceCssDiff.mjs` treated `@layer` exactly like `@media` — collecting its rules into the
+media bucket, which is never compared. So everything in `@layer components` — `.vf-section`,
+`.vf-split__icon` and the rest — was reported as **absent from the build** while sitting in the file.
+A cascade layer is not a conditional group; it applies at every viewport. Fixed, and the events family
+still reads zero, so nothing was resting on the bug.
+
+It also gained an `EXPLAINED` list: per-declaration exceptions with a reason each, for the differences
+that cannot close — editor-controlled spacing presets and column counts against the reference's
+literals, `stroke` on filled Phosphor icons, and two spellings of one computed value. Without it the
+count could never reach zero, and a count that never reaches zero is one nobody reads. **services: 0.**
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

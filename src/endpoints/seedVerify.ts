@@ -20,6 +20,7 @@ import { seedLegal } from './seed/seedLegal'
 import { repairBlockBands } from './seed/seedBlockBands'
 import { repairLinkTargets } from './seed/seedLinkRepairs'
 import { repairServiceLinks } from './seed/seedServiceLinks'
+import { repairServicesFeatureIcon } from './seed/seedServices'
 import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
 import { isPlaceholderLayout } from './seed/authored'
 import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
@@ -1173,6 +1174,7 @@ export const seedVerify = async ({
   // page groups so all service docs exist; unconditional (unlike seedHomepage,
   // which early-returns on an already-authored homepage) so it repairs live data.
   await repairServiceLinks({ payload, req })
+  await repairServicesFeatureIcon({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
   // Both write only into an absence — a missing carousel block, a superseded

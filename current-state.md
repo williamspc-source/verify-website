@@ -110,6 +110,11 @@ downloads, an optional photo hero, and one action row instead of three stacked e
 nothing was invented to fill them: a past event still shows the "this event has now concluded" line
 until someone writes one. That is the next content job, not a defect.
 
+`/services` followed (Comparison 26): the split-row icon removed, both card designs ported into
+page-scoped rules, and the Enquire links aligned in both grids. `referenceCssDiff.mjs` now has a
+`services` family reading zero, and gained two fixes of its own — it had been treating `@layer` like
+`@media`, so every rule in `@layer components` read as missing.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items

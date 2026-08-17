@@ -9708,26 +9708,33 @@
 /* ── /services: Administrative header split row — eyebrow+heading bottom-left,
    subtitle bottom-right (reference `.admin-header`). Scoped to svc-admin-split
    so the JME PeopleGrid (which also carries svc-glow-band) stays centred. ── */
+/* A WRAPPING FLEX ROW, not a grid. The reference's `.admin-header` is
+   `display:flex; flex-wrap:wrap; justify-content:space-between`, and at our
+   container width it always wraps — the heading block measures 788px, the
+   subtitle is capped at 480px, and 788+20+480 = 1288 > 1132 — so the intro sits
+   BELOW the heading. The grid this replaces was `1fr auto` at 620+480, which
+   fits inside 1132 and therefore never wrapped, leaving the intro stranded
+   beside the heading on every viewport. */
 .svc-admin-split .vf-section-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    'eyebrow .'
-    'title subtitle';
-  align-items: end;
-  column-gap: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
   text-align: left;
   margin-inline: 0 !important;
   max-width: none !important;
 }
-.svc-admin-split .vf-section-header__eyebrow { grid-area: eyebrow; margin-bottom: 10px; }
-.svc-admin-split .vf-section-header__title { grid-area: title; margin-bottom: 0; }
+/* Our SectionHeader is flat — eyebrow, title and subtitle are siblings — while
+   the reference wraps eyebrow+title in a div. Giving the eyebrow a full row
+   reproduces the reference's two-row geometry without touching the shared
+   component's markup. */
+.svc-admin-split .vf-section-header__eyebrow { flex-basis: 100%; margin-bottom: 0; }
+.svc-admin-split .vf-section-header__title { margin-bottom: 0; }
 .svc-admin-split .vf-section-header__subtitle {
-  grid-area: subtitle;
   max-width: 480px;
   margin: 0 !important;
   text-align: left;
-  align-self: end;
 }
 /* Dark blue band → light header text (reference `.admin-section` colours:
    heading var(--white), accent var(--accent-light), eyebrow/subtitle translucent white). Without
@@ -9741,6 +9748,125 @@
   .svc-admin-split .vf-section-header { display: block; }
   .svc-admin-split .vf-section-header__subtitle { margin-top: 16px !important; }
 }
+
+/* ── /services: IME & JME split rows (reference `.svc-feature-*`, declared in
+   services.html's inline <style>). Scoped to `.svc-learn-rows`, because
+   `.vf-split` and `.vf-split__media` are shared with /ime, /jme and About,
+   whose own reference pages declare different values — notably the 135deg photo
+   box documented above `.vf-split__media--placeholder`. ── */
+.svc-learn-rows .vf-split {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.svc-learn-rows .vf-split:first-child { padding-top: 0; }
+.svc-learn-rows .vf-split:last-child { border-bottom: none; padding-bottom: 0; }
+/* The reference spaces these rows with their own padding, so the shared sibling
+   margin would double it. */
+.svc-learn-rows .vf-split + .vf-split { margin-top: 0; }
+.svc-learn-rows .vf-split__media {
+  background: linear-gradient(145deg, var(--accent), var(--accent-light));
+}
+.svc-learn-rows .vf-split__media--placeholder span {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+/* The split-row heading is deliberately SMALLER than the section titles
+   elsewhere on the page — 1.75rem against 2.5rem. Ours inherited the shared
+   `.section-title` scale, which is why it wrapped to two lines where the
+   reference sets one. */
+.svc-learn-rows .vf-split__title {
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+  letter-spacing: -0.02em;
+}
+.svc-learn-rows .vf-split__body p { font-size: 0.95rem; line-height: 1.8; }
+.svc-learn-rows .vf-split__cta .btn {
+  font-size: 0.85rem;
+  transition: gap var(--transition), color var(--transition);
+}
+
+/* ── /services: Reports & Opinions cards (reference `.reporting-card*`).
+   One ServicesGrid block renders both this section and the Administrative one,
+   and the same `.service-card` renders on the homepage and /for-clients — so
+   every rule here is scoped, and the shared card keeps its own treatment
+   everywhere else. ── */
+.svc-reporting .service-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--vf-radius-md);
+  padding: 32px 28px;
+}
+/* The reference card has no accent bar across its top. */
+.svc-reporting .service-card::before { content: none; }
+.svc-reporting .service-card:hover {
+  background: var(--white);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+.svc-reporting .service-icon {
+  background: linear-gradient(135deg, var(--bg-light-1), var(--accent-light));
+  border-radius: var(--vf-radius-card);
+  flex-shrink: 0;
+}
+.svc-reporting .service-icon svg { width: 24px; height: 24px; }
+.svc-reporting .service-title { font-size: 0.97rem; line-height: 1.3; }
+/* `flex: 1` is what makes the Enquire link land at the same height on every card
+   in a row: the body absorbs the difference in copy length instead of pushing
+   the link down. `margin-top: auto` below is the reference's second, redundant
+   belt on the same braces — both are ported. */
+.svc-reporting .service-desc { font-size: 0.85rem; line-height: 1.72; flex: 1; }
+.svc-reporting .service-enquire {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  font-size: 0.78rem;
+  transition: gap var(--transition), color var(--transition);
+}
+.svc-reporting .service-enquire:hover { gap: 7px; }
+
+/* ── /services: Administrative cards (reference `.admin-card*`) — translucent
+   white on the blue band.
+
+   DELIBERATE DEPARTURE: the reference's `.admin-card` is a plain block with no
+   `margin-top: auto` on its link, so its Enquire links sit at 283/264/264/309px
+   down cards of identical height. Ours use the same flex-column treatment as the
+   reporting cards, by request, so all four align. ── */
+.svc-admin-split .service-card {
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--white) 85%, transparent);
+  border: none;
+  border-radius: var(--vf-radius-md);
+  padding: 32px 24px;
+}
+.svc-admin-split .service-card::before { content: none; }
+.svc-admin-split .service-card:hover {
+  background: color-mix(in srgb, var(--white) 92%, transparent);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px color-mix(in srgb, #000000 12%, transparent);
+}
+.svc-admin-split .service-icon {
+  width: 44px;
+  height: 44px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border-radius: 11px;
+}
+.svc-admin-split .service-icon svg { width: 22px; height: 22px; }
+.svc-admin-split .service-title { font-size: 0.93rem; line-height: 1.3; }
+.svc-admin-split .service-desc { font-size: 0.83rem; line-height: 1.72; flex: 1; }
+.svc-admin-split .service-enquire {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  font-size: 0.75rem;
+  transition: gap var(--transition), color var(--transition);
+}
+.svc-admin-split .service-enquire:hover { gap: 7px; }
 
 /* ── /services: AAMLE full-bleed edge-to-edge band, square corners
    (reference `.aamle-section { padding:0 }` + `.aamle-inner` no radius/shadow) ── */

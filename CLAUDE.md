@@ -425,6 +425,20 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   the only reason it was noticed — while two real pages went unmeasured. It now refuses any non-200.
   Whenever a checker takes a list of inputs, assert the inputs resolve; a tool that quietly measures
   the wrong thing reads exactly like a tool that found nothing wrong.
+- **A tool that treats `@layer` like `@media` is blind to whatever is inside it.** `referenceCssDiff.mjs`
+  collected `@layer` rules into the media bucket, which it never compares — so every rule in
+  `@layer components` (`.vf-section`, `.vf-split__icon`, …) was reported as **absent from the build**
+  while sitting in the file. A cascade layer is not a conditional group: its rules apply at every
+  viewport, they only lose priority ties. Fixed; the events family still read zero afterwards, so
+  nothing had been resting on it. The general shape: when a checker buckets rules by at-rule, check
+  which at-rules are *conditional* and which merely reorder.
+- **The reference does not always render what the reference declares.** `/services` has
+  `<i class="ph-duotone ph-activity">` above a heading, with CSS for it — and draws nothing, because
+  `ph-activity` is not in Phosphor's duotone set. Measured: `width: 0, height: 0`, `::before` content
+  `none`, while a sibling `.reporting-card-icon i` on the same page resolves to a real 24px glyph, so
+  the webfont had loaded and only the name was wrong. Ours drew one because Phosphor **React** has
+  `activity`. Before porting or removing something on the strength of a screenshot, check whether the
+  reference is *expressing* an intent it failed to execute — and say which of the two you are matching.
 - **`.prose` has two owners, and each one hides a different half of the bug.** The reference uses a
   plain `.prose` class, ported at `globals.css:4192–4208`; `@tailwindcss/typography` is also enabled
   (`globals.css:25`) and owns the same name. Measured on the event detail page: the body computed
@@ -462,7 +476,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   disagree — 8px there, 0.5rem here), compares font tokens by *name* because the brand typeface is a
   deliberate deviation, and merges base+override rules where we implement a bespoke reference selector
   through a shared component. Two lists are deliberate exceptions and must stay honest: `NOT_PORTED`
-  (with a reason each) and `IMPLEMENTED_AS`. **A zero is necessary, not sufficient** — it proves a rule
+  (with a reason each), `IMPLEMENTED_AS`, and `EXPLAINED` (per-declaration, for differences that
+  cannot close — an editor-controlled spacing preset against the reference's literal, `stroke` on a
+  filled Phosphor icon). **A zero is necessary, not sufficient** — it proves a rule
   is in the file, not that it reached the page. Always confirm with `getComputedStyle`.
 - `node tests/visual/findDeadCss.mjs` — emits **candidates, not a verdict**. It has already
   produced false positives that would each have broken a live page; read the header's caveats

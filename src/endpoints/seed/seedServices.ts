@@ -253,7 +253,6 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             imageSide: 'left',
-            icon: 'activity',
             title: 'Independent Medical Examinations',
             body: plainTextToLexical(
               'Impartial assessments delivered nationally by accredited specialists, supported by full end-to-end coordination and a mandatory quality assurance review on every report.',
@@ -1214,3 +1213,59 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
     ],
   )
 }
+
+/**
+ * Clears the icon above "Independent Medical Examinations" on /services.
+ *
+ * The reference has an icon element there — `<i class="ph-duotone ph-activity">`
+ * inside a `.svc-feature-icon` — and none above the JME row below it. It never
+ * draws: `ph-activity` is not in Phosphor's duotone set, so measured in the
+ * reference that `<i>` computes 0x0 with `::before` content `none`, while
+ * `.reporting-card-icon i` on the same page resolves to a real 24px glyph. Ours
+ * rendered one because `Icon` maps `activity` → Phosphor React's `Pulse`, which
+ * does exist. Removed to match what the reference renders.
+ *
+ * Runs unconditionally, because `authorPage` early-returns on an authored page —
+ * the fixture edit alone would never reach an existing install. Matched exactly
+ * against `'activity'` so an editor who later picks an icon deliberately keeps it.
+ */
+export const repairServicesFeatureIcon = async ({ payload, req }: Ctx): Promise<void> => {
+  const res = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'services' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const page = res.docs[0] as
+    | { id: number | string; layout?: { blockType?: string; rows?: { icon?: string | null }[] }[] }
+    | undefined
+  const layout = page?.layout
+  if (!page || !Array.isArray(layout)) return
+
+  let changed = false
+  const next = layout.map((block) => {
+    if (block?.blockType !== 'splitFeature' || !Array.isArray(block.rows)) return block
+    return {
+      ...block,
+      rows: block.rows.map((row) => {
+        if (row?.icon !== SUPERSEDED_FEATURE_ICON) return row
+        changed = true
+        return { ...row, icon: null }
+      }),
+    }
+  })
+  if (!changed) return
+
+  await payload.update({
+    collection: 'pages',
+    id: page.id,
+    data: { layout: next } as never,
+    req,
+    context: { disableRevalidate: true },
+  })
+  payload.logger.info('— Repaired /services: cleared the IME split-row icon')
+}
+
+// The exact value the seed used to write. Anything else is an editor's choice.
+const SUPERSEDED_FEATURE_ICON = 'activity'
