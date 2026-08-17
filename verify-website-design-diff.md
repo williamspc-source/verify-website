@@ -1033,7 +1033,43 @@ re-measured by counting `.page-hero-shield` in the served HTML directly.
 | 12 | Literal `[[double bracket]]` rich text | **Resolved.** Zero occurrences in visible markup across 26 pages; `.vf-accent` renders. |
 | 13 | Missing Public Transport / Car Parks detail | **Resolved.** Present on Contact and For Claimants — the same two pages as the reference. |
 
-### What is actually still open
+### Resolution — all six closed, 2026-08-17
+
+Decided and actioned in the pass that follows this audit. **Two were fixed; four were deliberate.**
+
+| | Item | Outcome |
+|---|---|---|
+| A | Nine breadcrumb trails | **Accepted as-is.** No change. |
+| B | Featured cards had no topic tag | **Fixed.** |
+| C | `/events` was a directory | **Fixed** — reference hub, with our search kept. |
+| D | `/contact` portal section | **Accepted.** Kept; useful to a visitor. |
+| E | Footer opening hours | **Accepted.** Kept; editable `Offices` content. |
+| F | IME/JME icon points | **Withdrawn — my finding was wrong.** |
+
+**A, in detail.** Labels stay long (`Independent Medical Examination (IME)`, not `IME`); depth stays
+at `Home › Section › Page`; the legal pages and Specialist Availability keep the trails the reference
+omits. The three *depth* rows would have meant copying an inconsistency — the reference keeps the
+section level on `specialty-list` and `join-expert-panel` but drops it on `specialist-panel`, and
+keeps it on `/events` while dropping it on that page's own children. Ours is self-consistent.
+
+**F was a false positive, and it is the fourth probe error in this comparison.** I reported the
+reference's three intro points as missing from IME and JME. They are on both pages: "Injury
+Stability", "Work Capacity" and "Causation" each return **2** occurrences in the served HTML — the
+same count as a control string I already knew was present. The probe only inspected the first
+`<section>` after the hero, so content that had been **moved further down the page** read as absent.
+The lesson is the one the other three already taught, at a different scale: a negative result needs
+a positive control *at the scope being searched*, not merely somewhere on the page.
+
+**C, as built.** `/events` is now Hero → *Four ways VERIFY brings medico-legal learning to life* →
+the searchable Events Explorer. The `h1` matches the reference exactly. The explorer **replaces** the
+reference's two static preview sections rather than joining them: it already splits upcoming from
+past and lists everything, so keeping the previews would print the same events twice on one page. The
+search bar is a deliberate improvement — the reference hub has none.
+
+No code was written for either fix, and no schema changed. The carousel already existed, complete,
+in `seedShowcase`; `postTagLabel` already preferred a post's own category.
+
+### What was open before that pass
 
 **A. Breadcrumbs — nine trails, three kinds of difference.**
 
@@ -1081,7 +1117,40 @@ Build: `…Street Brisbane QLD 4000 Monday to Friday 08:30 – 17:00`. Reference
 after the street. Both are editable content, not code.
 
 **F. Not re-verified:** item 7 (icon-card rows vs inline bullets). It needs a per-page visual read
-and no structural probe distinguishes it.
+and no structural probe distinguishes it. — *Later checked, and wrong; see the resolution above.*
+
+---
+
+## Comparison 23: What the events-hub fix exposed (2026-08-17)
+
+Fixing §C surfaced a defect with a far wider blast radius than the gap itself, and it is recorded
+here because it is a content-safety fault, not a design one.
+
+**Every seed run rewrote 13 of the 27 pages from the fixture, discarding editor changes.**
+
+Each of the seven `authorPage` copies decided whether a page had been written with
+`layout.length > 2`. That is a proxy for "looks substantial", not for "someone wrote this", and it
+fails in the direction that costs an editor their work: any page holding two or fewer blocks is
+overwritten every time. Measured on the local database: Contact, Meet the Team, Specialists,
+Specialist Panel, Information Centre, Events & Seminars, Upcoming Events, Past Events, Educational
+Services, Other Reporting Services, Specialist Availability, Privacy Policy and Terms & Conditions.
+
+**Proven, not reasoned about.** The events hero was reworded through the API to
+`EDITOR WORDING TEST`, the seed re-run, and the fixture wording came back. `/events` walked into this
+precisely because the fix left it at **exactly two** blocks — carousel plus explorer — and `2 > 2` is
+false.
+
+The correct signal already existed: `isPlaceholderLayout` in `seedVerify`, which matches the single
+scaffold `content` block the page tree creates ("…is scaffolded and ready for content"). It was used
+only for the two pages built outside `authorPage`, while the seven copies each guessed instead. It
+now lives in `src/endpoints/seed/authored.ts` as `isUnauthored`, and all seven read it — seven copies
+of a rule being how the collection→prefix map in `routes.ts` came to disagree with itself.
+
+**Re-tested after the fix**, with three simultaneous edits: the hero reworded, a carousel slide
+deleted, and a featured post's category changed. All three survived a full seed run. The trade this
+locks in is deliberate and already documented for links: **a fixture edit no longer reaches an
+existing install**, so every content correction must be paired with a narrow, additive repair that
+writes only into an absence (`src/endpoints/seed/seedEventsHub.ts`).
 
 ---
 

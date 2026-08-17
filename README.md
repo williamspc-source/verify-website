@@ -154,6 +154,12 @@ that reports every enquiry notification and password-reset email as sent. See `.
 7. a brand asset is referenced straight from a CSS rule instead of through a Site Settings token, or
    a block draws an image placeholder without offering an upload to replace it.
 
+`tests/int/seedAuthored.int.spec.ts` fails the build when a seed module decides whether a page has
+been written by **counting its blocks** instead of asking `isUnauthored`. That rule
+(`layout.length > 2`) meant the seed rewrote 13 of the 27 pages from its fixtures on every run,
+discarding editor changes — the file records the three deliberate breaks that prove it goes red, and
+what each one actually did when run.
+
 These exist because a 2026 audit found ~118 verified cases of exactly those shapes.
 
 **A guard that has never failed is not evidence.** An earlier version of this file justified itself

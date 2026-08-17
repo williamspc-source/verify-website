@@ -40,8 +40,8 @@ One application serves both the public site and `/admin`.
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **123/123**, 5 files |
-| `pnpm test:e2e` | **19/19**, 58.8s |
+| `pnpm test:int` | **131/131**, 6 files |
+| `pnpm test:e2e` | **19/19**, 59.2s |
 
 > The e2e run was against the **production** server on `:3000`, and the admin spec that
 > `OUTSTANDING.md` §2 reports as intermittent did not flake. That is consistent with §2's diagnosis
@@ -94,23 +94,15 @@ Current drift, re-measured 2026-08-17 (`verify_cms` against the checked-in basel
 | Tables | 301 | 303 |
 | Indexes | 946 | 1266 |
 
-### 2. Design gaps still open
+### 2. Design gaps — none open
 
-Full detail and measurements in `verify-website-design-diff.md` **Comparison 22 §A–F**. In short:
+All six items from `verify-website-design-diff.md` Comparison 22 are closed: two fixed (`/events`
+rebuilt as the reference hub; the In the Loop featured cards given topic tags), three accepted as
+deliberate deviations (breadcrumbs, the Contact portal section, the footer opening hours), and one
+withdrawn as a false positive of mine (the IME/JME icon points are present — the probe was scoped to
+one section and the content had moved down the page).
 
-| | Item | Kind |
-|---|---|---|
-| A | Nine breadcrumb trails differ — three labels, three depths, three presence | Mixed; see below |
-| B | The three *Featured* cards on In the Loop carry no topic tag; one reads `FEATURED FEATURED` | Defect |
-| C | `/events` is a directory where the reference hub is a marketing page; the `h1` differs too | Structural |
-| D | `/contact` has a *What you can do in the portal* section the reference does not | Decision |
-| E | The footer carries opening hours the reference omits | Content |
-| F | Recurring item 7 (icon-card rows vs inline bullets) was never re-verified | Unknown |
-
-**A needs a decision, not a fix, for three of its nine.** The reference contradicts itself on
-breadcrumb depth: `specialty-list` and `join-expert-panel` render `Home › Specialists › …` while
-`specialist-panel` skips that level, and `/events` keeps it where its own children drop it. The
-build is self-consistent. Matching the reference there would mean copying an inconsistency.
+The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items
 

@@ -57,11 +57,21 @@ const resolveAuthorName = (post: Post): string | null => {
 
 // Category/stream label — prefer the post's OWN first category so each slide
 // shows its specific tag, falling back to the stream title.
-const postTagLabel = (post: Post, stream: Stream | null): string | null => {
+//
+// The fallback is why `badge` is passed in. A featured post with no category
+// falls back to its stream, and the stream that makes a post featured is itself
+// called "Featured" — so the card printed the badge word twice, side by side
+// ("FEATURED  FEATURED"). Seeding the three featured articles with real topic
+// chips fixes today's data; this comparison is what stops it returning the next
+// time anyone adds a post to that stream without one. A chip that merely repeats
+// the badge carries no information, so dropping it loses nothing.
+const postTagLabel = (post: Post, stream: Stream | null, badge: string): string | null => {
   const firstCategory = Array.isArray(post.categories)
     ? (post.categories.find((c) => typeof c === 'object') as Category | undefined)
     : undefined
-  return firstCategory?.title || stream?.title || null
+  const label = firstCategory?.title || stream?.title || null
+  if (!label) return null
+  return label.trim().toLowerCase() === badge.trim().toLowerCase() ? null : label
 }
 
 const toSlide = (post: Post, badgeLabel: string, bylinePrefix: string): FeaturedSlide => {
@@ -76,7 +86,7 @@ const toSlide = (post: Post, badgeLabel: string, bylinePrefix: string): Featured
   return {
     imageUrl: mediaUrl(post.heroImage),
     badge: badgeLabel,
-    category: postTagLabel(post, stream),
+    category: postTagLabel(post, stream, badgeLabel),
     title: post.title,
     excerpt: post.excerpt ?? null,
     byline,

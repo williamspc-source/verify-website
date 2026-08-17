@@ -20,6 +20,8 @@ import { seedLegal } from './seed/seedLegal'
 import { repairBlockBands } from './seed/seedBlockBands'
 import { repairLinkTargets } from './seed/seedLinkRepairs'
 import { repairServiceLinks } from './seed/seedServiceLinks'
+import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
+import { isPlaceholderLayout } from './seed/authored'
 import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
 
 /* =====================================================================
@@ -195,16 +197,10 @@ const slugify = (s: string) =>
 const selectOptions = (labels: string[]) =>
   labels.map((label) => ({ label, value: slugify(label) }))
 
-// True when a page still holds the generic scaffold placeholder layout.
-const isPlaceholderLayout = (layout: unknown): boolean => {
-  const arr = layout as { blockType?: string }[] | undefined
-  return (
-    Array.isArray(arr) &&
-    arr.length === 1 &&
-    arr[0]?.blockType === 'content' &&
-    JSON.stringify(arr[0]).includes('scaffolded and ready for content')
-  )
-}
+// `isPlaceholderLayout` now lives in ./seed/authored, where every authorPage
+// copy reads it too — it used to be defined here and used only by the two pages
+// built outside authorPage, while the seven authorPage copies each guessed with
+// `layout.length > 2` instead.
 
 const placeholderLayout = (title: string) => [
   {
@@ -1179,6 +1175,11 @@ export const seedVerify = async ({
   await repairServiceLinks({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
+  // Both write only into an absence — a missing carousel block, a superseded
+  // heading string, a post with no category — so an editor's own work is never
+  // reverted by a later seed run. See the header of seedEventsHub.ts.
+  await repairEventsHub({ payload, req })
+  await repairFeaturedCategories({ payload, req })
 
   // Every write above passes `disableRevalidate: true` so the seed doesn't fire
   // hundreds of individual purges — correct, but it left nothing to purge at the

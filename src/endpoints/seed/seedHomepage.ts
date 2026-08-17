@@ -1,4 +1,5 @@
 import type { Payload, PayloadRequest } from 'payload'
+import { isUnauthored } from './authored'
 
 import { plainTextToLexical } from './data/richText'
 
@@ -61,8 +62,10 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     payload.logger.warn('— Homepage seed: no "home" page found, skipping')
     return
   }
-  // Don't clobber a hand-authored homepage (>2 real blocks); only fill the stub.
-  if (Array.isArray(rec.layout) && rec.layout.length > 2) {
+  // Only fill the stub — a homepage with any real content is left alone, whether
+  // this seed authored it on an earlier run or a person did. (This used to read
+  // ">2 real blocks", which overwrote any page holding two or fewer.)
+  if (!isUnauthored(rec.layout)) {
     payload.logger.info('— Homepage already authored, skipping')
     return
   }

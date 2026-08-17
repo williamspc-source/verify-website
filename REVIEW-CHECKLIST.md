@@ -121,8 +121,9 @@ drops its stylesheet and makes everything read as an unstyled default:
 ### Events & Seminars  
 `/events`
 
-- [ ] **Hero** (pageHero) — "Medico-Legal Education Events" — subtitle, breadcrumb
-- [ ] **Events Explorer** — "Explore VERIFY & AAMLE Events" (all)
+- [ ] **Hero** (pageHero) — "Medico-Legal Education for Better Practice" — subtitle, breadcrumb
+- [ ] **Slide Carousel** — "Four ways VERIFY brings medico-legal learning to life" (4 slides, eyebrow *Programs & partnerships*)
+- [ ] **Events Explorer** — "Explore VERIFY & AAMLE Events" (all, with search)
 
 ### Past Events  
 `/events/past-events`

@@ -1,6 +1,10 @@
 import type { Payload, PayloadRequest } from 'payload'
+import { isUnauthored } from './authored'
 
 import { plainTextToLexical } from './data/richText'
+// One definition of the events-hub carousel, shared with the repair that adds it
+// to installs the fixture cannot reach. Two copies would drift.
+import { fourWaysCarousel } from './seedEventsHub'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
@@ -73,7 +77,7 @@ async function authorPage(
     payload.logger.warn(`— ${slug}: page not found, skipping`)
     return
   }
-  if (Array.isArray(rec.layout) && rec.layout.length > 2) {
+  if (!isUnauthored(rec.layout)) {
     payload.logger.info(`— ${slug} already authored, skipping`)
     return
   }
@@ -439,11 +443,20 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
     ],
   )
 
-  // ── Events (chooser) ─────────────────────────────────────────────────
-  // The reference splits events into two dedicated pages (/upcoming-events +
-  // /past-events). The old combined page's promo carousel and 3-item preview
-  // treatment are removed; /events is now a lightweight chooser that routes to
-  // the two full listings.
+  // ── Events (hub) ─────────────────────────────────────────────────────
+  // The reference has THREE events pages, not two: the full listings at
+  // /upcoming-events and /past-events, plus a hub at events-seminars.html that
+  // opens with a four-way carousel of what VERIFY runs.
+  //
+  // The carousel used to be here and was removed, on the grounds that it was
+  // "not present in either Target page" (verify-website-design-diff.md
+  // Comparison 15 §3). That comparison only ever looked at the two listing
+  // pages, so it could not have found it. It is on the hub, and it is back.
+  //
+  // What the reference does NOT have is a search bar; its hub offers two static
+  // three-item previews instead. The explorer stays, below the carousel, because
+  // it already splits upcoming from past and lists everything — adding previews
+  // as well would print the same events twice on one page.
   await authorPage(
     ctx,
     'events',
@@ -453,11 +466,13 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       align: 'left',
       showBreadcrumb: true,
       showShield: false,
-      heading: 'Medico-Legal [[Education Events]]',
+      heading: 'Medico-Legal Education for [[Better Practice]]',
       subtitle:
         'Practical education, industry briefings, and specialist-led seminars from VERIFY and AAMLE — browse what is coming up or revisit recent programs.',
     },
     [
+      // Reference `.events-offer-stage` — the four ways VERIFY teaches.
+      fourWaysCarousel(),
       // All events on one page — Upcoming/Past split computed from the browser
       // date (client-side, so a cached page never goes stale) + a search/filter
       // toolbar, full-width list rows, and pagination (reference events pages).

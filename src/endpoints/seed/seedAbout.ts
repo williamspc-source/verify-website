@@ -1,4 +1,5 @@
 import type { Payload, PayloadRequest } from 'payload'
+import { isUnauthored } from './authored'
 
 import { plainTextToLexical } from './data/richText'
 
@@ -31,7 +32,7 @@ async function authorPage(
     payload.logger.warn(`— ${slug}: page not found, skipping`)
     return
   }
-  if (Array.isArray(rec.layout) && rec.layout.length > 2) {
+  if (!isUnauthored(rec.layout)) {
     payload.logger.info(`— ${slug} already authored, skipping`)
     return
   }

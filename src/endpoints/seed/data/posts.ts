@@ -30,11 +30,18 @@ export type PostSeed = {
 const RAW_POSTS: PostSeed[] = [
   // ————————————————————————————————————————————————————————————————
   // FEATURED (3) — all flagged featured for the hub carousel
+  //
+  // Each carries its own topic chip, matching the design reference's featured
+  // cards (Expert Guidance / AAMLE Events / Industry Insights). These are not
+  // decoration: a featured card with no category falls back to its stream title,
+  // and this stream is called "Featured" — the same word as the badge printed
+  // beside it, so the card renders "Featured Featured".
   // ————————————————————————————————————————————————————————————————
   {
     title: 'The IME Referral Brief: Why Quality Documentation Determines Report Quality',
     slug: 'the-ime-referral-brief-why-quality-documentation-determines-report-quality',
     stream: 'featured',
+    categories: ['expert-guidance'],
     featured: true,
     excerpt:
       'A well-prepared referral brief is the single greatest factor in the quality of an independent medical examination report. Our senior coordinators outline what information specialists need — and what is most often missing from the briefs they receive.',
@@ -51,6 +58,7 @@ Timing matters too. Engaging early lets us manage specialist availability and de
       "AAMLE 2026 Annual Conference: Registration Now Open for Australia's Premier Medico-Legal Education Event",
     slug: 'aamle-2026-annual-conference-registration-now-open',
     stream: 'featured',
+    categories: ['aamle-events'],
     featured: true,
     excerpt:
       'The AAMLE Annual Conference brings together medico-legal professionals, legal practitioners, and healthcare specialists for two days of expert-led sessions, workshops, and networking opportunities across Australia.',
@@ -67,6 +75,7 @@ VERIFY is proud to support the conference and will be attending across both days
       "Understanding Queensland's Updated WorkCover Guidelines: What Every Legal Practitioner Needs to Know",
     slug: 'understanding-queenslands-updated-workcover-guidelines-what-every-legal-practitioner-needs-to-know',
     stream: 'featured',
+    categories: ['industry-insights'],
     featured: true,
     excerpt:
       "The recent amendments to Queensland WorkCover guidelines introduce significant changes to how independent medical examinations are requested, coordinated, and reported. We break down what's changed and what it means for your practice.",

@@ -61,6 +61,10 @@ const BLOG_CATEGORIES: { title: string; slug: string; color: string }[] = [
   { title: 'Quality Assurance', slug: 'quality-assurance', color: '#1c75bc' },
   { title: 'Client Experience', slug: 'client-experience', color: '#2d8fe8' },
   { title: 'Clinical Insights', slug: 'clinical-insights', color: '#414042' },
+  // Carried by a Featured-stream article. Without a topic chip of its own, a
+  // featured card falls back to its stream title — which is "Featured", the same
+  // word as the badge beside it.
+  { title: 'Expert Guidance', slug: 'expert-guidance', color: '#2d8fe8' },
 ]
 
 // "In the Loop" streams — the section an article belongs to (drives its URL folder
