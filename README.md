@@ -15,6 +15,11 @@ code.
 register of what is knowingly imperfect — measured impact, what fixing each costs, and one item
 (the migration) that blocks the next deploy until it is done.
 
+**If you just want to know where the project stands today**, read
+[`current-state.md`](current-state.md) — a dated snapshot of what is green, what is open, and the
+steps to get a build onto the box. It supersedes this file wherever the two disagree about status,
+and defers to it on everything else.
+
 ---
 
 ## Running it locally

@@ -16,7 +16,7 @@ something undone.
 
 ## The records, and the rule for all of them
 
-Five documents describe this repo to someone who was not there. **A change lands in all the ones it
+Six documents describe this repo to someone who was not there. **A change lands in all the ones it
 touches, in the same pass, or the set starts lying** — and a reader cannot tell which one is stale.
 
 | File | Holds | Reader |
@@ -26,6 +26,15 @@ touches, in the same pass, or the set starts lying** — and a reader cannot tel
 | `README.md` | Running, testing, deploying, and where images go | Whoever maintains it |
 | `src/Styles/HOOKS.md` | Every editable control and where it lives | The non-technical editor |
 | `HOMEPAGE-CHANGES.md` | Design-reference audit, pass by pass | Whoever asked for the work |
+| `current-state.md` | Status *now*: what works, what is open, how to get it onto the box | Whoever is driving the work |
+
+`current-state.md` is the newest and the most fragile. It is a **snapshot**, so it holds no
+architecture, no invariants and no editor instructions — only status, and pointers to whichever of
+the other five owns the detail. That makes it the easiest to let drift and the worst one to leave
+stale, because it is what people read to decide whether something still needs doing. When an item
+there is fixed, **delete the item** rather than annotating it; the history belongs in `git log` and
+`HOMEPAGE-CHANGES.md`. Two numbers in it are measured and go out of date silently — the test counts
+and the schema drift — so re-measure rather than edit around them.
 
 This has failed once already, and quietly: the image pass was written up in its published artifact
 but **not** in `HOMEPAGE-CHANGES.md`, which went on claiming two finished items were "still
