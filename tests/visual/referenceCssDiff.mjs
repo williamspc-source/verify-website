@@ -310,7 +310,9 @@ function topLevelParts(value) {
  */
 const BOX_SIDES = ['top', 'right', 'bottom', 'left']
 function expandBox(prop, value) {
-  const v = topLevelParts(value)
+  // Strip `!important` FIRST. Otherwise `margin: 0 !important` splits as a
+  // two-value shorthand and yields `margin-left: !important`.
+  const v = topLevelParts(value.replace(/\s*!important\s*$/i, ''))
   if (!v.length || v.length > 4) return null
   const [t, r = t, b = t, l = r] = v
   return Object.fromEntries(BOX_SIDES.map((side, i) => [`${prop}-${side}`, [t, r, b, l][i]]))
@@ -366,7 +368,11 @@ function parse(css, media = '') {
 
 /** Resolve tokens and normalise colour/number spelling so equivalents compare equal. */
 function normalise(value, tokens) {
-  let s = value.toLowerCase().replace(/\s+/g, ' ').trim()
+  // `!important` is a cascade concern, not a value one, and this tool explicitly
+  // does not model the cascade. Comparing it made `margin: 0 !important` read as
+  // differing from `margin: 0` — which is how a needed `!important` came to be
+  // deleted to silence the diff, re-centring an intro paragraph.
+  let s = value.toLowerCase().replace(/\s*!important\s*$/, '').replace(/\s+/g, ' ').trim()
   for (const [name, val] of Object.entries(tokens)) s = s.split(`var(${name})`).join(val.toLowerCase())
   s = s.replace(/\b0\.5rem\b/g, '8px').replace(/\b1rem\b/g, '16px')
   s = s.replace(

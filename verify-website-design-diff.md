@@ -1409,6 +1409,26 @@ One more instance of the stale-build trap on the way through, the fifth: with th
 and the diff at zero, the browser still measured 0px. `rm -rf .next` and a restart, source unchanged,
 and both bands read exactly 48px.
 
+### And then the intro was centred, by the fix for the spacing
+
+Reported next: "the text isn't meant to be centred". It wasn't centred by design — it was a
+regression from the pass above. That pass deleted an `!important` from the admin subtitle's margin,
+justified as "the scoped rule already outranks `.section-subtitle`". True, and beside the point: the
+rule it was actually beating is
+`.vf-section-header--centered .vf-section-header__subtitle { margin-inline: auto }`, equal
+specificity and declared ~1,600 lines later, so it wins on order. `SectionHeader` always emits that
+modifier — which is exactly why the sibling `margin-inline` and `max-width` rules in the same block
+carry `!important` too. Measured after restoring it: the intro starts at the same x as the heading at
+1440, 1276 and 1100, matching the reference at all three.
+
+**Neither tool caught it.** `computedSnapshot.mjs` measured `marginTop`/`marginBottom` and no
+horizontal spacing, padding or position — the paragraph's width never changed, so a 326px sideways
+shift was outside the instrument, and it reported the page as unchanged. It now records
+`marginLeft`/`Right`, `paddingLeft`/`Right` and `textAlign`, proven by re-introducing the break:
+0 changed nodes before, 2 after. And `referenceCssDiff.mjs` compared `!important` as part of a value,
+so `margin: 0 !important` read as *differing* from `margin: 0` — which is what made deleting it look
+like closing a gap. It strips the flag now.
+
 ### The tool was blind to every layered rule
 
 `referenceCssDiff.mjs` treated `@layer` exactly like `@media` — collecting its rules into the

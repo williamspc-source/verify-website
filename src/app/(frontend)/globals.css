@@ -9733,9 +9733,16 @@
    component's markup. */
 .svc-admin-split .vf-section-header__eyebrow { flex-basis: 100%; margin-bottom: 0; }
 .svc-admin-split .vf-section-header__title { margin-bottom: 0; }
+/* `!important` is load-bearing, twice over. SectionHeader always emits
+   `vf-section-header--centered`, and BOTH of that modifier's rules are declared
+   later at equal specificity — `margin-inline: auto` on this element
+   (globals.css ~11325) centres the intro, and `max-width` centres the header.
+   Removing it once, on the reasoning that this rule outranks `.section-subtitle`,
+   put the intro back in the middle of the band: measured 326px in from the left
+   at 1440, 1276 and 1100. The competitor is the modifier, not the base class. */
 .svc-admin-split .vf-section-header__subtitle {
   max-width: 480px;
-  margin: 0;
+  margin: 0 !important;
   text-align: left;
 }
 /* Dark blue band → light header text (reference `.admin-section` colours:

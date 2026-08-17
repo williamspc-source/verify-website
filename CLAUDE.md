@@ -425,6 +425,21 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   the only reason it was noticed — while two real pages went unmeasured. It now refuses any non-200.
   Whenever a checker takes a list of inputs, assert the inputs resolve; a tool that quietly measures
   the wrong thing reads exactly like a tool that found nothing wrong.
+- **Before deleting an `!important`, find out which rule it was beating.** One was removed from
+  `.svc-admin-split .vf-section-header__subtitle` on the reasoning that the scoped rule already
+  outranked `.section-subtitle`. True, and irrelevant: the competitor was
+  `.vf-section-header--centered .vf-section-header__subtitle { margin-inline: auto }` — **equal
+  specificity, declared 1,600 lines later**, so it won on order. The intro paragraph moved 326px in
+  from the left at every width. `SectionHeader` always emits that modifier, which is why the sibling
+  `margin-inline`/`max-width` rules in the same block carry `!important` too.
+  **`computedSnapshot.mjs` reported the page as unchanged**, because it measured `marginTop`/
+  `marginBottom` and no horizontal spacing, padding or position at all — the element's width never
+  moved, so a pure sideways shift was outside the instrument. It now records `marginLeft`/`Right`,
+  `paddingLeft`/`Right` and `textAlign`; proven by re-introducing the break, which takes it from 0
+  changed nodes to 2. Related: `referenceCssDiff.mjs` used to compare `!important` as part of a
+  value, so `margin: 0 !important` read as differing from `margin: 0` — which is what made deleting
+  it look like closing a gap. It strips the flag now, since it models declarations and not the
+  cascade.
 - **A comparison tool's skip list is load-bearing, and "verified equal in the browser" expires.**
   `referenceCssDiff.mjs` excluded `margin` and `margin-bottom` from comparison for any selector
   checked under a rename, with a comment saying they were set elsewhere in our cascade and confirmed
@@ -472,7 +487,7 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   gate against a running `:3000`, keyed by structural index path rather than class name (class
   names are what the migrations change). Token replacements are value-preserving by
   construction, so the expected diff is empty; any diff is a real bug, not a tolerance.
-  It measures **34** properties over **14** routes — `width`/`height`/`gridTemplateColumns`/
+  It measures **39** properties over **14** routes — `width`/`height`/`gridTemplateColumns`/
   `transform` are in that set, which is what makes it catch a reflow and not just a repaint, but
   14 routes is 14 of the site's 29 pages and it never triggers `:hover`. Capture immediately
   before a change and compare immediately after; baselines are gitignored because any content

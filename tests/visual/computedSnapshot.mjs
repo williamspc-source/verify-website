@@ -51,8 +51,18 @@ const PROPS = [
   'letterSpacing',
   'paddingTop',
   'paddingBottom',
+  // Horizontal spacing and alignment are here because their absence let a real
+  // regression through: deleting a load-bearing `!important` re-centred an intro
+  // paragraph 326px in from the left, and this harness reported the page as
+  // unchanged — the element's width was identical and nothing it measured moved.
+  // A pure sideways shift was outside the instrument.
+  'paddingLeft',
+  'paddingRight',
   'marginTop',
   'marginBottom',
+  'marginLeft',
+  'marginRight',
+  'textAlign',
   'gap',
   'filter',
   // Layout properties. These were missing, so the harness returned a clean diff
