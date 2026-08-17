@@ -1,6 +1,7 @@
 import type { Payload, PayloadRequest } from 'payload'
 
 import { SPECIALIST_INDEX_PATH } from '@/utilities/routes'
+import { plainTextToLexical } from './data/richText'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
@@ -84,27 +85,34 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
   await payload.updateGlobal({
     slug: 'events-settings',
     data: {
+      // `blurb` and `callout` are richText. The `**…**` runs are parsed into
+      // Lexical bold nodes by plainTextToLexical — the design reference bolds the
+      // academy's name in both, and the old plain-text fields could not.
       aamle: {
-        blurb:
-          'This event is run by the Australian Academy of Medico-Legal Education (AAMLE), providing complimentary, CPD-eligible education across the medico-legal sector.',
-        callout: 'Run by AAMLE',
+        blurb: plainTextToLexical(
+          'This session is presented by the **Australian Academy of Medico-Legal Education (AAMLE)**, VERIFY’s education and training arm, as part of its complimentary, CPD-eligible program for legal, insurance, and medical professionals.',
+        ),
+        callout: plainTextToLexical('Run by **AAMLE** — VERIFY’s education & training arm.'),
         attendHeading: 'How to Attend',
         recapHeading: 'Event Recap',
         attendBody:
           'AAMLE events are complimentary for members. Register your interest and our team will confirm your place and share joining details.',
         registerLabel: 'Register Your Interest',
         contactLabel: 'Contact Us',
+        hostEventLinkLabel: 'View this event on AAMLE',
       },
       verify: {
-        blurb:
-          'This event is hosted by VERIFY Medico-Legal Solutions as part of our commitment to supporting best practice across the industry.',
-        callout: 'Hosted by VERIFY',
+        blurb: plainTextToLexical(
+          'This event is hosted by **VERIFY Medico-Legal Solutions** as part of our commitment to supporting best practice across the industry.',
+        ),
+        callout: plainTextToLexical('Hosted by **VERIFY** Medico-Legal Solutions.'),
         attendHeading: 'How to Attend',
         recapHeading: 'Event Recap',
         attendBody:
           'Places are limited. Register your interest and our team will be in touch with confirmation and joining details.',
         registerLabel: 'Register Your Interest',
         contactLabel: 'Contact Us',
+        hostEventLinkLabel: 'View this event on the VERIFY site',
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,

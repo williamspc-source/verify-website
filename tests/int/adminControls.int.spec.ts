@@ -78,6 +78,19 @@ const blockSources = (name: string): string => {
  *   { hours: renamed } destructuring with rename
  *   { hours = [] }     destructuring with default
  *   hours={...}        JSX prop being passed on
+ *
+ * ── Known false negative, measured ──────────────────────────────────────────
+ * A JSX expression container holding a bare identifier — `href={hostEventUrl}` —
+ * is textually identical to the `{ field }` destructuring shape, so it satisfies
+ * this matcher without reading the property at all. Found by deliberately
+ * breaking two new fields at once: `EventsSettings.labels.galleryHeading` was
+ * caught, `Events.hostEventUrl` was not, because a local of the same name was
+ * still being interpolated into JSX further down the file.
+ *
+ * Not tightened, because the two shapes are distinguishable only by whitespace
+ * convention, and a matcher keyed on that would fail on formatting. Recorded so
+ * the next person knows the guard is weakest where a field's value is copied
+ * into an identically-named local — check those by hand.
  */
 const readsField = (haystack: string, field: string): boolean => {
   const f = field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

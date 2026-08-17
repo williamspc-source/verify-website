@@ -409,12 +409,22 @@ three per collection, picking ones that differ (long vs short, with image vs wit
 - [ ] Photo or initials fallback, role, bio
 - [ ] Back-link to Meet the Team
 
-**Events — 16 documents**, at `/events/event/<slug>`.
+**Events — 16 documents**, at `/events/event/<slug>`. Rebuilt past the reference (approved) —
+see `verify-website-design-diff.md` Comparison 25 and `src/Styles/HOOKS.md` for what an editor can
+put on one.
 
 - [ ] Date, time, location, presenter
 - [ ] Status badge and CTA — an **upcoming** event and a **past** one behave differently, and
       deliberately disagree: an event can be finished and still taking expressions of interest
+- [ ] Action row at the foot — *Contact Us / Register* · *View this event on AAMLE* (only on events
+      with a Host event page URL) · *Back to all events*
 - [ ] Registration CTA wording on each
+
+Empty by design until someone writes them — check the surface, not the absence:
+
+- [ ] **Recap** on a past event: heading anchors, an "In this recap" list once it has two headings
+- [ ] **Photo gallery** and **Downloads**
+- [ ] **Image** on an event → full-bleed photo hero; no image → the plain hero
 
 ---
 

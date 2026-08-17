@@ -10,8 +10,11 @@ const hostGroup = (name: string, label: string): Field => ({
   type: 'group',
   label,
   fields: [
-    { name: 'blurb', type: 'textarea', label: 'Program blurb', admin: { description: 'Intro paragraph shown on every event by this host.' } },
-    { name: 'callout', type: 'text', label: 'Callout', admin: { description: 'e.g. "Run by AAMLE", "Hosted by VERIFY".' } },
+    // Rich text, not plain: the design reference bolds the academy's name inside
+    // both of these ("presented by the **Australian Academy of Medico-Legal
+    // Education (AAMLE)**", "Run by **AAMLE**"), which a text field cannot express.
+    { name: 'blurb', type: 'richText', label: 'Program blurb', admin: { description: 'Intro paragraph shown on every event by this host.' } },
+    { name: 'callout', type: 'richText', label: 'Callout', admin: { description: 'The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."' } },
     {
       type: 'row',
       fields: [
@@ -26,6 +29,15 @@ const hostGroup = (name: string, label: string): Field => ({
         { name: 'registerLabel', type: 'text', label: 'Register button label', admin: { width: '50%' } },
         { name: 'contactLabel', type: 'text', label: 'Contact button label', admin: { width: '50%' } },
       ],
+    },
+    {
+      name: 'hostEventLinkLabel',
+      type: 'text',
+      label: 'Host event link label',
+      admin: {
+        description:
+          'Label for the button linking to the event on the host’s own site, e.g. "View this event on AAMLE". Only shown on events that have a Host event page URL.',
+      },
     },
   ],
 })
@@ -110,6 +122,39 @@ const labelsGroup: Field = {
       type: 'text',
       defaultValue: 'Back to all events',
       admin: { description: 'Link back to the events listing at the bottom of the page.' },
+    },
+    {
+      name: 'contactUrl',
+      type: 'text',
+      label: 'Contact page URL',
+      defaultValue: '/contact',
+      admin: {
+        description:
+          'Where the “Contact Us” button goes once registrations have closed. It used to reuse the event’s external registration link, which sent people to the booking page they could no longer use.',
+      },
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'recapTocLabel',
+          type: 'text',
+          defaultValue: 'In this recap',
+          admin: { width: '50%', description: 'Heading above the recap’s contents list.' },
+        },
+        {
+          name: 'galleryHeading',
+          type: 'text',
+          defaultValue: 'From the day',
+          admin: { width: '50%', description: 'Heading above an event’s photo gallery.' },
+        },
+      ],
+    },
+    {
+      name: 'attachmentsHeading',
+      type: 'text',
+      defaultValue: 'Downloads',
+      admin: { description: 'Heading above an event’s downloads / attachments list.' },
     },
   ],
 }

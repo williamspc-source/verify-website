@@ -20,6 +20,7 @@ import { cn } from '@/utilities/ui'
 import { bgClasses, type SectionBackground } from '@/components/Section'
 import { toClassName } from '@/utilities/cssClass'
 import { postPath, eventPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
+import { getCachedGlobal } from '@/utilities/getGlobals'
 
 const MONTHS_SHORT = [
   'Jan',
@@ -201,22 +202,50 @@ const PostCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, readM
   )
 }
 
-// Format/status line for the compact card: "Webinar · CPD Eligible · Free".
-const eventFormatLine = (event: Event, typeLabel: string | null): string => {
+// Wording for the cost / CPD half of an event's format line. Editable, from the
+// Events Settings global — these used to be two string literals here, while the
+// editor's copies of them sat in the global driving the event detail page.
+export type EventFactLabels = {
+  freeLabel?: string | null
+  cpdPointsTemplate?: string | null
+  cpdEligibleLabel?: string | null
+}
+
+// Format/status line for the compact card: "Webinar · CPD · 2 point(s) · Free".
+//
+// This is now the only place cost and CPD are surfaced: the event detail page's
+// facts pills were removed to match the design reference, which shows them on no
+// event page. `cpdPoints` in particular has no other reader, so a change here is
+// the difference between an editable field and an inert one.
+const eventFormatLine = (
+  event: Event,
+  typeLabel: string | null,
+  labels: EventFactLabels,
+): string => {
   const parts: string[] = []
   if (typeLabel) parts.push(typeLabel)
-  if (event.cpdEligible) parts.push('CPD Eligible')
+  if (event.cpdEligible) {
+    parts.push(
+      event.cpdPoints
+        ? (labels.cpdPointsTemplate || 'CPD · {points} point(s)').replace(
+            /\{points\}/g,
+            String(event.cpdPoints),
+          )
+        : labels.cpdEligibleLabel || 'CPD Eligible',
+    )
+  }
   const cost = typeof event.cost === 'string' ? event.cost.trim() : ''
   if (cost) parts.push(cost)
-  else if (event.cpdEligible) parts.push('Free')
+  else if (event.cpdEligible) parts.push(labels.freeLabel || 'Free')
   return parts.join('  ·  ')
 }
 
 // ── Compact event card (In-the-Loop hub) ────────────────────
-const EventHubCard: React.FC<{ event: Event; typeLabel: string | null }> = ({
-  event,
-  typeLabel,
-}) => {
+const EventHubCard: React.FC<{
+  event: Event
+  typeLabel: string | null
+  factLabels: EventFactLabels
+}> = ({ event, typeLabel, factLabels }) => {
   const d = event.date ? new Date(event.date) : null
   const validDate = d && !Number.isNaN(d.getTime()) ? d : null
   const href = eventPath(event.slug) ?? '/events'
@@ -230,7 +259,7 @@ const EventHubCard: React.FC<{ event: Event; typeLabel: string | null }> = ({
         </div>
       )}
       <div className="ni-event-body">
-        <span className="ni-event-format">{eventFormatLine(event, typeLabel)}</span>
+        <span className="ni-event-format">{eventFormatLine(event, typeLabel, factLabels)}</span>
         <a className="ni-event-title" href={href}>
           {event.title}
         </a>
@@ -244,16 +273,17 @@ const EventHubCard: React.FC<{ event: Event; typeLabel: string | null }> = ({
 }
 
 // ── Event card (Events list) ────────────────────────────────
-const EventCard: React.FC<{ event: Event; isPast: boolean; compact?: boolean }> = ({
-  event,
-  isPast,
-  compact,
-}) => {
+const EventCard: React.FC<{
+  event: Event
+  isPast: boolean
+  compact?: boolean
+  factLabels: EventFactLabels
+}> = ({ event, isPast, compact, factLabels }) => {
   if (!event) return null
 
   const typeLabel = event.eventType ? EVENT_TYPE_LABELS[event.eventType] || event.eventType : null
 
-  if (compact) return <EventHubCard event={event} typeLabel={typeLabel} />
+  if (compact) return <EventHubCard event={event} typeLabel={typeLabel} factLabels={factLabels} />
 
   const image = event.image && typeof event.image === 'object' ? event.image : null
   const dateLabel = formatDate(event.date, true)
@@ -395,6 +425,13 @@ export const ArchiveBlock: React.FC<
     })
   }
 
+  // Only fetched when there are events to label — the cached global is cheap, but
+  // a posts-only archive has no reason to touch it.
+  const factLabels: EventFactLabels = events.length
+    ? ((((await getCachedGlobal('events-settings', 0)()) as { labels?: EventFactLabels } | null)
+        ?.labels ?? {}) as EventFactLabels)
+    : {}
+
   const hasContent = posts.length > 0 || events.length > 0
   const isNarrative = postStyle === 'narrative'
   const isCompactEvents = eventStyle === 'compact'
@@ -437,6 +474,7 @@ export const ArchiveBlock: React.FC<
                 key={event?.id ?? index}
                 event={event}
                 compact={isCompactEvents}
+                factLabels={factLabels}
                 isPast={view === 'past' || (!!event?.date && new Date(event.date) < now)}
               />
             ))}

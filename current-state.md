@@ -102,6 +102,14 @@ deliberate deviations (breadcrumbs, the Contact portal section, the footer openi
 withdrawn as a false positive of mine (the IME/JME icon points are present — the probe was scoped to
 one section and the content had moved down the page).
 
+The event **detail** page was then rebuilt past the reference — an approved deviation, written up as
+Comparison 25. It now has a recap body with anchored headings and a contents list, a photo gallery,
+downloads, an optional photo hero, and one action row instead of three stacked elements.
+
+**Those are empty editor surfaces.** No event has a recap, a photo, a gallery or a download yet, and
+nothing was invented to fill them: a past event still shows the "this event has now concluded" line
+until someone writes one. That is the next content job, not a defect.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items

@@ -109,6 +109,19 @@ export const Events: CollectionConfig<'events'> = {
               ],
             },
             {
+              // Deliberately separate from `registrationUrl`, which in practice
+              // points at a generic booking page (most events share the one AAMLE
+              // seminar menu). This one is the event's *own* page on the host's
+              // site, and drives the "View this event on …" action button.
+              name: 'hostEventUrl',
+              type: 'text',
+              label: 'Host event page URL',
+              admin: {
+                description:
+                  'This event’s own page on the host’s website (e.g. an aamle.com.au event page). Adds a “View this event on AAMLE” button. Leave empty and the button is not shown.',
+              },
+            },
+            {
               name: 'registrationClosesAt',
               type: 'date',
               label: 'Registrations close',
@@ -169,6 +182,47 @@ export const Events: CollectionConfig<'events'> = {
               type: 'richText',
               label: 'Recap (past events)',
               admin: { description: 'Optional write-up shown after the event has passed.' },
+            },
+            {
+              name: 'showToc',
+              type: 'checkbox',
+              label: 'Show “In this recap” contents list',
+              defaultValue: true,
+              admin: {
+                description:
+                  'Lists the recap’s headings above it, each one a link. Only appears when the recap has two or more headings.',
+              },
+            },
+            {
+              // Rendered whenever populated, not gated on the event having passed:
+              // a control that silently does nothing in one state is the failure the
+              // admin-controls guard exists to prevent.
+              name: 'gallery',
+              type: 'array',
+              label: 'Photo gallery',
+              labels: { singular: 'Photo', plural: 'Photos' },
+              admin: {
+                description:
+                  'Photos from the day. Shown beneath the recap as soon as you add one.',
+              },
+              fields: [
+                { name: 'image', type: 'upload', relationTo: 'media', required: true },
+                { name: 'caption', type: 'text' },
+              ],
+            },
+            {
+              // Same shape as Posts.attachments, so the article page's
+              // `.art-attachments` markup and CSS are reused rather than copied.
+              name: 'attachments',
+              type: 'array',
+              label: 'Downloads / attachments',
+              admin: {
+                description: 'Slides, handouts, recordings — anything to offer as a download.',
+              },
+              fields: [
+                { name: 'file', type: 'upload', relationTo: 'media', required: true },
+                { name: 'label', type: 'text', admin: { description: 'Shown instead of the filename.' } },
+              ],
             },
           ],
         },

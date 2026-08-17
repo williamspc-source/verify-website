@@ -4188,6 +4188,12 @@
   .page-hero-deco { display: none; }
 }
 .content-section { padding: clamp(44px, 7vw, 80px) 0; }
+/* Tailwind Typography owns `.prose` as well, and imposes `font-size: 1rem` on it.
+   The reference's `.prose` declares no size and inherits the page's 18px, which is
+   what the legal pages were missing. Only the size is reset: the 65ch max-width
+   is already out-declared there by `.content-narrow`, and widening these pages is
+   not the intent. */
+.content-section .prose { font-size: inherit; }
 .content-narrow { max-width: 820px; margin: 0 auto; }
 .prose h2 {
   font-family: var(--font-heading);
@@ -7200,29 +7206,81 @@
 }
 
 /* Compact cost / CPD fact pills */
-.event-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0 0 28px;
-  padding: 0;
-  list-style: none;
+/* Image hero: reuses the article's .art-hero family wholesale, so only the two
+   event-specific lines under the title need re-colouring for a dark ground. */
+.event-hero--image .event-hero-meta { color: color-mix(in srgb, var(--white) 88%, transparent); }
+.event-hero--image .event-hero-status { color: var(--white); }
+
+/* Event body copy.
+   This does NOT use `.prose`. Tailwind Typography owns that class name as well
+   (max-width: 65ch, font-size: 1rem), which is what squeezed this page's text
+   into a 595px column inside a 1132px container. Our ported `.prose` rules
+   declare no font-weight either, so weight was riding entirely on the plugin —
+   dropping the class without declaring weight here would have taken every
+   heading and every <strong> down to the `@layer base` reset's 400. Hence the
+   explicit weights below; see `.art-body`, which does the same. */
+.event-body h2 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 38px 0 14px;
 }
-.event-facts li {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 32px;
-  padding: 7px 14px;
-  border-radius: var(--vf-radius-pill);
-  background: #f2f9ff;
-  border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+.event-body h2:first-child { margin-top: 0; }
+.event-body h3 {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 26px 0 10px;
+}
+.event-body p,
+.event-body li { color: var(--text-mid); line-height: 1.75; }
+.event-body p { margin-bottom: 16px; }
+.event-body p:last-child { margin-bottom: 0; }
+.event-body strong { font-weight: 700; color: var(--text-dark); }
+.event-body em { font-style: italic; }
+.event-body ul,
+.event-body ol { margin: 0 0 18px; padding-left: 22px; }
+.event-body li { margin-bottom: 8px; }
+.event-body ul li::marker { color: var(--primary); }
+.event-body ol li::marker { color: var(--primary); font-weight: 700; font-family: var(--font-heading); }
+.event-body a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.event-body blockquote {
+  margin: 20px 0;
+  padding: 4px 0 4px 20px;
+  border-left: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--text-mid);
+  font-style: italic;
+}
+
+/* Contents list above a recap. A plain server-rendered list rather than the
+   article's sticky rail: this page has no sidebar to stick it to. */
+.event-toc {
+  margin: 0 0 28px;
+  padding: 16px 20px;
+  background: #f5f8fc;
+  border: 1px solid var(--border-light);
+  border-radius: var(--vf-radius-card);
+}
+.event-toc__label {
+  margin: 0 0 10px;
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+}
+.event-toc__list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.event-toc__list a {
   color: var(--primary);
   font-family: var(--font-heading);
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
 }
-.event-facts svg { color: var(--primary); flex-shrink: 0; }
+.event-toc__list a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Host callout box (Run by AAMLE / Hosted by VERIFY) */
 .event-callout {
@@ -7234,14 +7292,13 @@
   border-radius: var(--vf-radius-chip);
 }
 .event-callout p { margin: 0; color: var(--text-mid); }
+/* The callout is rich text now, and nothing else supplies a weight here. */
+.event-callout strong { font-weight: 700; color: var(--text-dark); }
 .event-callout--verify {
   background: #f5f8fc;
   border: 1px solid var(--border-light);
   border-left: 3px solid var(--primary);
 }
-
-/* Location tile (reuses shared .map-tile; adds detail-page spacing) */
-.event-map { margin-top: 24px; }
 
 /* How-to-attend / recap block */
 .event-attend__heading {
@@ -7253,23 +7310,64 @@
   margin-bottom: 12px;
 }
 .event-attend p { color: var(--text-mid); line-height: 1.75; }
-.event-attend__cta { margin-top: 18px; margin-bottom: 0; }
+/* Photo gallery */
+.event-gallery { margin-top: 40px; }
+.event-gallery__heading {
+  font-family: var(--font-heading);
+  font-size: var(--size-heading-sm);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.event-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.event-gallery__item { margin: 0; }
+.event-gallery__img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--vf-radius-card);
+  display: block;
+}
+.event-gallery__item figcaption {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  line-height: 1.5;
+}
 
-/* Back-to-events link */
-.event-back-wrap { margin-top: 26px; margin-bottom: 0; }
-.event-back {
+.event-attachments { margin-top: 40px; }
+
+/* One action row, replacing the stacked CTA paragraph, location tile and back
+   link. Wraps to two lines on narrow screens rather than shrinking the buttons. */
+.event-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-light);
+}
+.event-actions__back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  margin-left: auto;
   font-family: var(--font-heading);
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--text-mid);
   text-decoration: none;
   transition: color var(--transition);
 }
-.event-back svg { flex-shrink: 0; }
-.event-back:hover { color: var(--primary-strong); text-decoration: underline; text-underline-offset: 3px; }
+.event-actions__back svg { flex-shrink: 0; }
+.event-actions__back:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) {
+  .event-actions__back { margin-left: 0; }
+}
 
 /* ═══════════ PAGE-GROUP CSS (services / info-booking / hubs) ═══════════ */
 
@@ -11003,6 +11101,10 @@
 .art-attachments__heading {
   font-family: var(--font-heading);
   font-size: var(--size-heading-sm);
+  /* Same reason as .event-presenters__heading: the `@layer base` reset reduces an
+     otherwise unstyled heading to the body's 400. Measured at 400 on both the
+     article and the event page before this line. */
+  font-weight: 700;
   margin-bottom: 12px;
 }
 .art-attachments__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
@@ -11025,6 +11127,10 @@
 .event-presenters__heading {
   font-family: var(--font-heading);
   font-size: var(--size-heading-sm);
+  /* Explicit, because `@layer base` resets h1…h6 to `font-weight: unset` — which
+     for an inherited property means inherit, i.e. the body's 400. This heading
+     sits outside any scope that supplied one, so it rendered at 400. */
+  font-weight: 700;
   margin-bottom: 16px;
 }
 

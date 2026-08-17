@@ -1966,6 +1966,10 @@ export interface Event {
    */
   registrationLabel?: string | null;
   /**
+   * This event’s own page on the host’s website (e.g. an aamle.com.au event page). Adds a “View this event on AAMLE” button. Leave empty and the button is not shown.
+   */
+  hostEventUrl?: string | null;
+  /**
    * When registrations / expressions of interest stop being accepted. After this the button changes from "Register Your Interest" to "Contact Us". Leave empty to close at the event's start time. Set it later to keep registrations open once the event has begun, or earlier to close them in advance. This is separate from the Upcoming/Past badge, which follows the start date.
    */
   registrationClosesAt?: string | null;
@@ -2017,6 +2021,33 @@ export interface Event {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Lists the recap’s headings above it, each one a link. Only appears when the recap has two or more headings.
+   */
+  showToc?: boolean | null;
+  /**
+   * Photos from the day. Shown beneath the recap as soon as you add one.
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Slides, handouts, recordings — anything to offer as a download.
+   */
+  attachments?:
+    | {
+        file: number | Media;
+        /**
+         * Shown instead of the filename.
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   meta?: {
     title?: string | null;
     /**
@@ -13408,6 +13439,7 @@ export interface EventsSelect<T extends boolean = true> {
   host?: T;
   registrationUrl?: T;
   registrationLabel?: T;
+  hostEventUrl?: T;
   registrationClosesAt?: T;
   cpdEligible?: T;
   cpdPoints?: T;
@@ -13417,6 +13449,21 @@ export interface EventsSelect<T extends boolean = true> {
   excerpt?: T;
   description?: T;
   recap?: T;
+  showToc?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  attachments?:
+    | T
+    | {
+        file?: T;
+        label?: T;
+        id?: T;
+      };
   meta?:
     | T
     | {
@@ -15536,31 +15583,95 @@ export interface EventsSetting {
     /**
      * Intro paragraph shown on every event by this host.
      */
-    blurb?: string | null;
+    blurb?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     /**
-     * e.g. "Run by AAMLE", "Hosted by VERIFY".
+     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
      */
-    callout?: string | null;
+    callout?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     attendHeading?: string | null;
     recapHeading?: string | null;
     attendBody?: string | null;
     registerLabel?: string | null;
     contactLabel?: string | null;
+    /**
+     * Label for the button linking to the event on the host’s own site, e.g. "View this event on AAMLE". Only shown on events that have a Host event page URL.
+     */
+    hostEventLinkLabel?: string | null;
   };
   verify?: {
     /**
      * Intro paragraph shown on every event by this host.
      */
-    blurb?: string | null;
+    blurb?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     /**
-     * e.g. "Run by AAMLE", "Hosted by VERIFY".
+     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
      */
-    callout?: string | null;
+    callout?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     attendHeading?: string | null;
     recapHeading?: string | null;
     attendBody?: string | null;
     registerLabel?: string | null;
     contactLabel?: string | null;
+    /**
+     * Label for the button linking to the event on the host’s own site, e.g. "View this event on AAMLE". Only shown on events that have a Host event page URL.
+     */
+    hostEventLinkLabel?: string | null;
   };
   /**
    * Generic UI labels shown on every event detail page, regardless of host.
@@ -15602,6 +15713,22 @@ export interface EventsSetting {
      * Link back to the events listing at the bottom of the page.
      */
     backToEventsLabel?: string | null;
+    /**
+     * Where the “Contact Us” button goes once registrations have closed. It used to reuse the event’s external registration link, which sent people to the booking page they could no longer use.
+     */
+    contactUrl?: string | null;
+    /**
+     * Heading above the recap’s contents list.
+     */
+    recapTocLabel?: string | null;
+    /**
+     * Heading above an event’s photo gallery.
+     */
+    galleryHeading?: string | null;
+    /**
+     * Heading above an event’s downloads / attachments list.
+     */
+    attachmentsHeading?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -16280,6 +16407,7 @@ export interface EventsSettingsSelect<T extends boolean = true> {
         attendBody?: T;
         registerLabel?: T;
         contactLabel?: T;
+        hostEventLinkLabel?: T;
       };
   verify?:
     | T
@@ -16291,6 +16419,7 @@ export interface EventsSettingsSelect<T extends boolean = true> {
         attendBody?: T;
         registerLabel?: T;
         contactLabel?: T;
+        hostEventLinkLabel?: T;
       };
   labels?:
     | T
@@ -16304,6 +16433,10 @@ export interface EventsSettingsSelect<T extends boolean = true> {
         cpdEligibleLabel?: T;
         concludedFallback?: T;
         backToEventsLabel?: T;
+        contactUrl?: T;
+        recapTocLabel?: T;
+        galleryHeading?: T;
+        attachmentsHeading?: T;
       };
   updatedAt?: T;
   createdAt?: T;

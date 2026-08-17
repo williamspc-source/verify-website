@@ -360,3 +360,33 @@ tidied out of both the contents list and the link — `Preparing the [[Claimant]
 
 If two headings in one article are worded identically, the second gets `-2` on the end so both stay
 reachable.
+
+### An event page's recap is the page — here is everything you can put on one
+
+Open **Events → the event → Details**. Everything below is optional; each surface simply does not
+appear until you put something in it.
+
+| Field | What it does on the page |
+|---|---|
+| **Recap (past events)** | The main write-up, shown once the event date has passed. Formats exactly like an article body — Heading 2, Heading 3, bold, lists, links. |
+| **Show "In this recap" contents list** | On by default. Lists the recap's Heading 2s above it, each one a link. Only appears once the recap has **two or more** of them, so a short recap is not given a one-item contents box. |
+| **Photo gallery** | Photos from the day, in a grid under the recap. Each can carry a caption. |
+| **Downloads / attachments** | Slides, handouts, a recording — one download button each. The **Label** is what the visitor reads; leave it empty and they get the filename. |
+| **Image** | Turns the plain hero into a full-width photo hero, the same treatment an article gets. Leave it empty and the hero stays as it is. |
+| **Host event page URL** | The event's own page on aamle.com.au. Adds a "View this event on AAMLE" button to the row at the bottom. This is *not* the Registration URL, which usually points at the general seminar menu. |
+
+Recap headings get their own shareable links, exactly as article headings do — see the section
+above, including the warning about rewording one you have already circulated.
+
+**Cost and CPD** no longer appear on the event page itself; they read on the event *cards* in
+listings instead. The wording of all three ("Free", "CPD eligible", the points template) lives in
+**Events Settings → Event page labels**.
+
+**Two buttons that people ask about:**
+
+- The **"Contact Us"** button that replaces "Register" once registrations close goes to
+  **Events Settings → Event page labels → Contact page URL** (`/contact` by default). It used to
+  reuse the event's registration link, which sent people to a booking page they could no longer use.
+- The **AAMLE / VERIFY intro paragraph and the tinted callout** under it are shared by every event
+  with that host and live in **Events Settings → AAMLE events / VERIFY events**. Both are rich text,
+  so you can bold a name or link out.

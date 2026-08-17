@@ -425,6 +425,18 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   the only reason it was noticed — while two real pages went unmeasured. It now refuses any non-200.
   Whenever a checker takes a list of inputs, assert the inputs resolve; a tool that quietly measures
   the wrong thing reads exactly like a tool that found nothing wrong.
+- **`.prose` has two owners, and each one hides a different half of the bug.** The reference uses a
+  plain `.prose` class, ported at `globals.css:4192–4208`; `@tailwindcss/typography` is also enabled
+  (`globals.css:25`) and owns the same name. Measured on the event detail page: the body computed
+  `max-width: 594.648px` (65ch) and `font-size: 16px` against the reference's **1132px / 18px** — our
+  port declares neither property, so the plugin's won unopposed. The legal pages had the same 16px.
+  The trap is the obvious fix: our port declares no `font-weight` either, so **every heading and every
+  `<strong>` on those pages was getting its weight from the plugin**, and simply dropping the class
+  takes the bold with it (`@layer base` resets `h1…h6` to `font-weight: unset` → 400). The event page
+  now uses its own `.event-body` scope with weights declared explicitly, as `.art-body` does. Two more
+  headings were found at 400 the same way — `.event-presenters__heading` and
+  `.art-attachments__heading`, the latter live on the article page too. **When a class name is shared
+  with a plugin, read the computed value; the source file cannot tell you who won.**
 
 ### CSS token tooling
 

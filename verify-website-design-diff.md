@@ -1263,6 +1263,65 @@ and `/contact` at 69.6px against our shared 60.8px. Not touched in this pass.
 
 ---
 
+## Comparison 25: The event detail page, rebuilt past the reference (2026-08-17)
+
+**This is a deliberate, client-approved deviation.** The reference's event page is a stub — two
+paragraphs, a 260px `.map-tile`, one AAMLE button — and a recap has nothing to be a recap *of*. It is
+built past that, the way the article page was. The `events` family in `referenceCssDiff.mjs` covers
+the three listing pages only; the detail page's styles come from `styles.css` and fall outside its
+`match` regex, so nothing here is gated by that tool.
+
+### What was measured wrong, and why the tools said nothing
+
+| | Build | Reference |
+|---|---|---|
+| Body column | **595px / 16px** | 1132px / 18px |
+| `<strong>` in the intro | *absent — nothing was rich text* | bold |
+| "Contact Us" href | `aamle.com.au/2026-seminar-menu/` | — |
+| `.event-presenters__heading` | weight **400** | — |
+| `.art-attachments__heading` (article page too) | weight **400** | — |
+
+The width and size are one fault with one cause: **`@tailwindcss/typography` owns `.prose` as well**,
+and our hand-ported reference rules declare neither `max-width` nor `font-size`, so the plugin's 65ch
+and 1rem won unopposed. The same collision was costing the legal pages 2px of body text. And the
+obvious fix — drop the class — would have been worse than the bug, because our port declares no
+`font-weight` either: every heading and every `<strong>` on the page was getting its weight from the
+plugin. See the new entry in `CLAUDE.md`'s trap table.
+
+The bold was impossible rather than missing. Events Settings' `blurb` and `callout` were `textarea`
+and `text`; the reference bolds inside both. They are rich text now (a `varchar → jsonb` conversion
+applied by hand in `psql`, per the destructive-schema trap), and the seed writes the reference's
+wording through `plainTextToLexical`, whose `**…**` parser already existed for the AAMLE panel.
+
+### What the page is now
+
+Hero (full-bleed photo when the event has an image, today's flat hero when not) → intro and host
+callout → presenters → **recap, as the main body**, with anchored headings and an inline contents
+list → photo gallery and downloads → one action row.
+
+The row is the answer to three stacked elements that each did too little: the CTA paragraph, the
+260px tile containing one word of location text already printed in the hero, and the back link.
+It is now *Contact Us / Register* · *View this event on AAMLE* (only when a Host event page URL is
+set) · *Back to all events*.
+
+The cost/CPD pills are gone from every event page, matching the reference, which shows them nowhere.
+`cpdPoints` and three Events Settings labels would have been orphaned by that, so `eventFormatLine`
+in `ArchiveBlock` — the event cards' "Webinar · CPD eligible · Free" line — now reads all four
+instead of hardcoding two strings and ignoring the point count.
+
+### Two measurements that lied on the way through
+
+- **A deep link read as broken at `waitUntil: 'load'`** — heading at y=1006 instead of y=96. Images
+  were still settling and the browser had not finished re-scrolling. At `networkidle` it lands at
+  **96**, identical to the article page used as a control.
+- **A break that proved nothing.** Two new fields were broken at once to test the orphan-field guard.
+  `galleryHeading` went red; `hostEventUrl` did **not**, because `href={hostEventUrl}` is textually
+  identical to the `{ field }` destructuring shape the matcher accepts. Recorded in
+  `adminControls.int.spec.ts` rather than papered over — the guard is weakest exactly where a field's
+  value is copied into an identically-named local.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the
