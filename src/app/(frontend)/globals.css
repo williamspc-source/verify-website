@@ -9703,6 +9703,7 @@
   text-align: left;
   margin-inline: 0 !important;
   max-width: none !important;
+  margin-bottom: 48px;
 }
 
 /* ── /services: Administrative header split row — eyebrow+heading bottom-left,
@@ -9724,6 +9725,7 @@
   text-align: left;
   margin-inline: 0 !important;
   max-width: none !important;
+  margin-bottom: 48px;
 }
 /* Our SectionHeader is flat — eyebrow, title and subtitle are siblings — while
    the reference wraps eyebrow+title in a div. Giving the eyebrow a full row
@@ -9733,7 +9735,7 @@
 .svc-admin-split .vf-section-header__title { margin-bottom: 0; }
 .svc-admin-split .vf-section-header__subtitle {
   max-width: 480px;
-  margin: 0 !important;
+  margin: 0;
   text-align: left;
 }
 /* Dark blue band → light header text (reference `.admin-section` colours:
@@ -9778,8 +9780,9 @@
 .svc-learn-rows .vf-split__title {
   font-size: clamp(1.3rem, 2.2vw, 1.75rem);
   letter-spacing: -0.02em;
+  margin-bottom: 14px;
 }
-.svc-learn-rows .vf-split__body p { font-size: 0.95rem; line-height: 1.8; }
+.svc-learn-rows .vf-split__body p { font-size: 0.95rem; line-height: 1.8; margin-bottom: 22px; }
 .svc-learn-rows .vf-split__cta .btn {
   font-size: 0.85rem;
   transition: gap var(--transition), color var(--transition);
@@ -9810,14 +9813,15 @@
   background: linear-gradient(135deg, var(--bg-light-1), var(--accent-light));
   border-radius: var(--vf-radius-card);
   flex-shrink: 0;
+  margin-bottom: 20px;
 }
 .svc-reporting .service-icon svg { width: 24px; height: 24px; }
-.svc-reporting .service-title { font-size: 0.97rem; line-height: 1.3; }
+.svc-reporting .service-title { font-size: 0.97rem; line-height: 1.3; margin-bottom: 10px; }
 /* `flex: 1` is what makes the Enquire link land at the same height on every card
    in a row: the body absorbs the difference in copy length instead of pushing
    the link down. `margin-top: auto` below is the reference's second, redundant
    belt on the same braces — both are ported. */
-.svc-reporting .service-desc { font-size: 0.85rem; line-height: 1.72; flex: 1; }
+.svc-reporting .service-desc { font-size: 0.85rem; line-height: 1.72; flex: 1; margin-bottom: 22px; }
 .svc-reporting .service-enquire {
   display: inline-flex;
   align-items: center;
@@ -9854,10 +9858,11 @@
   height: 44px;
   background: color-mix(in srgb, var(--primary) 12%, transparent);
   border-radius: 11px;
+  margin-bottom: 18px;
 }
 .svc-admin-split .service-icon svg { width: 22px; height: 22px; }
-.svc-admin-split .service-title { font-size: 0.93rem; line-height: 1.3; }
-.svc-admin-split .service-desc { font-size: 0.83rem; line-height: 1.72; flex: 1; }
+.svc-admin-split .service-title { font-size: 0.93rem; line-height: 1.3; margin-bottom: 10px; }
+.svc-admin-split .service-desc { font-size: 0.83rem; line-height: 1.72; flex: 1; margin-bottom: 18px; }
 .svc-admin-split .service-enquire {
   display: inline-flex;
   align-items: center;

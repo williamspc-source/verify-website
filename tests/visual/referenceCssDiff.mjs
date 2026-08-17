@@ -277,6 +277,45 @@ function rootTokens(css) {
   return tokens
 }
 
+/**
+ * Split a CSS value on TOP-LEVEL whitespace, so `var(--a) 0` gives two parts and
+ * `color-mix(in srgb, x 5%, y)` stays one.
+ */
+function topLevelParts(value) {
+  const parts = []
+  let depth = 0
+  let cur = ''
+  for (const ch of value) {
+    if (ch === '(') depth++
+    else if (ch === ')') depth--
+    if (/\s/.test(ch) && depth === 0) {
+      if (cur) parts.push(cur)
+      cur = ''
+    } else cur += ch
+  }
+  if (cur) parts.push(cur)
+  return parts
+}
+
+/**
+ * Expand `margin` / `padding` shorthands into their longhands.
+ *
+ * Without this the tool compares property NAMES literally, so the reference's
+ * `margin-bottom: 24px` read as MISSING against our `.vf-breadcrumb`'s
+ * `margin: 0 0 24px` — the same 24px, differently spelled. That false positive
+ * is worse than useless on a spacing diff, because the real ones look identical
+ * to it. The shorthand key is kept as well, so shorthand-vs-shorthand still
+ * compares; longhands declared after a shorthand overwrite it, as the cascade
+ * does, because the caller assigns in source order.
+ */
+const BOX_SIDES = ['top', 'right', 'bottom', 'left']
+function expandBox(prop, value) {
+  const v = topLevelParts(value)
+  if (!v.length || v.length > 4) return null
+  const [t, r = t, b = t, l = r] = v
+  return Object.fromEntries(BOX_SIDES.map((side, i) => [`${prop}-${side}`, [t, r, b, l][i]]))
+}
+
 /** Flatten a stylesheet into {selector, decls, media} rows. */
 function parse(css, media = '') {
   css = css.replace(/\/\*[\s\S]*?\*\//g, '')
@@ -311,7 +350,9 @@ function parse(css, media = '') {
         if (c < 0) continue
         const prop = part.slice(0, c).trim()
         const val = part.slice(c + 1).trim().replace(/\s+/g, ' ')
-        if (prop && val && !prop.startsWith('--')) decls[prop] = val
+        if (!prop || !val || prop.startsWith('--')) continue
+        if (prop === 'margin' || prop === 'padding') Object.assign(decls, expandBox(prop, val) || {})
+        decls[prop] = val
       }
       for (const sel of prelude.split(',')) {
         const s = sel.trim().replace(/\s+/g, ' ')
@@ -430,17 +471,27 @@ for (const [sel, refDecls] of ref) {
   const explained = (EXPLAINED[name] || {})[sel] || {}
   const lines = []
   for (const [prop, val] of Object.entries(refDecls)) {
-    if (prop in explained) {
+    // An entry keyed on `padding` also excuses `padding-top` etc., since the
+    // longhands here are ones expandBox() derived from that same shorthand.
+    const excuse =
+      explained[prop] ?? explained[prop.replace(/-(top|right|bottom|left)$/, '')]
+    if (excuse) {
       explainedCount++
-      explainedLines.push(`   ${sel} · ${prop} — ${explained[prop]}`)
+      explainedLines.push(`   ${sel} · ${prop} — ${excuse}`)
       continue
     }
-    // Layout/positioning props are meaningless across a selector rename.
-    // Set elsewhere in our cascade (a theme modifier, or a `margin` shorthand)
-    // and verified equal in the browser. Comparing them across a rename reports
-    // a difference that getComputedStyle says is not there.
-    if (aliased && ['position', 'z-index', 'overflow', 'margin', 'margin-bottom', 'color'].includes(prop))
-      continue
+    // Layout/positioning props that a selector rename genuinely makes
+    // meaningless, and which our cascade sets on a theme modifier instead.
+    //
+    // `margin` and `margin-bottom` USED TO BE IN THIS LIST, on the stated
+    // grounds that they were "verified equal in the browser". They were not:
+    // the reference gives `.admin-header` and `.reporting-header` a
+    // `margin-bottom: 48px`, and ours measured 0px and 16px — the cards sat
+    // flush against the intro text. The skip hid a visible gap on a page this
+    // tool had just reported as zero. Spacing is exactly what a reader expects a
+    // declaration diff to catch, so it is compared now; anything that really is
+    // set elsewhere goes in EXPLAINED, with the reason.
+    if (aliased && ['position', 'z-index', 'overflow', 'color'].includes(prop)) continue
     if (!(prop in buildDecls)) {
       lines.push(`   missing   ${prop}: ${val}`)
     } else if (normalise(buildDecls[prop], buildTokens) !== normalise(val, refTokens)) {

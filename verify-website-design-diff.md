@@ -1387,6 +1387,28 @@ in the reference and had been ported at the shared `.section-title` scale of `cl
 one at 28px. And the image-placeholder label is 0.72rem uppercase with 0.1em tracking, against our
 0.85rem mixed case.
 
+### Then the cards turned out to be sitting flush against the text
+
+Reported after the above landed: "we need just a little extra space below the text and above the
+cards". Measured, the gap was **0px** in the Administrative band and **16px** in the reporting one,
+against **48px** for both in the reference.
+
+**The diff had just reported this page as zero.** Its comparison loop excluded `margin` and
+`margin-bottom` for any selector checked under a rename, on the stated grounds that they were
+"verified equal in the browser" — the exact `NOT_PORTED`-shaped failure the tool exists to prevent,
+inside the tool itself. Removing those two from the skip surfaced **11** spacing differences here and
+one on `events`, none ever compared: both section headers' 48px, the split row's 14px/22px rhythm, and
+every card's icon/heading/body margin (20/10/22 for reporting, 18/10/18 for admin).
+
+The `events` one was a real false positive — the reference declares `margin-bottom: 24px` where
+`.vf-breadcrumb` declares `margin: 0 0 24px`. Fixed by expanding `margin`/`padding` shorthands into
+longhands during parsing, rather than by adding an exception; an exception would have left the same
+blind spot for every future family. An excused shorthand now also excuses its sides.
+
+One more instance of the stale-build trap on the way through, the fifth: with the rules in the file
+and the diff at zero, the browser still measured 0px. `rm -rf .next` and a restart, source unchanged,
+and both bands read exactly 48px.
+
 ### The tool was blind to every layered rule
 
 `referenceCssDiff.mjs` treated `@layer` exactly like `@media` — collecting its rules into the

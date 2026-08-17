@@ -425,6 +425,18 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   the only reason it was noticed — while two real pages went unmeasured. It now refuses any non-200.
   Whenever a checker takes a list of inputs, assert the inputs resolve; a tool that quietly measures
   the wrong thing reads exactly like a tool that found nothing wrong.
+- **A comparison tool's skip list is load-bearing, and "verified equal in the browser" expires.**
+  `referenceCssDiff.mjs` excluded `margin` and `margin-bottom` from comparison for any selector
+  checked under a rename, with a comment saying they were set elsewhere in our cascade and confirmed
+  equal. They were not: the reference gives `.admin-header` and `.reporting-header`
+  `margin-bottom: 48px`, ours measured **0px and 16px**, and the cards sat flush against the intro
+  text on a page the tool had just reported as **zero**. Removing those two from the skip surfaced 11
+  real spacing differences on `/services` and one on `events`. The events one was a genuine false
+  positive — `margin: 0 0 24px` against `margin-bottom: 24px` — which is now fixed properly, by
+  expanding box shorthands into longhands rather than by adding an exception. Two rules follow:
+  spacing is precisely what a reader expects a declaration diff to catch, so it must never be
+  skipped; and a skip whose justification is a past measurement needs that measurement re-run, not
+  re-read.
 - **A tool that treats `@layer` like `@media` is blind to whatever is inside it.** `referenceCssDiff.mjs`
   collected `@layer` rules into the media bucket, which it never compares — so every rule in
   `@layer components` (`.vf-section`, `.vf-split__icon`, …) was reported as **absent from the build**
