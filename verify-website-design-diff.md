@@ -1444,6 +1444,69 @@ count could never reach zero, and a count that never reaches zero is one nobody 
 
 ---
 
+## Comparison 27: /ime — banding the assessment-format cards (2026-08-17)
+
+Six changes to "Four Ways to Attend Your IME", a **FeatureGrid** block. Two findings changed what the
+work actually was.
+
+**The icons already matched — all sixteen.** The four card icons (`user`, `video-camera`,
+`users-three`, `house`) and every one of the twelve "What's Included" icons are the same Phosphor
+names the reference uses. Nothing in the seed or the database needed touching. What differed was
+presentation: the reference sets each item icon in a 30×30 tinted tile and each card icon in a white
+chip on a tinted band, while ours were bare glyphs on a flat card.
+
+**The Videolink card's blue border and solid blue icon were the hover state**, not a featured
+variant. There is no such variant in this repo — no field, no column, no CSS rule; `.service-card:hover`
+sets `border-color: var(--primary)` and inverts the icon tile. The pointer was over that card in the
+screenshot. Which turned out to be the sixth item anyway: that hover was reported as "a bit much".
+
+### What changed
+
+| | Reference | Was |
+|---|---|---|
+| Card top | `.ime-format-card-top`, `linear-gradient(145deg,#f0f8ff,#e6f4ff)`, padding 28/28/22 | no wrapper element at all |
+| Card icon | 52px, solid white, radius 14, soft shadow | 48px, flat `--bg-light-1`, radius 10 |
+| Item icons | 30×30 tile, `--bg-light-1`, radius 8 | bare 20px svg |
+| The line under each description | none | `border-top: 1px solid var(--border-light)` |
+| Hover | `translateY(-4px)`, `0 12px 36px rgba(28,117,188,.13)`, border `.22` | `translate(-4px,-4px)`, `--vf-shadow-hard`, border full primary, plus a 3px bar wiping across the top |
+| Item alignment | `flex-start` | `flex-start` → **now centred, by request** |
+
+Measured after: the header band is **140px** on both sides, the icon chip 52px white on both, the item
+tiles 30×30 `rgb(203,229,250)` on both, and each item icon's midpoint sits within **0px** of its text
+block's midpoint.
+
+### The band needed markup, so it became a capability
+
+`.service-card` had icon, title, description and details as flat siblings — nothing to paint. Rather
+than hardcode a wrapper, `FeatureGrid` gained a third **Card style: "Banded"**, which renders
+`.vf-card__head` and `.vf-card__body`. Opt-in for two reasons: the block renders on seven pages, and
+`computedSnapshot.mjs` keys nodes by structural index path, so an unconditional wrapper would have
+invalidated every one of those baselines in the same pass that needed them as a regression check.
+Confirmed afterwards — only `/ime` moved (270 nodes), plus the usual sub-pixel `matrix()` on
+`/in-the-loop`.
+
+Worth recording: **no other page uses the `details` markup at all**, so the removed divider and the new
+icon wrapper reach nothing else. The verification step written to check "the border is still there on
+the other FeatureGrid pages" had no subject.
+
+### A responsive bug the section was hiding
+
+`FeatureGrid/Component.tsx` set an inline `grid-template-columns` **longhand**, which outranks every
+stylesheet — including the responsive `.services-grid` overrides the comment at `globals.css:2189`
+exists to protect. Every other grid block sets `--vf-cols` instead. So this grid was pinned 2-across
+down to 480px. Fixed; and since `.services-grid` has a 2-column rule at ≤1024px and nothing below it,
+`.ime-formats` also gained the reference's own 820px collapse to one column.
+
+### Five deliberate departures, all in `EXPLAINED`
+
+The card keeps its white→`#f7fbff` body gradient (reference: flat white) — asked for. The item icons
+are centred against the whole item (reference: top-aligned with a 1px optical nudge, which is
+meaningless once centred) — asked for. Section padding stays the editable `--space-normal` preset, the
+column count stays the editor's `--vf-cols`, and `stroke` is not set on filled Phosphor icons.
+`ime: 0`, and `events` / `services` still zero.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

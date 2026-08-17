@@ -34,7 +34,12 @@ export const FeatureGrid: Block = {
       options: [
         { label: 'Card (bordered)', value: 'card' },
         { label: 'Plain (no border)', value: 'plain' },
+        { label: 'Banded (tinted header)', value: 'banded' },
       ],
+      admin: {
+        description:
+          '“Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it.',
+      },
     },
     {
       name: 'items',

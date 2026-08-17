@@ -399,3 +399,23 @@ above a Downloads list, tells the visitor to email you for the file they are loo
 - The **AAMLE / VERIFY intro paragraph and the tinted callout** under it are shared by every event
   with that host and live in **Events Settings → AAMLE events / VERIFY events**. Both are rich text,
   so you can bold a name or link out.
+
+### Feature cards can have a tinted header band
+
+**Pages → the page → the Feature Grid block → Card style.** Three choices:
+
+| Card style | What it looks like |
+|---|---|
+| **Card (bordered)** | The default — a bordered box with a subtle gradient, everything stacked inside it. |
+| **Plain (no border)** | No border, no background. For a list of points that should not look like cards. |
+| **Banded (tinted header)** | The icon and title sit on a pale blue panel across the top of the card; the description and any "What's Included" details sit below it on the card's own background. |
+
+"Banded" is what `/services/medico-legal/ime` uses for its four assessment formats. Nothing else needs
+setting — pick it and the block rearranges itself.
+
+Two things worth knowing about that block generally:
+
+- The **"What's Included"** list under a card comes from the *Details* rows on each feature. Each row
+  takes an icon, a bold heading and a description; leave the list empty and nothing renders.
+- The **Columns** field is respected on phones now. It used to be written in a way that overrode every
+  screen-size rule, so a two-column grid stayed two-across on a phone no matter what.

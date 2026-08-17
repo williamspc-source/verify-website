@@ -85,6 +85,13 @@ const FAMILIES = {
     pages: ['.design-reference/services/services.html'],
     match: /^\.(svc-feature|reporting-|admin-|admin-link)/,
   },
+  // /services/medico-legal/ime → "Four Ways to Attend Your IME". Inline-only
+  // again: `grep ime-format` over styles.css returns zero.
+  ime: {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/services/medico-legal/ime.html'],
+    match: /^\.ime-format/,
+  },
 }
 
 /**
@@ -123,6 +130,20 @@ const NOT_PORTED = {
     '.admin-card-icon i': 'ditto',
     '.svc-feature-img svg':
       'Our image placeholder renders a label only; the reference also draws a picture glyph inside it. Cosmetic, and the placeholder is replaced the moment an editor uploads an image.',
+  },
+  ime: {
+    // Dead in the reference itself: declared at ime.html:470-512 and used by no
+    // markup on the page. Leftovers from an earlier card design — a pill badge
+    // and a chip row instead of the "What's Included" list.
+    '.ime-format-badge': 'Dead CSS in the reference — declared, never used by any markup on the page.',
+    '.ime-format-highlights': 'ditto',
+    '.ime-format-highlights-label': 'ditto',
+    '.ime-format-highlights-row': 'ditto',
+    '.ime-format-highlight': 'ditto',
+    // Same reason the other two families give.
+    '.ime-format-card-icon i':
+      'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. The `svg` rule carries the sizing.',
+    '.ime-format-included-item-icon i': 'ditto',
   },
 }
 
@@ -206,6 +227,32 @@ const IMPLEMENTED_AS = {
     '.admin-link': ['.service-enquire', '.svc-admin-split .service-enquire'],
     '.admin-link:hover': ['.service-enquire:hover', '.svc-admin-split .service-enquire:hover'],
   },
+  ime: {
+    '.ime-formats': ['.vf-section', '.vf-section--white'],
+    '.ime-formats-header': ['.vf-section-header', '.ime-formats .vf-section-header'],
+    '.ime-formats-header h2': ['.section-title', '.ime-formats .vf-section-header__title'],
+    '.ime-formats-header h2 span': ['.section-title span', '.vf-accent'],
+    '.ime-formats-header p': ['.section-subtitle', '.ime-formats .vf-section-header__subtitle'],
+    '.ime-formats-grid': ['.services-grid', '.ime-formats .services-grid'],
+    '.ime-format-card': ['.service-card', '.vf-card--banded'],
+    '.ime-format-card:hover': ['.service-card:hover', '.ime-formats .service-card:hover'],
+    '.ime-format-card-top': '.vf-card--banded .vf-card__head',
+    '.ime-format-card-icon': ['.service-icon', '.vf-card--banded .service-icon'],
+    '.ime-format-card-icon svg': ['.service-icon svg', '.vf-card--banded .service-icon svg'],
+    '.ime-format-card-top h3': ['.service-title', '.ime-formats .vf-card__title'],
+    '.ime-format-card-top h3 .card-name': '.ime-formats .vf-card__title',
+    '.ime-format-card-top h3 .card-type': '.ime-formats .vf-card__title-suffix',
+    '.ime-format-card-body': '.vf-card--banded .vf-card__body',
+    '.ime-format-card-desc': ['.service-desc', '.ime-formats .service-desc'],
+    '.ime-format-included-label': ['.vf-feature-details__label', '.ime-formats .vf-feature-details__label'],
+    '.ime-format-included-list': ['.vf-feature-details', '.ime-formats .vf-feature-details'],
+    '.ime-format-included-item': ['.vf-feature-detail', '.ime-formats .vf-feature-detail'],
+    '.ime-format-included-item-icon': ['.vf-feature-detail__icon', '.ime-formats .vf-feature-detail__icon'],
+    '.ime-format-included-item-icon svg': ['.vf-feature-detail svg', '.ime-formats .vf-feature-detail__icon svg'],
+    '.ime-format-included-text strong': ['.vf-feature-detail strong', '.ime-formats .vf-feature-detail strong'],
+    // The detail <p> has no rule of its own on either side; both inherit body type.
+    '.ime-format-included-text span': null,
+  },
 }
 
 /**
@@ -244,6 +291,18 @@ const EXPLAINED = {
     '.reporting-card-icon svg': { stroke: 'The reference draws stroked inline SVGs. Phosphor duotone icons are FILLED and take `currentColor`, which `.service-icon` already sets to `--primary`; a stroke would add a second outline.' },
     '.admin-card-icon svg': { stroke: 'ditto.' },
     '.admin-link': { transition: 'Ours also transitions `color`, because `.service-enquire` has a hover colour the reference\'s `.admin-link` does not. A superset, not a mismatch.' },
+  },
+  ime: {
+    '.ime-formats': { padding: 'Section padding is the editor-controlled `--space-normal` preset (56–88px), not a literal 80px.' },
+    '.ime-formats-grid': { 'grid-template-columns': 'Column count is the FeatureGrid block\'s `columns` field, emitted as `--vf-cols`. Set to 2 on this page, so the rendered grid matches.' },
+    // Asked for explicitly: "the body has a subtle gradient from the bottom up",
+    // and it should stay. The reference's card body is flat white.
+    '.ime-format-card': { background: 'DEPARTURE, by request: our card keeps its white→#f7fbff body gradient. The reference is flat #fff.' },
+    // Asked for explicitly: centre each icon against its whole item.
+    '.ime-format-included-item': { 'align-items': 'DEPARTURE, by request: the detail icon is centred against the whole item (heading + description). The reference top-aligns it.' },
+    '.ime-format-included-item-icon': { 'margin-top': 'The reference nudges the tile down 1px to sit optically against the first line of a TOP-ALIGNED item. Meaningless once the icon is centred — see the entry above.' },
+    '.ime-format-card-icon svg': { stroke: 'The reference draws stroked inline SVGs. Phosphor duotone icons are FILLED and take `currentColor`, which the tile already sets to `--primary`.' },
+    '.ime-format-included-item-icon svg': { stroke: 'ditto.' },
   },
 }
 

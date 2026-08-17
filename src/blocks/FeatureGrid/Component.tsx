@@ -27,6 +27,18 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
   if (!items || items.length === 0) return null
   const cols = Number(columns) || 3
 
+  // The banded style needs somewhere to paint: icon + title on a tinted panel,
+  // everything else below it. Every other style keeps the flat sibling markup it
+  // has always had, so the six other pages using this block are byte-identical —
+  // which also keeps computedSnapshot's structural index paths valid for them.
+  const banded = cardStyle === 'banded'
+  const Head = banded
+    ? ({ children }: { children: React.ReactNode }) => <div className="vf-card__head">{children}</div>
+    : React.Fragment
+  const Body = banded
+    ? ({ children }: { children: React.ReactNode }) => <div className="vf-card__body">{children}</div>
+    : React.Fragment
+
   return (
     <Section
       background={background as SectionBackground}
@@ -45,10 +57,12 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
         titleClassName={toClassName(elementClasses?.heading)}
       />
 
-      <div
-        className="services-grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-      >
+      {/* `--vf-cols`, not an inline `grid-template-columns`. An inline longhand
+          outranks every stylesheet including the responsive `.services-grid`
+          overrides, so this grid stayed hard 2-across down to 480px. Every other
+          grid block sets the custom property; the comment at globals.css:2189
+          exists because of exactly this. */}
+      <div className="services-grid" style={{ '--vf-cols': cols } as React.CSSProperties}>
         {items.map((item, i) => (
           <div
             key={i}
@@ -57,20 +71,24 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
               // 'Plain (no border)' was stored and ignored — the bordered card
               // rendered either way.
               cardStyle === 'plain' && 'vf-card--plain',
+              banded && 'vf-card--banded',
               toClassName(elementClasses?.card),
             )}
           >
-            {item.icon ? (
-              <div className="service-icon vf-card__icon">
-                <Icon name={item.icon} />
-              </div>
-            ) : null}
-            <h3 className="service-title vf-card__title">
-              {item.title}
-              {item.titleSuffix ? (
-                <span className="vf-card__title-suffix"> {item.titleSuffix}</span>
+            <Head>
+              {item.icon ? (
+                <div className="service-icon vf-card__icon">
+                  <Icon name={item.icon} />
+                </div>
               ) : null}
-            </h3>
+              <h3 className="service-title vf-card__title">
+                {item.title}
+                {item.titleSuffix ? (
+                  <span className="vf-card__title-suffix"> {item.titleSuffix}</span>
+                ) : null}
+              </h3>
+            </Head>
+            <Body>
             {item.description ? <p className="service-desc">{item.description}</p> : null}
             {Array.isArray(item.bullets) && item.bullets.length > 0 ? (
               <ul className="vf-feature-bullets">
@@ -87,7 +105,11 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
                 {Array.isArray(item.details)
                   ? item.details.map((d, j) => (
                       <div key={j} className="vf-feature-detail">
-                        {d.icon ? <Icon name={d.icon} className="size-5" /> : null}
+                        {d.icon ? (
+                          <span className="vf-feature-detail__icon">
+                            <Icon name={d.icon} className="size-5" />
+                          </span>
+                        ) : null}
                         <div>
                           <strong>{d.title}</strong>
                           {d.description ? <p>{d.description}</p> : null}
@@ -97,6 +119,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
                   : null}
               </div>
             ) : null}
+            </Body>
           </div>
         ))}
       </div>

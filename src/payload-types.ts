@@ -3689,7 +3689,10 @@ export interface FeatureGridBlock {
    */
   background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   columns?: ('1' | '2' | '3' | '4') | null;
-  cardStyle?: ('card' | 'plain') | null;
+  /**
+   * “Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it.
+   */
+  cardStyle?: ('card' | 'plain' | 'banded') | null;
   items?:
     | {
         /**

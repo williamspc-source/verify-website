@@ -115,6 +115,10 @@ page-scoped rules, and the Enquire links aligned in both grids. `referenceCssDif
 `services` family reading zero, and gained two fixes of its own — it had been treating `@layer` like
 `@media`, so every rule in `@layer components` read as missing.
 
+`/services/medico-legal/ime` followed (Comparison 27): the assessment-format cards now use a new
+**Banded** card style on FeatureGrid — a tinted header panel behind the icon and title — with the
+reference's icon chips, item tiles and hover. `referenceCssDiff.mjs` has an `ime` family reading zero.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items

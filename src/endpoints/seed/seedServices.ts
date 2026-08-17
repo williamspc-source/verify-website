@@ -482,6 +482,9 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           'VERIFY offers flexible assessment formats to accommodate varying clinical needs, geographic constraints, and personal circumstances — while always maintaining the integrity of the examination.',
         background: 'white',
         columns: '2',
+        // Reference `.ime-format-card`: icon + title on a tinted panel across the
+        // top, description and "What's Included" below it.
+        cardStyle: 'banded',
         cssClass: ['ime-formats'],
         items: [
           {
@@ -1213,6 +1216,50 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
     ],
   )
 }
+
+/**
+ * Puts the /ime "Four Ways to Attend" grid onto the banded card style.
+ *
+ * Unconditional, because `authorPage` early-returns on an authored page — the
+ * fixture change alone reaches no existing install. Only rewrites the Payload
+ * default (`card`); anything else is an editor's choice and is left alone.
+ */
+export const repairImeFormatsCardStyle = async ({ payload, req }: Ctx): Promise<void> => {
+  const res = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'ime' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const page = res.docs[0] as
+    | { id: number | string; layout?: { blockType?: string; cssClass?: unknown; cardStyle?: string | null }[] }
+    | undefined
+  const layout = page?.layout
+  if (!page || !Array.isArray(layout)) return
+
+  let changed = false
+  const next = layout.map((block) => {
+    const classes = Array.isArray(block?.cssClass) ? block.cssClass : []
+    if (block?.blockType !== 'featureGrid' || !classes.includes('ime-formats')) return block
+    if (block.cardStyle !== SUPERSEDED_IME_CARD_STYLE) return block
+    changed = true
+    return { ...block, cardStyle: 'banded' }
+  })
+  if (!changed) return
+
+  await payload.update({
+    collection: 'pages',
+    id: page.id,
+    data: { layout: next } as never,
+    req,
+    context: { disableRevalidate: true },
+  })
+  payload.logger.info('— Repaired /ime: assessment-format cards set to the banded style')
+}
+
+// The Payload default the seed used to leave in place.
+const SUPERSEDED_IME_CARD_STYLE = 'card'
 
 /**
  * Clears the icon above "Independent Medical Examinations" on /services.

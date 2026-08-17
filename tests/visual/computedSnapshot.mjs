@@ -94,6 +94,8 @@ const ROUTES = [
   '/contact',
   '/search',
   '/privacy-policy',
+  // Restyled in the banded-card pass, and the harness covers 14 of 29 pages.
+  '/services/medico-legal/ime',
   '/information-centre/for-clients',
   '/information-centre/for-claimants',
   '/make-a-booking',
