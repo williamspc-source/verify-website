@@ -16,12 +16,19 @@ type Ctx = { payload: Payload; req: PayloadRequest }
  * to prevent. So each one writes only into an *absence*:
  *
  *   · the carousel is inserted only when the page has no `slideCarousel` at all;
- *     an existing one is never inspected, reordered or rewritten;
- *   · the explorer instance is reused as-is, so edited search settings, page size
- *     and labels survive — only its position in the array changes;
- *   · the hero heading changes only while it still holds the exact superseded
- *     string;
- *   · a post's category is set only when it has none.
+ *     an existing one is never replaced;
+ *   · the explorer instance is reused, so edited labels and settings survive;
+ *     empty section-header fields are filled, populated ones are not;
+ *   · a post's category is set only when it has none;
+ *   · the page class is appended to whatever is already stored.
+ *
+ * The one apparent exception proves the rule. Some slide text and a few hero
+ * strings are corrected **in place**, but only on an exact match against a
+ * string this seed itself wrote and got wrong — see SUPERSEDED_SLIDE_TEXT. The
+ * first carousel here was seeded from a paraphrase, so installs that already had
+ * it were holding bad copy that "write only into an absence" could never reach.
+ * Matching the exact superseded string is what keeps that safe: reword a slide by
+ * one character and the repair no longer recognises it, and leaves it alone.
  *
  * Re-running the seed after any hand-edit must therefore be a no-op. That is the
  * acceptance test, not an aspiration.
@@ -29,15 +36,42 @@ type Ctx = { payload: Payload; req: PayloadRequest }
 
 // ── /events hub ─────────────────────────────────────────────────────────────
 
-/** The heading the events hub was seeded with before it became the reference's
- *  hub page. Matched exactly: anything else is an editor's wording. */
-const SUPERSEDED_EVENTS_HEADING = 'Medico-Legal [[Education Events]]'
+/** Headings the events hub has carried before now. Matched exactly: anything
+ *  else is an editor's wording and is left alone. */
+const SUPERSEDED_EVENTS_HEADINGS = [
+  'Medico-Legal [[Education Events]]',
+  // Briefly seeded before the hero was aligned to the reference.
+  'Medico-Legal Education for [[Better Practice]]',
+]
 const EVENTS_HEADING = 'Medico-Legal Education for [[Better Practice]]'
 
+/** Likewise for the hub subtitle, which the reference words differently. */
+const SUPERSEDED_EVENTS_SUBTITLES = [
+  'Practical education, industry briefings, and specialist-led seminars from VERIFY and AAMLE — browse what is coming up or revisit recent programs.',
+]
+const EVENTS_SUBTITLE =
+  'VERIFY and AAMLE host practical education, industry briefings, specialist-led seminars, and professional networking events for legal, medical, and insurance professionals.'
+
+/** All three events pages carry this so the reference's hero treatment applies.
+ *  See `.events-pages` in globals.css. */
+const EVENTS_PAGE_SLUGS = ['events', 'upcoming-events', 'past-events']
+const EVENTS_PAGE_CLASS = 'events-pages'
+
 /**
- * The four-ways carousel, matching `.design-reference/events/events-seminars.html`.
- * Identical in shape to the instance in `seedShowcase`, which is where this
- * content has been living while the events hub went without it.
+ * The four-ways carousel, copied from `.design-reference/events/events-seminars.html`.
+ *
+ * The first version of this was lifted from `seedShowcase`, where a paraphrased
+ * set of the same four slides had been written for the style-guide page. Only
+ * the four *titles* matched, which is exactly why it passed a review: a check
+ * that compares headings finds four out of four and stops. Every body was
+ * shorter and differently worded, three of the four pill sets were wrong, and
+ * slide 2 had lost the quotation marks in its title. This is the reference copy,
+ * verbatim.
+ *
+ * All four panels take the same `seminars` accent and the same "Office Photo"
+ * label, because the reference gives every slide one identical translucent-blue
+ * panel — it is a placeholder saying a photograph belongs here. The accent,
+ * label and per-slide image upload all remain editable in the admin.
  */
 export const fourWaysCarousel = () => ({
   blockType: 'slideCarousel' as const,
@@ -48,34 +82,156 @@ export const fourWaysCarousel = () => ({
   slides: [
     {
       title: 'Informative Seminars',
-      body: 'Tailored professional development seminars for legal, insurance and medical professionals across the medico-legal domain.',
+      body: 'VERIFY and AAMLE organise tailored professional development seminars for legal, insurance, and medical professionals in the medico-legal domain. Sessions are designed to sharpen practical knowledge, specialist understanding, and briefing confidence.',
       accent: 'seminars' as const,
-      visualLabel: 'Seminar',
+      visualLabel: 'Office Photo',
       pills: [{ text: 'CPD-ready' }, { text: 'Practical topics' }, { text: 'Expert-led' }],
     },
     {
-      title: 'Specialist Insights Presentations',
-      body: 'Deep-dive presentations from our expert panel on the issues shaping assessment and reporting.',
-      accent: 'insights' as const,
-      visualLabel: 'Insights',
-      pills: [{ text: 'Panel experts' }, { text: 'Case studies' }],
+      // The reference quotes this one. Keep the single quotes.
+      title: "'Specialist Insights' Presentations",
+      body: 'VERIFY, in collaboration with AAMLE, delivers high-quality specialist presentations that empower professionals within the medico-legal field. These sessions translate clinical expertise into practical, usable insight for complex legal and insurance matters.',
+      accent: 'seminars' as const,
+      visualLabel: 'Office Photo',
+      pills: [{ text: 'Specialist voices' }, { text: 'Clinical clarity' }, { text: 'Case context' }],
     },
     {
       title: 'Networking Events',
-      body: 'Connect with peers across the medico-legal sector at curated networking events.',
-      accent: 'networking' as const,
-      visualLabel: 'Networking',
-      pills: [{ text: 'Industry-wide' }, { text: 'Relationship-building' }],
+      body: 'VERIFY actively participates in networking events, both as a sponsor and participant, to support the growth of the medico-legal community. These events create opportunities to share experience and build meaningful industry connections.',
+      accent: 'seminars' as const,
+      visualLabel: 'Office Photo',
+      pills: [
+        { text: 'Client connection' },
+        { text: 'Industry dialogue' },
+        { text: 'Community building' },
+      ],
     },
     {
       title: 'Industry Sponsorships',
-      body: 'Partner with VERIFY and AAMLE to support education and innovation in the sector.',
-      accent: 'sponsorships' as const,
-      visualLabel: 'Sponsorship',
-      pills: [{ text: 'Brand visibility' }, { text: 'Thought leadership' }],
+      body: 'VERIFY proudly sponsors and participates in industry events related to medico-legal practice, forensic medicine, legal consultation, and allied fields. Our sponsorships reflect a commitment to collaboration, knowledge sharing, and professional excellence.',
+      accent: 'seminars' as const,
+      visualLabel: 'Office Photo',
+      pills: [
+        { text: 'Industry support' },
+        { text: 'Shared standards' },
+        { text: 'Professional growth' },
+      ],
     },
   ],
 })
+
+/**
+ * The hub's events section — one Events Explorer carrying the search bar AND
+ * both of the reference's sections.
+ *
+ * The search bar is the single deliberate deviation from `events-seminars.html`,
+ * which has none. Everything below it is the reference's copy: the eyebrow, the
+ * `[[bracketed]]` accent in each heading, the intro line and the "View more"
+ * button, all verbatim.
+ */
+export const eventsHubExplorer = () => ({
+  blockType: 'eventsExplorer' as const,
+  mode: 'all' as const,
+  showSearch: true,
+  // The reference previews 5 per section on the hub (events.js
+  // `data-event-cards-limit` defaults to 5) and keeps the full lists on the two
+  // child pages, which is what the "View more" buttons are for.
+  pageSize: 5,
+  background: 'white' as const,
+  cardStyle: 'card' as const,
+  eyebrow: 'Events & Seminars',
+  heading: 'Explore VERIFY & [[AAMLE Events]]',
+  subheading:
+    'Search everything coming up and every recent program — upcoming and past are sorted automatically by date.',
+  groups: {
+    upcomingEyebrow: 'Upcoming Events',
+    upcomingHeading: 'Latest Medico-Legal [[Education Events]]',
+    upcomingIntro:
+      'Register for upcoming breakfast seminars, webinars, and specialist-led sessions designed for practical medico-legal learning.',
+    upcomingLinkLabel: 'View more upcoming events',
+    upcomingLinkUrl: '/events/upcoming-events',
+    pastEyebrow: 'Past Events',
+    pastHeading: 'Recent VERIFY & AAMLE [[Programs]]',
+    pastIntro:
+      'Browse recent seminars, training sessions, and industry events delivered for our medico-legal community.',
+    pastLinkLabel: 'View more past events',
+    pastLinkUrl: '/events/past-events',
+  },
+})
+
+/**
+ * Slide text this seed previously wrote, mapped to the reference's wording.
+ *
+ * The first version of the carousel was seeded from a paraphrase (see the note
+ * on `fourWaysCarousel`). Installs that already have it hold that wrong copy,
+ * and the repair below will not replace a carousel wholesale — so correct the
+ * fields individually, and ONLY where they still hold the exact superseded
+ * string. An editor who has reworded a slide keeps their wording.
+ */
+const SUPERSEDED_SLIDE_TEXT: Record<string, string> = {
+  'Tailored professional development seminars for legal, insurance and medical professionals across the medico-legal domain.':
+    'VERIFY and AAMLE organise tailored professional development seminars for legal, insurance, and medical professionals in the medico-legal domain. Sessions are designed to sharpen practical knowledge, specialist understanding, and briefing confidence.',
+  'Deep-dive presentations from our expert panel on the issues shaping assessment and reporting.':
+    'VERIFY, in collaboration with AAMLE, delivers high-quality specialist presentations that empower professionals within the medico-legal field. These sessions translate clinical expertise into practical, usable insight for complex legal and insurance matters.',
+  'Connect with peers across the medico-legal sector at curated networking events.':
+    'VERIFY actively participates in networking events, both as a sponsor and participant, to support the growth of the medico-legal community. These events create opportunities to share experience and build meaningful industry connections.',
+  'Partner with VERIFY and AAMLE to support education and innovation in the sector.':
+    'VERIFY proudly sponsors and participates in industry events related to medico-legal practice, forensic medicine, legal consultation, and allied fields. Our sponsorships reflect a commitment to collaboration, knowledge sharing, and professional excellence.',
+  // Title: the reference quotes this one.
+  'Specialist Insights Presentations': "'Specialist Insights' Presentations",
+  // Panel labels: the reference uses one placeholder on every slide.
+  Seminar: 'Office Photo',
+  Insights: 'Office Photo',
+  Networking: 'Office Photo',
+  Sponsorship: 'Office Photo',
+}
+
+/** Pills the paraphrase got wrong, keyed by slide title. */
+const SUPERSEDED_PILLS: Record<string, { from: string[]; to: string[] }> = {
+  "'Specialist Insights' Presentations": {
+    from: ['Panel experts', 'Case studies'],
+    to: ['Specialist voices', 'Clinical clarity', 'Case context'],
+  },
+  'Networking Events': {
+    from: ['Industry-wide', 'Relationship-building'],
+    to: ['Client connection', 'Industry dialogue', 'Community building'],
+  },
+  'Industry Sponsorships': {
+    from: ['Brand visibility', 'Thought leadership'],
+    to: ['Industry support', 'Shared standards', 'Professional growth'],
+  },
+}
+
+type Slide = Record<string, unknown>
+
+/** Returns the corrected slide, or null when nothing needed changing. */
+const correctSlide = (slide: Slide): Slide | null => {
+  const next: Slide = { ...slide }
+  let changed = false
+
+  for (const key of ['title', 'body', 'visualLabel'] as const) {
+    const current = slide[key]
+    if (typeof current === 'string' && SUPERSEDED_SLIDE_TEXT[current]) {
+      next[key] = SUPERSEDED_SLIDE_TEXT[current]
+      changed = true
+    }
+  }
+  // The reference gives every panel the same fill; ours varied it per slide.
+  if (slide.accent && slide.accent !== 'seminars' && changed) {
+    next.accent = 'seminars'
+  }
+
+  const title = (next.title as string) || (slide.title as string)
+  const pillFix = SUPERSEDED_PILLS[title]
+  if (pillFix && Array.isArray(slide.pills)) {
+    const current = (slide.pills as { text?: string }[]).map((p) => p?.text).filter(Boolean)
+    if (JSON.stringify(current) === JSON.stringify(pillFix.from)) {
+      next.pills = pillFix.to.map((text) => ({ text }))
+      changed = true
+    }
+  }
+  return changed ? next : null
+}
 
 const blockTypeOf = (b: unknown): string | null =>
   b && typeof b === 'object' && typeof (b as { blockType?: unknown }).blockType === 'string'
@@ -100,6 +256,25 @@ export const repairEventsHub = async ({ payload, req }: Ctx): Promise<void> => {
   const data: Record<string, unknown> = {}
   const changes: string[] = []
 
+  // An existing carousel is never replaced, but slide text this seed itself got
+  // wrong is corrected in place, field by field, on exact match only.
+  const carouselAt = layout.findIndex((b) => blockTypeOf(b) === 'slideCarousel')
+  if (carouselAt !== -1) {
+    const carousel = layout[carouselAt] as Record<string, unknown>
+    const slides = Array.isArray(carousel.slides) ? (carousel.slides as Slide[]) : []
+    let fixed = 0
+    const nextSlides = slides.map((s) => {
+      const corrected = correctSlide(s)
+      if (corrected) fixed++
+      return corrected ?? s
+    })
+    if (fixed) {
+      layout[carouselAt] = { ...carousel, slides: nextSlides }
+      data.layout = layout
+      changes.push(`corrected ${fixed} carousel slide(s) to the reference copy`)
+    }
+  }
+
   // The carousel — only into an absence.
   if (!layout.some((b) => blockTypeOf(b) === 'slideCarousel')) {
     // Sit it directly above the explorer, so the page reads: what we run, then
@@ -111,23 +286,112 @@ export const repairEventsHub = async ({ payload, req }: Ctx): Promise<void> => {
     changes.push('added the Programs & partnerships carousel')
   }
 
-  // The hero heading — only while it is still the superseded string.
-  const hero = (page as { hero?: Record<string, unknown> | null }).hero
-  if (hero && hero.heading === SUPERSEDED_EVENTS_HEADING) {
-    data.hero = { ...hero, heading: EVENTS_HEADING }
-    changes.push('updated the hero heading')
+  // The explorer's presentation and section headers. Only fills what is EMPTY:
+  // a hub explorer still in list mode gets the reference's card treatment, and
+  // an absent section header gets the reference's copy. An editor's own heading
+  // or intro is never overwritten.
+  const explorerAt = layout.findIndex((b) => blockTypeOf(b) === 'eventsExplorer')
+  if (explorerAt !== -1) {
+    const current = layout[explorerAt] as Record<string, unknown>
+    const wanted = eventsHubExplorer()
+    const groups = (current.groups as Record<string, unknown> | undefined) || {}
+    const filledGroups: Record<string, unknown> = { ...groups }
+    let groupChanged = false
+    for (const [k, v] of Object.entries(wanted.groups)) {
+      if (!filledGroups[k]) {
+        filledGroups[k] = v
+        groupChanged = true
+      }
+    }
+    const needsCard = current.cardStyle !== 'card'
+    const needsPageSize = current.pageSize === 8
+    if (needsCard || groupChanged || needsPageSize) {
+      layout[explorerAt] = {
+        ...current,
+        cardStyle: 'card',
+        // 8 was the full-listing page size this seed gave the hub before it
+        // became a preview. Exact match only, so an editor's own number stands.
+        pageSize: current.pageSize === 8 || current.pageSize == null ? wanted.pageSize : current.pageSize,
+        groups: filledGroups,
+      }
+      data.layout = layout
+      // Report what actually changed. An earlier version picked one of two
+      // messages from `needsCard` alone, so a run that only adjusted the page
+      // size announced that it had filled the section headers.
+      if (needsCard) changes.push('switched the events list to the reference card layout')
+      if (groupChanged) changes.push('filled the section headers')
+      if (needsPageSize) changes.push(`set the hub preview to ${wanted.pageSize} per section`)
+    }
   }
 
-  if (!changes.length) return
+  // The hero — only while it still holds a string this seed wrote.
+  const hero = (page as { hero?: Record<string, unknown> | null }).hero
+  if (hero) {
+    const nextHero = { ...hero }
+    let heroChanged = false
+    if (SUPERSEDED_EVENTS_HEADINGS.includes(hero.heading as string) && hero.heading !== EVENTS_HEADING) {
+      nextHero.heading = EVENTS_HEADING
+      heroChanged = true
+    }
+    if (SUPERSEDED_EVENTS_SUBTITLES.includes(hero.subtitle as string)) {
+      nextHero.subtitle = EVENTS_SUBTITLE
+      heroChanged = true
+    }
+    // The reference centres all three events heroes; ours was left-aligned.
+    if (hero.align === 'left') {
+      nextHero.align = 'center'
+      heroChanged = true
+    }
+    if (heroChanged) {
+      data.hero = nextHero
+      changes.push('aligned the hero to the reference')
+    }
+  }
 
-  await payload.update({
-    collection: 'pages',
-    id: page.id,
-    data: data as never,
-    req,
-    context: { disableRevalidate: true },
-  })
-  payload.logger.info(`— Events hub: ${changes.join(', ')}`)
+  if (changes.length) {
+    await payload.update({
+      collection: 'pages',
+      id: page.id,
+      data: data as never,
+      req,
+      context: { disableRevalidate: true },
+    })
+    payload.logger.info(`— Events hub: ${changes.join(', ')}`)
+  }
+
+  await applyEventsPageClass({ payload, req })
+}
+
+/**
+ * Gives all three events pages the `events-pages` class their hero treatment is
+ * scoped to. Additive: the class is appended to whatever is already stored, and
+ * a page that already has it is skipped.
+ */
+const applyEventsPageClass = async ({ payload, req }: Ctx): Promise<void> => {
+  let touched = 0
+  for (const slug of EVENTS_PAGE_SLUGS) {
+    const found = await payload.find({
+      collection: 'pages',
+      limit: 1,
+      depth: 0,
+      where: { slug: { equals: slug } },
+      req,
+    })
+    const page = found.docs[0]
+    if (!page) continue
+    const raw = (page as { cssClass?: unknown }).cssClass
+    const classes = Array.isArray(raw) ? (raw as string[]) : raw ? [String(raw)] : []
+    if (classes.includes(EVENTS_PAGE_CLASS)) continue
+    await payload.update({
+      collection: 'pages',
+      id: page.id,
+      data: { cssClass: [...classes, EVENTS_PAGE_CLASS] } as never,
+      req,
+      context: { disableRevalidate: true },
+    })
+    touched++
+  }
+  if (touched) payload.logger.info(`— Events pages: applied the hero treatment to ${touched} page(s)`)
 }
 
 // ── Featured article topic chips ────────────────────────────────────────────

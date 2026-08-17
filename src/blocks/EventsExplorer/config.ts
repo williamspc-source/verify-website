@@ -54,6 +54,70 @@ export const EventsExplorer: Block = {
       label: 'Show search / filter bar',
     },
     {
+      // The reference has two event presentations, and which one is right
+      // depends on the page. The dedicated listings (upcoming-events.html /
+      // past-events.html) use full-width list rows with a calendar block; the
+      // hub (events-seminars.html) uses bordered cards with an image panel.
+      // Defaulting to `list` keeps both child pages exactly as they are.
+      name: 'cardStyle',
+      type: 'select',
+      defaultValue: 'list',
+      label: 'Event presentation',
+      admin: {
+        description:
+          'List rows suit a dedicated listing page. Cards suit a hub or overview, and show each event’s image.',
+      },
+      options: [
+        { label: 'List rows (dedicated listing)', value: 'list' },
+        { label: 'Cards with image (hub / overview)', value: 'card' },
+      ],
+    },
+    {
+      // Card mode gives each group the reference's `.events-section-header`:
+      // an eyebrow, a heading whose [[bracketed]] half takes the brand accent,
+      // a line of copy, and a "View more" button aligned to the right.
+      name: 'groups',
+      type: 'group',
+      label: 'Section headers (card presentation)',
+      admin: {
+        condition: (_, siblingData) => siblingData?.cardStyle === 'card',
+        description:
+          'Shown above each group when the Cards presentation is used. Wrap part of a heading in [[double brackets]] to tint it with the brand colour.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'upcomingEyebrow', type: 'text', label: 'Upcoming · eyebrow', admin: { width: '50%' } },
+            { name: 'upcomingHeading', type: 'text', label: 'Upcoming · heading', admin: { width: '50%' } },
+          ],
+        },
+        { name: 'upcomingIntro', type: 'textarea', label: 'Upcoming · intro' },
+        {
+          type: 'row',
+          fields: [
+            { name: 'upcomingLinkLabel', type: 'text', label: 'Upcoming · link label', admin: { width: '50%' } },
+            { name: 'upcomingLinkUrl', type: 'text', label: 'Upcoming · link URL', admin: { width: '50%' } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'pastEyebrow', type: 'text', label: 'Past · eyebrow', admin: { width: '50%' } },
+            { name: 'pastHeading', type: 'text', label: 'Past · heading', admin: { width: '50%' } },
+          ],
+        },
+        { name: 'pastIntro', type: 'textarea', label: 'Past · intro' },
+        {
+          type: 'row',
+          fields: [
+            { name: 'pastLinkLabel', type: 'text', label: 'Past · link label', admin: { width: '50%' } },
+            { name: 'pastLinkUrl', type: 'text', label: 'Past · link URL', admin: { width: '50%' } },
+          ],
+        },
+      ],
+    },
+    {
       name: 'labels',
       type: 'group',
       label: 'Labels & messages',

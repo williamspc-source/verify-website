@@ -4639,8 +4639,122 @@
 }
 
 /* =====================================================================
-   Slide carousel — ported verbatim from design-reference/assets/css/events.css
-   (.events-offer-*). Full-width slides, arrows + dots + pause/play.
+   Events pages — the reference styles these heroes differently from every
+   other page (`.events-hero` in events.css, NOT `.page-hero`), so the port is
+   scoped to the `events-pages` class the three Events pages carry on their
+   wrapping <article> (Pages → Custom CSS class, registered in
+   src/fields/codeDefinedClasses.ts so the strict picker can offer it back).
+
+   Scoping matters: `tests/e2e/frontend.e2e.spec.ts` asserts `.page-hero h1`
+   weight against three pages that use `.page-hero h1` in the reference's own
+   inline <style>. Widening any of this to `.page-hero` would break that guard
+   and restyle 25 unrelated pages.
+
+   Measured before the port — build 60.8px/800/left against the reference's
+   52.8px/700/centred, in a 1132px column against 860px.
+   ===================================================================== */
+.events-pages .page-hero {
+  background: linear-gradient(160deg, #14639e 0%, #1c75bc 100%);
+  padding: 90px 0;
+  text-align: center;
+}
+.events-pages .page-hero-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+.events-pages .page-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: 0;
+  margin-bottom: 18px;
+}
+.events-pages .page-hero-sub {
+  max-width: 650px;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+/* The trail is centred with the rest of the hero on these pages, and the
+   reference dims it slightly further than our shared on-dark default: 0.65
+   against 0.82, with the current page at 0.9 and the separator at 0.4. */
+.events-pages .vf-breadcrumb {
+  --bc-link: rgba(255, 255, 255, 0.65);
+  --bc-current: rgba(255, 255, 255, 0.9);
+  justify-content: center;
+}
+.events-pages .vf-breadcrumb__sep {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* =====================================================================
+   Events section header + view-more link + card grid — the treatment the
+   reference hub (events-seminars.html) gives its Upcoming and Past sections.
+   Absent from the build entirely until now, which is why those sections had no
+   heading, no intro copy and no "View more" button.
+   ===================================================================== */
+.events-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 28px;
+  margin-bottom: 30px;
+}
+.events-section-header h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  color: var(--text-dark);
+  line-height: 1.18;
+  margin-bottom: 10px;
+}
+.events-section-header h2 span { color: var(--primary); }
+.events-section-header p {
+  color: var(--text-mid);
+  max-width: 620px;
+}
+.events-view-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: var(--vf-radius-sm);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: all var(--transition);
+}
+.events-view-link:hover {
+  background: var(--primary);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+.events-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.events-summary-section { padding: 78px 0; }
+.events-summary-section.bg-soft { background: #f6fbff; }
+
+@media (max-width: 1080px) {
+  .events-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 820px) {
+  .events-section-header { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 620px) {
+  .events-pages .page-hero { padding: 64px 0 68px; }
+  .events-card-grid { grid-template-columns: 1fr; }
+}
+
+/* =====================================================================
+   Slide carousel — ported from design-reference/assets/css/events.css
+   (.events-offer-*). Full-width slides, arrows + dots.
    ===================================================================== */
 .events-offer-stage {
   min-height: 580px;
@@ -4650,30 +4764,16 @@
   justify-content: center;
   padding: 76px 24px 72px;
   overflow: hidden;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--white) 72%, transparent), color-mix(in srgb, var(--white) 42%, transparent)),
-    radial-gradient(circle at 12% 28%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 23%),
-    radial-gradient(circle at 82% 70%, rgba(65,64,66,0.3), transparent 27%),
-    linear-gradient(135deg, #edf5fa 0%, #d7e0e6 48%, #eef2f5 100%);
+  background: linear-gradient(135deg, #eef9ff 0%, #e6f4ff 48%, #d9efff 100%);
 }
-.events-offer-stage::before {
-  content: '';
-  position: absolute;
-  inset: -40px;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--primary) 12%, transparent) 1px, transparent 1px),
-    linear-gradient(0deg, color-mix(in srgb, var(--primary) 8%, transparent) 1px, transparent 1px);
-  background-size: 110px 110px;
-  transform: rotate(-8deg) scale(1.1);
-  opacity: 0.45;
-}
+/* The reference declares a rotated grid pattern and a bottom fade, then turns
+   both off. Our port kept them switched on, which is why the stage rendered
+   grey-blue with a texture where the reference is a flat pale-blue wash. They
+   are left declared-and-disabled exactly as the reference has them, so the next
+   person diffing the two files sees the same shape on both sides. */
+.events-offer-stage::before,
 .events-offer-stage::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 46%;
-  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--primary) 8%, transparent));
-  pointer-events: none;
+  display: none;
 }
 .events-offer-shell { position: relative; z-index: 1; width: min(1080px, 100%); }
 .events-offer-toolbar {
@@ -4695,7 +4795,10 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
-.events-offer-eyebrow::before { content: ''; width: 24px; height: 2px; background: var(--primary); }
+/* The reference hides this. Ours drew a 24px rule before the eyebrow, so the
+   label read "— PROGRAMS & PARTNERSHIPS" where the reference reads
+   "PROGRAMS & PARTNERSHIPS". */
+.events-offer-eyebrow::before { display: none; }
 .events-offer-toolbar h2 {
   max-width: 680px;
   font-family: var(--font-heading);
@@ -4704,29 +4807,20 @@
   color: var(--text-dark);
   letter-spacing: 0;
 }
-.events-offer-toggle {
-  flex-shrink: 0;
-  min-width: 86px;
-  min-height: 38px;
-  padding: 9px 16px;
-  border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--white) 82%, transparent);
-  color: var(--primary);
-  font-family: var(--font-heading);
-  font-size: 0.74rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition), transform var(--transition);
-}
-.events-offer-toggle:hover,
-.events-offer-toggle[aria-pressed="true"] { background: var(--primary); color: var(--white); transform: translateY(-1px); }
+/* `.events-offer-toggle` removed with the Pause/Play button it styled. The
+   reference has no such control — its JS refers to a `toggleButton` that is not
+   in its markup, which is what caused one to be built here. */
 .events-offer-carousel {
   position: relative;
   z-index: 1;
   width: 100%;
   overflow: hidden;
-  border-radius: var(--radius);
+  /* Literal 20px, not a token. The radius codemod rewrote this to
+     `var(--radius)`, which is 0.5rem here against the reference's 8px — and the
+     reference declares 20px for this element regardless. The codemods are
+     documented as value-preserving; this substitution was not, and it shrank the
+     carousel's corners by 12px. Caught by tests/visual/referenceCssDiff.mjs. */
+  border-radius: 20px;
   box-shadow: 0 24px 72px rgba(65,64,66,0.2);
   border: 1px solid color-mix(in srgb, var(--white) 65%, transparent);
   outline: none;
@@ -4784,50 +4878,37 @@
   font-size: 0.7rem;
   font-weight: 800;
 }
+/* The label's typography lives HERE, on the container, exactly as the reference
+   has it — there is no `span` rule in events.css. Ours styled the span instead,
+   at 0.78rem/800/0.16em against the reference's 0.75rem/700/0.1em.
+   `position: relative` is ours and is load-bearing: it is what the optional
+   uploaded image positions against. The reference never shows an image. */
 .events-offer-visual {
   position: relative;
   flex: 0 0 34%;
   min-width: 290px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
   overflow: hidden;
   color: var(--white);
-  isolation: isolate;
-}
-.events-offer-visual::before {
-  content: '';
-  position: absolute;
-  inset: 28px;
-  border: 1px solid color-mix(in srgb, var(--white) 24%, transparent);
-  border-radius: var(--radius);
-  z-index: -1;
-}
-.events-offer-visual::after {
-  content: '';
-  position: absolute;
-  width: 210px;
-  height: 210px;
-  border-radius: var(--vf-radius-circle);
-  background: color-mix(in srgb, var(--white) 12%, transparent);
-  transform: translate(64px, -76px);
-  z-index: -1;
-}
-.events-offer-visual img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: -1; }
-.events-offer-visual svg { width: 84px; height: 84px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.18)); }
-.events-offer-visual span {
   font-family: var(--font-heading);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
+/* An uploaded image fills the panel and covers the gradient. Kept out of a
+   negative stacking context so it does not fall behind the card. */
+.events-offer-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.events-offer-visual span { position: relative; z-index: 1; }
+/* "Blue" is the default, and it is the reference's own panel fill — the single
+   translucent wash `events-seminars.html` sets inline on all four slides. The
+   other three remain as editorial choices; seeding every slide to Blue is what
+   reproduces the reference, without turning the Visual colour select into a
+   control that does nothing. */
 .offer-seminars .events-offer-visual {
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--primary) 90%, transparent), rgba(45,143,232,0.78)),
-    radial-gradient(circle at 26% 28%, color-mix(in srgb, var(--white) 24%, transparent), transparent 22%);
+  background: linear-gradient(135deg, rgba(28,117,188,0.3), rgba(147,208,247,0.95));
 }
 .offer-insights .events-offer-visual {
   background:

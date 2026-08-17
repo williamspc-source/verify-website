@@ -1154,6 +1154,83 @@ writes only into an absence (`src/endpoints/seed/seedEventsHub.ts`).
 
 ---
 
+## Comparison 24: The events pages, diffed declaration by declaration (2026-08-17)
+
+Comparison 23 recorded `/events` as rebuilt to match the reference. **It did not match, and the
+verification is why that went unnoticed.** The check compared the `h1` string and the list of `h2`
+headings. A structural match was reported as a visual one.
+
+What that check never looked at, all measured afterwards: hero alignment (`start` against the
+reference's `center`), type scale (60.8px/800 against 52.8px/700), copy width (1132px against 860px),
+the subtitle (different copy, 18.4px/560px against 16px/650px), the section background, the card
+design, and every slide *body* — which were paraphrases carried over from `seedShowcase`, where only
+the four **titles** matched. Four titles out of four is exactly what a heading comparison finds
+before it stops.
+
+### The structural root cause
+
+The reference has **two** event presentations, and the hub was given the wrong one:
+
+| Reference page | Presentation | Our block |
+|---|---|---|
+| `events-seminars.html` (hub) | `.event-card` grid — image panel, date, type tag, "More info →" | `ArchiveBlock` already emitted this markup |
+| `upcoming-events.html`, `past-events.html` | filter toolbar + list rows | `EventsExplorer` |
+
+`/events` was given `EventsExplorer`, so the hub rendered the *child pages'* list rows with their
+calendar graphic. `EventsExplorer` now takes a `cardStyle` (`list` by default, so both child pages are
+untouched) and carries the reference's section headers.
+
+### Enumerating instead of spotting
+
+Three rounds of "you have missed something" preceded this, each finding another difference by eye.
+`node tests/visual/referenceCssDiff.mjs events` parses every declaration on both sides and prints a
+count. It reported **26 selectors missing and 6 differing**, including two that no amount of looking
+had found:
+
+- `.events-offer-eyebrow::before` drew a **24px dash** before the eyebrow that the reference hides —
+  visible in every screenshot as `— PROGRAMS & PARTNERSHIPS`, and never noticed;
+- `.events-offer-carousel` had a literal `20px` rewritten by the radius codemod to `var(--radius)`,
+  which is `0.5rem` here and `8px` in the reference. **The codemods are documented as
+  "value-preserving by construction". This one was not**, and it shrank the carousel's corners by 12px.
+
+Three of the reported faults turned out to be already correct, and were left alone: the autoplay
+interval (5801ms against 5800), the transition (0.55s, identical curve), and the arrow geometry
+(42×42 at x=197/1201). The real cause of "it skips too fast" was the **hover binding** — ours covered
+only the inner viewport, so hovering the heading or the arrows, which is exactly when you want it to
+stop, did nothing. The reference binds to the whole section.
+
+### Building the tool honestly took three corrections
+
+Worth recording, because each is a way a diff tool lies:
+
+1. Comparing raw text made all **60+** token substitutions look like defects. Resolving `var()` and
+   `color-mix()` first is what left a readable list.
+2. Resolving both sides with **one** token map was wrong: both stylesheets define `--radius` and they
+   disagree. `.events-view-link` was reported as differing when the two computed values are identical.
+3. Font tokens must compare **by name**. Resolving `--font-heading` produced 24 phantom differences
+   whose "reference" and "build" lines were the same string — the brand typeface is a deliberate,
+   documented deviation (Comparison 19), not a porting error.
+
+The tool now reports **zero**, and every fix was then confirmed with `getComputedStyle` — a rule in
+the file is not a rule on the page.
+
+### Deliberate deviations, recorded so they are not re-reported
+
+- **The search bar on `/events`.** The reference hub has none; it offers two static previews instead.
+  Ours keeps search and the explorer supplies both sections, so no event is listed twice.
+- **An empty card shows the event's date**, where the reference prints a fixed "Event image" label.
+- **Arrow glyphs are `<svg>`**, not `<i>` — Phosphor React renders components, and the caret is the
+  same shape at the same 20px.
+- **The events hero port is scoped to `.events-pages`**, not `.events-hero`, because widening
+  `.page-hero h1` would restyle 25 unrelated pages and break the hero-weight guard.
+
+### Still open, found while measuring
+
+The reference sizes heroes **per page family**. `/about` matches ours; `/services` renders at 42.4px
+and `/contact` at 69.6px against our shared 60.8px. Not touched in this pass.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

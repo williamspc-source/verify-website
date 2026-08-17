@@ -4,9 +4,16 @@ import { isUnauthored } from './authored'
 import { plainTextToLexical } from './data/richText'
 // One definition of the events-hub carousel, shared with the repair that adds it
 // to installs the fixture cannot reach. Two copies would drift.
-import { fourWaysCarousel } from './seedEventsHub'
+import { fourWaysCarousel, eventsHubExplorer } from './seedEventsHub'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
+
+// The reference styles the events heroes differently from every other page
+// (`.events-hero`, not `.page-hero`): centred, 52.8px/700 in an 860px column,
+// against our shared 60.8px/800. This class scopes that port to the three
+// events pages — see `.events-pages` in globals.css, and the entry in
+// src/fields/codeDefinedClasses.ts that keeps it offerable in the admin picker.
+const EVENTS_PAGE_CSS = ['events-pages']
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const custom = (url: string, label: string, extra: Record<string, unknown> = {}): any => ({
@@ -64,6 +71,9 @@ async function authorPage(
   // `<title>` as `${meta.title} | ${siteName}`, so pass the bare page title
   // (e.g. 'Upcoming Events') and let the site name suffix be appended.
   meta?: { title?: string; description?: string },
+  // Page-level classes, applied to the wrapping <article>. The events pages use
+  // this to pick up their own hero treatment — see `.events-pages` in globals.css.
+  pageCss?: string[],
 ): Promise<void> {
   const found = await payload.find({
     collection: 'pages',
@@ -84,7 +94,7 @@ async function authorPage(
   await payload.update({
     collection: 'pages',
     id: rec.id,
-    data: { hero, layout, ...(meta ? { meta } : {}) } as never,
+    data: { hero, layout, ...(meta ? { meta } : {}), ...(pageCss ? { cssClass: pageCss } : {}) } as never,
     req,
     context: { disableRevalidate: true },
   })
@@ -463,31 +473,29 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
     {
       type: 'pageHero',
       theme: 'dark',
-      align: 'left',
+      // The reference centres all three events heroes.
+      align: 'center',
       showBreadcrumb: true,
       showShield: false,
       heading: 'Medico-Legal Education for [[Better Practice]]',
       subtitle:
-        'Practical education, industry briefings, and specialist-led seminars from VERIFY and AAMLE — browse what is coming up or revisit recent programs.',
+        'VERIFY and AAMLE host practical education, industry briefings, specialist-led seminars, and professional networking events for legal, medical, and insurance professionals.',
     },
     [
       // Reference `.events-offer-stage` — the four ways VERIFY teaches.
       fourWaysCarousel(),
-      // All events on one page — Upcoming/Past split computed from the browser
-      // date (client-side, so a cached page never goes stale) + a search/filter
-      // toolbar, full-width list rows, and pagination (reference events pages).
-      {
-        blockType: 'eventsExplorer',
-        mode: 'all',
-        showSearch: true,
-        pageSize: 8,
-        background: 'white',
-        eyebrow: 'Events & Seminars',
-        heading: 'Explore VERIFY & [[AAMLE Events]]',
-        subheading:
-          'Everything coming up and every recent program in one place — upcoming and past are sorted automatically by date.',
-      },
+      // The reference hub's two sections — Upcoming and Past, each with an
+      // eyebrow, an accented heading, a line of copy and a "View more" button,
+      // rendered as `.event-card`s with an image panel.
+      //
+      // One block, not two, because the explorer already splits upcoming from
+      // past: adding separate preview sections alongside it would print the same
+      // events twice on one page. `cardStyle: 'card'` is what swaps the child
+      // pages' list rows for the hub's cards.
+      eventsHubExplorer(),
     ],
+    undefined,
+    EVENTS_PAGE_CSS,
   )
 
   // ── Upcoming Events (dedicated full listing) ─────────────────────────
@@ -520,6 +528,7 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       description:
         'Explore upcoming VERIFY and AAMLE medico-legal seminars, webinars, workshops, industry briefings, sponsorships, and networking events.',
     },
+    EVENTS_PAGE_CSS,
   )
 
   // ── Past Events (dedicated full listing — 8 most recent) ─────────────
@@ -551,5 +560,6 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       description:
         'Browse previous VERIFY and AAMLE medico-legal seminars, webinars, workshops, industry briefings, sponsorships, and networking events.',
     },
+    EVENTS_PAGE_CSS,
   )
 }

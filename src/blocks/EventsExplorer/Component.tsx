@@ -11,7 +11,7 @@ import { toClassName } from '@/utilities/cssClass'
 import { accentText } from '@/utilities/accentText'
 
 import { EventsExplorerClient } from './EventsExplorerClient'
-import type { EventItem, EventsExplorerLabels } from './EventsExplorerClient'
+import type { EventItem, EventsExplorerLabels, EventsExplorerGroups } from './EventsExplorerClient'
 
 // Human-readable event-type labels — kept in sync with the Events collection
 // options (mirrors EVENT_TYPE_LABELS in ArchiveBlock / the event detail page).
@@ -39,6 +39,8 @@ type Props = {
   pageSize?: number | null
   showSearch?: boolean | null
   labels?: EventsExplorerLabels | null
+  cardStyle?: 'list' | 'card' | null
+  groups?: EventsExplorerGroups | null
   anchorId?: string | null
   background?: SectionBackground | null
   cssClass?: string | string[] | null
@@ -70,6 +72,10 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
   const pageSize = (props as { pageSize?: number | null }).pageSize || 8
   const showSearch = (props as { showSearch?: boolean | null }).showSearch ?? true
   const labels = (props as { labels?: EventsExplorerLabels | null }).labels ?? undefined
+  // Defaults to the list presentation, so the two dedicated listing pages are
+  // untouched; only a block explicitly set to `card` takes the hub treatment.
+  const cardStyle = (props as { cardStyle?: 'list' | 'card' | null }).cardStyle || 'list'
+  const groups = (props as { groups?: EventsExplorerGroups | null }).groups ?? undefined
 
   const payload = await getPayload({ config: configPromise })
   const res = await payload.find({
@@ -106,6 +112,8 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
         pageSize={pageSize}
         showSearch={showSearch}
         labels={labels}
+        cardStyle={cardStyle}
+        groups={groups}
       />
     </Section>
   )

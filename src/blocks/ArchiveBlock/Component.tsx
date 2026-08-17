@@ -262,7 +262,14 @@ const EventCard: React.FC<{ event: Event; isPast: boolean; compact?: boolean }> 
   return (
     <article className="event-card">
       <a className="event-card-media" href={href}>
-        {image ? <Media resource={image} fill imgClassName="event-card-photo" /> : <span>Event image</span>}
+        {/* The reference prints a fixed "Event image" here. We print the date
+            instead, so a panel still awaiting a photograph tells the visitor
+            something. Matches EventsExplorer's card, which shares this design. */}
+        {image ? (
+          <Media resource={image} fill imgClassName="event-card-photo" />
+        ) : (
+          <span>{dateLabel || 'Event image'}</span>
+        )}
       </a>
       <div className="event-card-body">
         <div className="event-card-top">

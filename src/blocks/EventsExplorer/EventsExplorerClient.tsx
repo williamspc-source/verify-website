@@ -4,6 +4,7 @@ import React, { useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Icon } from '@/components/Icon'
 import { eventPath } from '@/utilities/routes'
 import { isEventPast, startOfDay } from '@/utilities/eventTiming'
+import { accentText } from '@/utilities/accentText'
 
 // Plain, serialisable event shape passed from the server component.
 export type EventItem = {
@@ -40,12 +41,27 @@ export type EventsExplorerLabels = {
   searchButtonLabel?: string | null
 }
 
+export type EventsExplorerGroups = {
+  upcomingEyebrow?: string | null
+  upcomingHeading?: string | null
+  upcomingIntro?: string | null
+  upcomingLinkLabel?: string | null
+  upcomingLinkUrl?: string | null
+  pastEyebrow?: string | null
+  pastHeading?: string | null
+  pastIntro?: string | null
+  pastLinkLabel?: string | null
+  pastLinkUrl?: string | null
+}
+
 type Props = {
   events: EventItem[]
   mode: 'all' | 'upcoming-only' | 'past-only'
   pageSize: number
   showSearch: boolean
   labels?: EventsExplorerLabels | null
+  cardStyle?: 'list' | 'card' | null
+  groups?: EventsExplorerGroups | null
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -211,6 +227,78 @@ const EventRow: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, cta
   )
 }
 
+// The hub card, matching `.event-card` in the reference's events.css. Same
+// markup as ArchiveBlock emits, so the two presentations of an event stay one
+// design rather than drifting into two.
+//
+// The reference prints a fixed "Event image" label in the empty media panel. We
+// print the event's DATE instead — the one deliberate improvement here, so a
+// slot awaiting a photograph still tells the visitor something. An uploaded
+// image replaces it.
+const EventCard: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, ctaLabel }) => {
+  const href = eventUrl(event)
+  return (
+    <article className="event-card">
+      <a className="event-card-media" href={href} aria-hidden tabIndex={-1}>
+        {event.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={event.image} alt="" />
+        ) : (
+          <span>{dateLabel(event.date)}</span>
+        )}
+      </a>
+      <div className="event-card-body">
+        <div className="event-card-top">
+          <span className="event-card-date">{dateLabel(event.date)}</span>
+          {event.typeLabel ? <span className="event-type-tag">{event.typeLabel}</span> : null}
+        </div>
+        <h3>
+          <a href={href}>{event.title}</a>
+        </h3>
+        {event.excerpt ? <p className="event-card-desc">{event.excerpt}</p> : null}
+        <div className="event-card-meta">
+          {event.timeLabel ? <span>{event.timeLabel}</span> : null}
+          {event.location ? <span>{event.location}</span> : null}
+        </div>
+        <a className="event-card-link" href={href}>
+          {/* Explicit space: JSX collapses the newline between the expression and
+              the entity, which rendered "More Info→" with no gap. */}
+          {ctaLabel}
+          {' →'}
+        </a>
+      </div>
+    </article>
+  )
+}
+
+// The reference's `.events-section-header`: eyebrow, heading whose [[bracketed]]
+// half takes the brand accent, a line of copy, and a "View more" button pushed
+// to the right. Absent from the build entirely until now, which is why the
+// upcoming/past sections had a bare label and no intro or button.
+const SectionHeader: React.FC<{
+  eyebrow?: string
+  heading?: string
+  intro?: string
+  linkLabel?: string
+  linkUrl?: string
+}> = ({ eyebrow, heading, intro, linkLabel, linkUrl }) => {
+  if (!eyebrow && !heading && !intro && !linkLabel) return null
+  return (
+    <div className="events-section-header">
+      <div>
+        {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
+        {heading ? <h2>{accentText(heading)}</h2> : null}
+        {intro ? <p>{intro}</p> : null}
+      </div>
+      {linkLabel && linkUrl ? (
+        <a className="events-view-link" href={linkUrl}>
+          {linkLabel}
+        </a>
+      ) : null}
+    </div>
+  )
+}
+
 // A single upcoming/past group: optional label, paginated list of rows, and its
 // own pagination.
 //
@@ -223,7 +311,9 @@ const EventGroup: React.FC<{
   ctaLabel: string
   pageSize: number
   emptyText: string
-}> = ({ label, list, ctaLabel, pageSize, emptyText }) => {
+  cardStyle?: 'list' | 'card'
+  header?: React.ReactNode
+}> = ({ label, list, ctaLabel, pageSize, emptyText, cardStyle = 'list', header }) => {
   const [page, setPage] = useState(1)
   const boxRef = useRef<HTMLDivElement | null>(null)
 
@@ -243,10 +333,18 @@ const EventGroup: React.FC<{
 
   return (
     <div className="events-explorer-group">
-      {label ? <div className="section-label">{label}</div> : null}
-      <div className="event-list" ref={boxRef}>
+      {/* Card mode carries a full section header; list mode keeps the bare
+          label, which is what the reference's dedicated listing pages use. */}
+      {header ?? (label ? <div className="section-label">{label}</div> : null)}
+      <div className={cardStyle === 'card' ? 'events-card-grid' : 'event-list'} ref={boxRef}>
         {pageList.length ? (
-          pageList.map((e) => <EventRow key={e.id} event={e} ctaLabel={ctaLabel} />)
+          pageList.map((e) =>
+            cardStyle === 'card' ? (
+              <EventCard key={e.id} event={e} ctaLabel={ctaLabel} />
+            ) : (
+              <EventRow key={e.id} event={e} ctaLabel={ctaLabel} />
+            ),
+          )
         ) : (
           <p className="events-empty">{emptyText}</p>
         )}
@@ -273,7 +371,10 @@ export const EventsExplorerClient: React.FC<Props> = ({
   pageSize,
   showSearch,
   labels,
+  cardStyle,
+  groups,
 }) => {
+  const style: 'list' | 'card' = cardStyle === 'card' ? 'card' : 'list'
   const now = useSyncExternalStore(subscribeToNothing, getToday, getTodayServer)
   const [query, setQuery] = useState('')
 
@@ -369,6 +470,18 @@ export const EventsExplorerClient: React.FC<Props> = ({
           {showUpcoming ? (
             <EventGroup
               label={showBothLabels ? L.upcomingHeading : undefined}
+              cardStyle={style}
+              header={
+                style === 'card' ? (
+                  <SectionHeader
+                    eyebrow={groups?.upcomingEyebrow || undefined}
+                    heading={groups?.upcomingHeading || undefined}
+                    intro={groups?.upcomingIntro || undefined}
+                    linkLabel={groups?.upcomingLinkLabel || undefined}
+                    linkUrl={groups?.upcomingLinkUrl || undefined}
+                  />
+                ) : undefined
+              }
               list={upcoming}
               ctaLabel={L.moreInfo}
               pageSize={pageSize}
@@ -378,6 +491,18 @@ export const EventsExplorerClient: React.FC<Props> = ({
           {showPast ? (
             <EventGroup
               label={showBothLabels ? L.pastHeading : undefined}
+              cardStyle={style}
+              header={
+                style === 'card' ? (
+                  <SectionHeader
+                    eyebrow={groups?.pastEyebrow || undefined}
+                    heading={groups?.pastHeading || undefined}
+                    intro={groups?.pastIntro || undefined}
+                    linkLabel={groups?.pastLinkLabel || undefined}
+                    linkUrl={groups?.pastLinkUrl || undefined}
+                  />
+                ) : undefined
+              }
               list={past}
               ctaLabel={L.viewRecap}
               pageSize={pageSize}

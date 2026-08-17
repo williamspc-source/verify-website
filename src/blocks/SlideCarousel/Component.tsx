@@ -1,6 +1,7 @@
 'use client'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
+
+import { Icon } from '@/components/Icon'
 
 import type { SlideCarouselBlock as Props } from '@/payload-types'
 
@@ -49,9 +50,14 @@ const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean; className?
   )
 }
 
-// Faithful port of the design reference's `.events-offer-*` slide carousel:
-// one full-width slide at a time, prev/next arrows, dot indicators, a Pause/Play
-// toggle, autoplay, pause on hover/focus, and arrow-key nav.
+// Port of the design reference's `.events-offer-*` slide carousel: one
+// full-width slide at a time, prev/next arrows, dot indicators, autoplay, pause
+// on hover/focus, and arrow-key nav.
+//
+// No Pause/Play button — the reference has none. Its JS does reference a
+// `toggleButton`, which is why one was built here, but no such element exists in
+// its markup; the control is dead code carried through the design. Hover/focus
+// pause covers the same need without occupying the toolbar.
 //
 // Seamless infinite loop: the track is [cloneOfLast, ...slides, cloneOfFirst];
 // real slide k sits at track position k+1. Advancing past the last slide glides
@@ -76,7 +82,6 @@ export const SlideCarouselBlock: React.FC<Props> = ({
   const base = looped ? 1 : 0 // track position of the first real slide
   const [pos, setPos] = useState(base) // current track position
   const [animate, setAnimate] = useState(true)
-  const [paused, setPaused] = useState(false) // manual Pause/Play
   const [hovering, setHovering] = useState(false) // hover/focus pause
   const tick = (interval ?? 5800) || 5800
 
@@ -101,13 +106,13 @@ export const SlideCarouselBlock: React.FC<Props> = ({
   }, [animate])
 
   useEffect(() => {
-    if (!autoplay || paused || hovering || count <= 1) return
+    if (!autoplay || hovering || count <= 1) return
     const id = window.setInterval(() => {
       setAnimate(true)
       setPos((p) => p + 1)
     }, tick)
     return () => window.clearInterval(id)
-  }, [autoplay, paused, hovering, count, tick])
+  }, [autoplay, hovering, count, tick])
 
   // When we land on a clone, jump (without animation) to the matching real slide.
   const onTransitionEnd = () => {
@@ -137,6 +142,16 @@ export const SlideCarouselBlock: React.FC<Props> = ({
       aria-label={stripAccent(heading) || 'Carousel'}
       className={cn('events-offer-stage vf-slide-carousel', toClassName(cssClass))}
       data-offer-carousel
+      // Hover/focus pause is bound to the whole STAGE, matching the reference,
+      // which binds to `[data-offer-carousel]`. Ours was bound to the inner
+      // viewport, so moving the pointer onto the heading, the arrows or the dots
+      // — the places you go precisely when you want it to stop — let it keep
+      // advancing. The interval itself was never the problem: measured 5801ms
+      // against the reference's 5800ms, with an identical 0.55s transition.
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      onFocusCapture={() => setHovering(true)}
+      onBlurCapture={() => setHovering(false)}
     >
       <div className="events-offer-shell">
         <div className="events-offer-toolbar vf-slide-carousel__toolbar">
@@ -144,26 +159,12 @@ export const SlideCarouselBlock: React.FC<Props> = ({
             {eyebrow ? <div className="events-offer-eyebrow">{eyebrow}</div> : null}
             {heading ? <h2 className={headingClass || undefined}>{accentText(heading)}</h2> : null}
           </div>
-          {autoplay && count > 1 ? (
-            <button
-              type="button"
-              className={cn('events-offer-toggle vf-slide-carousel__toggle', buttonClass)}
-              aria-pressed={paused}
-              onClick={() => setPaused((p) => !p)}
-            >
-              {paused ? 'Play' : 'Pause'}
-            </button>
-          ) : null}
         </div>
 
         <div
           className="events-offer-carousel vf-slide-carousel__viewport"
           aria-roledescription="carousel"
           tabIndex={0}
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
-          onFocus={() => setHovering(true)}
-          onBlur={() => setHovering(false)}
           onKeyDown={(e) => {
             if (e.key === 'ArrowLeft') {
               e.preventDefault()
@@ -202,7 +203,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
                 aria-label="Previous slide"
                 onClick={() => step(-1)}
               >
-                <ChevronLeft />
+                <Icon name="caret-left" className="size-5" />
               </button>
               <button
                 type="button"
@@ -210,7 +211,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
                 aria-label="Next slide"
                 onClick={() => step(1)}
               >
-                <ChevronRight />
+                <Icon name="caret-right" className="size-5" />
               </button>
             </>
           ) : null}

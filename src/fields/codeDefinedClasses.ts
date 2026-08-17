@@ -23,4 +23,8 @@ export const CODE_DEFINED_CLASSES: CodeDefinedClass[] = [
   { name: 'vf-home-enquiry-formcard', label: 'Home · Enquiry form card' },
   { name: 'vf-home-edu-sponsor', label: 'Home · AAMLE sponsor callout' },
   { name: 'vf-home-edu-cta', label: 'Home · AAMLE CTA row' },
+  // Applied to the PAGE (Pages → sidebar → Custom CSS class), not to a block.
+  // The reference gives the events pages their own hero treatment — centred,
+  // smaller, lighter, in a narrower column — and this is what scopes it to them.
+  { name: 'events-pages', label: 'Events · page hero treatment' },
 ]

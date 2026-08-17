@@ -213,6 +213,13 @@ disable — these rules have already earned their keep.
 When one fails, wire the control up; if it genuinely should not be wired, add it to the allowlist
 **with a reason**.
 
+`tests/visual/referenceCssDiff.mjs <family>` diffs every declaration the design reference makes for a
+selector family against `globals.css`, and exits non-zero until the count is zero. It exists because
+`/events` was ported, reviewed and reported as matching the reference on the strength of a heading
+comparison — while its hero, type scale, backgrounds, card design and slide copy all differed. Run it
+before claiming a port is done, then confirm in the browser: a zero proves a rule is in the file, not
+that it reached the page.
+
 `tests/visual/computedSnapshot.mjs` captures computed styles across the site so a CSS change can be
 diffed. It measures 34 properties, including `width`, `height`, `grid-template-columns` and
 `transform` — which is what lets it catch a layout change and not just a repaint. Two real limits

@@ -19,11 +19,16 @@ document, so it appears under *Site-wide* below instead.
   each pane. This has already caused a block to be reported missing when it was rendering fine.
 - Anchors are shown as `#name` where a block defines one.
 
-**Before logging something, check it is not already known.** The items in
-`verify-website-design-diff.md` **Comparison 22 §A–F** are measured and open; re-reporting them
-costs a round trip. In short: nine breadcrumb trails, the In the Loop *Featured* card tags,
-`/events` being a directory where the reference is a marketing page, the extra Contact portal
-section, and opening hours in the footer.
+**Before logging something, check it is not already known.** `verify-website-design-diff.md`
+Comparison 22 closed all six of its items, and Comparison 24 records the events pages. The
+deliberate deviations from the reference, which are **not** faults: the nine breadcrumb trails, the
+Contact portal section, the footer opening hours, the brand typeface, and the search bar on
+`/events` (the reference hub has none).
+
+**Heads-up on the rest of the site.** The events pages have been diffed declaration by declaration;
+no other page has. The reference sizes heroes per page family — `/services` at 42.4px and `/contact`
+at 69.6px against our shared 60.8px — so expect similar gaps elsewhere, and see
+`node tests/visual/referenceCssDiff.mjs` for how to enumerate them rather than spot them.
 
 **To compare against the design reference**, serve it over HTTP — never `file://`, which silently
 drops its stylesheet and makes everything read as an unstyled default:
@@ -121,9 +126,12 @@ drops its stylesheet and makes everything read as an unstyled default:
 ### Events & Seminars  
 `/events`
 
-- [ ] **Hero** (pageHero) — "Medico-Legal Education for Better Practice" — subtitle, breadcrumb
+- [ ] **Hero** (pageHero) — "Medico-Legal Education for Better Practice" — centred, subtitle, breadcrumb
 - [ ] **Slide Carousel** — "Four ways VERIFY brings medico-legal learning to life" (4 slides, eyebrow *Programs & partnerships*)
-- [ ] **Events Explorer** — "Explore VERIFY & AAMLE Events" (all, with search)
+- [ ] **Events Explorer** — "Explore VERIFY & AAMLE Events" (all, with search, **card presentation**)
+  - [ ] Upcoming section — "Latest Medico-Legal Education Events" + intro + *View more upcoming events*
+  - [ ] Past section — "Recent VERIFY & AAMLE Programs" + intro + *View more past events*
+  - [ ] Cards show the event image, or its **date** when no image is uploaded
 
 ### Past Events  
 `/events/past-events`

@@ -400,6 +400,17 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   (59 pageHero, 2 homeHero) while `_pages_v.version_hero_type` held **62 `lowImpact`** rows of
   template-era history. Count both tables before removing any select option. The failure is atomic —
   the enum and all 481 rows were intact afterwards — but until the config is reverted nothing serves.
+- **A structural match is not a visual match, and reporting one as the other is how a whole page
+  ships wrong.** `/events` was rebuilt, verified, and reported as matching the reference. The check
+  compared the `h1` string and the list of `h2` headings — it found four slide titles out of four and
+  stopped. Never measured: hero alignment, type scale (60.8px/800 against the reference's 52.8/700),
+  section background, card design, and every slide *body*, which were paraphrases from `seedShowcase`.
+  Three rounds of "you missed something" followed, each finding another by eye. Spotting differences
+  does not converge; enumerating them does. `node tests/visual/referenceCssDiff.mjs <family>` parses
+  every declaration on both sides and prints a count that has to reach zero — and it caught two things
+  no amount of looking had: a `::before` drawing a 24px dash before an eyebrow the reference hides, and
+  a literal `20px` the radius codemod had rewritten to `var(--radius)` (0.5rem here, 8px there) despite
+  those codemods being documented as value-preserving.
 - **A harness silently covers less than it claims.** `computedSnapshot.mjs` listed two routes that do
   not exist (`/about-verify`, `/legal/privacy-policy`); both 404, `capture` never checked status, so
   it banked the not-found page as a baseline **twice** — 178 nodes each, an identical count, which is
@@ -425,6 +436,14 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   `node tests/visual/tokeniseShape.mjs <radius|gradient> [--dry]` — one-shot codemods over
   `globals.css` (colour literals → `var()`/`color-mix()`, radius/gradient literals → tokens).
   Their carve-outs are deliberate and documented in the file headers.
+- `node tests/visual/referenceCssDiff.mjs <family> [--verbose]` — diffs every CSS declaration the
+  design reference makes for a selector family against `globals.css`, and exits non-zero until the
+  count is zero. Resolves each side's `:root` **separately** (both define `--radius`, and they
+  disagree — 8px there, 0.5rem here), compares font tokens by *name* because the brand typeface is a
+  deliberate deviation, and merges base+override rules where we implement a bespoke reference selector
+  through a shared component. Two lists are deliberate exceptions and must stay honest: `NOT_PORTED`
+  (with a reason each) and `IMPLEMENTED_AS`. **A zero is necessary, not sufficient** — it proves a rule
+  is in the file, not that it reached the page. Always confirm with `getComputedStyle`.
 - `node tests/visual/findDeadCss.mjs` — emits **candidates, not a verdict**. It has already
   produced false positives that would each have broken a live page; read the header's caveats
   before deleting any selector.

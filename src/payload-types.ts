@@ -10778,6 +10778,25 @@ export interface EventsExplorerBlock {
   pageSize?: number | null;
   showSearch?: boolean | null;
   /**
+   * List rows suit a dedicated listing page. Cards suit a hub or overview, and show each event’s image.
+   */
+  cardStyle?: ('list' | 'card') | null;
+  /**
+   * Shown above each group when the Cards presentation is used. Wrap part of a heading in [[double brackets]] to tint it with the brand colour.
+   */
+  groups?: {
+    upcomingEyebrow?: string | null;
+    upcomingHeading?: string | null;
+    upcomingIntro?: string | null;
+    upcomingLinkLabel?: string | null;
+    upcomingLinkUrl?: string | null;
+    pastEyebrow?: string | null;
+    pastHeading?: string | null;
+    pastIntro?: string | null;
+    pastLinkLabel?: string | null;
+    pastLinkUrl?: string | null;
+  };
+  /**
    * Editable UI text for this block — buttons, group headings, the search bar and empty-state messages. Leave a field blank to use its default.
    */
   labels?: {
@@ -12944,6 +12963,21 @@ export interface EventsExplorerBlockSelect<T extends boolean = true> {
   mode?: T;
   pageSize?: T;
   showSearch?: T;
+  cardStyle?: T;
+  groups?:
+    | T
+    | {
+        upcomingEyebrow?: T;
+        upcomingHeading?: T;
+        upcomingIntro?: T;
+        upcomingLinkLabel?: T;
+        upcomingLinkUrl?: T;
+        pastEyebrow?: T;
+        pastHeading?: T;
+        pastIntro?: T;
+        pastLinkLabel?: T;
+        pastLinkUrl?: T;
+      };
   labels?:
     | T
     | {
