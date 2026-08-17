@@ -15706,9 +15706,13 @@ export interface EventsSetting {
      */
     cpdEligibleLabel?: string | null;
     /**
-     * Shown under a past event that has no recap content.
+     * Shown under a past event that has no recap AND no photos or downloads. If there are photos or downloads, the line below is used instead — this one would be telling people to ask for something already on the page.
      */
     concludedFallback?: string | null;
+    /**
+     * Shown under a past event that has no recap written yet but does have photos or downloads attached.
+     */
+    concludedWithMaterials?: string | null;
     /**
      * Link back to the events listing at the bottom of the page.
      */
@@ -16432,6 +16436,7 @@ export interface EventsSettingsSelect<T extends boolean = true> {
         cpdPointsTemplate?: T;
         cpdEligibleLabel?: T;
         concludedFallback?: T;
+        concludedWithMaterials?: T;
         backToEventsLabel?: T;
         contactUrl?: T;
         recapTocLabel?: T;

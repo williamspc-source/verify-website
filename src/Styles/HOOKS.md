@@ -382,6 +382,15 @@ above, including the warning about rewording one you have already circulated.
 listings instead. The wording of all three ("Free", "CPD eligible", the points template) lives in
 **Events Settings → Event page labels**.
 
+**The "this event has now concluded" line is two lines.** A past event with no recap written yet
+shows one of them, and which one depends on whether you have attached anything:
+
+- nothing attached → *"…Contact our team for recordings or resources from this session."*
+- photos or downloads attached → *"…Photos and resources from the session are below."*
+
+Both are in **Events Settings → Event page labels**. They are separate because the first one, shown
+above a Downloads list, tells the visitor to email you for the file they are looking straight at.
+
 **Two buttons that people ask about:**
 
 - The **"Contact Us"** button that replaces "Register" once registrations close goes to

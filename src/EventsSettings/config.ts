@@ -115,7 +115,20 @@ const labelsGroup: Field = {
       label: 'Concluded-event fallback',
       defaultValue:
         'This event has now concluded. Contact our team for recordings or resources from this session.',
-      admin: { description: 'Shown under a past event that has no recap content.' },
+      admin: {
+        description:
+          'Shown under a past event that has no recap AND no photos or downloads. If there are photos or downloads, the line below is used instead — this one would be telling people to ask for something already on the page.',
+      },
+    },
+    {
+      name: 'concludedWithMaterials',
+      type: 'textarea',
+      label: 'Concluded-event fallback (materials available)',
+      defaultValue: 'This event has now concluded. Photos and resources from the session are below.',
+      admin: {
+        description:
+          'Shown under a past event that has no recap written yet but does have photos or downloads attached.',
+      },
     },
     {
       name: 'backToEventsLabel',

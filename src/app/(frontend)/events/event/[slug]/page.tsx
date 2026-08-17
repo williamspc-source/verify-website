@@ -169,6 +169,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   const attachments = (event.attachments ?? []).filter(
     (a) => a?.file && typeof a.file === 'object',
   )
+  const hasMaterials = gallery.length > 0 || attachments.length > 0
 
   // Presenters: linked cards for panel/team members, plain cards for outside
   // speakers. Both were previously unrenderable — `presenters` had no consumer
@@ -304,9 +305,18 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                   </div>
                 </>
               ) : (
+                // Two different sentences, because one of them would be a lie.
+                // The default fallback asks the visitor to contact us for
+                // recordings — which reads absurdly directly above a Downloads
+                // list holding the recording. Measured before this existed: the
+                // page said "Contact our team for recordings or resources from
+                // this session." and then rendered "Downloads · Session recording".
                 <p>
-                  {labels.concludedFallback ||
-                    'This event has now concluded. Contact our team for recordings or resources from this session.'}
+                  {hasMaterials
+                    ? labels.concludedWithMaterials ||
+                      'This event has now concluded. Photos and resources from the session are below.'
+                    : labels.concludedFallback ||
+                      'This event has now concluded. Contact our team for recordings or resources from this session.'}
                 </p>
               )
             ) : (

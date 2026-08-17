@@ -1309,6 +1309,15 @@ The cost/CPD pills are gone from every event page, matching the reference, which
 in `ArchiveBlock` — the event cards' "Webinar · CPD eligible · Free" line — now reads all four
 instead of hardcoding two strings and ignoring the point count.
 
+### Caught immediately after, by asking one question of the finished page
+
+*"What if we add resources — will the line still say contact our team for recordings?"* It did.
+Measured: a past event with a download and no recap rendered *"Contact our team for recordings or
+resources from this session."* directly above *"Downloads · Session recording"* — the page telling
+someone to email for the file two inches below it. The concluded-event fallback is now two editable
+lines, chosen on whether any photos or downloads are attached. Both branches verified, plus the
+gallery-only case.
+
 ### Two measurements that lied on the way through
 
 - **A deep link read as broken at `waitUntil: 'load'`** — heading at y=1006 instead of y=96. Images
