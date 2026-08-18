@@ -53,6 +53,30 @@
  * **So always confirm in the browser with getComputedStyle**, and measure the
  * inherited properties — weight, size, colour, alignment — explicitly. A zero
  * here is necessary, not sufficient.
+ *
+ * ── How this tool lies about YOUR CSS ───────────────────────────────────────
+ *
+ * A reported difference is not automatically a real one. Two ways an
+ * `IMPLEMENTED_AS` entry produces a phantom:
+ *
+ * 1. **An incomplete mapping under-reports.** The reference tends to put every
+ *    declaration on one element; ours are often split between a wrapper and its
+ *    children. Listing only the child reported `line-height: 1.75` for
+ *    `.rs-service-row-desc` while the browser measured the correct `1.8` — the
+ *    wrapper rule carrying it was simply not in the list. The list form exists
+ *    for exactly this, and the order is cascade order (base first, override
+ *    last). Fixing CSS to satisfy a diff you have not cross-checked in the
+ *    browser is how a correct rule gets "corrected".
+ *
+ * 2. **A stale exception hides a real gap.** `NOT_PORTED` and `EXPLAINED`
+ *    entries whose justification is a past measurement need that measurement
+ *    RE-RUN, not re-read. Two properties were once skipped here with a comment
+ *    saying they were "confirmed equal in the browser". They were not, and
+ *    removing the skip surfaced 11 genuine spacing differences on /services.
+ *
+ * The rule that follows from both: when the tool reports ONE difference on a
+ * selector whose other declarations all match, suspect the mapping first and
+ * the CSS second — and settle it with getComputedStyle before editing anything.
  */
 
 import { readFileSync } from 'node:fs'

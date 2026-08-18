@@ -16,7 +16,7 @@ something undone.
 
 ## The records, and the rule for all of them
 
-Six documents describe this repo to someone who was not there. **A change lands in all the ones it
+Seven documents describe this repo to someone who was not there. **A change lands in all the ones it
 touches, in the same pass, or the set starts lying** — and a reader cannot tell which one is stale.
 
 | File | Holds | Reader |
@@ -25,8 +25,14 @@ touches, in the same pass, or the set starts lying** — and a reader cannot tel
 | `OUTSTANDING.md` | What is knowingly imperfect, and what fixing it costs | Whoever inherits it |
 | `README.md` | Running, testing, deploying, and where images go | Whoever maintains it |
 | `src/Styles/HOOKS.md` | Every editable control and where it lives | The non-technical editor |
-| `HOMEPAGE-CHANGES.md` | Design-reference audit, pass by pass | Whoever asked for the work |
+| `verify-website-design-diff.md` | The design-reference audit for **every page**, numbered `Comparison N` | Whoever asked for the work |
+| `HOMEPAGE-CHANGES.md` | The **homepage** audit only — one dated pass against `index.html` | ditto, for that one page |
 | `current-state.md` | Status *now*: what works, what is open, how to get it onto the box | Whoever is driving the work |
+
+The last two are easy to confuse, and the table used to list only `HOMEPAGE-CHANGES.md` — which was
+wrong, because every design pass since Comparison 25 has gone into `verify-website-design-diff.md`
+and the table did not name it at all. A page pass belongs in `verify-website-design-diff.md` as the
+next numbered `Comparison`. `HOMEPAGE-CHANGES.md` is closed history for one page; do not append to it.
 
 `current-state.md` is the newest and the most fragile. It is a **snapshot**, so it holds no
 architecture, no invariants and no editor instructions — only status, and pointers to whichever of
@@ -201,6 +207,19 @@ bounded to `Section > Row > block`.
 `Spacer`/`Divider`/`IconBlock` are nestable-only atoms. Editors compose new layouts from these
 rather than getting a new bespoke block per design — build capability, don't hardcode a design.
 
+**Porting a reference design: prefer a block *variant* over a page-scoped class.** When a reference
+page styles a section differently, the tempting fix is a rule scoped to that page (`.svc-learn-rows`,
+`.ime-formats`, `.jme-process`, `.as-how` all do this, and are staying). The better fix is a field on
+the block that emits a modifier class — `FeatureGrid.cardStyle: banded`, `ProcessSteps.numberStyle`,
+`SplitFeature.rowStyle`/`density`/`bulletStyle` — because the look then becomes available to every
+instance instead of one URL. **Default every new variant to what already renders**, so adding it
+moves nothing, and prove that with `computedSnapshot.mjs` rather than asserting it.
+
+Page-scope only what is genuinely a per-page *literal* rather than a design choice: a gradient angle
+one reference page tilts differently, a palette value. Say which it is in the comment. And a variant
+must never make an existing field dead — when `bulletStyle: dot` replaces the tick, it replaces only
+the *default* tick, because a bullet the editor gave an icon still has to keep it.
+
 Shared field helpers live in `src/fields/blockFields.ts` (`backgroundField`, `containerWidthField`,
 `spacingFields`, `motionField`, `sectionHeaderFields`, `anchorIdField`, `iconField`,
 `cssClassField`, …). Use them so blocks stay consistent and every rendered detail is admin-editable.
@@ -260,6 +279,11 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   that had been captured beforehand. Capture/compare *before* seeding, or recapture after.
   A handful of sub-pixel `matrix(…)`/`opacity` diffs are scroll-reveal animation frames, not
   regressions — same node count and only transform/opacity differing is the signature.
+  **Its printed diff truncates** (`…and N more`), so "which routes changed?" cannot be answered by
+  eyeballing or `grep`-ing the output — a `uniq -c` over the visible slice reported two routes when
+  seven had moved. Read `tests/visual/__snapshots__/<name>.json` and count keys directly; the route is
+  the substring before the first space. And when adding a route to `ROUTES`, add it **before**
+  capturing the baseline, or the new route has nothing to compare against and reads as clean.
 - **A Playwright probe can lie.** A DOM-walk that reported "event not on listing" was wrong; the
   event was there. Assert on something you have independently confirmed (curl the HTML, query the
   DB) before concluding a feature is broken.
@@ -479,6 +503,47 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   headings were found at 400 the same way — `.event-presenters__heading` and
   `.art-attachments__heading`, the latter live on the article page too. **When a class name is shared
   with a plugin, read the computed value; the source file cannot tell you who won.**
+- **"Visually inert" is not "unchanged", and only the snapshot knows the difference.** A new variant's
+  whole claim was that it moves no other page. `.vf-split__media--placeholder { flex-direction:
+  column; gap: 12px }` was written unscoped on the reasoning that stacking a *single* child does
+  nothing — which is true, and it still moved `row-gap` from `normal` to `12px` on six boxes across
+  `/`, `/about`, `/services` and `/ime`. Gating it on `:has(.vf-split__placeholder-icon)` took the
+  compare down to the one intended route plus the usual `/in-the-loop` scroll-reveal frame. Reason
+  about the *selector's* reach, not the rendering's; "it looks the same" is not the claim being made
+  when you say a default changed nothing.
+- **A two-state control proven on a page that lacks the content proves nothing.** The dot-bullet
+  variant was first verified on `/services`: the modifier appeared, and "the default ticks are gone"
+  passed. Both were true and worthless — only `reporting-services` and `/style-guide` have any
+  bullets at all, so the tick count was zero before the change too. Re-pointed at `/style-guide`,
+  where it goes **5 → 0 → 5**, the assertion has content. This is the positive-control rule again in
+  its most seductive form: the check *did* find the page, *did* find the section, and still measured
+  an empty set. Assert a non-zero count in the "before" state, or the "after" state means nothing.
+- **The reference's `:first-child` is rarely our `:first-child`.** Its rows sit in a dedicated
+  `.rs-services-rows` wrapper; ours are siblings of the section header inside `.vf-section__inner`,
+  so `:first-child` matches the *header* and the first row keeps the rule it was supposed to lose.
+  `:first-of-type` fails identically — both are `div`. The working form is the adjacent sibling:
+  `.vf-section-header + .vf-split`. Whenever a ported rule depends on position, diff the two DOM
+  shapes before trusting the selector; the CSS is valid either way and simply matches nothing.
+- **A shared "tidy the last child" rule will close a gap the reference is relying on.**
+  `.vf-split__body p:last-child { margin-bottom: 0 }` exists to stop trailing space. On a row whose
+  body is a *single* paragraph, that paragraph is both first and last — so the reference's 20px
+  below the description, which is what separates it from the "When to Request" label, computed to
+  **0px**. The fix is to not re-declare the zeroing inside the scope that needs the gap. Before
+  porting a spacing value, check whether a `:last-child`/`:only-child` rule upstream will eat it.
+- **Map every rule that contributes a declaration, not the one that looks equivalent.**
+  `referenceCssDiff.mjs` reported `line-height: 1.75` against the reference's `1.8` while the browser
+  correctly measured `1.8`. Not a CSS bug — an `IMPLEMENTED_AS` gap: the reference puts colour, size,
+  line-height and margin on one element, ours splits them between a body wrapper and the paragraphs
+  inside it, and only the paragraph rule had been listed. The list form exists precisely for this;
+  omit a contributing rule and the tool reports a difference that is not there, which trains you to
+  distrust it. Cross-check any single reported difference against `getComputedStyle` before changing
+  CSS to satisfy the tool.
+- **A regex bulk edit across a fixture file reaches further than the page you are editing.** Adding
+  one field to five rows via `perl -0pi -e` matched **13** — every row in `seedServices.ts` with the
+  same two-line preamble, including `/services`, which must not have it. It was caught by reading
+  `git diff` before moving on, which is the only reason it did not ship. Count the matches and name
+  the line numbers before accepting a bulk edit to seeded content; the fixtures for several pages
+  live in one file and look alike by design.
 
 ### CSS token tooling
 
@@ -500,14 +565,24 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   Their carve-outs are deliberate and documented in the file headers.
 - `node tests/visual/referenceCssDiff.mjs <family> [--verbose]` — diffs every CSS declaration the
   design reference makes for a selector family against `globals.css`, and exits non-zero until the
-  count is zero. Resolves each side's `:root` **separately** (both define `--radius`, and they
-  disagree — 8px there, 0.5rem here), compares font tokens by *name* because the brand typeface is a
-  deliberate deviation, and merges base+override rules where we implement a bespoke reference selector
-  through a shared component. Two lists are deliberate exceptions and must stay honest: `NOT_PORTED`
-  (with a reason each), `IMPLEMENTED_AS`, and `EXPLAINED` (per-declaration, for differences that
-  cannot close — an editor-controlled spacing preset against the reference's literal, `stroke` on a
-  filled Phosphor icon). **A zero is necessary, not sufficient** — it proves a rule
-  is in the file, not that it reached the page. Always confirm with `getComputedStyle`.
+  count is zero. **Six families**: `events`, `services`, `ime`, `jme`, `admin-services`,
+  `reporting-services`; all read zero, so any non-zero is something you just did. Resolves each side's
+  `:root` **separately** (both define `--radius`, and they disagree — 8px there, 0.5rem here),
+  compares font tokens by *name* because the brand typeface is a deliberate deviation, and merges
+  base+override rules where we implement a bespoke reference selector through a shared component.
+  Three lists are deliberate exceptions and must stay honest: `NOT_PORTED` (with a reason each),
+  `IMPLEMENTED_AS`, and `EXPLAINED` (per-declaration, for differences that cannot close — an
+  editor-controlled spacing preset against the reference's literal, `stroke` on a filled Phosphor
+  icon). **A zero is necessary, not sufficient** — it proves a rule is in the file, not that it
+  reached the page. Always confirm with `getComputedStyle`.
+
+  Two failure modes of the tool itself, both seen: **a mapping that lists only the closest-looking
+  selector under-reports**, because our scoped rules split across a wrapper and its children while the
+  reference declares everything on one element — that produced a phantom `line-height` difference the
+  browser disagreed with, and the fix is the list form of `IMPLEMENTED_AS`, not a CSS edit. And **an
+  exception entry ages**: `NOT_PORTED`/`EXPLAINED` reasons that cite a past measurement need the
+  measurement re-run, not re-read. A skip justified by "verified equal in the browser" was once false
+  and hid 11 real spacing gaps.
 - `node tests/visual/findDeadCss.mjs` — emits **candidates, not a verdict**. It has already
   produced false positives that would each have broken a live page; read the header's caveats
   before deleting any selector.
