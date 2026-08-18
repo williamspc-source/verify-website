@@ -799,7 +799,10 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
         layout: 'carousel',
         limit: 10,
         linkProfiles: true,
-        carouselOptions: { speed: 34, direction: 'left', showArrows: true },
+        // 60s and no arrows, matching the reference's own marquee on
+        // services/medico-legal/jme.html — 60s per loop (styles.css:1666) and no
+        // controls after the track.
+        carouselOptions: { speed: 60, direction: 'left', showArrows: false },
         footerLinks: [
           custom('/specialists/specialist-panel', 'View Full Panel'),
           enquiry('Make an Enquiry'),
@@ -1216,6 +1219,62 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
     ],
   )
 }
+
+/**
+ * Slows the /jme specialist marquee to the reference's 60s and removes its arrows.
+ *
+ * The reference makes this section a carousel too, but at 60s per loop and with
+ * no controls after the track — the direction arrows exist only on
+ * specialist-availability.html and make-a-booking.html. Ours ran at 34s with
+ * arrows on.
+ *
+ * Unconditional, because `authorPage` early-returns on an authored page. Matched
+ * exactly against the superseded pair, so an editor who has since retuned either
+ * value keeps it.
+ */
+export const repairJmeSpecialistCarousel = async ({ payload, req }: Ctx): Promise<void> => {
+  const res = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'jme' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const page = res.docs[0] as
+    | {
+        id: number | string
+        layout?: {
+          blockType?: string
+          layout?: string
+          carouselOptions?: { speed?: number | null; showArrows?: boolean | null } | null
+        }[]
+      }
+    | undefined
+  const layout = page?.layout
+  if (!page || !Array.isArray(layout)) return
+
+  let changed = false
+  const next = layout.map((block) => {
+    if (block?.blockType !== 'peopleGrid' || block.layout !== 'carousel') return block
+    const opts = block.carouselOptions
+    if (opts?.speed !== SUPERSEDED_JME_SPEED || opts?.showArrows !== true) return block
+    changed = true
+    return { ...block, carouselOptions: { ...opts, speed: 60, showArrows: false } }
+  })
+  if (!changed) return
+
+  await payload.update({
+    collection: 'pages',
+    id: page.id,
+    data: { layout: next } as never,
+    req,
+    context: { disableRevalidate: true },
+  })
+  payload.logger.info('— Repaired /jme: specialist marquee slowed to 60s, arrows removed')
+}
+
+// The value the seed used to write.
+const SUPERSEDED_JME_SPEED = 34
 
 /**
  * Puts the /ime "Four Ways to Attend" grid onto the banded card style.

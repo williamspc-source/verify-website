@@ -419,3 +419,26 @@ Two things worth knowing about that block generally:
   takes an icon, a bold heading and a description; leave the list empty and nothing renders.
 - The **Columns** field is respected on phones now. It used to be written in a way that overrode every
   screen-size rule, so a two-column grid stayed two-across on a phone no matter what.
+
+### Carousels — what you can change, and what the numbers mean
+
+Two different kinds of carousel, and their speed fields mean different things. Getting this backwards
+is the usual reason one ends up too fast.
+
+| Block | Where | Speed field | What the number means |
+|---|---|---|---|
+| **People Grid** (Layout: Carousel) | Home, JME specialists | **Loop duration (seconds)** | How long the whole strip takes to scroll past **once**. It never stops — it is a continuous ribbon, not slides. **Lower = faster.** The design uses **60**. |
+| **Availability** | Make a Booking, Specialist Availability | *(none)* | Same ribbon, fixed at 60 seconds. |
+| **Featured Articles Carousel** | In the Loop | **Autoplay interval (ms)** | How long **each slide** is shown before the next one. The design uses **5000** (5 seconds). |
+| **Slide Carousel** | Events | **Autoplay interval (ms)** | Same — per slide. The design uses **5800**. |
+| **Testimonials** (Layout: Carousel) | Home | *(none)* | Never moves on its own; the arrows are the only way through. |
+
+Both auto-advancing carousels also have **Auto-advance slides** (untick it and it only moves when
+someone clicks), **Show prev / next arrows** and **Show dot indicators**.
+
+The ribbon carousels have **Show direction arrows** instead. Those arrows do not step through cards —
+they reverse the direction the ribbon travels. All of them pause while the pointer is over them, or
+while anything inside has keyboard focus; that is deliberate and not something you can switch off.
+
+Arrows and dots also hide themselves automatically when there is only one item to show, whatever the
+tickbox says.

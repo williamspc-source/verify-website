@@ -10,7 +10,7 @@ type Direction = 'left' | 'right'
 /**
  * Faithful port of the design reference's `.experts-carousel` — an infinite
  * auto-scrolling marquee of expert cards. The track renders the cards twice
- * (the second pass aria-hidden/non-focusable) so the 30s `translateX(-50%)`
+ * (the second pass aria-hidden/non-focusable) so the 60s `translateX(-50%)`
  * keyframe loops seamlessly. Pause-on-hover is pure CSS; the arrows toggle
  * scroll direction. Respects `prefers-reduced-motion` (no animation).
  */
@@ -38,7 +38,10 @@ export const ExpertsCarousel: React.FC<{
   const ready = !usePrefersReducedMotion()
 
   if (!cards || cards.length === 0) return null
-  const duration = `${speed || 30}s`
+  // 60s matches the reference (styles.css:1666). The fallback is load-bearing:
+  // the Availability block passes no speed at all, so this is what that strip
+  // runs at on /make-a-booking and /specialist-availability.
+  const duration = `${speed || 60}s`
 
   return (
     <div

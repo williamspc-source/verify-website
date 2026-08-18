@@ -4888,7 +4888,7 @@ export interface PeopleGridBlock {
    */
   carouselOptions?: {
     /**
-     * Lower = faster scroll.
+     * Seconds for one full loop of the strip — NOT a per-card delay. Lower = faster. The design reference uses 60.
      */
     speed?: number | null;
     direction?: ('left' | 'right') | null;
@@ -10748,6 +10748,13 @@ export interface FeaturedArticlesBlock {
    * Small uppercase label above the carousel (optional).
    */
   eyebrow?: string | null;
+  autoplay?: boolean | null;
+  /**
+   * Milliseconds each slide is shown. The design reference uses 5000.
+   */
+  interval?: number | null;
+  showArrows?: boolean | null;
+  showDots?: boolean | null;
   /**
    * Auto: newest featured posts (checkbox "Featured" or the Featured stream). Manual: hand-pick posts below.
    */
@@ -12974,6 +12981,10 @@ export interface SectionNavBlockSelect<T extends boolean = true> {
  */
 export interface FeaturedArticlesBlockSelect<T extends boolean = true> {
   eyebrow?: T;
+  autoplay?: T;
+  interval?: T;
+  showArrows?: T;
+  showDots?: T;
   source?: T;
   posts?: T;
   limit?: T;

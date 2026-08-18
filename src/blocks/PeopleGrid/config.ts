@@ -172,9 +172,15 @@ export const PeopleGrid: Block = {
             {
               name: 'speed',
               type: 'number',
-              defaultValue: 30,
+              // 60s is the design reference's own marquee duration
+              // (assets/css/styles.css:1666), used on all four of its instances.
+              defaultValue: 60,
               label: 'Loop duration (seconds)',
-              admin: { width: '50%', description: 'Lower = faster scroll.' },
+              admin: {
+                width: '50%',
+                description:
+                  'Seconds for one full loop of the strip — NOT a per-card delay. Lower = faster. The design reference uses 60.',
+              },
             },
             {
               name: 'direction',

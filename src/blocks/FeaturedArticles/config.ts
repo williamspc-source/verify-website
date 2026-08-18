@@ -18,6 +18,52 @@ export const FeaturedArticles: Block = {
       defaultValue: 'Featured',
       admin: { description: 'Small uppercase label above the carousel (optional).' },
     },
+    // Motion + controls, mirroring SlideCarousel. Defaults are exactly what was
+    // hardcoded before, so adding them changes nothing until an editor touches
+    // one. Deliberately NOT copying SlideCarousel's `(interval ?? d) || d`
+    // idiom, which turns a stored 0 back into the default.
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'autoplay',
+          type: 'checkbox',
+          defaultValue: true,
+          label: 'Auto-advance slides',
+          admin: { width: '50%' },
+        },
+        {
+          name: 'interval',
+          type: 'number',
+          defaultValue: 5000,
+          label: 'Autoplay interval (ms)',
+          admin: {
+            width: '50%',
+            description: 'Milliseconds each slide is shown. The design reference uses 5000.',
+            condition: (_data, siblingData) => siblingData?.autoplay !== false,
+          },
+        },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'showArrows',
+          type: 'checkbox',
+          defaultValue: true,
+          label: 'Show prev / next arrows',
+          admin: { width: '50%' },
+        },
+        {
+          name: 'showDots',
+          type: 'checkbox',
+          defaultValue: true,
+          label: 'Show dot indicators',
+          admin: { width: '50%' },
+        },
+      ],
+    },
     {
       name: 'source',
       type: 'select',

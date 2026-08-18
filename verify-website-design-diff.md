@@ -1507,6 +1507,70 @@ column count stays the editor's `--vf-cols`, and `stroke` is not set on filled P
 
 ---
 
+## Comparison 28: every carousel, cross-referenced (2026-08-17)
+
+Prompted by the `/jme` specialist strip reading as too fast. **Seven instances, five
+implementations. Five already matched the reference; two did not.**
+
+| Carousel | Page | Build | Reference | |
+|---|---|---|---|---|
+| PeopleGrid marquee | `/services/medico-legal/jme` | 34s, arrows on | 60s, no arrows | **fixed** |
+| PeopleGrid marquee | `/` | 60s, no arrows | 60s, no arrows | ✓ |
+| Availability marquee | `/make-a-booking`, `/specialists/specialist-availability` | 30s | 60s | **fixed (speed)** |
+| SlideCarousel | `/events` | 5800ms, arrows, dots, hover-pause | 5800ms intended | ✓ |
+| FeaturedArticles | `/in-the-loop` | 5000ms, arrows, 3 dots | 5000ms, arrows, 3 dots | ✓ |
+| TestimonialsGrid | `/` | no autoplay, arrows only | no autoplay, arrows only | ✓ |
+| PeopleGrid marquee | `/style-guide` | 30s, arrows on | *no counterpart* | left as a controls demo |
+
+Measured after: **every marquee reads `animation-duration: 60s`**, matching the reference on all four
+of its own instances. `/in-the-loop` still advances at ~5s with 2 arrows and 3 dots; `/events` still
+at ~5.8s with 2 arrows and 4 dots; the homepage testimonials still do not auto-advance at all.
+
+### Arrow behaviour needed no decision
+
+All four arrow implementations already behaved exactly as the reference's do. The direction-toggle
+arrows on the specialist marquee — which look like an odd affordance — are **not ours**: the reference
+does the same on `specialist-availability.html:170` and `make-a-booking.html:381`, `aria-pressed` and
+`title="Move right"` / `"Move left"` included. The stepping arrows step on both sides.
+
+### The 30s that was wrong in two places
+
+The Availability strip passes no `speed` at all, so it fell through to the component's fallback — which
+was 30, half the reference's 60. Fixing the fallback and the `PeopleGrid.speed` default together
+corrected `/make-a-booking` and `/specialists/specialist-availability` without touching either block's
+data. `globals.css`'s base `30s` was aligned too; it never renders, because the component always sets
+an inline `animation-duration`, but a stylesheet claiming the wrong number is how the next person gets
+misled.
+
+### The reference's own events carousel is broken
+
+Worth recording, because it looks like a difference and is not one. `events-seminars.html` is coded for
+5800ms autoplay, hover-pause, arrow keys and a Pause/Play button — but no element carries
+`data-offer-toggle`, so `toggleButton.addEventListener` throws at line 234 and **everything registered
+after it never runs**: the hover-pause handlers, the keyboard handler, and the `start()` call itself.
+In a browser the reference's carousel does not move at all. Ours matches the intent, which is the call
+that was made here.
+
+### Two accepted departures
+
+- **No arrows on the Availability marquee**, where the reference has them. Decided deliberately.
+- **SlideCarousel and FeaturedArticles ignore `prefers-reduced-motion`**, as the reference does. Only
+  the specialist marquee honours it (`ExpertsCarousel/index.tsx:38` and `globals.css:2978`). Left as
+  is, and recorded so it is a known state rather than an oversight.
+
+### FeaturedArticles was the one carousel with no controls at all
+
+5000ms autoplay, arrows and dots were all hardcoded. It now has `autoplay`, `interval`, `showArrows`
+and `showDots`, defaulted to exactly the previous behaviour so nothing moved. Proven not inert: with
+`autoplay` off the track stopped for 9s, and with `showDots` off the three dots disappeared while both
+arrows stayed.
+
+Deliberately **not** copying `SlideCarousel`'s `(interval ?? 5800) || 5800` idiom
+(`SlideCarousel/Component.tsx:86`) — that turns a stored `0` back into the default, so the field
+cannot express a value it accepts. The new one uses `?? 5000` and guards `tick <= 0` explicitly.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

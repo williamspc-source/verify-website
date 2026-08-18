@@ -19,9 +19,20 @@ export type FeaturedSlide = {
 // one full-width article slide at a time, a sliding translateX track, prev/next
 // round arrow buttons, dot indicators, 5s autoplay, pause on hover and
 // wrap-around at both ends.
-export const FeaturedArticlesClient: React.FC<{ slides: FeaturedSlide[]; ctaLabel?: string }> = ({
+export const FeaturedArticlesClient: React.FC<{
+  slides: FeaturedSlide[]
+  ctaLabel?: string
+  autoplay?: boolean | null
+  interval?: number | null
+  showArrows?: boolean | null
+  showDots?: boolean | null
+}> = ({
   slides,
   ctaLabel = 'Read Full Article →',
+  autoplay = true,
+  interval,
+  showArrows = true,
+  showDots = true,
 }) => {
   const count = slides.length
   const [current, setCurrent] = useState(0)
@@ -35,13 +46,17 @@ export const FeaturedArticlesClient: React.FC<{ slides: FeaturedSlide[]; ctaLabe
     [count],
   )
 
+  // `?? 5000` only — NOT `(interval ?? 5000) || 5000`, which is what SlideCarousel
+  // does and which silently turns a stored 0 back into the default, making the
+  // field unable to express a value it accepts.
+  const tick = interval ?? 5000
   useEffect(() => {
-    if (paused || count <= 1) return
+    if (autoplay === false || paused || count <= 1 || tick <= 0) return
     const timer = window.setInterval(() => {
       setCurrent((c) => (c + 1) % count)
-    }, 5000)
+    }, tick)
     return () => window.clearInterval(timer)
-  }, [paused, count])
+  }, [autoplay, paused, count, tick])
 
   if (count === 0) return null
 
@@ -108,7 +123,7 @@ export const FeaturedArticlesClient: React.FC<{ slides: FeaturedSlide[]; ctaLabe
           ))}
         </div>
 
-        {count > 1 ? (
+        {showArrows !== false && count > 1 ? (
           <>
             <button
               type="button"
@@ -130,7 +145,7 @@ export const FeaturedArticlesClient: React.FC<{ slides: FeaturedSlide[]; ctaLabe
         ) : null}
       </div>
 
-      {count > 1 ? (
+      {showDots !== false && count > 1 ? (
         <div className="ni-carousel-dots">
           {slides.map((_, i) => (
             <button

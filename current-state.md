@@ -119,6 +119,11 @@ page-scoped rules, and the Enquire links aligned in both grids. `referenceCssDif
 **Banded** card style on FeatureGrid — a tinted header panel behind the icon and title — with the
 reference's icon chips, item tiles and hover. `referenceCssDiff.mjs` has an `ime` family reading zero.
 
+Every carousel was then cross-referenced against the reference (Comparison 28): five of seven already
+matched, the `/jme` marquee was slowed 34s → 60s with its arrows removed, and the Availability strip's
+30s fallback was corrected to 60s. Featured Articles gained the motion/control fields the other
+carousels already had.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items

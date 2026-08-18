@@ -2841,7 +2841,10 @@
   will-change: transform;
 }
 .experts-carousel.is-ready .experts-grid {
-  animation: experts-carousel-loop 30s linear infinite;
+  /* 60s matches the reference (styles.css:1666). Always overridden by the inline
+     animation-duration the component sets from the editable Loop duration, so
+     this is the value the stylesheet should *claim*, not one that ever renders. */
+  animation: experts-carousel-loop 60s linear infinite;
 }
 .experts-carousel[data-direction="right"].is-ready .experts-grid {
   animation-direction: reverse;

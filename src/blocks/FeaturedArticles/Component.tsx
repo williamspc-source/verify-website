@@ -104,6 +104,10 @@ type Props = {
   background?: 'white' | 'muted' | 'accent' | 'primary' | 'dark' | null
   cssClass?: string | string[] | null
   bare?: boolean
+  autoplay?: boolean | null
+  interval?: number | null
+  showArrows?: boolean | null
+  showDots?: boolean | null
 }
 
 export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
@@ -114,6 +118,7 @@ export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
   const badgeLabel = (props as { badgeLabel?: string | null }).badgeLabel || 'Featured'
   const bylinePrefix = (props as { bylinePrefix?: string | null }).bylinePrefix || 'By:'
   const ctaLabel = (props as { ctaLabel?: string | null }).ctaLabel || 'Read Full Article →'
+  const { autoplay, interval, showArrows, showDots } = props
 
   const limit = limitFromProps || 6
   let posts: Post[] = []
@@ -163,7 +168,14 @@ export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
       className={cn('ni-featured', toClassName(cssClass))}
     >
       {eyebrow ? <div className="ni-featured-label">{eyebrow}</div> : null}
-      <FeaturedArticlesClient slides={slides} ctaLabel={ctaLabel} />
+      <FeaturedArticlesClient
+        slides={slides}
+        ctaLabel={ctaLabel}
+        autoplay={autoplay}
+        interval={interval}
+        showArrows={showArrows}
+        showDots={showDots}
+      />
     </Section>
   )
 }
