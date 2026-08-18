@@ -442,3 +442,13 @@ while anything inside has keyboard focus; that is deliberate and not something y
 
 Arrows and dots also hide themselves automatically when there is only one item to show, whatever the
 tickbox says.
+
+### Step numbers can be `1` or `01`
+
+**Pages → the page → the Process Steps block → Step number style.** The design uses both, so this is
+per-section rather than a site-wide setting:
+
+- **Plain — 1, 2, 3** — the JME process, and the Administrative Services "how it works".
+- **Padded — 01, 02, 03** — Information for Clients, Information for Claimants.
+
+Changing it affects only the block you are editing.

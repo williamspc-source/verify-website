@@ -4004,6 +4004,7 @@ export interface ProcessStepsBlock {
    * Layout. "Cards" = numbered card grid. "Two-row process" = connected numbered rows (01–03 blue, 04+ dark) matching the reference Our Process. "Claimant step list" = left intro + a compact numbered list on the right (reference Your Examination Step by Step).
    */
   variant?: ('cards' | 'two-row' | 'claimant' | 'edu-panels') | null;
+  numberStyle?: ('padded' | 'plain') | null;
   /**
    * Replaces the plain Subheading for this variant, adding bold and italic. Leave empty to keep using Subheading.
    */
@@ -11850,6 +11851,7 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
   subheading?: T;
   background?: T;
   variant?: T;
+  numberStyle?: T;
   introRich?: T;
   columns?: T;
   steps?:

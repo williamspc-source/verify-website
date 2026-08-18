@@ -817,6 +817,10 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           'VERIFY manages the entire JME process from initial agreement through to report delivery — keeping both parties informed at every stage.',
         background: 'muted',
         columns: '5',
+        // Reference `.jme-process`: 56px circles, plain digits, a 2px connector
+        // masked by each circle's band-coloured border, and smaller step type.
+        cssClass: ['jme-process'],
+        numberStyle: 'plain',
         steps: [
           {
             title: 'Joint Agreement',
@@ -1218,6 +1222,61 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
       },
     ],
   )
+}
+
+/**
+ * Puts the /jme process steps onto the reference's treatment.
+ *
+ * Two values: the `jme-process` scope class that carries the reference's 56px
+ * circles and type scale, and plain step numbers. The reference uses BOTH
+ * numbering styles across the site — plain on jme.html and admin-services.html,
+ * padded on for-clients.html and for-claimants.html — so this is per-instance.
+ *
+ * Unconditional (`authorPage` early-returns on an authored page), and one-shot:
+ * the `jme-process` class is the marker, so once it is present nothing here is
+ * written again.
+ */
+export const repairJmeProcessSteps = async ({ payload, req }: Ctx): Promise<void> => {
+  const res = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'jme' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const page = res.docs[0] as
+    | {
+        id: number | string
+        layout?: { blockType?: string; cssClass?: unknown; numberStyle?: string | null }[]
+      }
+    | undefined
+  const layout = page?.layout
+  if (!page || !Array.isArray(layout)) return
+
+  let changed = false
+  const next = layout.map((block) => {
+    if (block?.blockType !== 'processSteps') return block
+    const classes = Array.isArray(block.cssClass) ? (block.cssClass as string[]) : []
+    // The class is the migration marker, and it has to be: `padded` is both the
+    // Payload default AND a legitimate editor choice, so "is it still padded?"
+    // cannot tell an untouched block from a deliberate one. Keying on the class
+    // makes this a one-shot — once the block carries `jme-process`, the number
+    // style is never written again. Same shape as `isUnauthored`: write into an
+    // absence, not into a value that merely looks like a default.
+    if (classes.includes('jme-process')) return block
+    changed = true
+    return { ...block, cssClass: [...classes, 'jme-process'], numberStyle: 'plain' }
+  })
+  if (!changed) return
+
+  await payload.update({
+    collection: 'pages',
+    id: page.id,
+    data: { layout: next } as never,
+    req,
+    context: { disableRevalidate: true },
+  })
+  payload.logger.info('— Repaired /jme: process steps scoped to the reference treatment')
 }
 
 /**

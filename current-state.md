@@ -124,6 +124,10 @@ matched, the `/jme` marquee was slowed 34s → 60s with its arrows removed, and 
 30s fallback was corrected to 60s. Featured Articles gained the motion/control fields the other
 carousels already had.
 
+The `/jme` process steps were then ported to the reference (Comparison 29) — 56px circles, plain step
+numbers, and the reference's type scale — with a new editable **Step number style** field, since the
+reference uses `1` on some pages and `01` on others.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items

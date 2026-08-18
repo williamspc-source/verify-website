@@ -92,6 +92,13 @@ const FAMILIES = {
     pages: ['.design-reference/services/medico-legal/ime.html'],
     match: /^\.ime-format/,
   },
+  // /services/medico-legal/jme → "The JME Process, Step by Step". Inline-only
+  // again: `grep jme-process` over styles.css returns zero.
+  jme: {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/services/medico-legal/jme.html'],
+    match: /^\.jme-process/,
+  },
 }
 
 /**
@@ -253,6 +260,21 @@ const IMPLEMENTED_AS = {
     // The detail <p> has no rule of its own on either side; both inherit body type.
     '.ime-format-included-text span': null,
   },
+  jme: {
+    '.jme-process': ['.vf-section', '.vf-section--muted'],
+    '.jme-process-header': ['.vf-section-header', '.jme-process .vf-section-header'],
+    '.jme-process-header h2': ['.section-title', '.jme-process .vf-section-header__title'],
+    '.jme-process-header h2 span': ['.section-title span', '.vf-accent'],
+    '.jme-process-header p': ['.section-subtitle', '.jme-process .vf-section-header__subtitle'],
+    '.jme-process-steps': '.vf-process',
+    '.jme-process-steps::before': ['.vf-process::before', '.jme-process .vf-process::before'],
+    '.jme-process-step': ['.vf-process-step', '.jme-process .vf-process-step'],
+    '.jme-process-step-num': ['.vf-process-step-num', '.jme-process .vf-process-step-num'],
+    // Our step title is an <h4> and the description a <p>; the reference uses
+    // <strong> and <span> inside a flex column. Same role, different element.
+    '.jme-process-step strong': ['.vf-process-step h4', '.jme-process .vf-process-step h4'],
+    '.jme-process-step span': ['.vf-process-step p', '.jme-process .vf-process-step p'],
+  },
 }
 
 /**
@@ -303,6 +325,11 @@ const EXPLAINED = {
     '.ime-format-included-item-icon': { 'margin-top': 'The reference nudges the tile down 1px to sit optically against the first line of a TOP-ALIGNED item. Meaningless once the icon is centred — see the entry above.' },
     '.ime-format-card-icon svg': { stroke: 'The reference draws stroked inline SVGs. Phosphor duotone icons are FILLED and take `currentColor`, which the tile already sets to `--primary`.' },
     '.ime-format-included-item-icon svg': { stroke: 'ditto.' },
+  },
+  jme: {
+    '.jme-process': { padding: 'Section padding is the editor-controlled `--space-normal` preset (56–88px), not a literal 80px.' },
+    '.jme-process-steps': { 'grid-template-columns': 'Column count is the ProcessSteps block\'s `columns` field, emitted as `--vf-cols`. Set to 5 on this page, so the rendered grid matches.' },
+    '.jme-process-step strong': { display: 'The reference needs `display: block` because its step title is a `<strong>`, which is inline. Ours is an `<h4>`, already block-level.' },
   },
 }
 

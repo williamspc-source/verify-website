@@ -9768,6 +9768,51 @@
   .svc-admin-split .vf-section-header__subtitle { margin-top: 16px !important; }
 }
 
+/* ── /jme: "The JME Process, Step by Step" (reference `.jme-process*`,
+   jme.html's inline <style>). Scoped, because `.vf-process*` is the shared
+   ProcessSteps "cards" variant and also renders on /admin-services, /for-clients
+   and the style guide, whose own reference sections differ. ── */
+.jme-process .vf-section-header {
+  max-width: 600px;
+  margin: 0 auto 52px;
+  text-align: center;
+}
+.jme-process .vf-section-header__title {
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+.jme-process .vf-section-header__subtitle {
+  font-size: 0.95rem;
+  line-height: 1.78;
+  margin-bottom: 0;
+}
+/* The connector sits behind the circles and is masked by each circle's 4px
+   band-coloured border, which is what makes the line appear to stop at the
+   circle's edge rather than run under it. */
+.jme-process .vf-process::before {
+  top: 28px;
+  left: calc(10% + 14px);
+  right: calc(10% + 14px);
+  background: linear-gradient(90deg, var(--bg-light-1), var(--primary), var(--bg-light-1));
+}
+.jme-process .vf-process-step { padding: 0 12px; }
+.jme-process .vf-process-step-num {
+  width: 56px;
+  height: 56px;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  border: 4px solid var(--band-muted);
+  box-shadow: none;
+  flex-shrink: 0;
+}
+.jme-process .vf-process-step h4 {
+  font-size: 0.84rem;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.jme-process .vf-process-step p { font-size: 0.78rem; line-height: 1.55; }
+
 /* ── /services: IME & JME split rows (reference `.svc-feature-*`, declared in
    services.html's inline <style>). Scoped to `.svc-learn-rows`, because
    `.vf-split` and `.vf-split__media` are shared with /ime, /jme and About,

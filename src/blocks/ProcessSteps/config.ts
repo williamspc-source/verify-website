@@ -33,6 +33,19 @@ export const ProcessSteps: Block = {
         { label: 'AAMLE education feature panels', value: 'edu-panels' },
       ],
     },
+    {
+      // The reference uses BOTH styles: plain digits on jme.html and
+      // admin-services.html, zero-padded on for-clients.html and
+      // for-claimants.html. So it is a per-instance choice, not a global one.
+      name: 'numberStyle',
+      type: 'select',
+      defaultValue: 'padded',
+      label: 'Step number style',
+      options: [
+        { label: 'Padded — 01, 02, 03', value: 'padded' },
+        { label: 'Plain — 1, 2, 3', value: 'plain' },
+      ],
+    },
     // The shared `subheading` above is plain text, and it is one field on a helper
     // used by 26 blocks — widening it to rich text would touch 58 columns. Only
     // this variant's intro needs emphasis (the reference bolds "Australian Academy

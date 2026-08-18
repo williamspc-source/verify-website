@@ -1571,6 +1571,55 @@ cannot express a value it accepts. The new one uses `?? 5000` and guards `tick <
 
 ---
 
+## Comparison 29: /jme "The JME Process, Step by Step" (2026-08-17)
+
+Ported to the reference's treatment. Every measured value now matches:
+
+| | Was | Reference / now |
+|---|---|---|
+| Step circle | 72px, 22.4px glyph, blue glow shadow | **56px, 16px, 4px band-coloured border, no shadow** |
+| Step numbers | `01 02 03` | **`1 2 3`** |
+| Heading | 40px, one line | **38.4px, wraps to two** (header capped at 600px) |
+| Step title | 16.8px | **13.44px / 700, 6px below** |
+| Step description | 14.4px | **12.48px / 1.55** |
+| Connector | `top: 36px`, primary→light→primary | **`top: 28px`, light→primary→light** |
+
+The circle's `border: 4px solid var(--band-muted)` is what makes the connector appear to stop at each
+circle rather than run beneath it — the border is the band colour, so it masks the line.
+
+### The numbering is per-instance, not a global style
+
+`padStart(2, '0')` was hardcoded in `ProcessSteps/Component.tsx` for all four variants. Checking the
+reference before changing it: it uses **both** — plain digits on `jme.html` and
+`admin-services.html`, zero-padded on `for-clients.html` and `for-claimants.html`. So it became an
+editable **Step number style** field, defaulted to `padded` so the other five instances did not move.
+
+### The repair had to be keyed on the class, not the value
+
+The first version set the number style whenever it was "still the default". But `padded` **is** the
+default *and* a legitimate editor choice, so that predicate cannot tell an untouched block from a
+deliberate one — it would have re-asserted `plain` on every seed run, forever. The `jme-process` scope
+class is the marker instead, making the repair one-shot. Proven: with the class removed the block is
+migrated, and with the class present a hand-set `padded` survives a reseed. Same shape as
+`isUnauthored` — write into an absence, never into a value that merely looks like a default.
+
+### Scoped, because `.vf-process*` is shared
+
+The ProcessSteps "cards" variant also renders on `/admin-services`, `/style-guide` and (as other
+variants) `/for-clients`, `/for-claimants` and the homepage. All confirmed unchanged after: still
+`01 02 03` at 72px, and none carry the `jme-process` scope.
+
+**Noted, not fixed:** `/admin-services` uses plain digits in the reference (`as-how-step-num` → `1`)
+and padded in ours. One field value, but its section was not otherwise audited, so it is left for a
+pass of its own rather than half-corrected here.
+
+A `jme` family was added to `referenceCssDiff.mjs` and driven to **zero**; `ime`, `services` and
+`events` all still read zero. Three explained departures: the editable spacing preset, the editable
+column count, and `display: block` on the step title — the reference needs it because its title is a
+`<strong>`, ours is an `<h4>`.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

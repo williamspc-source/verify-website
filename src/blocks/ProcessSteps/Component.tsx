@@ -12,7 +12,8 @@ import { accentText } from '@/utilities/accentText'
 
 type Step = NonNullable<Props['steps']>[number]
 
-const num = (i: number) => String(i + 1).padStart(2, '0')
+const num = (i: number, style?: string | null) =>
+  style === 'plain' ? String(i + 1) : String(i + 1).padStart(2, '0')
 
 /**
  * A step description is rich text: multiple paragraphs plus bold/italic, which
@@ -49,6 +50,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
     subheading,
     background,
     columns,
+    numberStyle,
     steps,
     cssClass,
     elementClasses,
@@ -135,7 +137,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
           <div className="claimant-steps">
             {steps.map((step, i) => (
               <div key={i} className="claimant-step">
-                <div className="claimant-step-num">{num(i)}</div>
+                <div className="claimant-step-num">{num(i, numberStyle)}</div>
                 <div className="claimant-step-content">
                   {step.title ? <h3>{step.title}</h3> : null}
                   <Body data={step.description} />
@@ -191,7 +193,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
           {steps.map((step, i) => (
             <div key={i} className="aamle-feature-panel">
               <div className="aamle-feature-panel-left">
-                <span className="aamle-feature-panel-step">{num(i)}</span>
+                <span className="aamle-feature-panel-step">{num(i, numberStyle)}</span>
                 {step.icon ? (
                   <div className="aamle-feature-panel-icon">
                     <Icon name={step.icon} />
@@ -252,7 +254,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
             key={i}
             className={cn('vf-process-step vf-process-steps__step', toClassName(elementClasses?.card))}
           >
-            <div className="vf-process-step-num vf-process-steps__number">{num(i)}</div>
+            <div className="vf-process-step-num vf-process-steps__number">{num(i, numberStyle)}</div>
             {step.icon ? (
               <div className="vf-process-step-icon vf-card__icon">
                 <Icon name={step.icon} />
