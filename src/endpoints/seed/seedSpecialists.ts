@@ -87,7 +87,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
       showShield: true,
       heading: 'Our Panel of [[Medical Specialists]]',
       subtitle:
-        'At VERIFY, we work with a variety of medical specialists to provide a service uniquely catered to our clients. Our specialists are highly skilled professionals committed to the highest standards of professionalism, accuracy and impartiality.',
+        'At VERIFY, we work with a variety of medical specialists to provide a service uniquely catered to our clients. Our specialists are highly skilled professionals committed to the highest standards of professionalism, accuracy, and impartiality.',
     },
     [
       {
@@ -398,7 +398,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
       showShield: true,
       heading: 'Our Panel of [[Medical Specialists]]',
       subtitle:
-        'At VERIFY, we work with a variety of medical specialists to provide a service uniquely catered to our clients. Our specialists are highly skilled professionals committed to the highest standards of professionalism, accuracy and impartiality.',
+        'At VERIFY, we work with a variety of medical specialists to provide a service uniquely catered to our clients. Our specialists are highly skilled professionals committed to the highest standards of professionalism, accuracy, and impartiality.',
     },
     // The reference Specialists page IS the searchable directory (not a hub).
     [

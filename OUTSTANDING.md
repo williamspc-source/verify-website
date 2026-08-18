@@ -22,13 +22,13 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | # | Issue | Live today? | User impact | Effort | Recommendation |
 |---|---|---|---|---|---|
 | 1 | Migration not yet created on the box | — | **Blocks deploy** | ~20 min + a careful read | **Required, immediately before the push** |
-| 2 | The admin e2e spec is flaky under a loaded dev server | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine | ~10 min | Worth doing before handover |
+| 2 | Two e2e specs are flaky under a loaded dev server | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine | ~10 min | Worth doing before handover |
 | 3 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** | After the deploy, not before |
 | 4 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min | Only if someone confirms which is intended |
 
 ---
 
-## 2. `admin.e2e.spec.ts` fails intermittently, and only in a full run
+## 2. `admin.e2e.spec.ts` and `links.e2e.spec.ts` fail intermittently, and only in a full run
 
 Found while verifying the article deep-link pass, not caused by it — the change touches no admin
 code, and the spec passes on the pre-change tree too.
@@ -48,6 +48,15 @@ generous budget for a rendered page and a thin one for a cold Turbopack compile 
 **The fix** is to give those two assertions their own timeout (`{ timeout: 30_000 }`), or to warm
 `/admin` once in `beforeAll` before starting the clock. Not a longer global timeout — that would
 slow every genuine failure in the suite to a crawl.
+
+**Widened 2026-08-18: the link crawl itself does it too.** During the FAQ pass, a full run reported
+*"Links › every internal link resolves"* as the failure, with the three specs behind it skipped by
+serial mode — the same `1 failed / N passed / M did not run` shape described above, just one spec
+earlier. It passed in isolation immediately afterwards (43s) and the very next full run was
+**19/19**, including that spec. So the fault is not specific to the admin bundle: any spec can draw
+the short straw when the dev server is compiling on demand under a crawl. That also means the
+"failing spec" name in a report is not diagnostic, and a single red run here is not evidence of a
+regression until it reproduces.
 
 Left alone because it is a test-harness fault with no user-facing effect, and widening the scope of
 a content-rendering pass into the admin suite is how unrelated changes get bundled into one commit.
