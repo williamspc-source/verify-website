@@ -1609,9 +1609,34 @@ The ProcessSteps "cards" variant also renders on `/admin-services`, `/style-guid
 variants) `/for-clients`, `/for-claimants` and the homepage. All confirmed unchanged after: still
 `01 02 03` at 72px, and none carry the `jme-process` scope.
 
-**Noted, not fixed:** `/admin-services` uses plain digits in the reference (`as-how-step-num` → `1`)
-and padded in ours. One field value, but its section was not otherwise audited, so it is left for a
-pass of its own rather than half-corrected here.
+**Then done too — `/admin-services` (reference `.as-how`).** Same compact design, and every value now
+matches: 560px header, `clamp(1.7rem, 3vw, 2.2rem)` heading wrapping to two lines, plain digits,
+56px circles, `0 16px` step padding, and the connector at `top: 28px` starting at **155.5px** on both
+sides.
+
+The reference declares `.jme-process*` and `.as-how*` as two families, but they are the same design —
+only the header width, the heading clamp and the step padding differ. The shared half is written once
+as a grouped selector. The connector inset, which the reference hardcodes per family (10% for five
+columns, 12.5% for four), is derived from `--vf-cols` instead:
+`calc(100% / (2 * var(--vf-cols)) + 14px)`. That resolves to both reference values exactly and means a
+three- or six-step process needs no new rule. Both families read zero with that noted in `EXPLAINED`.
+
+### The heading-wrap guard fired, and was right to
+
+`tests/e2e/frontend.e2e.spec.ts` went **19 → 18**: the `as-how` header caps itself at 560px and wraps
+its title, which is precisely the fault that guard was written to catch. Here the wrap is the design —
+the reference's own heading wraps at that width.
+
+The guard could not tell the two apart by measuring, because in the DOM they are identical. Its claim
+was narrowed rather than weakened: an `INTENTIONAL` map of section classes, each naming the reference
+rule it ports. Re-proved red afterwards by restoring `max-width: 720px` on
+`.vf-section-header--centered` — **3 specs fail**, 2 on `/`, 1 on `/about`, and, importantly, 1 on
+`/services/medico-legal/admin-services`, because the exemption skips only the `as-how` header and the
+guard still catches the other header on that same page. An exemption that blinded the whole page would
+be worse than no guard.
+
+The original fault was a *shared* rule capping every centred header site-wide; these are page-scoped
+ports of a specific measured value. That is the distinction the map records.
 
 A `jme` family was added to `referenceCssDiff.mjs` and driven to **zero**; `ime`, `services` and
 `events` all still read zero. Three explained departures: the editable spacing preset, the editable

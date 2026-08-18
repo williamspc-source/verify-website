@@ -112,12 +112,17 @@ test.describe('Frontend', () => {
    * newline in the heading field into a `<br>`, so two lines there are the
    * editor's decision, not a layout fault.
    *
-   * Proven red by restoring `max-width: var(--vf-measure, 720px)` on
-   * `.vf-section-header--centered` in `src/app/(frontend)/globals.css` (and
-   * `--vf-measure: 720px` in `:root`) — a guard that has never failed is not
-   * evidence. With that restored it reports 2 violations on `/`, 1 on `/about`
-   * and 2 on `/services/medico-legal/admin-services`, and still none on
-   * `/services`.
+   * Proven red by restoring `max-width: 720px` on `.vf-section-header--centered`
+   * in `src/app/(frontend)/globals.css` — a guard that has never failed is not
+   * evidence. Re-run after the INTENTIONAL exemption below was added: **3 specs
+   * fail**, reporting 2 violations on `/` ("Medico-Legal Support, Tailored to
+   * You", "Comprehensive Medico-Legal Services"), 1 on `/about` ("CCARRE — The
+   * Principles That Guide Us") and 1 on `/services/medico-legal/admin-services`
+   * ("Four Services. One Less Thing to Manage."), with none on `/services`.
+   *
+   * That last one is the point of re-proving: the exemption skips the `as-how`
+   * header on that page and the guard still catches the *other* header there. An
+   * exemption that blinded the whole page would be worse than no guard.
    */
   for (const path of ['/', '/about', '/services', '/services/medico-legal/admin-services']) {
     test(`${path} centred section headers do not narrow themselves into a wrap`, async ({
@@ -129,11 +134,32 @@ test.describe('Frontend', () => {
       const measured = await page.evaluate(() => {
         const rows: { text: string; before: number; after: number; capped: string }[] = []
 
+        /**
+         * Sections whose header is capped ON PURPOSE, each with the reference
+         * rule it ports. The guard's claim is "a header should not narrow its
+         * own title *by accident*", and it cannot tell an accident from a
+         * deliberate port by measuring — both look identical in the DOM.
+         *
+         * The original fault was a SHARED rule (`--vf-measure` on
+         * `.vf-section-header--centered`) capping every centred header on the
+         * site. These are page-scoped ports of a specific reference value, and
+         * the reference's own heading wraps to two lines at exactly this width.
+         *
+         * Keep this honest: an entry is a claim that the wrap is the design.
+         * Anything merely inconvenient belongs in the CSS, not here.
+         */
+        const INTENTIONAL: Record<string, string> = {
+          'as-how': 'reference .as-how-header — max-width: 560px, and its heading wraps to two lines',
+          'jme-process': 'reference .jme-process-header — max-width: 600px, same',
+        }
+
         document
           .querySelectorAll<HTMLElement>('.vf-section-header--centered')
           .forEach((header) => {
             const title = header.querySelector<HTMLElement>('.section-title')
             if (!title || title.querySelector('br')) return
+            const section = header.closest('section')
+            if (section && Object.keys(INTENTIONAL).some((c) => section.classList.contains(c))) return
 
             const lineHeight = parseFloat(getComputedStyle(title).lineHeight)
             if (!lineHeight) return

@@ -24,7 +24,7 @@ import {
   repairServicesFeatureIcon,
   repairImeFormatsCardStyle,
   repairJmeSpecialistCarousel,
-  repairJmeProcessSteps,
+  repairCompactProcessSteps,
 } from './seed/seedServices'
 import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
 import { isPlaceholderLayout } from './seed/authored'
@@ -1182,7 +1182,7 @@ export const seedVerify = async ({
   await repairServicesFeatureIcon({ payload, req })
   await repairImeFormatsCardStyle({ payload, req })
   await repairJmeSpecialistCarousel({ payload, req })
-  await repairJmeProcessSteps({ payload, req })
+  await repairCompactProcessSteps({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
   // Both write only into an absence — a missing carousel block, a superseded

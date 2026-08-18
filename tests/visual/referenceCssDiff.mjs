@@ -99,6 +99,14 @@ const FAMILIES = {
     pages: ['.design-reference/services/medico-legal/jme.html'],
     match: /^\.jme-process/,
   },
+  // /services/medico-legal/admin-services → "Simple to Request, Seamless to
+  // Deliver". The same compact process design as `jme-process`, declared by the
+  // reference as a separate family. Inline-only again.
+  'admin-services': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/services/medico-legal/admin-services.html'],
+    match: /^\.as-how/,
+  },
 }
 
 /**
@@ -275,6 +283,19 @@ const IMPLEMENTED_AS = {
     '.jme-process-step strong': ['.vf-process-step h4', '.jme-process .vf-process-step h4'],
     '.jme-process-step span': ['.vf-process-step p', '.jme-process .vf-process-step p'],
   },
+  'admin-services': {
+    '.as-how': ['.vf-section', '.vf-section--accent'],
+    '.as-how-header': ['.vf-section-header', '.as-how .vf-section-header'],
+    '.as-how-header h2': ['.section-title', '.as-how .vf-section-header__title'],
+    '.as-how-header h2 span': ['.section-title span', '.vf-accent'],
+    '.as-how-header p': ['.section-subtitle', '.as-how .vf-section-header__subtitle'],
+    '.as-how-steps': '.vf-process',
+    '.as-how-steps::before': ['.vf-process::before', '.as-how .vf-process::before'],
+    '.as-how-step': ['.vf-process-step', '.as-how .vf-process-step'],
+    '.as-how-step-num': ['.vf-process-step-num', '.as-how .vf-process-step-num'],
+    '.as-how-step strong': ['.vf-process-step h4', '.as-how .vf-process-step h4'],
+    '.as-how-step span': ['.vf-process-step p', '.as-how .vf-process-step p'],
+  },
 }
 
 /**
@@ -329,7 +350,14 @@ const EXPLAINED = {
   jme: {
     '.jme-process': { padding: 'Section padding is the editor-controlled `--space-normal` preset (56–88px), not a literal 80px.' },
     '.jme-process-steps': { 'grid-template-columns': 'Column count is the ProcessSteps block\'s `columns` field, emitted as `--vf-cols`. Set to 5 on this page, so the rendered grid matches.' },
+    '.jme-process-steps::before': { left: 'Derived from `--vf-cols` rather than hardcoded per family — `calc(100% / (2 * cols) + 14px)` resolves to the reference\'s 10% here and 12.5% on /admin-services.', right: 'ditto.' },
     '.jme-process-step strong': { display: 'The reference needs `display: block` because its step title is a `<strong>`, which is inline. Ours is an `<h4>`, already block-level.' },
+  },
+  'admin-services': {
+    '.as-how': { padding: 'Section padding is the editor-controlled `--space-normal` preset (56–88px), not a literal 80px.' },
+    '.as-how-steps': { 'grid-template-columns': 'Column count is the ProcessSteps block\'s `columns` field, emitted as `--vf-cols`. Set to 4 on this page, so the rendered grid matches.' },
+    '.as-how-steps::before': { left: 'Derived from `--vf-cols` rather than hardcoded per family — `calc(100% / (2 * cols) + 14px)` resolves to the reference\'s 12.5% here and 10% on /jme.', right: 'ditto.' },
+    '.as-how-step strong': { display: 'The reference needs `display: block` because its step title is a `<strong>`, which is inline. Ours is an `<h4>`, already block-level.' },
   },
 }
 
