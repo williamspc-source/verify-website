@@ -20,7 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 31 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 32 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -144,6 +144,13 @@ a **content decision and a deliberate deviation from the reference**, which carr
 type, the `/ime` accordion and the contact form's option are untouched, so the offering itself is
 unchanged. The heading became "Four Ways", and the rows moved to `imageSide: 'auto'` so the
 alternation now maintains itself.
+
+The /ime "What's Included" text was then corrected (Comparison 32) — the detail descriptions were
+rendering at 18px against the reference's 12.8px, and the label was grey instead of brand blue. The
+page had been reading **zero** in `referenceCssDiff.mjs` throughout, for two reasons now fixed: the
+tool blanket-skipped `color` for any aliased selector, and one mapping was `null`ed with a
+justification that was simply untrue. Removing the `color` skip surfaced five more differences across
+three families — one real, four measured and explained.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 

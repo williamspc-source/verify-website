@@ -1791,6 +1791,67 @@ now leave a single orphan on the second row. It is an editor field, one click to
 
 ---
 
+## Comparison 32: /ime "What's Included" — and the two tool bugs that hid it (2026-08-18)
+
+Reported by eye, on a page the diff tool had been reporting as **zero** since Comparison 27. That is
+the finding; the CSS fix is three declarations.
+
+| | Was | Reference / now |
+|---|---|---|
+| Detail description | **18px / 30.6px**, `--text-dark` | **12.8px / 19.84px**, `--text-mid` |
+| "WHAT'S INCLUDED" label | `rgb(34,34,34)` | **brand blue** `rgb(28,117,188)` |
+| Detail title colour | correct, but only by inheritance | declared explicitly |
+
+The description size is why those cards ran so much taller than the reference's — every item wrapped
+to three lines instead of one or two.
+
+### Why a family reading zero was wrong twice over
+
+**1. `color` was blanket-skipped for every aliased selector.** `referenceCssDiff.mjs` carried
+`['position', 'z-index', 'overflow', 'color']`, so no colour difference on any renamed selector could
+ever be reported. The skip sat *directly beneath* the comment explaining that `margin` had been
+removed from that same list after hiding 11 real spacing gaps on /services — the lesson was written
+down and the next entry in the list went unexamined.
+
+Deleting `color` surfaced **five** more across three families. Each was then measured in the browser
+at 1440px before being judged, rather than assumed either way:
+
+| Selector | Verdict |
+|---|---|
+| `.svc-feature-img-label` | **Real.** 50%-translucent primary against an opaque `#7aafc8`. Fixed — same brand-mix as reporting-services. |
+| `.svc-feature-link:hover` | Artefact. `var(--primary-strong, var(--primary-strong))` — a doubled fallback that defeated the token resolver. Simplified; both measure `rgb(21,95,160)`. |
+| `.events-hero-breadcrumb` | Explained. `--bc-link` has three context-dependent definitions; on a dark band it resolves to the reference literal exactly. |
+| `.events-hero h1` | Explained. Ours colours via `.page-hero--dark`; both measure `rgb(255,255,255)`. |
+| `.ime-format-included-text strong` | Explained → **fixed anyway.** Both measured `rgb(65,64,66)`, but ours only by inheritance, so it is declared now. |
+
+**2. A `null` mapping carried a false justification.** `'.ime-format-included-text span': null` was
+annotated *"no rule of its own on either side; both inherit body type"*. The reference declares three
+properties on it. A `null` deletes a selector from the comparison entirely, so that one comment is
+the whole reason the size difference was invisible — no amount of re-running the tool could find it.
+
+Both are now in `CLAUDE.md`'s trap list. The general shape: **a comparison tool's exclusions are
+load-bearing code, and a blanket skip is not a reason.** An exclusion belongs in `EXPLAINED`, per
+selector, per property, with a measurement.
+
+### One probe mistake worth recording
+
+The first browser probe compared `.ime-formats .vf-card__title` against the reference's
+`.ime-format-card-top h3` and reported the card title as the wrong colour. Two errors at once: the
+selector matched the *first* card on the page, which belongs to a different grid; and the reference
+paints nothing at `h3` level — both halves of "**In-Person** Assessment" live in coloured spans
+(`.card-name` blue, `.card-type` dark), where ours puts the blue on the title element and the dark on
+the suffix. Comparing the halves that actually render: both `rgb(28,117,188)` / `rgb(65,64,66)` at
+16.8px/700. No defect — but "the tool says zero and my probe says red" is worth resolving before
+changing CSS, not after.
+
+### Verification
+
+Snapshot moved **only** `/services/medico-legal/ime` (62 nodes) and `/services` (2, the caption
+colour). All six families read zero again, now with `color` genuinely compared. int **131/131**,
+e2e **19/19**.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

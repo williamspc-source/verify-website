@@ -310,8 +310,7 @@ const IMPLEMENTED_AS = {
     '.ime-format-included-item-icon': ['.vf-feature-detail__icon', '.ime-formats .vf-feature-detail__icon'],
     '.ime-format-included-item-icon svg': ['.vf-feature-detail svg', '.ime-formats .vf-feature-detail__icon svg'],
     '.ime-format-included-text strong': ['.vf-feature-detail strong', '.ime-formats .vf-feature-detail strong'],
-    // The detail <p> has no rule of its own on either side; both inherit body type.
-    '.ime-format-included-text span': null,
+    '.ime-format-included-text span': ['.vf-feature-detail p', '.ime-formats .vf-feature-detail p'],
   },
   jme: {
     '.jme-process': ['.vf-section', '.vf-section--muted'],
@@ -401,7 +400,25 @@ const IMPLEMENTED_AS = {
  * printed in the summary so they stay visible.
  */
 const EXPLAINED = {
+  // These three surfaced the moment `color` stopped being blanket-skipped for
+  // aliased selectors. Every one was then MEASURED in the browser at 1440px on
+  // 2026-08-18 before being excused — which is the only thing that separates an
+  // explanation from the habit that hid the /ime label bug in the first place.
+  events: {
+    '.events-hero-breadcrumb': {
+      color:
+        '`--bc-link` is context-dependent by design — it has three definitions, and on a dark band resolves to exactly the reference literal. Measured on /events: ours rgba(255, 255, 255, 0.65), reference rgba(255, 255, 255, 0.65). A single-value resolver cannot follow that, so it cannot close in the tool.',
+    },
+    '.events-hero h1': {
+      color:
+        'Ours takes it from the `.page-hero--dark` modifier rather than declaring it on the h1, so there is nothing here for the diff to match. Measured on /events: both rgb(255, 255, 255).',
+    },
+  },
   services: {
+    '.svc-feature-img-label': {
+      color:
+        'The reference hardcodes #7aafc8; ours mixes it from the brand colour so a rebrand retints it — the same choice made for reporting-services. Measured at rgb(121, 174, 216): within 1/255 on red and green, 16/255 bluer. This one was a REAL difference until now (the base left it 50%-translucent primary) and was fixed rather than excused; only the token-vs-literal residue is explained here.',
+    },
     '.svc-features': { padding: 'Section padding is the editor-controlled `--space-normal` preset (56–88px) rather than a literal 80px. Retuning the site rhythm is a Design System edit, not a per-page one.' },
     '.reporting-section': { padding: 'ditto — the reference varies 72/80px per section; ours is one preset.' },
     '.admin-section': {
@@ -706,7 +723,15 @@ for (const [sel, refDecls] of ref) {
     // tool had just reported as zero. Spacing is exactly what a reader expects a
     // declaration diff to catch, so it is compared now; anything that really is
     // set elsewhere goes in EXPLAINED, with the reason.
-    if (aliased && ['position', 'z-index', 'overflow', 'color'].includes(prop)) continue
+    // `color` USED TO BE IN THIS LIST TOO, and it hid a reported defect: the /ime
+    // "What's Included" label renders brand blue in the reference and rendered
+    // rgb(34,34,34) here, on a page this tool called zero. That is the same
+    // failure as the `margin` skip described above, one paragraph later in the
+    // same file — a blanket skip is not a reason, it is an unexamined habit.
+    // Colour is a first-class thing a reader expects a declaration diff to catch.
+    // What remains here is genuinely structural: a selector rename can move where
+    // stacking and clipping are declared without changing what renders.
+    if (aliased && ['position', 'z-index', 'overflow'].includes(prop)) continue
     if (!(prop in buildDecls)) {
       lines.push(`   missing   ${prop}: ${val}`)
     } else if (normalise(buildDecls[prop], buildTokens) !== normalise(val, refTokens)) {

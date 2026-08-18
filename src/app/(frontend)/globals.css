@@ -8565,7 +8565,7 @@
 }
 .svc-learn-rows .vf-split__cta .btn:hover {
   background: transparent;
-  color: var(--primary-strong, var(--primary-strong));
+  color: var(--primary-strong);
   transform: none;
   gap: 10px;
   text-decoration: none;
@@ -10021,10 +10021,16 @@
 .svc-learn-rows .vf-split__media {
   background: linear-gradient(145deg, var(--accent), var(--accent-light));
 }
+/* Colour matches the reporting-services treatment: the shared base leaves this
+   50%-translucent primary, where the reference paints an opaque #7aafc8. Taken
+   as a brand mix so a rebrand retints it — measured at rgb(121,174,216), within
+   1/255 on red and green and 16/255 bluer. Surfaced only after `color` stopped
+   being skipped for aliased selectors in referenceCssDiff. */
 .svc-learn-rows .vf-split__media--placeholder span {
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: color-mix(in srgb, var(--primary) 59%, var(--white));
 }
 /* The split-row heading is deliberately SMALLER than the section titles
    elsewhere on the page — 1.75rem against 2.5rem. Ours inherited the shared
@@ -10252,12 +10258,28 @@
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.14em;
+  /* The shared base sets --text-mid; the reference's label is brand blue. Missed
+     on the first port because referenceCssDiff skipped `color` outright for any
+     aliased selector — measured at rgb(34,34,34) against the reference's
+     rgb(28,117,188) while the tool reported the family as zero. */
+  color: var(--primary);
   margin-bottom: 14px;
 }
 .ime-formats .vf-feature-detail strong {
   font-size: 0.84rem;
   font-weight: 700;
+  /* Correct today only by inheritance. Declared explicitly — an inherited value
+     is one upstream edit from being wrong, and nothing would catch it. */
+  color: var(--text-dark);
   margin-bottom: 3px;
+}
+/* The detail description had NO rule on either the base or this scope, so it
+   inherited body type — 18px/30.6px against the reference's 12.8px/19.84px,
+   which is why these cards ran so much taller than the reference's. */
+.ime-formats .vf-feature-detail p {
+  font-size: 0.8rem;
+  color: var(--text-mid);
+  line-height: 1.55;
 }
 /* No divider above "What's Included" — the reference has none, and the rule is
    shared with every other FeatureGrid, so it is removed here only. */

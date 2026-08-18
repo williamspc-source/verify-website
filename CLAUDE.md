@@ -538,6 +538,22 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   omit a contributing rule and the tool reports a difference that is not there, which trains you to
   distrust it. Cross-check any single reported difference against `getComputedStyle` before changing
   CSS to satisfy the tool.
+- **A blanket property skip in a comparison tool is not a reason, it is an unexamined habit — and
+  `color` was one.** `referenceCssDiff.mjs` skipped `position`, `z-index`, `overflow` and **`color`**
+  for every aliased selector. That is how a *reported* defect survived a family reading zero: the
+  /ime "What's Included" label renders brand blue in the reference and rendered `rgb(34,34,34)` here.
+  Worse, the skip sat directly above a comment narrating the identical lesson about `margin` — which
+  had been removed from that same list after hiding 11 real spacing gaps. Deleting `color` surfaced
+  **five** more across three families: one real (the /services placeholder caption, still
+  50%-translucent primary against an opaque reference literal) and four token-resolution artefacts,
+  each then measured in the browser before being excused. If a checker excludes a property, the
+  exclusion needs a per-case reason in `EXPLAINED` with a measurement, never a global list.
+- **A `null` in `IMPLEMENTED_AS` deletes a selector from the comparison, so its justification has to
+  be true.** `'.ime-format-included-text span': null` carried the comment *"no rule of its own on
+  either side; both inherit body type"*. The reference declares three properties on it, and ours
+  declared none — the detail descriptions rendered at **18px/30.6px against 12.8px/19.84px**, which is
+  why those cards ran far taller than the reference's. The tool cannot check a claim like that; only
+  reading the reference can. Treat every `null` mapping as an assertion needing evidence.
 - **A regex bulk edit across a fixture file reaches further than the page you are editing.** Adding
   one field to five rows via `perl -0pi -e` matched **13** — every row in `seedServices.ts` with the
   same two-line preamble, including `/services`, which must not have it. It was caught by reading
