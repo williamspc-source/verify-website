@@ -277,7 +277,7 @@ drops its stylesheet and makes everything read as an unstyled default:
 `/services/medico-legal/reporting-services`
 
 - [ ] **Hero** (pageHero) — "Specialist Reporting Beyond the Examination" — breadcrumb
-- [ ] **Split Feature** — "Five Ways to Get the Specialist Opinion You Need" (5 rows)
+- [ ] **Split Feature** — "Four Ways to Get the Specialist Opinion You Need" (4 rows — Medical Negligence removed 2026-08-18)
 - [ ] **CTA Band** — "Ready to Refer Your Next Matter to VERIFY?" (2 links)
 
 ### Specialists  

@@ -26,6 +26,7 @@ import {
   repairJmeSpecialistCarousel,
   repairCompactProcessSteps,
   repairReportingSplitVariants,
+  repairMedicalNegligenceRemoval,
 } from './seed/seedServices'
 import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
 import { isPlaceholderLayout } from './seed/authored'
@@ -1185,6 +1186,7 @@ export const seedVerify = async ({
   await repairJmeSpecialistCarousel({ payload, req })
   await repairCompactProcessSteps({ payload, req })
   await repairReportingSplitVariants({ payload, req })
+  await repairMedicalNegligenceRemoval({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
   // Both write only into an absence — a missing carousel block, a superseded

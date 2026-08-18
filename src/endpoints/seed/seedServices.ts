@@ -130,7 +130,11 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
       'Additional specialist opinions addressing new records or questions that arise after an initial report has been delivered.',
     order: 4,
   })
-  const negligenceId = await ensureService({
+  // Deliberately created and deliberately not listed. VERIFY still accepts
+  // medical negligence claims — the doc is kept complete so it is one edit away
+  // from being usable again — but it is no longer shown on any services page.
+  // Removed from the /services grid and from reporting-services on 2026-08-18.
+  await ensureService({
     slug: 'medical-negligence',
     title: 'Medical Negligence',
     category: 'medico-legal',
@@ -219,7 +223,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
     order: 35,
   })
 
-  const reportingServices = [fileReviewId, supplementaryId, negligenceId, teleconferenceId, expertEvidenceId]
+  const reportingServices = [fileReviewId, supplementaryId, teleconferenceId, expertEvidenceId]
   // Landing-grid order: Surrogate · Interpreter · Brief Reduction · LOI (single row of four).
   const adminServicesRow = [surrogateId, interpreterId, briefReductionId, loiReviewId]
   // Accordion column order: col 1 = Surrogate + Brief Reduction, col 2 = Interpreter + LOI
@@ -913,11 +917,13 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
       heading: 'Specialist Reporting [[Beyond the Examination]]',
     },
     [
-      // ── Five alternating service rows (plain service-name headings, dot bullets, no buttons) ──
+      // ── Four alternating service rows (plain service-name headings, dot bullets, no buttons).
+      //    `imageSide: 'auto'` is the field's own default and alternates from the row's
+      //    index, so removing or adding a row keeps the pattern without a manual flip. ──
       {
         blockType: 'splitFeature',
         eyebrow: 'Our Services',
-        heading: 'Five Ways to Get [[the Specialist Opinion You Need]]',
+        heading: 'Four Ways to Get [[the Specialist Opinion You Need]]',
         subheading:
           'VERIFY offers a full spectrum of specialist reporting options — each designed to support your matter at the right stage, with the right level of clinical input.',
         background: 'white',
@@ -930,7 +936,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             placeholderIcon: 'image',
-            imageSide: 'left',
+            imageSide: 'auto',
             anchorId: 'file-review',
             title: 'File Review',
             body: plainTextToLexical(
@@ -948,7 +954,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             placeholderIcon: 'image',
-            imageSide: 'right',
+            imageSide: 'auto',
             anchorId: 'supplementary-report',
             title: 'Supplementary Report',
             body: plainTextToLexical(
@@ -966,25 +972,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             placeholderIcon: 'image',
-            imageSide: 'left',
-            anchorId: 'medical-negligence',
-            title: 'Medical Negligence',
-            body: plainTextToLexical(
-              "A specialist with expertise in the relevant field provides an independent opinion on whether medical treatment fell below the accepted standard of care, and whether any such departure caused the claimant's injury or loss.",
-            ),
-            bulletsLabel: 'When to Request',
-            bullets: [
-              { text: 'Medical malpractice or clinical negligence claims' },
-              { text: 'Healthcare provider liability matters' },
-              { text: 'Cases requiring a specialist opinion on standard of care' },
-              { text: 'Matters involving alleged procedural or diagnostic errors' },
-            ],
-          },
-          {
-            imagePlaceholder: true,
-            placeholderLabel: 'Image Placeholder',
-            placeholderIcon: 'image',
-            imageSide: 'right',
+            imageSide: 'auto',
             anchorId: 'teleconference',
             title: 'Teleconference',
             body: plainTextToLexical(
@@ -1002,7 +990,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
             placeholderIcon: 'image',
-            imageSide: 'left',
+            imageSide: 'auto',
             anchorId: 'expert-evidence',
             title: 'Expert Evidence',
             body: plainTextToLexical(
@@ -1173,7 +1161,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
             icon: 'file-magnifying-glass',
             title: 'Other Reporting Services',
             description:
-              'File Reviews, Supplementary Reports, Medical Negligence opinions, Teleconferences, and Expert Evidence.',
+              'File Reviews, Supplementary Reports, Teleconferences, and Expert Evidence.',
           },
           {
             icon: 'user-plus',
@@ -1530,3 +1518,172 @@ export const repairReportingSplitVariants = async ({ payload, req }: Ctx): Promi
   })
   payload.logger.info('— Repaired /services/medico-legal/reporting-services: split-feature variants')
 }
+
+/**
+ * Removes Medical Negligence from the two services pages that named it, and
+ * repairs the consequences of removing it.
+ *
+ * VERIFY still accepts medical negligence claims — this is a services-page
+ * removal, not a withdrawal of the offering. The claim type, the /ime claim
+ * accordion, the specialists linked to it and the contact form's "Medical
+ * Negligence Opinion" option are all deliberately untouched, and the Services
+ * doc itself is still seeded (see `ensureService` above) so it is one edit from
+ * being usable again.
+ *
+ * ── Why the predicate is the old heading, and not the row ──
+ * This is the first repair here that DELETES an array row rather than filling an
+ * absence, which inverts the usual safety argument: the obvious predicate — "a
+ * row with anchorId `medical-negligence` exists" — would delete that row on
+ * EVERY future seed run, so an editor who deliberately re-added the service
+ * would lose it again with no way to tell why.
+ *
+ * The superseded heading string is the honest marker instead. It is content, so
+ * it has no `defaultValue` to be backfilled (the trap recorded in CLAUDE.md's
+ * invariants), it is written by exactly one thing — the old fixture — and this
+ * repair is what replaces it. So the repair fires once and then cannot fire
+ * again, and a re-added row survives because the heading no longer matches.
+ *
+ * The /services grid edit rides on the same predicate on purpose: both pages
+ * change in one seed run, and a shared marker is what stops them drifting into
+ * different states. If that grid has already lost the id, that half is a no-op.
+ */
+export const repairMedicalNegligenceRemoval = async ({ payload, req }: Ctx): Promise<void> => {
+  type Row = { anchorId?: string | null; imageSide?: string | null }
+  type Item = { description?: string | null }
+  type Block = {
+    blockType?: string
+    heading?: string | null
+    rows?: Row[]
+    services?: unknown[]
+    items?: Item[]
+  }
+
+  const found = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'reporting-services' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const page = found.docs[0] as { id: number | string; layout?: Block[] } | undefined
+  const layout = page?.layout
+  if (!page || !Array.isArray(layout)) return
+  if (!layout.some((b) => b?.blockType === 'splitFeature' && b.heading === SUPERSEDED_REPORTING_HEADING)) {
+    return
+  }
+
+  const next = layout.map((block) => {
+    if (block?.blockType !== 'splitFeature' || block.heading !== SUPERSEDED_REPORTING_HEADING) {
+      return block
+    }
+    return {
+      ...block,
+      heading: 'Four Ways to Get [[the Specialist Opinion You Need]]',
+      rows: (block.rows ?? [])
+        .filter((row) => row?.anchorId !== 'medical-negligence')
+        // Back to the field's own alternating default, so the pattern survives
+        // this removal and any future one without a hand-flipped left/right.
+        .map((row) => ({ ...row, imageSide: 'auto' })),
+    }
+  })
+
+  await payload.update({
+    collection: 'pages',
+    id: page.id,
+    data: { layout: next } as never,
+    req,
+    context: { disableRevalidate: true },
+  })
+  payload.logger.info('— Repaired /services/medico-legal/reporting-services: removed Medical Negligence')
+
+  // The parent page's "Other Reporting Services" card names the five services in
+  // prose. It is an authored page too, so the fixture edit alone never reaches it —
+  // and it would go on advertising a service the page below it no longer has.
+  const parentRes = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'medico-legal' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const parent = parentRes.docs[0] as { id: number | string; layout?: Block[] } | undefined
+  if (parent && Array.isArray(parent.layout)) {
+    let proseChanged = false
+    const nextParent = parent.layout.map((block) => {
+      if (block?.blockType !== 'featureGrid' || !Array.isArray(block.items)) return block
+      return {
+        ...block,
+        items: block.items.map((item) => {
+          if (item?.description !== SUPERSEDED_PARENT_PROSE) return item
+          proseChanged = true
+          return {
+            ...item,
+            description:
+              'File Reviews, Supplementary Reports, Teleconferences, and Expert Evidence.',
+          }
+        }),
+      }
+    })
+    if (proseChanged) {
+      await payload.update({
+        collection: 'pages',
+        id: parent.id,
+        data: { layout: nextParent } as never,
+        req,
+        context: { disableRevalidate: true },
+      })
+      payload.logger.info('— Repaired /services/medico-legal: dropped it from the reporting prose')
+    }
+  }
+
+  // The same service is a card in the /services "Reports & Opinions" grid.
+  const negligence = await payload.find({
+    collection: 'services',
+    where: { slug: { equals: 'medical-negligence' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const negligenceId = negligence.docs[0]?.id
+  if (negligenceId == null) return
+
+  const servicesRes = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'services' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  const servicesPage = servicesRes.docs[0] as { id: number | string; layout?: Block[] } | undefined
+  const servicesLayout = servicesPage?.layout
+  if (!servicesPage || !Array.isArray(servicesLayout)) return
+
+  let gridChanged = false
+  const nextServices = servicesLayout.map((block) => {
+    if (block?.blockType !== 'servicesGrid' || !Array.isArray(block.services)) return block
+    // depth: 0, so `services` is a list of ids — but tolerate populated docs.
+    const kept = block.services.filter((s) => {
+      const id = s && typeof s === 'object' ? (s as { id?: unknown }).id : s
+      return String(id) !== String(negligenceId)
+    })
+    if (kept.length === block.services.length) return block
+    gridChanged = true
+    return { ...block, services: kept }
+  })
+  if (!gridChanged) return
+
+  await payload.update({
+    collection: 'pages',
+    id: servicesPage.id,
+    data: { layout: nextServices } as never,
+    req,
+    context: { disableRevalidate: true },
+  })
+  payload.logger.info('— Repaired /services: dropped the Medical Negligence card')
+}
+
+// The exact strings the old fixture wrote. Anything else means this has already
+// run, or an editor has since rewritten the copy — either way, leave it alone.
+const SUPERSEDED_REPORTING_HEADING = 'Five Ways to Get [[the Specialist Opinion You Need]]'
+const SUPERSEDED_PARENT_PROSE =
+  'File Reviews, Supplementary Reports, Medical Negligence opinions, Teleconferences, and Expert Evidence.'

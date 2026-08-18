@@ -20,7 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 22 is the current one** |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 31 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -137,6 +137,13 @@ per-row **Placeholder icon**. Each defaults to what already rendered, so any spl
 the look and none of them moved. A `reporting-services` family reads zero, the page joined
 `computedSnapshot.mjs` (14 of 29 routes → 15), and uploading an image to a row still replaces the
 placeholder outright, which is proven rather than assumed.
+
+Medical Negligence was then removed from the services pages (Comparison 31) — the row on
+reporting-services, the card on `/services`, and the prose mention on `/services/medico-legal`. It is
+a **content decision and a deliberate deviation from the reference**, which carries both. The claim
+type, the `/ime` accordion and the contact form's option are untouched, so the offering itself is
+unchanged. The heading became "Four Ways", and the rows moved to `imageSide: 'auto'` so the
+alternation now maintains itself.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 

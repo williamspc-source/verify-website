@@ -1722,6 +1722,75 @@ reference selectors; the other five families still read zero. The page also join
 
 ---
 
+## Comparison 31: Medical Negligence removed from the services pages (2026-08-18)
+
+A content decision, not a fidelity one, and **a deliberate deviation from the reference** — recorded
+here because the reference disagrees on both counts: its reporting-services page has five rows, and
+its `/services` "Reports & Opinions" grid does carry a Medical Negligence card.
+
+**VERIFY still accepts medical negligence claims.** This removes the service from the *services
+pages* only. Untouched on purpose: the `medical-negligence` ClaimTypes doc (linked to 7 specialists),
+the `/ime` claim accordion that lists it as a claim type, and the contact form's "Medical Negligence
+Opinion" option — so enquiries still have a route in. The Services doc itself is still seeded and
+kept complete, one edit from being usable again; it is simply listed nowhere.
+
+| Page | Change |
+|---|---|
+| `/services/medico-legal/reporting-services` | The Medical Negligence row deleted — five rows to four |
+| ditto | Heading **"Five Ways…" → "Four Ways…"**, which the row count had made wrong |
+| ditto | All four rows switched to `imageSide: 'auto'` |
+| `/services` | The card dropped from the Reports & Opinions grid (5 → 4, in a 3-column grid) |
+| `/services/medico-legal` | "Medical Negligence opinions" removed from the "Other Reporting Services" prose |
+
+### Alternation is now self-maintaining
+
+The rows stored explicit `left`/`right` values, so deleting the third would have left
+left · right · **right** · left. Rather than hand-flipping the survivors, all four moved to
+`imageSide: 'auto'` — the field's own default, which alternates from the row's index. Adding or
+removing a row again keeps the pattern with no manual fix, and an editor can still pin a single row.
+
+### The first repair here that deletes a row, and why it keys on the heading
+
+Every prior repair fills an absence. Deleting inverts the safety argument: the obvious predicate —
+"a row with `anchorId: medical-negligence` exists" — would delete that row on **every** future seed
+run, so an editor who deliberately re-added the service would lose it again with no way to tell why.
+
+The superseded heading string is the marker instead. It is content, so it has no `defaultValue` to be
+backfilled (the trap recorded last session), exactly one thing ever wrote it, and this repair is what
+replaces it. Proven in both directions:
+
+- Restored the full superseded state — the row re-inserted through the API, explicit left/right, the
+  old heading, the old prose, the card back on `/services` — re-ran the seed, and **all four edits
+  reapplied**.
+- Then, with the heading at "Four Ways", added a Medical Negligence row by hand and re-ran the seed:
+  **it survived**. That is the assertion that separates one-shot from "worked once".
+
+### Two things the first pass got wrong
+
+**The parent page was missed.** The prose edit went into the fixture only, and `/services/medico-legal`
+is an authored page — so `authorPage` early-returns and the live page went on advertising a service the
+page below it no longer had. Caught by asserting the served HTML of every affected page rather than
+only the one being worked on.
+
+**A content-anchored regex hit the wrong page.** A rewrite scoped from `heading: 'Four Ways` matched
+`/ime`'s identically-worded *"Four Ways to Attend Your IME"* first, ~440 lines earlier, and ran over
+that region instead. It happened to change nothing, and `git diff` is what showed that — the same
+blast-radius failure as the bulk edit recorded last session, from the opposite direction. Redone with
+explicit line numbers, each asserted against the `anchorId` on the following line.
+
+### Verification
+
+Snapshot moved **only** `/services/medico-legal/reporting-services` (31 nodes) and `/services` (8),
+plus the usual `/in-the-loop` scroll-reveal frame. Nothing links to `#medical-negligence` — the two
+anchors `links.e2e.spec.ts` asserts are `#file-review` and `#expert-evidence`, both surviving — so the
+links spec stayed green unedited. All six CSS families still read zero; this pass changes no CSS.
+
+**One thing to look at rather than fix blind:** the `/services` grid is `columns: '3'`, so four cards
+now leave a single orphan on the second row. It is an editor field, one click to change to 2 or 4, and
+3 is what the reference sets — so it was left alone.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the
