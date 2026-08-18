@@ -172,6 +172,51 @@ const FAMILIES = {
     pages: ['.design-reference/services/medico-legal/reporting-services.html'],
     match: /^\.rs-service/,
   },
+  // ── The FAQ accordion — the four sections on this site that have one ──────
+  //
+  // These four families exist because NONE of this was ever measured. `ime`
+  // above matches only `^\.ime-format` and `jme` only `^\.jme-process`, so both
+  // read zero while a second section on each of those same two pages went
+  // entirely uncovered — and there was no Information Centre family at all.
+  // A family's zero is scoped to its `match`, never to the page it is named
+  // after.
+  //
+  // Source split, and neither side can be trusted alone — they are the opposite
+  // way round from `for-clients`:
+  //   · `.faq-item` / `.faq-a` are SHARED-SHEET-ONLY. The two Information Centre
+  //     pages' inline blocks declare no base rules for them whatsoever.
+  //   · `.claimant-faqs` / `.client-faqs` / `.ic-faq-*` are INLINE-ONLY.
+  //
+  // Trap: `.ic-faq-unified`, `.ic-faq-header` and `.ic-faq-unified .faq-a a` are
+  // DEAD in the reference. They are declared in BOTH pages' inline blocks and no
+  // markup in the whole of .design-reference carries those classes — the live
+  // wrappers are `.claimant-faqs` / `.client-faqs`. Listed in NOT_PORTED so they
+  // can never answer for a live selector.
+  'faq-claimants': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/information-centre/for-claimants.html'],
+    match: /^\.(claimant-faqs|faq-item|faq-a|faq-header|ic-faq-)/,
+  },
+  'faq-clients': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/information-centre/for-clients.html'],
+    match: /^\.(client-faqs|faq-item|faq-a|faq-header|ic-faq-)/,
+  },
+  // /services/medico-legal/ime → "IMEs Across All Major Claim Types". The same
+  // divided accordion, with a circular ± pill and a 36px icon tile. Inline-only:
+  // `grep ime-claim` over assets/ returns zero.
+  'ime-claims': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/services/medico-legal/ime.html'],
+    match: /^\.ime-claim/,
+  },
+  // /services/medico-legal/jme → "Common Questions About JMEs". The same pill
+  // accordion again, inside a 380px + 1fr split. Inline-only.
+  'jme-faq': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/services/medico-legal/jme.html'],
+    match: /^\.jme-faq/,
+  },
 }
 
 /**
@@ -235,6 +280,32 @@ const NOT_PORTED = {
     '.service-icon i':
       'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. `.service-icon svg` carries the same sizing \u2014 measured 24px on both sides.',
     '.client-support-icon i': 'ditto.',
+  },
+  // The three dead selectors below are declared in BOTH Information Centre pages'
+  // inline blocks and used by no markup anywhere in .design-reference — the live
+  // wrappers are `.claimant-faqs` / `.client-faqs`. Porting them would mean
+  // porting a rule the reference itself does not render.
+  'faq-claimants': {
+    '.ic-faq-unified': 'Dead CSS in the reference — declared in both Information Centre pages, matched by no markup in the whole of .design-reference.',
+    '.ic-faq-header': 'ditto',
+    '.ic-faq-unified .faq-a a': 'ditto',
+    '.claimant-faqs': 'Section band and padding are editor-controlled Section presets — the pale-blue `light` background and the `normal` padding preset, which caps at exactly the reference\'s 88px. Not a rule in globals.css for a declaration diff to match.',
+  },
+  'faq-clients': {
+    '.ic-faq-unified': 'Dead CSS in the reference — declared in both Information Centre pages, matched by no markup in the whole of .design-reference.',
+    '.ic-faq-header': 'ditto',
+    '.ic-faq-unified .faq-a a': 'ditto',
+    '.client-faqs': 'Section band and padding are editor-controlled Section presets (`white`, `normal`). Not a rule in globals.css.',
+  },
+  'ime-claims': {
+    '.ime-claims': 'Section band and padding are editor-controlled Section presets. The reference gradient is byte-identical to our `--band-accent`.',
+    '.ime-claim-q': 'The reference\'s question is a <button> and needs `width: 100%`, `background: none`, `border: none` and `text-align: left` to undo the UA button styling. Ours is a native <summary>, which has none of those defaults to undo — the shared `.faq-item summary` rule carries everything that actually renders.',
+    '.ime-claim-icon i': 'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. `.vf-faq--icon-tile .vf-faq__question-icon svg` carries the same 18px sizing and colour.',
+  },
+  'jme-faq': {
+    '.jme-faq': 'Section band and padding are editor-controlled Section presets (`white`, `normal`).',
+    '.jme-faq-q': 'Reference <button> reset — see the `ime-claims` entry. Ours is a native <summary>.',
+    '.jme-faq-left h2 span': 'The accent word is coloured by the shared `.vf-accent` span that SectionHeader emits from `[[bracketed]]` heading syntax, not by a rule scoped to this page.',
   },
   'reporting-services': {
     '.rs-services-header':
@@ -438,6 +509,152 @@ const IMPLEMENTED_AS = {
     '.profile-breadcrumb span': '.vf-breadcrumb__sep',
     '.profile-breadcrumb strong': '.vf-breadcrumb__current',
   },
+  'faq-claimants': {
+    // Our divided look is a variant on the shared accordion, so every mapping is
+    // the LIST form: the base rule plus the modifier that overrides it, merged in
+    // cascade order. Comparing the modifier alone would report every inherited
+    // declaration as missing.
+    '.faq-item': ['.faq-item', '.vf-faq--divided .faq-item'],
+    '.faq-item:last-child': '.vf-faq--divided .faq-item:last-child',
+    '.faq-item summary': ['.faq-item summary', '.vf-faq--divided .faq-item summary'],
+    '.faq-item:hover > summary': '.faq-item:hover > summary',
+    '.faq-item[open] > summary': '.faq-item[open] > summary',
+    '.faq-item summary::-webkit-details-marker': '.faq-item summary::-webkit-details-marker',
+    '.faq-item summary::after': [
+      '.faq-item summary::after',
+      '.vf-faq--toggle-chevron .faq-item summary::after',
+    ],
+    '.faq-item[open] summary::after': [
+      '.faq-item[open] summary::after',
+      '.vf-faq--toggle-chevron .faq-item[open] summary::after',
+    ],
+    '.faq-item .faq-a': ['.faq-item .faq-a', '.vf-faq--divided .faq-item .faq-a'],
+    // The help card.
+    '.ic-faq-help-card': '.vf-faq__help',
+    '.ic-faq-help-message': '.vf-faq__help-message',
+    '.ic-faq-help-icon': '.vf-faq__help-icon',
+    '.ic-faq-help-message p': '.vf-faq__help-text',
+    '.ic-faq-contact-list': '.vf-faq__help-contact',
+    '.ic-faq-contact-item': '.vf-faq__help-contact-item',
+    '.ic-faq-contact-item a': '.vf-faq__help-contact a',
+    '.ic-faq-contact-item a:hover': '.vf-faq__help-contact a:hover',
+    '.claimant-faqs .faq-header': '.vf-faq--divided:not(.vf-faq--split) .vf-section-header',
+    '.claimant-faqs .faq-a a': '.vf-faq--divided .faq-item .faq-a a',
+  },
+  'faq-clients': {
+    // Our divided look is a variant on the shared accordion, so every mapping is
+    // the LIST form: the base rule plus the modifier that overrides it, merged in
+    // cascade order. Comparing the modifier alone would report every inherited
+    // declaration as missing.
+    '.faq-item': ['.faq-item', '.vf-faq--divided .faq-item'],
+    '.faq-item:last-child': '.vf-faq--divided .faq-item:last-child',
+    '.faq-item summary': ['.faq-item summary', '.vf-faq--divided .faq-item summary'],
+    '.faq-item:hover > summary': '.faq-item:hover > summary',
+    '.faq-item[open] > summary': '.faq-item[open] > summary',
+    '.faq-item summary::-webkit-details-marker': '.faq-item summary::-webkit-details-marker',
+    '.faq-item summary::after': [
+      '.faq-item summary::after',
+      '.vf-faq--toggle-chevron .faq-item summary::after',
+    ],
+    '.faq-item[open] summary::after': [
+      '.faq-item[open] summary::after',
+      '.vf-faq--toggle-chevron .faq-item[open] summary::after',
+    ],
+    '.faq-item .faq-a': ['.faq-item .faq-a', '.vf-faq--divided .faq-item .faq-a'],
+    // The help card.
+    '.ic-faq-help-card': '.vf-faq__help',
+    '.ic-faq-help-message': '.vf-faq__help-message',
+    '.ic-faq-help-icon': '.vf-faq__help-icon',
+    '.ic-faq-help-message p': '.vf-faq__help-text',
+    '.ic-faq-contact-list': '.vf-faq__help-contact',
+    '.ic-faq-contact-item': '.vf-faq__help-contact-item',
+    '.ic-faq-contact-item a': '.vf-faq__help-contact a',
+    '.ic-faq-contact-item a:hover': '.vf-faq__help-contact a:hover',
+    '.client-faqs .faq-header': '.vf-faq--divided:not(.vf-faq--split) .vf-section-header',
+    '.client-faqs .faq-a a': '.vf-faq--divided .faq-item .faq-a a',
+  },
+  'ime-claims': {
+    '.ime-claims-header': [
+      '.vf-faq--divided:not(.vf-faq--split) .vf-section-header',
+      '.vf-faq--compact.vf-faq--divided:not(.vf-faq--split) .vf-section-header',
+    ],
+    '.ime-claims-grid': '.vf-faq--divided .vf-faq__list',
+    '.ime-claims-header h2': [
+      '.section-title',
+      '.vf-section-header__title',
+      '.vf-faq--compact .vf-section-header__title',
+    ],
+    '.ime-claims-header h2 span': ['.section-title span', '.vf-accent'],
+    '.ime-claims-header p': [
+      '.section-subtitle',
+      '.vf-section-header__subtitle',
+      '.vf-faq--compact .vf-section-header__subtitle',
+    ],
+    '.ime-claim-card': [
+      '.faq-item',
+      '.vf-faq--divided .faq-item',
+      '.vf-faq--rule-brand.vf-faq--divided .faq-item',
+    ],
+    '.ime-claim-icon': '.vf-faq--icon-tile .vf-faq__question-icon',
+    '.ime-claim-name': [
+      '.faq-item summary',
+      '.vf-faq--divided .faq-item summary',
+      '.vf-faq--compact .faq-item summary',
+      '.vf-faq--divided .vf-faq__question-text',
+      '.vf-faq--compact .vf-faq__question-text',
+    ],
+    '.ime-claim-toggle': [
+      '.faq-item summary::after',
+      '.vf-faq--toggle-pill .faq-item summary::after',
+    ],
+    '.ime-claim-card.is-open .ime-claim-toggle': '.vf-faq--toggle-pill .faq-item[open] summary::after',
+    '.ime-claim-desc': [
+      '.faq-item .faq-a',
+      '.vf-faq--divided .faq-item .faq-a',
+      '.vf-faq--compact .faq-item .faq-a',
+      '.vf-faq--icon-tile .faq-item .faq-a',
+    ],
+    '.ime-claim-card.is-open .ime-claim-desc': '.vf-faq--compact .faq-item .faq-a',
+  },
+  'jme-faq': {
+    '.jme-faq-inner': '.vf-faq--split .vf-faq__split',
+    '.jme-faq-items': '.vf-faq--divided .vf-faq__list',
+    '.jme-faq-left h2': [
+      '.section-title',
+      '.vf-section-header__title',
+      '.vf-faq--split .vf-faq__aside .vf-section-header__title',
+    ],
+    '.jme-faq-left p': [
+      '.section-subtitle',
+      '.vf-section-header__subtitle',
+      '.vf-faq--compact .vf-section-header__subtitle',
+      '.vf-faq--split .vf-faq__aside .vf-section-header__subtitle',
+    ],
+    '.jme-faq-item': [
+      '.faq-item',
+      '.vf-faq--divided .faq-item',
+      '.vf-faq--rule-grey.vf-faq--divided .faq-item',
+    ],
+    '.jme-faq-q span': [
+      '.faq-item summary',
+      '.vf-faq--divided .faq-item summary',
+      '.vf-faq--compact .faq-item summary',
+      '.vf-faq--divided .vf-faq__question-text',
+      '.vf-faq--compact .vf-faq__question-text',
+      '.vf-faq--split .vf-faq__question-text',
+    ],
+    '.jme-faq-q-icon': [
+      '.faq-item summary::after',
+      '.vf-faq--toggle-pill .faq-item summary::after',
+    ],
+    '.jme-faq-item.is-open .jme-faq-q-icon': '.vf-faq--toggle-pill .faq-item[open] summary::after',
+    '.jme-faq-a': [
+      '.faq-item .faq-a',
+      '.vf-faq--divided .faq-item .faq-a',
+      '.vf-faq--compact .faq-item .faq-a',
+    ],
+    '.jme-faq-item.is-open .jme-faq-a': '.vf-faq--compact .faq-item .faq-a',
+  },
   'reporting-services': {
     '.rs-services': ['.vf-section', '.vf-section--white'],
     '.rs-services-header h2': ['.section-title', '.vf-split-feature--compact .vf-section-header__title'],
@@ -498,6 +715,61 @@ const IMPLEMENTED_AS = {
  * printed in the summary so they stay visible.
  */
 const EXPLAINED = {
+  // ── FAQ accordions ────────────────────────────────────────────────────────
+  // Every entry below was measured in the browser at 1440px on 2026-08-18, with
+  // JavaScript disabled on both sides, before being excused.
+  //
+  // The two recurring ones are worth stating once. FIRST, the hairline rules.
+  // The reference attaches its n+1 rules as a border-top on the LIST plus a
+  // border-bottom on every ITEM; ours as a border-top on every item plus a
+  // border-bottom on the last. Both draw the same n+1 lines. Measured by walking
+  // every element and collecting each border with a non-zero width: /ime renders
+  // 10 rules on both sides, one colour, spanning an identical 763px; /jme renders
+  // 6 on both sides, rgb(198,198,198) on both, spanning an identical 440px. The
+  // reference is not even self-consistent here — the Information Centre pages use
+  // OUR construction, which is why those two families read zero without an
+  // exception. Whichever we adopt, one family needs this note.
+  //
+  // SECOND, `max-height` / `transition` / the closed-state padding. Those are the
+  // mechanism of a JavaScript accordion that animates a div from `max-height: 0`.
+  // Ours is a native <details>, which does not render the answer at all when
+  // closed, so there is no closed state to declare and nothing to animate. What
+  // matters is the OPEN state, and it is byte-identical on both sides: /ime
+  // `padding: 0px 0px 20px 52px`, 820x69, 14.08px/24.64px; /jme `0px 0px 20px`,
+  // 680x94, 14.08px/24.64px.
+  'ime-claims': {
+    '.ime-claims-grid': {
+      'border-top': 'Construction, not appearance — see the note above. The top hairline is our first row\'s border-top. Measured: 10 rules on both sides, all rgba(28,117,188,0.15), spanning an identical 763px.',
+    },
+    '.ime-claim-card': {
+      'border-bottom': 'ditto — ours is on `:last-child`, the reference\'s on every card. Same 10 rules, same colour, same positions.',
+    },
+    '.ime-claim-icon': {
+      background: 'Token vs literal: `color-mix(in srgb, var(--primary) 8%, transparent)` against `rgba(28,117,188,0.08)`. Identical — --primary IS #1c75bc = rgb(28,117,188) — and mixing from the token means a rebrand retints the tile.',
+    },
+    '.ime-claim-desc': {
+      'max-height': 'The JS accordion\'s animation mechanism. A native <details> does not render its answer when closed, so there is no height to animate from. Open state measured identical on both sides.',
+      transition: 'ditto.',
+      padding: 'The reference\'s CLOSED-state padding, which native <details> never renders. Measured open: `0px 0px 20px 52px` on both sides.',
+      'padding-bottom': 'ditto — 0 closed, 20px open in the reference; 20px always in ours, because closed is not rendered.',
+    },
+    '.ime-claim-card.is-open .ime-claim-desc': {
+      'max-height': 'ditto — the 300px cap exists to bound the JS animation. Nothing caps a native <details>, which is strictly better: a long answer cannot be clipped.',
+    },
+  },
+  'jme-faq': {
+    '.jme-faq-items': {
+      'border-top': 'Construction, not appearance — see the note above. Measured: 6 rules on both sides, all rgb(198,198,198), spanning an identical 440px.',
+    },
+    '.jme-faq-item': { 'border-bottom': 'ditto.' },
+    '.jme-faq-a': {
+      'max-height': 'JS accordion mechanism; native <details> has no closed state to animate. Open state measured identical.',
+      transition: 'ditto.',
+      padding: "The reference's closed-state `padding: 0`, never rendered by a native <details>. Measured open: `0px 0px 20px` on both sides.",
+      'padding-bottom': 'ditto.',
+    },
+    '.jme-faq-item.is-open .jme-faq-a': { 'max-height': 'ditto — the 300px animation cap.' },
+  },
   // Every for-clients entry was measured in the browser at 1440px on 2026-08-18
   // before being excused. Both reported sections read 0 differences there, and
   // the hover states were measured separately with the pointer parked first.

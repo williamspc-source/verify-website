@@ -409,6 +409,17 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
         columns: '1',
         exclusive: true,
         openFirst: true,
+        // The reference draws this as the same divided accordion as the
+        // Information Centre, with a circled ± and a tinted icon tile. Its rules
+        // are a 15% primary tint, because it sits on the accent band.
+        itemStyle: 'divided',
+        toggleStyle: 'pill',
+        iconStyle: 'tile',
+        density: 'compact',
+        ruleStyle: 'brand',
+        // The reference runs these rows 820px wide inside the full container,
+        // rather than in the 772px narrow column the Information Centre uses.
+        containerWidth: 'normal',
         cssClass: ['ime-claim-faq'],
         items: [
           {
@@ -853,17 +864,23 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
         ],
       },
       // ── FAQ — reference `.jme-faq-inner` is a two-column grid: a left heading
-      //    column (380px, left-aligned) beside the accordion (jme-faq-aside) ──
+      //    column (380px, left-aligned) beside the accordion ──
       {
         blockType: 'faq',
         eyebrow: 'Frequently Asked Questions',
         heading: 'Common Questions [[About JMEs]]',
         subheading:
           'Here are the questions we hear most often from legal professionals and insurers considering a JME for their matter.',
-        columns: '1',
+        // `columns: 'split'` IS the two-column layout the `jme-faq-aside` class
+        // used to hand-roll, so the page-scoped class goes and the field does the
+        // work. Same divided accordion as /ime, on grey rules over white.
+        columns: 'split',
         exclusive: true,
         openFirst: true,
-        cssClass: ['jme-faq-aside'],
+        itemStyle: 'divided',
+        toggleStyle: 'pill',
+        density: 'compact',
+        ruleStyle: 'grey',
         items: [
           {
             question: "Does both parties' consent mean the specialist is jointly instructed?",

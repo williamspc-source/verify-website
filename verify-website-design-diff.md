@@ -271,7 +271,12 @@ Significant redesign divergence:
 No meaningful differences — 5-step layout (Joint Agreement, Specialist Selection, Brief & Scheduling, Assessment, QA & Delivery) and copy match closely between Target and Current.
 
 ### 6. "Common Questions About JMEs" (FAQ) section
-No meaningful differences — same 5 questions, same accordion behavior, first item expanded by default in both.
+**CORRECTED 2026-08-18 — this was wrong, and wrong in the way the records already warn about.**
+"No meaningful differences" was concluded from the question text and the open-by-default state. Never
+measured: the rows were rounded outlined white cards with a 12px gap against the reference's flat
+hairline-divided list; the toggle was a bare `+` glyph against a 28px circled ± that inverts to
+white-on-blue when open; the question ran at 18px against 14.72px; and the answer at 18px/32.4px
+against 14.08px/24.64px. A structural match is not a visual match. Closed in Comparison 35.
 
 ### 7. Bottom CTA section
 - **Heading differs — custom vs standard CTA**: Target uses the standard site-wide CTA heading "Ready to Refer Your Next Matter to VERIFY?" Current instead uses a JME-specific heading, "Ready to Arrange a Joint Examination?"
@@ -465,9 +470,17 @@ See headline issue above. If reverting to Target's directory approach:
 No meaningful differences — the 3 cards (Keep the Brief and LOI Focused, Send material at least 5 business days before, Flag attendance risks early) and the closing Terms & Conditions note both match well.
 
 ### 6. "Client FAQs" section
-- Content matches closely — both list the same 15 questions in the same order. Good consistency here.
-- **Icon style differs**: Target uses chevron-down (˅) icons for the accordion toggles; Current uses plus (+) icons — minor style inconsistency, low priority.
-- **Missing callout styling**: Target's closing "Have a question that is not covered here?" note is presented in a styled light-blue rounded callout box with icon and separately formatted email/phone lines. Current shows the same text as plain, unstyled paragraph text with no box, icon, or visual separation.
+- **CORRECTED 2026-08-18 — and all of it CLOSED in Comparison 35.** This entry said "the same 15
+  questions". There are **16**, and there always were; the count was never checked, only eyeballed.
+  Extracting and diffing both sides shows all 16 questions AND all 16 answers are byte-identical to
+  the reference, so nothing was ever wrong with the content here.
+- ~~**Icon style differs**: Target uses chevron-down (˅) icons; Current uses plus (+) icons.~~ Real,
+  and the least of it — see Comparison 35. Closed by the `toggleStyle: chevron` variant.
+- ~~**Missing callout styling**~~ — the callout box had already been built by the time this was
+  re-read (`.vf-faq__help`, measured identical to the reference for background, padding, radius and
+  position). What was still wrong was its *contents*: no info icon, the copy split into a bold
+  heading, and the contacts inline behind a middot instead of stacked behind their own icons.
+  Closed in Comparison 35.
 
 ### 7. Bottom CTA section
 - Heading and eyebrow copy match the standard site-wide CTA ("Ready to Refer Your Next Matter to VERIFY?") — good, this page correctly uses the shared component rather than a custom variant.
@@ -500,9 +513,12 @@ No meaningful differences — the 3 cards (Keep the Brief and LOI Focused, Send 
 No meaningful differences — video embed, heading, and subtext all match between Target and Current.
 
 ### 5. "Frequently Asked Questions" section
-- Content matches — both list the same 15 questions in the same order.
-- **Icon style differs (recurring)**: Target uses chevron-down icons; Current uses plus icons — same minor inconsistency flagged on the Information for Clients page.
-- **Missing callout styling (recurring)**: Target's "Have a question that is not covered here?" note is in a styled light-blue callout box with icon; Current shows the same text unstyled, with no box or icon — same pattern as the Clients page.
+- **CORRECTED 2026-08-18 — CLOSED in Comparison 35.** **16** questions, not 15, same as the Clients
+  page. All 16 questions and all 16 answers are byte-identical to the reference.
+- ~~**Icon style differs (recurring)**~~ / ~~**Missing callout styling (recurring)**~~ — both closed
+  in Comparison 35. Neither was the largest gap on this page: the accordion was drawn as rounded
+  outlined cards against the reference's flat divided list, and the section band was white against
+  the reference's pale blue. Two passes recorded the toggle glyph and missed both.
 
 ### 6. "Where to Find Us" section
 - Map, address, and the three action buttons (Get Directions, phone, Email Us) match between both.
@@ -2016,6 +2032,90 @@ intended routes (`/information-centre/for-clients` 88 nodes, `/` 30) plus the us
 frame. int **134/134**, e2e **19/19**.
 
 ---
+
+## Comparison 35: the FAQ accordion — one design, four pages (2026-08-18)
+
+Reported: the FAQ sections on `/information-centre/for-claimants` and `/information-centre/for-clients`
+are "completely different" to the reference. Then widened: fold in every other page the same change
+touches, so they all become correct rather than merely untouched.
+
+### The content was already perfect
+
+All **32 questions and all 32 answers** across the two Information Centre pages are byte-identical to
+the reference — established by extracting both sides and diffing them, not by reading. Every gap was
+presentation. That also corrects three earlier entries: Comparisons 12 and 13 both recorded "15
+questions" (there are 16), and Comparison 6 cleared the JME FAQ on question text alone.
+
+### The reference has one accordion, not four
+
+Its three accordions are the same flat divided list — transparent rows, a hairline between each, no
+boxes, no radius, no gaps. They vary on four axes only:
+
+| | Information Centre | /ime claim types | /jme FAQ |
+|---|---|---|---|
+| Toggle | bare CSS chevron | 28px circled ± | 28px circled ± |
+| When open | question tints blue | question stays dark, pill fills | ditto |
+| Rule colour | `#e2e8f0` | `rgba(28,117,188,.15)` | `var(--border-light)` |
+| Leading icon | none | 36px tinted tile, answer indented 52px | none |
+| Question size | 0.97rem | 0.95rem | 0.92rem |
+
+Ours drew all four as rounded outlined white cards with a 12px gap and a `+` glyph — one design
+decision applied everywhere, and wrong everywhere.
+
+### Fixed as block settings, not page scopes
+
+Six fields on the FAQ block — **Item style**, **Toggle style**, **Icon style**, **Density**, **Rule
+colour**, **Content width** — plus a reusable **Pale blue** Section background. Every one of them
+declares **no `defaultValue`**, so an unset value renders exactly what the block rendered before they
+existed. Proven, not asserted: with the fields added and no stored data touched, the computed-style
+snapshot moved **0 nodes** across 18 routes (8228 → 8228).
+
+That also makes the repair possible. A field carrying a `defaultValue` cannot be a migration signal —
+the adapter emits `ADD COLUMN … DEFAULT` and Postgres backfills every row. Confirmed in the schema:
+all six new columns arrived with an empty Default, against `columns`, which shows `'1'::enum…`.
+
+Two pairings are **derived rather than exposed**, because the reference makes the same pairing every
+time and a field would invent a choice the design does not offer: the open-state tint follows the
+toggle (chevron tints the text, pill fills the pill and leaves it dark), and the 52px answer indent
+follows the icon tile. The rule colour is *not* derivable — /ime and /jme share the pill but use
+different rule colours — so it gets its own control.
+
+Retired on the way: `.vf-faq.jme-faq-aside`, a page-scoped class that hand-rolled the two-column
+layout `columns: 'split'` already provides.
+
+### What the measurement caught that reading would not
+
+- **The diff tool had never covered any of this.** `referenceCssDiff.mjs` matches `ime` on
+  `^\.ime-format` and `jme` on `^\.jme-process`; `.ime-claim-*` and `.jme-faq-*` fall outside both,
+  and there was no Information Centre family at all. Those families read zero throughout while a
+  second section on each of the same two pages went unmeasured. Four new families now cover them.
+- **The construction differs and the rendering does not.** The reference hangs its n+1 hairlines off
+  the list's `border-top` plus each item's `border-bottom`; ours off each item's `border-top` plus
+  `:last-child`. Walking every element and collecting each non-zero border: /ime draws **10 rules on
+  both sides**, one colour, spanning an identical **763px**; /jme draws **6 on both**, `rgb(198,198,198)`
+  on both, spanning an identical **440px**. The reference is not self-consistent here — the
+  Information Centre pages use *our* construction — so one family had to carry the note either way.
+- **`max-height` and `transition` are a JS accordion's mechanism, not its appearance.** The reference
+  animates a div from `max-height: 0`; a native `<details>` does not render its answer when closed.
+  The open state is what matters, and it is byte-identical: /ime `0px 0px 20px 52px`, 820×69,
+  14.08px/24.64px; /jme `0px 0px 20px`, 680×94, same type.
+
+### One deliberate deviation
+
+The reference's subtitle is a 600px box sitting *un-centred* inside its own 640px header, so its text
+lands 20px left of centre under a centred heading. Ours is centred. This is the reference failing to
+execute its own intent rather than expressing one, so it is not ported — recorded here rather than
+matched.
+
+### Result
+
+All **twelve** `referenceCssDiff` families read zero, including the four new ones. Both toggle states
+measured in the browser: chevron rotates 45° → −135° and tints to `rgb(28,117,188)`; pill inverts from
+`#cbe5fa`/blue to blue/white while the question stays `rgb(65,64,66)`. Multiple answers can now stay
+open on the Information Centre pages (asserted 2 open at once); /ime keeps one-at-a-time, per its
+field. The Style Guide's FAQ still renders the untouched card style, so the default stays visible.
+Snapshot moved only the four intended routes plus the usual `/in-the-loop` scroll-reveal frame.
+
 
 ## Summary of recurring, cross-page issues
 

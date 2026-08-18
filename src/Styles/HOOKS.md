@@ -200,7 +200,11 @@ everything listed here as live, and they should not be renamed without updating 
   (rows are `.claims-list li`, the arrow is `.claim-arrow`, the label `.claim-name`);
   each card-variant tile is a `.vf-card` with `.vf-card__icon` / `.vf-card__title`
 - Services grid: `.services-grid`, plus `.vf-cards--center` when **Card alignment** is Centred
-- FAQ: `.vf-faq__item`, `__question`, `__answer`
+- FAQ: `.vf-faq__item`, `__question`, `__question-text`, `__question-icon`, `__answer`, `__list`,
+  plus the help card `.vf-faq__help`, `__help-message`, `__help-icon`, `__help-text`,
+  `__help-contact`, `__help-contact-item`. Appearance variants appear on the block root:
+  `.vf-faq--divided`, `--toggle-chevron`, `--toggle-pill`, `--icon-tile`, `--compact`,
+  `--rule-grey`, `--rule-brand`, `--split`
 - Callout: `.vf-callout`, `__content`, `__icon`, `__tag`, `__heading`, `__body`, `__links`
 - Heroes: the interior hero root is `.page-hero` (with `.page-hero--light|dark|service`);
   its meta row is `.vf-page-hero__meta` / `__meta-item`. Home hero:
@@ -515,3 +519,41 @@ Separately, on a **Services Grid**, the **Card alignment** field is what turns t
 tiles — icon centred above a centred title, all cards the same height. Left is the default and gives
 you a normal left-aligned card. The homepage and Information for Clients both use **Centred**; if a
 services grid ever looks unexpectedly ragged next to those, this is the field to check.
+
+### The FAQ accordion — six settings, and every one leaves the others alone
+
+**Pages → the page → the FAQ block.** The block has always drawn each question in its own outlined
+white box. The design reference draws a flat list instead, so both are now available, along with the
+pieces that vary between them. **Leave any of these blank and nothing changes** — an untouched FAQ
+looks exactly as it always has.
+
+| Setting | Choices | What changes |
+|---|---|---|
+| **Item style** | Card · **Divided** | Card keeps each question in its own outlined box with a gap between. Divided drops the boxes for a flat list separated by hairline rules. |
+| **Toggle style** | Plus / minus · **Chevron** · **Pill** | The open/close marker at the end of each question. Chevron is a thin arrow that turns as it opens; Pill sets the + and − in a filled circle that inverts to white-on-blue. |
+| **Icon style** | Inline · **Tile** | Only matters if a question has an icon. Tile sets it in a rounded tinted square and indents the answer so it lines up under the question text. |
+| **Density** | Comfortable · **Compact** | Compact tightens the row height and steps the question, answer and section heading down a size. |
+| **Rule colour** | Light · Grey · **Brand tinted** | Only appears when Item style is Divided. Brand tinted suits an accordion sitting on a coloured band. |
+| **Content width** | Narrow · Normal · Wide · Full | Leave blank for the narrow column the block has always used. |
+
+Where each is used: **Information for Clients** and **Information for Claimants** are Divided +
+Chevron; the **IME** page's claim-types list is Divided + Pill + Tile + Compact on brand-tinted rules;
+the **JME** FAQ is Divided + Pill + Compact. The **Style Guide** is deliberately left on Card, so the
+default look stays visible somewhere.
+
+> **"Only one open at a time" is a separate tickbox, and it is worth a thought.** Untick it and a
+> reader can leave several answers open to compare them — which is what the reference does on both
+> Information Centre pages. Tick it and opening one closes the last, which suits a short list where
+> the whole set should stay on screen. Both Information Centre pages are now unticked; IME and JME
+> stay ticked.
+
+> **Side by side** (under Layout) puts the heading and intro in a narrow left column with the
+> questions beside them. It replaces a hand-written style class that used to do the same thing on the
+> JME page only — so it is now available on any FAQ.
+
+### A fifth section background: Pale blue
+
+**Background** on any Section now offers **Pale blue** alongside White, Light grey, Light blue accent,
+Light blue (solid), Primary and Dark. It is the palest of the blues — noticeably lighter than "Light
+blue (solid)" — and is what the design reference bands the Claimants FAQ, the contact enquiry panel
+and the appointment-guide highlight cards with. Its value is editable like every other band token.

@@ -5,6 +5,7 @@ import type { FAQBlock as FAQBlockProps } from '@/payload-types'
 import RichText from '@/components/RichText'
 import { Icon } from '@/components/Icon'
 import { SectionHeader } from '@/components/SectionHeader'
+import { widthClasses } from '@/components/Section'
 import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
@@ -12,8 +13,25 @@ import { toClassName } from '@/utilities/cssClass'
 // Server-rendered accordion using native <details>/<summary> (no client JS).
 // `exclusive` uses the native [name] grouping so only one stays open.
 export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }> = (props) => {
-  const { eyebrow, heading, subheading, columns, items, cssClass, exclusive, openFirst, helpCard, id, bare } =
-    props
+  const {
+    eyebrow,
+    heading,
+    subheading,
+    columns,
+    items,
+    cssClass,
+    exclusive,
+    openFirst,
+    helpCard,
+    itemStyle,
+    toggleStyle,
+    iconStyle,
+    density,
+    ruleStyle,
+    containerWidth,
+    id,
+    bare,
+  } = props
   const anchorId = (props as { anchorId?: string | null }).anchorId || undefined
 
   if (!items || items.length === 0) return null
@@ -27,6 +45,8 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
   // narrow left column, questions stacked beside them. It also gives the
   // per-item `image` field somewhere to render — the field's description used to
   // promise an "accordion-with-image layout" that was never built.
+  const divided = itemStyle === 'divided'
+  const iconTile = iconStyle === 'tile'
   const split = columns === 'split'
   const splitImage = split
     ? (items.find((i) => i.image && typeof i.image === 'object')?.image ?? null)
@@ -49,8 +69,24 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
             className="faq-item vf-faq__item"
           >
             <summary className="vf-faq__question">
-              {item.icon ? <Icon name={item.icon} className="size-5" /> : null}
-              {item.question}
+              {item.icon ? (
+                iconTile ? (
+                  <span className="vf-faq__question-icon">
+                    <Icon name={item.icon} />
+                  </span>
+                ) : (
+                  <Icon name={item.icon} className="size-5" />
+                )
+              ) : null}
+              {/* The divided variant needs a real element to flex against, so the
+                  toggle sits hard right of a text block rather than of an
+                  anonymous text node. Card mode keeps the bare text node, which
+                  is what makes the unset default byte-identical to before. */}
+              {divided ? (
+                <span className="vf-faq__question-text">{item.question}</span>
+              ) : (
+                item.question
+              )}
             </summary>
             <div className="faq-a vf-faq__answer">
               <RichText data={item.answer} enableGutter={false} enableProse={false} />
@@ -66,7 +102,22 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
       className={cn(
         'vf-faq',
         split && 'vf-faq--split',
-        bare ? '' : split ? 'container' : 'container content-narrow',
+        // Every one of these is absent unless an editor picks it, so a FAQ that
+        // has never been touched emits exactly the classes it always did.
+        divided && 'vf-faq--divided',
+        toggleStyle === 'chevron' && 'vf-faq--toggle-chevron',
+        toggleStyle === 'pill' && 'vf-faq--toggle-pill',
+        iconTile && 'vf-faq--icon-tile',
+        density === 'compact' && 'vf-faq--compact',
+        ruleStyle === 'grey' && 'vf-faq--rule-grey',
+        ruleStyle === 'brand' && 'vf-faq--rule-brand',
+        bare
+          ? ''
+          : split
+            ? 'container'
+            : containerWidth && containerWidth !== 'narrow'
+              ? widthClasses[containerWidth]
+              : 'container content-narrow',
         toClassName(cssClass),
       )}
     >
@@ -89,14 +140,30 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
 
       {help && (help.heading || help.body) ? (
         <div className="vf-faq__help vf-callout vf-callout--info">
-          {help.heading ? <p className="vf-faq__help-heading">{help.heading}</p> : null}
-          {help.body ? <p>{help.body}</p> : null}
-          {help.email || help.phone ? (
-            <p className="vf-faq__help-contact">
-              {help.email ? <a href={`mailto:${help.email}`}>{help.email}</a> : null}
-              {help.email && help.phone ? ' · ' : null}
-              {help.phone ? <a href={`tel:${help.phone.replace(/\s+/g, '')}`}>{help.phone}</a> : null}
+          {/* The reference runs the heading and body together as one weighted
+              paragraph beside an info icon. The two fields stay separate so an
+              editor can leave either empty; only the rendering is joined. */}
+          <div className="vf-faq__help-message">
+            <Icon name="info" className="vf-faq__help-icon" />
+            <p className="vf-faq__help-text">
+              {[help.heading, help.body].filter(Boolean).join(' ')}
             </p>
+          </div>
+          {help.email || help.phone ? (
+            <div className="vf-faq__help-contact">
+              {help.email ? (
+                <span className="vf-faq__help-contact-item">
+                  <Icon name="envelope" className="vf-faq__help-icon" />
+                  <a href={`mailto:${help.email}`}>{help.email}</a>
+                </span>
+              ) : null}
+              {help.phone ? (
+                <span className="vf-faq__help-contact-item">
+                  <Icon name="phone" className="vf-faq__help-icon" />
+                  <a href={`tel:${help.phone.replace(/\s+/g, '')}`}>{help.phone}</a>
+                </span>
+              ) : null}
+            </div>
           ) : null}
         </div>
       ) : null}

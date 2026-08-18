@@ -360,7 +360,7 @@ export interface Page {
     /**
      * Section background colour.
      */
-    heroBackground?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+    heroBackground?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
     /**
      * Content width for this section.
      */
@@ -2116,7 +2116,7 @@ export interface SectionBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Content width for this section.
    */
@@ -3036,6 +3036,30 @@ export interface FAQBlock {
    * Lay the questions out in one or two columns, or side by side — heading and intro in a left column with the questions beside them (the services-page treatment).
    */
   columns?: ('1' | '2' | 'split') | null;
+  /**
+   * Card keeps each question in its own outlined white box. Divided drops the boxes for a flat list separated by hairline rules.
+   */
+  itemStyle?: ('card' | 'divided') | null;
+  /**
+   * The open/close marker at the end of each question. Pill puts the + and − inside a filled circle.
+   */
+  toggleStyle?: ('plus' | 'chevron' | 'pill') | null;
+  /**
+   * How a question’s icon is drawn. Tile sets it in a rounded tinted square and indents the answer to line up beneath the text.
+   */
+  iconStyle?: ('inline' | 'tile') | null;
+  /**
+   * Compact tightens the row height and text size a step.
+   */
+  density?: ('comfortable' | 'compact') | null;
+  /**
+   * Content width, for a FAQ placed directly on the page. Leave unset for the narrow column this block has always used; the reference widens it where an accordion carries icons. Ignored when this block sits INSIDE a Section — the Section sets the width there.
+   */
+  containerWidth?: ('narrow' | 'normal' | 'wide' | 'full') | null;
+  /**
+   * Colour of the hairline rules between questions. Brand tinted suits an accordion sitting on a coloured band.
+   */
+  ruleStyle?: ('light' | 'grey' | 'brand') | null;
   items?:
     | {
         question: string;
@@ -3216,7 +3240,7 @@ export interface GatewayCardsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   columns?: ('2' | '3' | '4') | null;
   cards?:
     | {
@@ -3703,7 +3727,7 @@ export interface FeatureGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   columns?: ('1' | '2' | '3' | '4') | null;
   /**
    * “Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift.
@@ -4017,7 +4041,7 @@ export interface ProcessStepsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Layout. "Cards" = numbered card grid. "Two-row process" = connected numbered rows (01–03 blue, 04+ dark) matching the reference Our Process. "Claimant step list" = left intro + a compact numbered list on the right (reference Your Examination Step by Step).
    */
@@ -4259,7 +4283,7 @@ export interface SpecialtyGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * Which taxonomy to list.
@@ -4704,11 +4728,11 @@ export interface PeopleGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Give the eyebrow/heading/intro their own coloured band above the rest of the block. Leave as "Same as the section" for one continuous band. The colours themselves come from Design System → Section bands.
    */
-  headerBackground?: ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  headerBackground?: ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   source?: ('specialists' | 'team' | 'manual') | null;
   onlyAdvertised?: boolean | null;
   featuredOnly?: boolean | null;
@@ -4976,7 +5000,7 @@ export interface ServicesGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * Optional — limit to one category.
@@ -5397,7 +5421,7 @@ export interface TestimonialsGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   featuredOnly?: boolean | null;
   testimonials?: (number | Testimonial)[] | null;
@@ -5502,7 +5526,7 @@ export interface StatsBandBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   stats?:
     | {
         /**
@@ -5571,7 +5595,7 @@ export interface TabsBlockType {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   tabs?:
     | {
         label: string;
@@ -5765,7 +5789,7 @@ export interface AamleEducationBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Small uppercase label above the wordmark.
    */
@@ -6218,7 +6242,7 @@ export interface SplitFeatureBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * “Divided” separates each row with a hairline rule instead of a gap — the Reporting Services treatment.
    */
@@ -7873,7 +7897,7 @@ export interface LeadershipSpotlightBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Founder portrait. Falls back to a labelled placeholder when empty.
    */
@@ -8539,7 +8563,7 @@ export interface VideoEmbedBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
@@ -8772,7 +8796,7 @@ export interface ArchiveBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   introContent?: {
     root: {
       type: string;
@@ -9080,7 +9104,7 @@ export interface SpecialistDirectoryBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   enableSearch?: boolean | null;
   enableSpecialty?: boolean | null;
   enableLocation?: boolean | null;
@@ -9160,7 +9184,7 @@ export interface SpecialtyDirectoryBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   showFilterBar?: boolean | null;
   /**
    * List each specialty’s specialists inside the accordion.
@@ -9200,7 +9224,7 @@ export interface ResourcesGridBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * "Standard card" or "Resource card" (design-reference In-the-Loop .ni-resource-card — coloured header panel + body).
@@ -9907,7 +9931,7 @@ export interface MissionPillarsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Small uppercase label above the heading (optional).
    */
@@ -9966,7 +9990,7 @@ export interface ValueCardsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Value cards, rendered in a 3-column grid. Every second card (2nd, 4th, 6th) is tinted light blue automatically.
    */
@@ -10177,7 +10201,7 @@ export interface AudiencePathwaysBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Two audience pathway cards shown side by side.
    */
@@ -10960,7 +10984,7 @@ export interface FeaturedArticlesBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -11071,7 +11095,7 @@ export interface EventsExplorerBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -11874,6 +11898,12 @@ export interface FAQBlockSelect<T extends boolean = true> {
   heading?: T;
   subheading?: T;
   columns?: T;
+  itemStyle?: T;
+  toggleStyle?: T;
+  iconStyle?: T;
+  density?: T;
+  containerWidth?: T;
+  ruleStyle?: T;
   items?:
     | T
     | {

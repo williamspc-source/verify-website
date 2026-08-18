@@ -564,6 +564,27 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   declared none — the detail descriptions rendered at **18px/30.6px against 12.8px/19.84px**, which is
   why those cards ran far taller than the reference's. The tool cannot check a claim like that; only
   reading the reference can. Treat every `null` mapping as an assertion needing evidence.
+- **A diff family's zero is scoped to its `match` regex, not to the page it is named after.** The `ime`
+  family matches `/^\.ime-format/` and `jme` matches `/^\.jme-process/`. Both read zero for months while
+  a *second* section on each of those same two pages — the `.ime-claim-*` and `.jme-faq-*` accordions —
+  was covered by nothing at all, and there was no Information Centre family in existence. So "the `ime`
+  family is zero" was repeatedly read as "the /ime page is right". Measured once the families existed:
+  15 and 13 reference selectors respectively, absent from the build. Before trusting a family, print the
+  reference selectors it actually collected and check that against the sections on the page; a checker
+  that silently measures a subset reads exactly like one that found nothing wrong.
+- **A `var()` with a fallback renders correctly and is opaque to a declaration diff.**
+  `border-top: 1px solid var(--vf-faq-rule, #e2e8f0)` computes to the reference's literal in every case
+  where nothing sets the custom property, and still reports as differing forever. Where a default exists
+  to be compared, declare the literal and let the variants override it — the CSS is simpler *and*
+  checkable. The same applies to shorthands: a variant that sets only `border-color` cannot close a
+  reference `border-top`, so the variant declares the whole shorthand.
+- **A structural difference is not automatically a visual one — but only enumeration can tell you which.**
+  The reference hangs its accordion hairlines off the list's `border-top` plus every item's
+  `border-bottom`; ours off every item's `border-top` plus `:last-child`. That reads as four differing
+  declarations. Walking the DOM and collecting every border with a non-zero width settled it: 10 rules on
+  both sides on /ime, one colour, spanning an identical 763px; 6 on both on /jme, same colour, identical
+  440px. Count the rendered artefacts before either "fixing" a construction or excusing it — and note
+  that the reference used *both* constructions across its own pages, so some family must carry the note.
 - **A regex bulk edit across a fixture file reaches further than the page you are editing.** Adding
   one field to five rows via `perl -0pi -e` matched **13** — every row in `seedServices.ts` with the
   same two-line preamble, including `/services`, which must not have it. It was caught by reading
@@ -579,9 +600,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   gate against a running `:3000`, keyed by structural index path rather than class name (class
   names are what the migrations change). Token replacements are value-preserving by
   construction, so the expected diff is empty; any diff is a real bug, not a tolerance.
-  It measures **39** properties over **15** routes — `width`/`height`/`gridTemplateColumns`/
+  It measures **40** properties over **18** routes — `width`/`height`/`gridTemplateColumns`/
   `transform` are in that set, which is what makes it catch a reflow and not just a repaint, but
-  15 routes is 15 of the site's 29 pages and it never triggers `:hover`. Capture immediately
+  18 routes is 18 of the site's 29 pages and it never triggers `:hover`. Capture immediately
   before a change and compare immediately after; baselines are gitignored because any content
   change invalidates them. `capture` refuses a non-200 — it used to bank the 404 page as a
   baseline for two routes that do not exist.
@@ -591,8 +612,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   Their carve-outs are deliberate and documented in the file headers.
 - `node tests/visual/referenceCssDiff.mjs <family> [--verbose]` — diffs every CSS declaration the
   design reference makes for a selector family against `globals.css`, and exits non-zero until the
-  count is zero. **Six families**: `events`, `services`, `ime`, `jme`, `admin-services`,
-  `reporting-services`; all read zero, so any non-zero is something you just did. Resolves each side's
+  count is zero. **Twelve families**: `events`, `services`, `ime`, `jme`, `admin-services`,
+  `reporting-services`, `specialist-profile`, `for-clients`, `faq-claimants`, `faq-clients`,
+  `ime-claims`, `jme-faq`; all read zero, so any non-zero is something you just did. Resolves each side's
   `:root` **separately** (both define `--radius`, and they disagree — 8px there, 0.5rem here),
   compares font tokens by *name* because the brand typeface is a deliberate deviation, and merges
   base+override rules where we implement a bespoke reference selector through a shared component.

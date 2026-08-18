@@ -22,6 +22,10 @@ const BACKGROUND_OPTIONS = [
   // could stop being a hardcoded inline colour; available everywhere since it
   // is a genuinely useful option, not a one-off.
   { label: 'Light blue (solid)', value: 'accent-solid' },
+  // The reference's #eef6fc, which is paler than `accent-solid`. It reuses that
+  // value on the contact page and the Claimants FAQ, and it was a hardcoded
+  // literal in three places in globals.css before this became a preset.
+  { label: 'Pale blue', value: 'light' },
   { label: 'Primary (dark blue)', value: 'primary' },
   { label: 'Dark (charcoal)', value: 'dark' },
 ]

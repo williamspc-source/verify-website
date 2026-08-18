@@ -20,7 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 34 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 35 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -168,6 +168,17 @@ byte-identical to the reference's gradient, and the padding preset was one step 
 cards became a new editable **Soft** card style. The homepage was wrong in the same way and now
 measures 0 against its own reference. Recurring item 7 in the design-diff was **corrected** — it had
 described these cards as a bulleted list long after they stopped being one.
+
+The FAQ accordions followed (Comparison 35), across all four pages that have one. The content was
+already exact — all 32 questions and 32 answers on the two Information Centre pages are byte-identical
+to the reference — so every gap was presentation: the reference draws one flat divided list, ours drew
+four rounded card stacks. Now six settings on the FAQ block, each defaulting to what already rendered
+(proven: 0 nodes moved with the fields added and no data touched), plus a reusable **Pale blue**
+Section background. The page-scoped `.vf-faq.jme-faq-aside` class was retired for the `columns: split`
+field that supersedes it. The tooling gap mattered more than the CSS: `referenceCssDiff.mjs` matched
+`ime` on `^\.ime-format` and `jme` on `^\.jme-process`, so both read zero while a second section on
+each of the same two pages was covered by nothing — four new families now cover them, and all
+**twelve** read zero.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 

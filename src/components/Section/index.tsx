@@ -6,6 +6,7 @@ export type SectionBackground =
   | 'muted'
   | 'accent'
   | 'accent-solid'
+  | 'light'
   | 'primary'
   | 'dark'
 
@@ -21,6 +22,7 @@ export const bgClasses: Record<SectionBackground, string> = {
   muted: 'vf-section--muted',
   accent: 'vf-section--accent',
   'accent-solid': 'vf-section--accent-solid',
+  light: 'vf-section--light',
   primary: 'vf-section--primary vf-on-dark',
   dark: 'vf-section--dark vf-on-dark',
 }

@@ -660,8 +660,8 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         anchorId: 'faqs',
         background: 'white',
         containerWidth: 'narrow',
-        paddingTop: 'spacious',
-        paddingBottom: 'spacious',
+        paddingTop: 'normal',
+        paddingBottom: 'normal',
         content: [
           {
             blockType: 'faq',
@@ -670,7 +670,10 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
             subheading:
               'Answers to common questions from lawyers, insurers, case managers and other instructing parties.',
             columns: '1',
-            exclusive: true,
+            // The reference lets several answers stay open at once.
+            exclusive: false,
+            itemStyle: 'divided',
+            toggleStyle: 'chevron',
             items: [
               faqItem(
                 'What is medico-legal?',
@@ -1093,10 +1096,11 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
       {
         blockType: 'section',
         anchorId: 'claimant-faqs',
-        background: 'white',
+        // The reference bands this one pale blue; the Clients FAQ stays white.
+        background: 'light',
         containerWidth: 'narrow',
-        paddingTop: 'spacious',
-        paddingBottom: 'spacious',
+        paddingTop: 'normal',
+        paddingBottom: 'normal',
         content: [
           {
             blockType: 'faq',
@@ -1105,7 +1109,9 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
             subheading:
               'Answers to the questions claimants ask us most about the independent medico-legal examination process.',
             columns: '1',
-            exclusive: true,
+            exclusive: false,
+            itemStyle: 'divided',
+            toggleStyle: 'chevron',
             items: [
               faqItem(
                 'What is an Independent Medico-Legal Examination (IME)?',
