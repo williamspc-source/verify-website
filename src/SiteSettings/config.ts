@@ -17,6 +17,8 @@ export const SiteSettings: GlobalConfig = {
   },
   admin: {
     group: 'Site',
+    description:
+      'Logo, favicon, brand colours, the form behind the Make an Enquiry drawer, and the wording of the booking-portal registration email.',
   },
   fields: [
     {

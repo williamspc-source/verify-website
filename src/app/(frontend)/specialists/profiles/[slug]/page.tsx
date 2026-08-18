@@ -113,7 +113,12 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
     ? (s.languages as { language?: string }[]).map((l) => l.language).filter(Boolean)
     : []
   const areas = relTitles(s.areasOfExpertise)
-  const assessmentTypes = [...relTitles(s.claimTypes), ...relTitles(s.assessmentTypes)]
+  // Two distinct taxonomies, rendered separately. They used to be concatenated
+  // under the single "Assessment Types" heading, which meant a Claim Type never
+  // appeared under its own name anywhere on the site — 23 of 26 specialists
+  // carry them.
+  const claimTypes = relTitles(s.claimTypes)
+  const assessmentTypes = relTitles(s.assessmentTypes)
   const qualifications = Array.isArray(s.qualifications)
     ? (s.qualifications as { qualification?: string; icon?: string }[])
     : []
@@ -213,6 +218,21 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
                     {assessmentTypes.map((a) => (
                       <div key={a} className="profile-type-item">
                         {a}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {claimTypes.length ? (
+                <div className="profile-section">
+                  <div className="profile-section-label">
+                    {labels.claimTypes || 'Claim Types'}
+                  </div>
+                  <div className="profile-types">
+                    {claimTypes.map((c) => (
+                      <div key={c} className="profile-type-item">
+                        {c}
                       </div>
                     ))}
                   </div>

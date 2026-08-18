@@ -37,7 +37,9 @@ export const Events: CollectionConfig<'events'> = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'eventType', 'date', 'host'],
-    group: 'Content',
+    group: 'Publishing',
+    description:
+      'Seminars and webinars, listed at /events. After an event you can add a recap, photo gallery and downloads to the same record.',
   },
   fields: [
     {

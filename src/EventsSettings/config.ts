@@ -177,7 +177,7 @@ export const EventsSettings: GlobalConfig = {
   label: 'Events Settings',
   access: { read: () => true },
   admin: {
-    group: 'Content',
+    group: 'Page settings',
     description: 'Host-specific boilerplate copy shown on event detail pages (AAMLE / VERIFY).',
   },
   fields: [hostGroup('aamle', 'AAMLE events'), hostGroup('verify', 'VERIFY events'), labelsGroup],

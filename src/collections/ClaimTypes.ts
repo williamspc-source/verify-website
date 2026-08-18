@@ -19,6 +19,8 @@ export const ClaimTypes: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'Kinds of claim a specialist handles. Listed on their profile under "Claim Types".',
     defaultColumns: ['title', 'slug'],
   },
   fields: [

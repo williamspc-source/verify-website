@@ -9,10 +9,10 @@ import { revalidateGlobal } from '@/utilities/revalidateGlobal'
 // here rather than per post.
 export const ArticleSettings: GlobalConfig = {
   slug: 'article-settings',
-  label: 'In the Loop / Article Settings',
+  label: 'Article Settings',
   access: { read: () => true },
   admin: {
-    group: 'Content',
+    group: 'Page settings',
     description: 'Sidebar CTA cards + fixed labels shown on every In-the-Loop article.',
   },
   fields: [

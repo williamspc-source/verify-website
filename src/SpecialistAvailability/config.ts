@@ -19,7 +19,9 @@ export const SpecialistAvailability: GlobalConfig = {
     read: () => true,
   },
   admin: {
-    group: 'Specialist Availability',
+    group: 'Page settings',
+    description:
+      'Wording for the availability page and the prefilled enquiry email its Send button opens. The slots themselves are in Availability Sessions.',
   },
   fields: [
     {

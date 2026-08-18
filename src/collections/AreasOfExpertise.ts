@@ -9,7 +9,10 @@ import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/reva
 // Admin-editable taxonomy.
 export const AreasOfExpertise: CollectionConfig = {
   slug: 'areas-of-expertise',
-  labels: { singular: 'Area of Expertise', plural: 'Areas of Expertise' },
+  // Rendered on a specialist profile under the heading "Assessment Areas"
+  // (SpecialistProfile → labels.assessmentAreas). The phrase "Areas of
+  // Expertise" appears nowhere on the site, so the admin follows the site.
+  labels: { singular: 'Assessment Area', plural: 'Assessment Areas' },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -19,6 +22,8 @@ export const AreasOfExpertise: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'Sub-specialty areas a specialist assesses. Listed on their profile under "Assessment Areas", and used to filter the specialist directory.',
     defaultColumns: ['title', 'slug'],
   },
   fields: [

@@ -20,7 +20,9 @@ export const Services: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    group: 'Content',
+    group: 'Reference',
+    description:
+      'The service cards shown in Services grids. These are cards, not pages — each links to a page you choose under "Link override".',
     defaultColumns: ['title', 'category', 'featured', 'order'],
   },
   fields: [

@@ -19,6 +19,8 @@ export const AssessmentTypes: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'Kinds of assessment a specialist performs. Listed on their profile under "Assessment Types".',
     defaultColumns: ['title', 'slug'],
   },
   fields: [

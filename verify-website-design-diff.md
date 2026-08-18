@@ -2297,3 +2297,43 @@ block that forwards raw links fails to compile — observed, not assumed: both c
   consumed it. No overflow; the 1px separator and 22px padding are intact.
 
 All **13** diff families still zero; the new button is not in the reference, so none should move.
+
+---
+
+## Comparison 38: Claim Types get their own heading — a deliberate departure (2026-08-18)
+
+Not a reference gap. Found while auditing the admin against the site: the specialist profile
+concatenated two separately-maintained taxonomies into one list.
+
+`specialists/profiles/[slug]/page.tsx` built
+`[...relTitles(s.claimTypes), ...relTitles(s.assessmentTypes)]` and rendered the result under the
+single heading **Assessment Types**. So a Claim Type never appeared under its own name anywhere on
+the site, while being a collection an editor maintains separately. Measured: **23 of 26** specialists
+carry claim types, 90 relationships.
+
+### The reference merges them, and we are not going to
+
+`.design-reference/specialists/profiles/dr-adam-parr.html` lists all ten items under one
+**Assessment Types** heading — *Motor Vehicle Accident (MVA) Claim*, *Workers' Compensation* and
+*Public Liability Claim* sit beside *File Review* and *Joint Medical Examination*. There is no Claim
+Types heading in the reference at all. **The build was matching it; this change departs from it.**
+
+That was checked *after* the fix was written, which is the wrong order — the decision had already
+been put as "bug or convention?" without the evidence that answers it. Recorded so the sequence is
+not repeated, and re-confirmed with the reason that stands on its own: an assessment type is a thing
+done (file review, IME, JME); a claim type is the matter it is done for (MVA, public liability).
+They are different questions, maintained in different collections, and they now read as different
+sections.
+
+**So this is a deliberate departure — do not "correct" it back.** The heading is editable at
+**Page settings → Specialist Profile → Claim Types**.
+
+### Measured
+
+- Anna Lenardon: **7** items under Assessment Types and **6** under Claim Types, matching the
+  database exactly by kind. Previously 13 under one heading.
+- A profile without claim types (`dr-timothy-doyle`) renders **no** stray heading and no empty block
+  — both states asserted, not just the working one.
+- `computedSnapshot`: `/specialists/profiles/dr-adam-parr` only (22 nodes, +3), plus the usual
+  `/in-the-loop` scroll-reveal frame. The `specialist-profile` diff family stays at zero — it
+  compares declarations, not content, so it could never have caught this either way.

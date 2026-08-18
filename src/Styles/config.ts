@@ -14,6 +14,8 @@ export const CustomStyles: GlobalConfig = {
   },
   admin: {
     group: 'Design',
+    description:
+      'Reusable style presets and a box for site-wide CSS. See HOOKS.md before adding CSS — a block option or a Design System value is usually the better tool.',
   },
   fields: [
     {

@@ -5,11 +5,15 @@ import { revalidateHeader } from './hooks/revalidateHeader'
 
 export const Header: GlobalConfig = {
   slug: 'header',
+  // Explicit, so renaming the slug cannot silently rename the nav entry.
+  label: 'Header',
   access: {
     read: () => true,
   },
   admin: {
     group: 'Site',
+    description:
+      'The main navigation and its dropdowns, plus the button at the top right. Shown on every page.',
   },
   fields: [
     {

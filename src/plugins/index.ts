@@ -62,7 +62,11 @@ export const plugins: Plugin[] = [
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {
-      admin: { group: 'System' },
+      admin: {
+        group: 'System',
+        description:
+          'Sends an old web address to a new one. Add a redirect whenever you change a page’s slug or parent, so existing links keep working.',
+      },
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
@@ -99,7 +103,11 @@ export const plugins: Plugin[] = [
       payment: false,
     },
     formOverrides: {
-      admin: { group: 'Forms' },
+      admin: {
+        group: 'Forms',
+        description:
+          'The enquiry forms used across the site. A form’s Emails tab decides who is notified when someone submits it — check that before renaming a form.',
+      },
       // Forms render inside pages via FormBlock (fields, labels, confirmation
       // message), but the form docs live in their own collection with no hooks of
       // their own — so editing a form never refreshed the pages hosting it. Purge
@@ -150,14 +158,24 @@ export const plugins: Plugin[] = [
       },
     },
     formSubmissionOverrides: {
-      admin: { group: 'Forms' },
+      admin: {
+        group: 'Forms',
+        description:
+          'Every enquiry a visitor has submitted, newest first. Read-only — this is the record of what came in.',
+      },
     },
   }),
   searchPlugin({
     collections: ['posts', 'specialists', 'events'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
-      admin: { group: 'System' },
+      admin: {
+        group: 'System',
+        // Replaces the plugin's stock copy, which was the only description in
+        // the nav not written for this site.
+        description:
+          'Built automatically so the site search can find articles, specialists and events. Nothing here is edited by hand — it rewrites itself when you save one of those.',
+      },
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields]
       },

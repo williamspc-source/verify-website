@@ -34,7 +34,9 @@ export const AvailabilitySessions: CollectionConfig<'availability-sessions'> = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'specialist', 'date', 'mode', 'status', 'expiresAt'],
-    group: 'Specialist Availability',
+    group: 'Availability',
+    description:
+      'Advertised appointment slots. Each belongs to a specialist and stops showing after its "Advertise until" date.',
     listSearchableFields: ['title'],
   },
   defaultPopulate: {

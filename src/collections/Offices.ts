@@ -107,7 +107,9 @@ export const Offices: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    group: 'Content',
+    group: 'Reference',
+    description:
+      'Your office locations. The primary office fills the footer contact details and the "Where to Find Us" map on Contact and For Claimants.',
     defaultColumns: ['title', 'order', 'slug'],
   },
   fields: [

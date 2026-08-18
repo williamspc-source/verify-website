@@ -42,6 +42,8 @@ export const Specialists: CollectionConfig<'specialists'> = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'position', 'specialty', 'updatedAt'],
     group: 'People',
+    description:
+      'The external doctors on your panel. Each gets a profile page at /specialists/profiles/... Save as a draft to hide one from the site.',
   },
   fields: [
     {

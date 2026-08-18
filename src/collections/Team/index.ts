@@ -18,7 +18,7 @@ import {
 // Internal VERIFY staff. SEPARATE from Specialists (external doctors).
 export const Team: CollectionConfig<'team'> = {
   slug: 'team',
-  labels: { singular: 'Team Member', plural: 'Team' },
+  labels: { singular: 'Team Member', plural: 'Team Members' },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -37,6 +37,8 @@ export const Team: CollectionConfig<'team'> = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'role', 'department', 'order'],
     group: 'People',
+    description:
+      'VERIFY’s own staff. Each gets a profile at /about/team/... and appears on Meet the Team. Save as a draft to hide one.',
   },
   fields: [
     {

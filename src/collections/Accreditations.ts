@@ -21,6 +21,8 @@ export const Accreditations: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'Impairment-rating credentials (AMA 5, GEPI 2...). Shown as chips on a specialist’s profile and used as a directory filter.',
     defaultColumns: ['title', 'slug'],
   },
   fields: [

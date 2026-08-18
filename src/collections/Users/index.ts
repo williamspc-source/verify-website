@@ -15,6 +15,8 @@ export const Users: CollectionConfig = {
     defaultColumns: ['name', 'email'],
     useAsTitle: 'name',
     group: 'System',
+    description:
+      'Admin logins. Everyone here has full access — there are no restricted roles, so only add people you trust with the whole site.',
   },
   auth: true,
   fields: [

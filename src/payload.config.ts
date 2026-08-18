@@ -122,13 +122,23 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
+  // ORDER IS LOAD-BEARING, TWICE OVER.
+  //   1. Taxonomy lookups stay ahead of the content that references them.
+  //   2. The admin nav derives its GROUP order from first appearance while
+  //      scanning this array and then `globals` — there is no way to declare it.
+  //      So this order is also the sidebar's order: Publishing, Reference,
+  //      People, Availability, Taxonomy, Media, System.
   collections: [
+    // Publishing — the things you write and publish
     Pages,
     Posts,
-    Media,
-    Categories,
-    Users,
-    // Taxonomy lookups (registered before the content that references them)
+    Events,
+    // Reference — records that feed blocks rather than pages of their own
+    Services,
+    Resources,
+    Offices,
+    Testimonials,
+    // Taxonomy lookups (still registered before the content that references them)
     Specialties,
     SpecialtyCategories,
     ClaimTypes,
@@ -137,26 +147,28 @@ export default buildConfig({
     Accreditations,
     Locations,
     Streams,
-    // People & content
+    Categories,
+    // People
     Specialists,
     Team,
-    Events,
+    // Availability
     AvailabilitySessions,
-    Services,
-    Resources,
-    Offices,
-    Testimonials,
+    Media,
+    Users,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [
-    Header,
-    Footer,
-    SiteSettings,
-    SpecialistAvailability,
-    SpecialistProfile,
+    // Page settings — fixed wording on templated pages
     ArticleSettings,
     EventsSettings,
     TeamSettings,
+    SpecialistProfile,
+    SpecialistAvailability,
+    // Site
+    Header,
+    Footer,
+    SiteSettings,
+    // Design
     CustomStyles,
     DesignSystem,
   ],

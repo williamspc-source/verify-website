@@ -20,7 +20,8 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 37 is the latest**; 22 is the last full cross-page audit |
+| `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 38 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -198,6 +199,15 @@ changes both. The body is the design reference's own, byte for byte. `CMSLink` c
 client components import it), so the new `portalEnquiry` link type is resolved by the block and
 offered only on the two blocks that resolve it — enforced by the resolver's return type, so
 forwarding a raw link is a compile error rather than a dead button.
+
+**The admin was audited and made legible.** Nothing anywhere explained the 21 collections and 10
+globals, and the admin used different words from the site in four places. `Posts` is now **Articles**,
+`Categories` **Topics**, `Areas of Expertise` **Assessment Areas**; the settings globals moved out of
+the content groups into **Page settings**; every collection and global gained a one-line description;
+and the dashboard stopped telling editors to visit a *Globals* heading that does not exist.
+`ADMIN-GUIDE.md` is the new editor-facing guide. One real defect fell out of it: Claim Types were
+concatenated into the Assessment Types list on 23 of 26 specialist profiles, so a claim type never
+appeared under its own name — now its own section, a deliberate departure from the reference.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 

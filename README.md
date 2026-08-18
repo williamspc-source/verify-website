@@ -6,7 +6,8 @@ The public site and the admin are one application. Content is edited at `/admin`
 save — there is no separate publish step beyond each document's Draft/Published toggle, and no
 deploy needed for a content change.
 
-**If you are taking this over and do not write code, read `src/Styles/HOOKS.md`.** It is the
+**If you are taking this over and do not write code, start with `ADMIN-GUIDE.md`** — it explains
+what every item in the admin sidebar is for — **then read `src/Styles/HOOKS.md`.** It is the
 editor's manual: where every colour, font, spacing and corner-rounding control lives, what each one
 reaches, and what to do when a change appears not to work. This file is for whoever maintains the
 code.

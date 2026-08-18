@@ -21,6 +21,8 @@ export const SpecialtyCategories: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'The groups that specialties are filed under (Surgery, Psychiatry...). They become the filter buttons on the Specialty List.',
     defaultColumns: ['title', 'order', 'slug'],
   },
   fields: [

@@ -16,7 +16,7 @@ something undone.
 
 ## The records, and the rule for all of them
 
-Seven documents describe this repo to someone who was not there. **A change lands in all the ones it
+Nine documents describe this repo to someone who was not there. **A change lands in all the ones it
 touches, in the same pass, or the set starts lying** — and a reader cannot tell which one is stale.
 
 | File | Holds | Reader |
@@ -25,9 +25,20 @@ touches, in the same pass, or the set starts lying** — and a reader cannot tel
 | `OUTSTANDING.md` | What is knowingly imperfect, and what fixing it costs | Whoever inherits it |
 | `README.md` | Running, testing, deploying, and where images go | Whoever maintains it |
 | `src/Styles/HOOKS.md` | Every editable control and where it lives | The non-technical editor |
+| `ADMIN-GUIDE.md` | What every item in the admin sidebar **is**, and what feeds off it | ditto |
+| `REVIEW-CHECKLIST.md` | Every page and block, in render order, to tick through | Whoever is doing the manual review |
 | `verify-website-design-diff.md` | The design-reference audit for **every page**, numbered `Comparison N` | Whoever asked for the work |
 | `HOMEPAGE-CHANGES.md` | The **homepage** audit only — one dated pass against `index.html` | ditto, for that one page |
 | `current-state.md` | Status *now*: what works, what is open, how to get it onto the box | Whoever is driving the work |
+
+It said **seven** while listing seven and `REVIEW-CHECKLIST.md` already existed unlisted — the rule
+this section states, broken by the section itself. It is nine now: the two additions are
+`ADMIN-GUIDE.md` and the checklist that was always there.
+
+`ADMIN-GUIDE.md` and `src/Styles/HOOKS.md` share a reader and must not share content. HOOKS.md owns
+*"how do I change how this looks"*; ADMIN-GUIDE.md owns *"what is this thing and what feeds off it"*.
+Where they touch — the Events recap fields, the specialist qualification icons, the Site Settings
+enquiry form — cross-link, do not restate.
 
 The last two are easy to confuse, and the table used to list only `HOMEPAGE-CHANGES.md` — which was
 wrong, because every design pass since Comparison 25 has gone into `verify-website-design-diff.md`
@@ -66,6 +77,7 @@ Every rule below is here because that failure already happened once in this repo
 | **Never call `revalidatePath`/`revalidateTag` from `next/cache` directly.** Use `safeRevalidatePath` / `safeRevalidateTag` from `src/utilities/safeRevalidate.ts`, and honour `context.disableRevalidate`. | Next 16 throws when either is called outside a Server Action or route handler, and Payload runs `afterChange` *inside the transaction*. Building the **Create New** form state tripped it, so `/admin/collections/pages/create` rendered the sidebar and **no form at all** — zero inputs, HTTP 200, nothing in the browser console. No page or post could be created. Same for CLI and job writes, where the throw rolls the write back. |
 | **Never pass a named cacheLife profile to a tag purge.** `safeRevalidateTag(tag)` takes no profile and always sends `{ expire: 0 }`. Guarded by `adminControls.int.spec.ts`. | Every purge in the repo used to pass `'max'`. Given *any* profile Next sets `stale = now` but `expired = now + expire*1000` — and `max`'s expire is a **year**, which `areTagsExpired` (`expiredAt <= now`) never satisfies. So the tag went stale-while-revalidate instead of expiring. Measured under `next start`: after saving a Design System token, the editor's **first reload served the old value**, and three quick edits left the page two versions behind. Related: a tag purge only reaches the manifest of the process that calls it, so a `payload run` script cannot purge a separately running server. |
 | **`308` only for moves that will never change again.** Anything whose destination an editor can change is `307`. | `/posts/<slug>` 308'd to a stream-derived URL; browsers cache that forever, so reassigning an article's stream stranded everyone who had followed the old link. |
+| **The admin sidebar's group order is derived from `payload.config.ts` array order**, not declared. Groups appear in order of first appearance while scanning `collections` then `globals`. That array also has to keep taxonomy lookups ahead of the content referencing them — both constraints at once. | Assigning tidy `admin.group` names left the sidebar in an arbitrary order (Media second, Reference after Availability) because nothing declares it. Reordering the array is the only lever, and it is the same array carrying the taxonomy-first rule.
 | **`CMSLink` is imported by client components, so it cannot be async.** A link type needing a server lookup is resolved by the *block*, and offered only on blocks that resolve it (`link({ portalEnquiry: true })`). | Making it async would break `HighImpact`, `Header/Nav` and `Header/Component.client`. Offering `portalEnquiry` on every block instead would give an editor a type that renders an inert `data-link-unresolved` span wherever nothing resolves it — a control that can be set and silently does nothing. The resolver's return type narrows `type` to CMSLink's union, so a block that forwards raw links fails to compile; both call sites errored with `'portalEnquiry' is not assignable` before they were wired. |
 | **A component that hardcodes `appearance="inline"` must have `appearances: false` in its config**, or read `.appearance` itself. | `CMSLink` destructures `appearance`, so a literal after `{...link}` wins and the editor's stored choice is discarded. |
 | **Queries against draft-enabled collections pass `overrideAccess` explicitly.** The Local API defaults to `overrideAccess: true`. | A legacy `/specialists/<slug>` URL matched *unpublished* specialists and 308'd to a profile that 404s — while its own comment claimed it checked for published ones. |
@@ -673,7 +685,12 @@ Team, Events, AvailabilitySessions, Services, Resources, Offices, Testimonials. 
 filter axes are added as collections, not as hardcoded option lists.
 
 Globals: Header, Footer, SiteSettings, SpecialistAvailability, SpecialistProfile, ArticleSettings,
-EventsSettings, TeamSettings, CustomStyles, DesignSystem. Page-level and section-level copy lives
+EventsSettings, TeamSettings, CustomStyles, DesignSystem.
+
+**Admin labels deliberately follow the site, not the slug** — `posts` shows as **Articles**,
+`categories` as **Topics**, `areas-of-expertise` as **Assessment Areas**. The sidebar groups are
+Publishing / Reference / Taxonomy / People / Availability / Media / System / Forms / Page settings /
+Site / Design; every group holds either records or settings, never both. See `ADMIN-GUIDE.md`. Page-level and section-level copy lives
 in globals rather than in components.
 
 **Event timing** is two separate questions, resolved by one helper

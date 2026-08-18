@@ -19,6 +19,8 @@ export const Locations: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'Where specialists consult. Shown on a profile and used as a directory filter. Not the same as Offices, which are your own premises.',
     defaultColumns: ['title', 'region', 'slug'],
   },
   fields: [

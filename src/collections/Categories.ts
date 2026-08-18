@@ -8,7 +8,9 @@ import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/reva
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
-  labels: { singular: 'Category', plural: 'Categories' },
+  // Shown on an article as "Topics" (ArticleSettings → labels.topics), so the
+  // admin follows the site rather than the other way round.
+  labels: { singular: 'Topic', plural: 'Topics' },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -18,6 +20,8 @@ export const Categories: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'Subject tags for articles. Shown as coloured chips on article cards and under the "Topics" heading on an article.',
     defaultColumns: ['title', 'slug'],
   },
   fields: [

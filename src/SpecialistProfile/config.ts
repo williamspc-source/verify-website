@@ -12,7 +12,7 @@ export const SpecialistProfile: GlobalConfig = {
   label: 'Specialist Profile',
   access: { read: () => true },
   admin: {
-    group: 'People',
+    group: 'Page settings',
     description: 'Shared copy shown on every specialist profile (the booking-portal CTA + labels).',
   },
   fields: [
@@ -140,9 +140,24 @@ export const SpecialistProfile: GlobalConfig = {
           ],
         },
         {
-          name: 'assessmentTypes',
-          type: 'text',
-          defaultValue: 'Assessment Types',
+          type: 'row',
+          fields: [
+            {
+              name: 'assessmentTypes',
+              type: 'text',
+              defaultValue: 'Assessment Types',
+              admin: { width: '50%' },
+            },
+            {
+              // Claim Types used to be concatenated into the Assessment Types
+              // list, so a claim type never appeared under its own name on any
+              // profile — two separately-maintained taxonomies rendered as one.
+              name: 'claimTypes',
+              type: 'text',
+              defaultValue: 'Claim Types',
+              admin: { width: '50%' },
+            },
+          ],
         },
       ],
     },

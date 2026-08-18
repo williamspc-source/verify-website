@@ -10,7 +10,7 @@ export const TeamSettings: GlobalConfig = {
   label: 'Team Settings',
   access: { read: () => true },
   admin: {
-    group: 'Content',
+    group: 'Page settings',
     description: 'Breadcrumb + fixed labels shown on every team member profile page.',
   },
   fields: [

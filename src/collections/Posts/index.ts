@@ -79,6 +79,7 @@ const postPreviewPath = async (
 
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
+  labels: { singular: 'Article', plural: 'Articles' },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -109,7 +110,12 @@ export const Posts: CollectionConfig<'posts'> = {
     },
     preview: (data, { req }) => postPreviewPath(data, req),
     useAsTitle: 'title',
-    group: 'Content',
+    group: 'Publishing',
+    // The admin says "Articles" and the site says "In the Loop" — the nav item,
+    // the URL, the breadcrumb and the H1 all use the latter. The description is
+    // where those two vocabularies are bridged, so name the URL explicitly.
+    description:
+      'Articles published to the In the Loop section (/in-the-loop). Every article needs a Stream — that is what gives it a web address.',
   },
   fields: [
     {

@@ -22,6 +22,8 @@ export const Streams: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'The sections of In the Loop. A stream is the folder in an article’s web address (/in-the-loop/<stream>/...), so DELETING a stream leaves its articles with no address — move them first.',
     defaultColumns: ['title', 'order', 'slug'],
   },
   fields: [

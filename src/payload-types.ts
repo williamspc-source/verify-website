@@ -69,9 +69,11 @@ export interface Config {
   collections: {
     pages: Page;
     posts: Post;
-    media: Media;
-    categories: Category;
-    users: User;
+    events: Event;
+    services: Service;
+    resources: Resource;
+    offices: Office;
+    testimonials: Testimonial;
     specialties: Specialty;
     'specialty-categories': SpecialtyCategory;
     'claim-types': ClaimType;
@@ -80,14 +82,12 @@ export interface Config {
     accreditations: Accreditation;
     locations: Location;
     streams: Stream;
+    categories: Category;
     specialists: Specialist;
     team: Team;
-    events: Event;
     'availability-sessions': AvailabilitySession;
-    services: Service;
-    resources: Resource;
-    offices: Office;
-    testimonials: Testimonial;
+    media: Media;
+    users: User;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -107,9 +107,11 @@ export interface Config {
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    categories: CategoriesSelect<false> | CategoriesSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    offices: OfficesSelect<false> | OfficesSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     specialties: SpecialtiesSelect<false> | SpecialtiesSelect<true>;
     'specialty-categories': SpecialtyCategoriesSelect<false> | SpecialtyCategoriesSelect<true>;
     'claim-types': ClaimTypesSelect<false> | ClaimTypesSelect<true>;
@@ -118,14 +120,12 @@ export interface Config {
     accreditations: AccreditationsSelect<false> | AccreditationsSelect<true>;
     locations: LocationsSelect<false> | LocationsSelect<true>;
     streams: StreamsSelect<false> | StreamsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     specialists: SpecialistsSelect<false> | SpecialistsSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
-    events: EventsSelect<false> | EventsSelect<true>;
     'availability-sessions': AvailabilitySessionsSelect<false> | AvailabilitySessionsSelect<true>;
-    services: ServicesSelect<false> | ServicesSelect<true>;
-    resources: ResourcesSelect<false> | ResourcesSelect<true>;
-    offices: OfficesSelect<false> | OfficesSelect<true>;
-    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -142,26 +142,26 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
-    header: Header;
-    footer: Footer;
-    'site-settings': SiteSetting;
-    'specialist-availability': SpecialistAvailability;
-    'specialist-profile': SpecialistProfile;
     'article-settings': ArticleSetting;
     'events-settings': EventsSetting;
     'team-settings': TeamSetting;
+    'specialist-profile': SpecialistProfile;
+    'specialist-availability': SpecialistAvailability;
+    header: Header;
+    footer: Footer;
+    'site-settings': SiteSetting;
     'custom-styles': CustomStyle;
     'design-system': DesignSystem;
   };
   globalsSelect: {
-    header: HeaderSelect<false> | HeaderSelect<true>;
-    footer: FooterSelect<false> | FooterSelect<true>;
-    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    'specialist-availability': SpecialistAvailabilitySelect<false> | SpecialistAvailabilitySelect<true>;
-    'specialist-profile': SpecialistProfileSelect<false> | SpecialistProfileSelect<true>;
     'article-settings': ArticleSettingsSelect<false> | ArticleSettingsSelect<true>;
     'events-settings': EventsSettingsSelect<false> | EventsSettingsSelect<true>;
     'team-settings': TeamSettingsSelect<false> | TeamSettingsSelect<true>;
+    'specialist-profile': SpecialistProfileSelect<false> | SpecialistProfileSelect<true>;
+    'specialist-availability': SpecialistAvailabilitySelect<false> | SpecialistAvailabilitySelect<true>;
+    header: HeaderSelect<false> | HeaderSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'custom-styles': CustomStylesSelect<false> | CustomStylesSelect<true>;
     'design-system': DesignSystemSelect<false> | DesignSystemSelect<true>;
   };
@@ -200,6 +200,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * The pages of the site. Each is built from blocks; a page’s web address comes from its Parent, so changing the parent changes the URL.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
@@ -647,6 +649,8 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Articles published to the In the Loop section (/in-the-loop). Every article needs a Stream — that is what gives it a web address.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
@@ -759,6 +763,8 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Every uploaded image and file. Set alt text here, and fix a bad crop by moving the focal point rather than re-uploading.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -882,6 +888,8 @@ export interface FolderInterface {
   createdAt: string;
 }
 /**
+ * VERIFY’s own staff. Each gets a profile at /about/team/... and appears on Meet the Team. Save as a draft to hide one.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "team".
  */
@@ -962,6 +970,8 @@ export interface Team {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The external doctors on your panel. Each gets a profile page at /specialists/profiles/... Save as a draft to hide one from the site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialists".
  */
@@ -1179,6 +1189,8 @@ export interface Specialist {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Where specialists consult. Shown on a profile and used as a directory filter. Not the same as Offices, which are your own premises.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "locations".
  */
@@ -1205,6 +1217,8 @@ export interface Location {
   createdAt: string;
 }
 /**
+ * Impairment-rating credentials (AMA 5, GEPI 2...). Shown as chips on a specialist’s profile and used as a directory filter.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "accreditations".
  */
@@ -1332,6 +1346,8 @@ export interface Accreditation {
   createdAt: string;
 }
 /**
+ * Medical specialties. They drive the Specialty List page and the specialist directory filters.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialties".
  */
@@ -1473,6 +1489,8 @@ export interface Specialty {
   createdAt: string;
 }
 /**
+ * The groups that specialties are filed under (Surgery, Psychiatry...). They become the filter buttons on the Specialty List.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialty-categories".
  */
@@ -1603,6 +1621,8 @@ export interface SpecialtyCategory {
   createdAt: string;
 }
 /**
+ * Kinds of claim a specialist handles. Listed on their profile under "Claim Types".
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "claim-types".
  */
@@ -1623,6 +1643,8 @@ export interface ClaimType {
   createdAt: string;
 }
 /**
+ * Kinds of assessment a specialist performs. Listed on their profile under "Assessment Types".
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "assessment-types".
  */
@@ -1639,6 +1661,8 @@ export interface AssessmentType {
   createdAt: string;
 }
 /**
+ * Sub-specialty areas a specialist assesses. Listed on their profile under "Assessment Areas", and used to filter the specialist directory.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "areas-of-expertise".
  */
@@ -1655,6 +1679,8 @@ export interface AreasOfExpertise {
   createdAt: string;
 }
 /**
+ * Subject tags for articles. Shown as coloured chips on article cards and under the "Topics" heading on an article.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
@@ -1792,6 +1818,8 @@ export interface Category {
   createdAt: string;
 }
 /**
+ * The sections of In the Loop. A stream is the folder in an article’s web address (/in-the-loop/<stream>/...), so DELETING a stream leaves its articles with no address — move them first.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "streams".
  */
@@ -1923,6 +1951,8 @@ export interface Stream {
   createdAt: string;
 }
 /**
+ * Admin logins. Everyone here has full access — there are no restricted roles, so only add people you trust with the whole site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -1949,6 +1979,8 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Seminars and webinars, listed at /events. After an event you can add a recap, photo gallery and downloads to the same record.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
@@ -5240,6 +5272,8 @@ export interface ServicesGridBlock {
   blockType: 'servicesGrid';
 }
 /**
+ * The service cards shown in Services grids. These are cards, not pages — each links to a page you choose under "Link override".
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services".
  */
@@ -5481,6 +5515,8 @@ export interface TestimonialsGridBlock {
   blockType: 'testimonialsGrid';
 }
 /**
+ * Client quotes. They appear in one place: the testimonial carousel on the homepage.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "testimonials".
  */
@@ -7819,6 +7855,8 @@ export interface MapEmbedBlock {
   blockType: 'mapEmbed';
 }
 /**
+ * Your office locations. The primary office fills the footer contact details and the "Where to Find Us" map on Contact and For Claimants.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "offices".
  */
@@ -8627,6 +8665,8 @@ export interface FormBlock {
   blockType: 'formBlock';
 }
 /**
+ * The enquiry forms used across the site. A form’s Emails tab decides who is notified when someone submits it — check that before renaming a form.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "forms".
  */
@@ -9301,6 +9341,8 @@ export interface ResourcesGridBlock {
   blockType: 'resourcesGrid';
 }
 /**
+ * Downloadable guides and checklists. They appear in one place: the Resources section of the In the Loop hub.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "resources".
  */
@@ -11133,6 +11175,8 @@ export interface EventsExplorerBlock {
   blockType: 'eventsExplorer';
 }
 /**
+ * Advertised appointment slots. Each belongs to a specialist and stops showing after its "Advertise until" date.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "availability-sessions".
  */
@@ -11167,6 +11211,8 @@ export interface AvailabilitySession {
   createdAt: string;
 }
 /**
+ * Sends an old web address to a new one. Add a redirect whenever you change a page’s slug or parent, so existing links keep working.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -11193,6 +11239,8 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * Every enquiry a visitor has submitted, newest first. Read-only — this is the record of what came in.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
@@ -11210,7 +11258,7 @@ export interface FormSubmission {
   createdAt: string;
 }
 /**
- * This is a collection of automatically created search results. These results are used by the global site search and will be updated automatically as documents in the CMS are created or updated.
+ * Built automatically so the site search can find articles, specialists and events. Nothing here is edited by hand — it rewrites itself when you save one of those.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "search".
@@ -11375,16 +11423,24 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'events';
+        value: number | Event;
       } | null)
     | ({
-        relationTo: 'categories';
-        value: number | Category;
+        relationTo: 'services';
+        value: number | Service;
       } | null)
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'resources';
+        value: number | Resource;
+      } | null)
+    | ({
+        relationTo: 'offices';
+        value: number | Office;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: number | Testimonial;
       } | null)
     | ({
         relationTo: 'specialties';
@@ -11419,6 +11475,10 @@ export interface PayloadLockedDocument {
         value: number | Stream;
       } | null)
     | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
         relationTo: 'specialists';
         value: number | Specialist;
       } | null)
@@ -11427,28 +11487,16 @@ export interface PayloadLockedDocument {
         value: number | Team;
       } | null)
     | ({
-        relationTo: 'events';
-        value: number | Event;
-      } | null)
-    | ({
         relationTo: 'availability-sessions';
         value: number | AvailabilitySession;
       } | null)
     | ({
-        relationTo: 'services';
-        value: number | Service;
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
-        relationTo: 'resources';
-        value: number | Resource;
-      } | null)
-    | ({
-        relationTo: 'offices';
-        value: number | Office;
-      } | null)
-    | ({
-        relationTo: 'testimonials';
-        value: number | Testimonial;
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -13341,144 +13389,161 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "events_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
-  zoom?: T;
-  folder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        square?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        small?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        medium?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        large?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        xlarge?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        og?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories_select".
- */
-export interface CategoriesSelect<T extends boolean = true> {
+export interface EventsSelect<T extends boolean = true> {
   title?: T;
-  icon?: T;
-  color?: T;
+  date?: T;
+  timeLabel?: T;
+  location?: T;
+  host?: T;
+  registrationUrl?: T;
+  registrationLabel?: T;
+  hostEventUrl?: T;
+  registrationClosesAt?: T;
+  cpdEligible?: T;
+  cpdPoints?: T;
+  cost?: T;
+  locationRef?: T;
+  image?: T;
+  excerpt?: T;
   description?: T;
-  generateSlug?: T;
-  slug?: T;
-  parent?: T;
-  breadcrumbs?:
+  recap?: T;
+  showToc?: T;
+  gallery?:
     | T
     | {
-        doc?: T;
-        url?: T;
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  attachments?:
+    | T
+    | {
+        file?: T;
         label?: T;
         id?: T;
       };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  eventType?: T;
+  presenters?: T;
+  guestPresenters?:
+    | T
+    | {
+        name?: T;
+        role?: T;
+        organisation?: T;
+        id?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  serviceGroup?: T;
+  icon?: T;
+  photo?: T;
+  linkOverride?: T;
+  shortDescription?: T;
+  body?: T;
+  featured?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "resources_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
+export interface ResourcesSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  resourceType?: T;
+  audience?: T;
+  description?: T;
+  file?: T;
+  externalUrl?: T;
+  ctaLabel?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "offices_select".
+ */
+export interface OfficesSelect<T extends boolean = true> {
+  title?: T;
+  isPrimary?: T;
+  address?: T;
+  phone?: T;
   email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+  mapEmbedUrl?: T;
+  hours?:
     | T
     | {
+        days?: T;
+        time?: T;
         id?: T;
-        createdAt?: T;
-        expiresAt?: T;
       };
+  hoursNote?: T;
+  transport?:
+    | T
+    | {
+        label?: T;
+        note?: T;
+        href?: T;
+        id?: T;
+      };
+  parking?:
+    | T
+    | {
+        name?: T;
+        address?: T;
+        walkTime?: T;
+        heightLimit?: T;
+        href?: T;
+        note?: T;
+        id?: T;
+      };
+  note?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  quote?: T;
+  authorRole?: T;
+  org?: T;
+  rating?: T;
+  order?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -13593,6 +13658,29 @@ export interface StreamsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
+  icon?: T;
+  color?: T;
+  description?: T;
+  generateSlug?: T;
+  slug?: T;
+  parent?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialists_select".
  */
 export interface SpecialistsSelect<T extends boolean = true> {
@@ -13683,66 +13771,6 @@ export interface TeamSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events_select".
- */
-export interface EventsSelect<T extends boolean = true> {
-  title?: T;
-  date?: T;
-  timeLabel?: T;
-  location?: T;
-  host?: T;
-  registrationUrl?: T;
-  registrationLabel?: T;
-  hostEventUrl?: T;
-  registrationClosesAt?: T;
-  cpdEligible?: T;
-  cpdPoints?: T;
-  cost?: T;
-  locationRef?: T;
-  image?: T;
-  excerpt?: T;
-  description?: T;
-  recap?: T;
-  showToc?: T;
-  gallery?:
-    | T
-    | {
-        image?: T;
-        caption?: T;
-        id?: T;
-      };
-  attachments?:
-    | T
-    | {
-        file?: T;
-        label?: T;
-        id?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        image?: T;
-        description?: T;
-      };
-  eventType?: T;
-  presenters?: T;
-  guestPresenters?:
-    | T
-    | {
-        name?: T;
-        role?: T;
-        organisation?: T;
-        id?: T;
-      };
-  generateSlug?: T;
-  slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "availability-sessions_select".
  */
 export interface AvailabilitySessionsSelect<T extends boolean = true> {
@@ -13761,101 +13789,121 @@ export interface AvailabilitySessionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services_select".
+ * via the `definition` "media_select".
  */
-export interface ServicesSelect<T extends boolean = true> {
-  title?: T;
-  category?: T;
-  serviceGroup?: T;
-  icon?: T;
-  photo?: T;
-  linkOverride?: T;
-  shortDescription?: T;
-  body?: T;
-  featured?: T;
-  order?: T;
-  generateSlug?: T;
-  slug?: T;
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  zoom?: T;
+  folder?: T;
   updatedAt?: T;
   createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        square?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        small?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        medium?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        xlarge?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resources_select".
+ * via the `definition` "users_select".
  */
-export interface ResourcesSelect<T extends boolean = true> {
-  title?: T;
-  icon?: T;
-  resourceType?: T;
-  audience?: T;
-  description?: T;
-  file?: T;
-  externalUrl?: T;
-  ctaLabel?: T;
-  order?: T;
-  generateSlug?: T;
-  slug?: T;
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "offices_select".
- */
-export interface OfficesSelect<T extends boolean = true> {
-  title?: T;
-  isPrimary?: T;
-  address?: T;
-  phone?: T;
   email?: T;
-  mapEmbedUrl?: T;
-  hours?:
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
     | T
     | {
-        days?: T;
-        time?: T;
         id?: T;
+        createdAt?: T;
+        expiresAt?: T;
       };
-  hoursNote?: T;
-  transport?:
-    | T
-    | {
-        label?: T;
-        note?: T;
-        href?: T;
-        id?: T;
-      };
-  parking?:
-    | T
-    | {
-        name?: T;
-        address?: T;
-        walkTime?: T;
-        heightLimit?: T;
-        href?: T;
-        note?: T;
-        id?: T;
-      };
-  note?: T;
-  order?: T;
-  generateSlug?: T;
-  slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials_select".
- */
-export interface TestimonialsSelect<T extends boolean = true> {
-  quote?: T;
-  authorRole?: T;
-  org?: T;
-  rating?: T;
-  order?: T;
-  featured?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -14138,6 +14186,750 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Sidebar CTA cards + fixed labels shown on every In-the-Loop article.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-settings".
+ */
+export interface ArticleSetting {
+  id: number;
+  /**
+   * The fixed cards in the article right rail (e.g. "Have a Question?", "Make a Referral").
+   */
+  sidebarCards?:
+    | {
+        /**
+         * Icon shown with this item.
+         */
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-down'
+              | 'arrow-right'
+              | 'arrows-out'
+              | 'award'
+              | 'bag-simple'
+              | 'bell-ringing'
+              | 'bone'
+              | 'book-open'
+              | 'brain'
+              | 'briefcase'
+              | 'building'
+              | 'bus'
+              | 'calendar'
+              | 'calendar-blank'
+              | 'calendar-check'
+              | 'car'
+              | 'caret-left'
+              | 'caret-right'
+              | 'cell-signal-full'
+              | 'certificate'
+              | 'chart-bar'
+              | 'chat'
+              | 'chat-circle-text'
+              | 'chats'
+              | 'chats-circle'
+              | 'check'
+              | 'check-circle'
+              | 'check-square'
+              | 'clipboard-check'
+              | 'clipboard-text'
+              | 'clock'
+              | 'currency-dollar'
+              | 'desktop'
+              | 'download'
+              | 'download-simple'
+              | 'envelope'
+              | 'envelope-simple'
+              | 'file-magnifying-glass'
+              | 'file-plus'
+              | 'file-text'
+              | 'files'
+              | 'first-aid'
+              | 'gavel'
+              | 'globe'
+              | 'graduation-cap'
+              | 'handshake'
+              | 'headset'
+              | 'heart-pulse'
+              | 'heartbeat'
+              | 'home'
+              | 'house'
+              | 'identification-card'
+              | 'image'
+              | 'info'
+              | 'link'
+              | 'list'
+              | 'lock'
+              | 'lock-simple'
+              | 'magnifying-glass'
+              | 'mail'
+              | 'map-pin'
+              | 'medal'
+              | 'message'
+              | 'monitor'
+              | 'navigation-arrow'
+              | 'paper-plane-tilt'
+              | 'person-arms-spread'
+              | 'phone'
+              | 'question'
+              | 'scale'
+              | 'scales'
+              | 'seal-check'
+              | 'search'
+              | 'send'
+              | 'shield'
+              | 'shield-check'
+              | 'sign-in'
+              | 'sliders'
+              | 'sort-ascending'
+              | 'squares-four'
+              | 'star'
+              | 'stethoscope'
+              | 't-shirt'
+              | 'target'
+              | 'translate'
+              | 'upload'
+              | 'upload-simple'
+              | 'user'
+              | 'user-check'
+              | 'user-circle'
+              | 'user-plus'
+              | 'users'
+              | 'users-three'
+              | 'video'
+              | 'video-camera'
+              | 'warning'
+              | 'warning-circle'
+              | 'wheelchair'
+              | 'wifi-high'
+              | 'wind'
+            )
+          | null;
+        heading: string;
+        body?: string | null;
+        link: {
+          type?: ('reference' | 'custom' | 'enquiry') | null;
+          newTab?: boolean | null;
+          /**
+           * You can link to a draft. The link will 404 for visitors until that document is published.
+           */
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'specialists';
+                value: number | Specialist;
+              } | null)
+            | ({
+                relationTo: 'team';
+                value: number | Team;
+              } | null)
+            | ({
+                relationTo: 'events';
+                value: number | Event;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
+           */
+          anchor?: string | null;
+          /**
+           * Optional leading icon shown before the label.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'image'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  labels?: {
+    /**
+     * Heading above an article’s attached files.
+     */
+    attachmentsHeading?: string | null;
+    related?: string | null;
+    toc?: string | null;
+    topics?: string | null;
+    /**
+     * Second breadcrumb link (the In the Loop hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
+     */
+    breadcrumbSectionLabel?: string | null;
+    /**
+     * Shown under a stream heading when that stream has no description of its own.
+     */
+    streamFallbackSubtitle?: string | null;
+    bylinePrefix?: string | null;
+    minReadSuffix?: string | null;
+    shareLinkedinLabel?: string | null;
+    shareCopyLabel?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Host-specific boilerplate copy shown on event detail pages (AAMLE / VERIFY).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events-settings".
+ */
+export interface EventsSetting {
+  id: number;
+  aamle?: {
+    /**
+     * Intro paragraph shown on every event by this host.
+     */
+    blurb?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
+     */
+    callout?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    attendHeading?: string | null;
+    recapHeading?: string | null;
+    attendBody?: string | null;
+    registerLabel?: string | null;
+    contactLabel?: string | null;
+    /**
+     * Label for the button linking to the event on the host’s own site, e.g. "View this event on AAMLE". Only shown on events that have a Host event page URL.
+     */
+    hostEventLinkLabel?: string | null;
+  };
+  verify?: {
+    /**
+     * Intro paragraph shown on every event by this host.
+     */
+    blurb?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
+     */
+    callout?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    attendHeading?: string | null;
+    recapHeading?: string | null;
+    attendBody?: string | null;
+    registerLabel?: string | null;
+    contactLabel?: string | null;
+    /**
+     * Label for the button linking to the event on the host’s own site, e.g. "View this event on AAMLE". Only shown on events that have a Host event page URL.
+     */
+    hostEventLinkLabel?: string | null;
+  };
+  /**
+   * Generic UI labels shown on every event detail page, regardless of host.
+   */
+  labels?: {
+    /**
+     * Heading above the presenter cards on an event page.
+     */
+    presentersHeading?: string | null;
+    /**
+     * Second breadcrumb link (the events hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
+     */
+    breadcrumbSectionLabel?: string | null;
+    /**
+     * Status pill for events still to come.
+     */
+    statusUpcomingLabel?: string | null;
+    /**
+     * Status pill for events whose date has passed.
+     */
+    statusPastLabel?: string | null;
+    /**
+     * Cost shown when an event has no cost set.
+     */
+    freeLabel?: string | null;
+    /**
+     * CPD line when points are set. Use {points} for the number.
+     */
+    cpdPointsTemplate?: string | null;
+    /**
+     * CPD line when eligible but no point count is set.
+     */
+    cpdEligibleLabel?: string | null;
+    /**
+     * Shown under a past event that has no recap AND no photos or downloads. If there are photos or downloads, the line below is used instead — this one would be telling people to ask for something already on the page.
+     */
+    concludedFallback?: string | null;
+    /**
+     * Shown under a past event that has no recap written yet but does have photos or downloads attached.
+     */
+    concludedWithMaterials?: string | null;
+    /**
+     * Link back to the events listing at the bottom of the page.
+     */
+    backToEventsLabel?: string | null;
+    /**
+     * Where the “Contact Us” button goes once registrations have closed. It used to reuse the event’s external registration link, which sent people to the booking page they could no longer use.
+     */
+    contactUrl?: string | null;
+    /**
+     * Heading above the recap’s contents list.
+     */
+    recapTocLabel?: string | null;
+    /**
+     * Heading above an event’s photo gallery.
+     */
+    galleryHeading?: string | null;
+    /**
+     * Heading above an event’s downloads / attachments list.
+     */
+    attachmentsHeading?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Breadcrumb + fixed labels shown on every team member profile page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team-settings".
+ */
+export interface TeamSetting {
+  id: number;
+  labels?: {
+    /**
+     * Second breadcrumb link (the team index). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
+     */
+    breadcrumbSectionLabel?: string | null;
+    /**
+     * Sidebar label above the member’s role.
+     */
+    roleLabel?: string | null;
+    /**
+     * Sidebar label above each qualification.
+     */
+    qualificationLabel?: string | null;
+    /**
+     * Prefix for the bio heading, e.g. “About” in “About Wes”.
+     */
+    aboutPrefix?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Shared copy shown on every specialist profile (the booking-portal CTA + labels).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-profile".
+ */
+export interface SpecialistProfile {
+  id: number;
+  portalCta?: {
+    eyebrow?: string | null;
+    heading?: string | null;
+    subheading?: string | null;
+    tiles?:
+      | {
+          /**
+           * Icon shown with this item.
+           */
+          icon?:
+            | (
+                | 'activity'
+                | 'arrow-down'
+                | 'arrow-right'
+                | 'arrows-out'
+                | 'award'
+                | 'bag-simple'
+                | 'bell-ringing'
+                | 'bone'
+                | 'book-open'
+                | 'brain'
+                | 'briefcase'
+                | 'building'
+                | 'bus'
+                | 'calendar'
+                | 'calendar-blank'
+                | 'calendar-check'
+                | 'car'
+                | 'caret-left'
+                | 'caret-right'
+                | 'cell-signal-full'
+                | 'certificate'
+                | 'chart-bar'
+                | 'chat'
+                | 'chat-circle-text'
+                | 'chats'
+                | 'chats-circle'
+                | 'check'
+                | 'check-circle'
+                | 'check-square'
+                | 'clipboard-check'
+                | 'clipboard-text'
+                | 'clock'
+                | 'currency-dollar'
+                | 'desktop'
+                | 'download'
+                | 'download-simple'
+                | 'envelope'
+                | 'envelope-simple'
+                | 'file-magnifying-glass'
+                | 'file-plus'
+                | 'file-text'
+                | 'files'
+                | 'first-aid'
+                | 'gavel'
+                | 'globe'
+                | 'graduation-cap'
+                | 'handshake'
+                | 'headset'
+                | 'heart-pulse'
+                | 'heartbeat'
+                | 'home'
+                | 'house'
+                | 'identification-card'
+                | 'image'
+                | 'info'
+                | 'link'
+                | 'list'
+                | 'lock'
+                | 'lock-simple'
+                | 'magnifying-glass'
+                | 'mail'
+                | 'map-pin'
+                | 'medal'
+                | 'message'
+                | 'monitor'
+                | 'navigation-arrow'
+                | 'paper-plane-tilt'
+                | 'person-arms-spread'
+                | 'phone'
+                | 'question'
+                | 'scale'
+                | 'scales'
+                | 'seal-check'
+                | 'search'
+                | 'send'
+                | 'shield'
+                | 'shield-check'
+                | 'sign-in'
+                | 'sliders'
+                | 'sort-ascending'
+                | 'squares-four'
+                | 'star'
+                | 'stethoscope'
+                | 't-shirt'
+                | 'target'
+                | 'translate'
+                | 'upload'
+                | 'upload-simple'
+                | 'user'
+                | 'user-check'
+                | 'user-circle'
+                | 'user-plus'
+                | 'users'
+                | 'users-three'
+                | 'video'
+                | 'video-camera'
+                | 'warning'
+                | 'warning-circle'
+                | 'wheelchair'
+                | 'wifi-high'
+                | 'wind'
+              )
+            | null;
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    enquiryLabel?: string | null;
+    /**
+     * Shown only when the specialist has a Booking link.
+     */
+    bookingLabel?: string | null;
+    /**
+     * Shown only when a CV is attached.
+     */
+    cvLabel?: string | null;
+    /**
+     * Shown only when a sample report is attached.
+     */
+    sampleReportLabel?: string | null;
+    /**
+     * Optional — defaults to the Site Settings / Footer contact email.
+     */
+    enquiryEmail?: string | null;
+  };
+  /**
+   * Subject line of the booking-portal enquiry email (mailto).
+   */
+  portalEnquirySubject?: string | null;
+  /**
+   * Enquiry-type tag sent with the booking-portal CTA.
+   */
+  portalEnquiryType?: string | null;
+  /**
+   * The fixed headings on the profile body (leave default unless rebranding).
+   */
+  labels?: {
+    biography?: string | null;
+    assessmentAreas?: string | null;
+    qualifications?: string | null;
+    accreditations?: string | null;
+    assessmentTypes?: string | null;
+    claimTypes?: string | null;
+  };
+  /**
+   * The middle crumb of the trail shown at the top of every profile. The first crumb — “Home” — is shared site-wide (Site Settings → Breadcrumbs); the last is the specialist’s own name.
+   */
+  breadcrumb?: {
+    breadcrumbParentLabel?: string | null;
+    breadcrumbParentHref?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Wording for the availability page and the prefilled enquiry email its Send button opens. The slots themselves are in Availability Sessions.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-availability".
+ */
+export interface SpecialistAvailability {
+  id: number;
+  heading?: string | null;
+  /**
+   * Introductory copy shown above the availability list.
+   */
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Small label above the carousel heading.
+   */
+  carouselEyebrow?: string | null;
+  /**
+   * Wrap a word in [[brackets]] to highlight it in the accent colour.
+   */
+  carouselTitle?: string | null;
+  /**
+   * Intro paragraph shown under the carousel heading.
+   */
+  carouselSubtitle?: string | null;
+  /**
+   * Where the prefilled enquiry email is sent.
+   */
+  enquiryEmail?: string | null;
+  enquirySubject?: string | null;
+  enquiryBodyIntro?: string | null;
+  enquiryBodyFooter?: string | null;
+  /**
+   * Short UI labels for the interactive availability grid (legend, action bar).
+   */
+  labels?: {
+    /**
+     * Label for in-person sessions (legend + chips).
+     */
+    modeInPersonLabel?: string | null;
+    /**
+     * Label for telehealth sessions (legend + chips).
+     */
+    modeTelehealthLabel?: string | null;
+    /**
+     * Label for sessions offered either way (legend + chips).
+     */
+    modeEitherLabel?: string | null;
+    /**
+     * Hint shown in the legend when sessions are available to select.
+     */
+    selectionHint?: string | null;
+    /**
+     * Button that clears the current selection.
+     */
+    clearLabel?: string | null;
+    /**
+     * Button that opens the prefilled enquiry email.
+     */
+    sendEnquiryLabel?: string | null;
+    /**
+     * Selection count in the action bar. Use {count} for the number and {noun} for session/sessions.
+     */
+    sessionsSelectedTemplate?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The main navigation and its dropdowns, plus the button at the top right. Shown on every page.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
@@ -14742,6 +15534,8 @@ export interface Header {
   createdAt?: string | null;
 }
 /**
+ * The footer on every page: link columns, contact details and opening hours. Contact fields left blank fall back to your primary Office.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer".
  */
@@ -15078,6 +15872,8 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * Logo, favicon, brand colours, the form behind the Make an Enquiry drawer, and the wording of the booking-portal registration email.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
@@ -15304,745 +16100,8 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialist-availability".
- */
-export interface SpecialistAvailability {
-  id: number;
-  heading?: string | null;
-  /**
-   * Introductory copy shown above the availability list.
-   */
-  intro?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Small label above the carousel heading.
-   */
-  carouselEyebrow?: string | null;
-  /**
-   * Wrap a word in [[brackets]] to highlight it in the accent colour.
-   */
-  carouselTitle?: string | null;
-  /**
-   * Intro paragraph shown under the carousel heading.
-   */
-  carouselSubtitle?: string | null;
-  /**
-   * Where the prefilled enquiry email is sent.
-   */
-  enquiryEmail?: string | null;
-  enquirySubject?: string | null;
-  enquiryBodyIntro?: string | null;
-  enquiryBodyFooter?: string | null;
-  /**
-   * Short UI labels for the interactive availability grid (legend, action bar).
-   */
-  labels?: {
-    /**
-     * Label for in-person sessions (legend + chips).
-     */
-    modeInPersonLabel?: string | null;
-    /**
-     * Label for telehealth sessions (legend + chips).
-     */
-    modeTelehealthLabel?: string | null;
-    /**
-     * Label for sessions offered either way (legend + chips).
-     */
-    modeEitherLabel?: string | null;
-    /**
-     * Hint shown in the legend when sessions are available to select.
-     */
-    selectionHint?: string | null;
-    /**
-     * Button that clears the current selection.
-     */
-    clearLabel?: string | null;
-    /**
-     * Button that opens the prefilled enquiry email.
-     */
-    sendEnquiryLabel?: string | null;
-    /**
-     * Selection count in the action bar. Use {count} for the number and {noun} for session/sessions.
-     */
-    sessionsSelectedTemplate?: string | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Shared copy shown on every specialist profile (the booking-portal CTA + labels).
+ * Reusable style presets and a box for site-wide CSS. See HOOKS.md before adding CSS — a block option or a Design System value is usually the better tool.
  *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialist-profile".
- */
-export interface SpecialistProfile {
-  id: number;
-  portalCta?: {
-    eyebrow?: string | null;
-    heading?: string | null;
-    subheading?: string | null;
-    tiles?:
-      | {
-          /**
-           * Icon shown with this item.
-           */
-          icon?:
-            | (
-                | 'activity'
-                | 'arrow-down'
-                | 'arrow-right'
-                | 'arrows-out'
-                | 'award'
-                | 'bag-simple'
-                | 'bell-ringing'
-                | 'bone'
-                | 'book-open'
-                | 'brain'
-                | 'briefcase'
-                | 'building'
-                | 'bus'
-                | 'calendar'
-                | 'calendar-blank'
-                | 'calendar-check'
-                | 'car'
-                | 'caret-left'
-                | 'caret-right'
-                | 'cell-signal-full'
-                | 'certificate'
-                | 'chart-bar'
-                | 'chat'
-                | 'chat-circle-text'
-                | 'chats'
-                | 'chats-circle'
-                | 'check'
-                | 'check-circle'
-                | 'check-square'
-                | 'clipboard-check'
-                | 'clipboard-text'
-                | 'clock'
-                | 'currency-dollar'
-                | 'desktop'
-                | 'download'
-                | 'download-simple'
-                | 'envelope'
-                | 'envelope-simple'
-                | 'file-magnifying-glass'
-                | 'file-plus'
-                | 'file-text'
-                | 'files'
-                | 'first-aid'
-                | 'gavel'
-                | 'globe'
-                | 'graduation-cap'
-                | 'handshake'
-                | 'headset'
-                | 'heart-pulse'
-                | 'heartbeat'
-                | 'home'
-                | 'house'
-                | 'identification-card'
-                | 'image'
-                | 'info'
-                | 'link'
-                | 'list'
-                | 'lock'
-                | 'lock-simple'
-                | 'magnifying-glass'
-                | 'mail'
-                | 'map-pin'
-                | 'medal'
-                | 'message'
-                | 'monitor'
-                | 'navigation-arrow'
-                | 'paper-plane-tilt'
-                | 'person-arms-spread'
-                | 'phone'
-                | 'question'
-                | 'scale'
-                | 'scales'
-                | 'seal-check'
-                | 'search'
-                | 'send'
-                | 'shield'
-                | 'shield-check'
-                | 'sign-in'
-                | 'sliders'
-                | 'sort-ascending'
-                | 'squares-four'
-                | 'star'
-                | 'stethoscope'
-                | 't-shirt'
-                | 'target'
-                | 'translate'
-                | 'upload'
-                | 'upload-simple'
-                | 'user'
-                | 'user-check'
-                | 'user-circle'
-                | 'user-plus'
-                | 'users'
-                | 'users-three'
-                | 'video'
-                | 'video-camera'
-                | 'warning'
-                | 'warning-circle'
-                | 'wheelchair'
-                | 'wifi-high'
-                | 'wind'
-              )
-            | null;
-          label: string;
-          id?: string | null;
-        }[]
-      | null;
-    enquiryLabel?: string | null;
-    /**
-     * Shown only when the specialist has a Booking link.
-     */
-    bookingLabel?: string | null;
-    /**
-     * Shown only when a CV is attached.
-     */
-    cvLabel?: string | null;
-    /**
-     * Shown only when a sample report is attached.
-     */
-    sampleReportLabel?: string | null;
-    /**
-     * Optional — defaults to the Site Settings / Footer contact email.
-     */
-    enquiryEmail?: string | null;
-  };
-  /**
-   * Subject line of the booking-portal enquiry email (mailto).
-   */
-  portalEnquirySubject?: string | null;
-  /**
-   * Enquiry-type tag sent with the booking-portal CTA.
-   */
-  portalEnquiryType?: string | null;
-  /**
-   * The fixed headings on the profile body (leave default unless rebranding).
-   */
-  labels?: {
-    biography?: string | null;
-    assessmentAreas?: string | null;
-    qualifications?: string | null;
-    accreditations?: string | null;
-    assessmentTypes?: string | null;
-  };
-  /**
-   * The middle crumb of the trail shown at the top of every profile. The first crumb — “Home” — is shared site-wide (Site Settings → Breadcrumbs); the last is the specialist’s own name.
-   */
-  breadcrumb?: {
-    breadcrumbParentLabel?: string | null;
-    breadcrumbParentHref?: string | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Sidebar CTA cards + fixed labels shown on every In-the-Loop article.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "article-settings".
- */
-export interface ArticleSetting {
-  id: number;
-  /**
-   * The fixed cards in the article right rail (e.g. "Have a Question?", "Make a Referral").
-   */
-  sidebarCards?:
-    | {
-        /**
-         * Icon shown with this item.
-         */
-        icon?:
-          | (
-              | 'activity'
-              | 'arrow-down'
-              | 'arrow-right'
-              | 'arrows-out'
-              | 'award'
-              | 'bag-simple'
-              | 'bell-ringing'
-              | 'bone'
-              | 'book-open'
-              | 'brain'
-              | 'briefcase'
-              | 'building'
-              | 'bus'
-              | 'calendar'
-              | 'calendar-blank'
-              | 'calendar-check'
-              | 'car'
-              | 'caret-left'
-              | 'caret-right'
-              | 'cell-signal-full'
-              | 'certificate'
-              | 'chart-bar'
-              | 'chat'
-              | 'chat-circle-text'
-              | 'chats'
-              | 'chats-circle'
-              | 'check'
-              | 'check-circle'
-              | 'check-square'
-              | 'clipboard-check'
-              | 'clipboard-text'
-              | 'clock'
-              | 'currency-dollar'
-              | 'desktop'
-              | 'download'
-              | 'download-simple'
-              | 'envelope'
-              | 'envelope-simple'
-              | 'file-magnifying-glass'
-              | 'file-plus'
-              | 'file-text'
-              | 'files'
-              | 'first-aid'
-              | 'gavel'
-              | 'globe'
-              | 'graduation-cap'
-              | 'handshake'
-              | 'headset'
-              | 'heart-pulse'
-              | 'heartbeat'
-              | 'home'
-              | 'house'
-              | 'identification-card'
-              | 'image'
-              | 'info'
-              | 'link'
-              | 'list'
-              | 'lock'
-              | 'lock-simple'
-              | 'magnifying-glass'
-              | 'mail'
-              | 'map-pin'
-              | 'medal'
-              | 'message'
-              | 'monitor'
-              | 'navigation-arrow'
-              | 'paper-plane-tilt'
-              | 'person-arms-spread'
-              | 'phone'
-              | 'question'
-              | 'scale'
-              | 'scales'
-              | 'seal-check'
-              | 'search'
-              | 'send'
-              | 'shield'
-              | 'shield-check'
-              | 'sign-in'
-              | 'sliders'
-              | 'sort-ascending'
-              | 'squares-four'
-              | 'star'
-              | 'stethoscope'
-              | 't-shirt'
-              | 'target'
-              | 'translate'
-              | 'upload'
-              | 'upload-simple'
-              | 'user'
-              | 'user-check'
-              | 'user-circle'
-              | 'user-plus'
-              | 'users'
-              | 'users-three'
-              | 'video'
-              | 'video-camera'
-              | 'warning'
-              | 'warning-circle'
-              | 'wheelchair'
-              | 'wifi-high'
-              | 'wind'
-            )
-          | null;
-        heading: string;
-        body?: string | null;
-        link: {
-          type?: ('reference' | 'custom' | 'enquiry') | null;
-          newTab?: boolean | null;
-          /**
-           * You can link to a draft. The link will 404 for visitors until that document is published.
-           */
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null)
-            | ({
-                relationTo: 'specialists';
-                value: number | Specialist;
-              } | null)
-            | ({
-                relationTo: 'team';
-                value: number | Team;
-              } | null)
-            | ({
-                relationTo: 'events';
-                value: number | Event;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
-           */
-          anchor?: string | null;
-          /**
-           * Optional leading icon shown before the label.
-           */
-          icon?:
-            | (
-                | 'activity'
-                | 'arrow-down'
-                | 'arrow-right'
-                | 'arrows-out'
-                | 'award'
-                | 'bag-simple'
-                | 'bell-ringing'
-                | 'bone'
-                | 'book-open'
-                | 'brain'
-                | 'briefcase'
-                | 'building'
-                | 'bus'
-                | 'calendar'
-                | 'calendar-blank'
-                | 'calendar-check'
-                | 'car'
-                | 'caret-left'
-                | 'caret-right'
-                | 'cell-signal-full'
-                | 'certificate'
-                | 'chart-bar'
-                | 'chat'
-                | 'chat-circle-text'
-                | 'chats'
-                | 'chats-circle'
-                | 'check'
-                | 'check-circle'
-                | 'check-square'
-                | 'clipboard-check'
-                | 'clipboard-text'
-                | 'clock'
-                | 'currency-dollar'
-                | 'desktop'
-                | 'download'
-                | 'download-simple'
-                | 'envelope'
-                | 'envelope-simple'
-                | 'file-magnifying-glass'
-                | 'file-plus'
-                | 'file-text'
-                | 'files'
-                | 'first-aid'
-                | 'gavel'
-                | 'globe'
-                | 'graduation-cap'
-                | 'handshake'
-                | 'headset'
-                | 'heart-pulse'
-                | 'heartbeat'
-                | 'home'
-                | 'house'
-                | 'identification-card'
-                | 'image'
-                | 'info'
-                | 'link'
-                | 'list'
-                | 'lock'
-                | 'lock-simple'
-                | 'magnifying-glass'
-                | 'mail'
-                | 'map-pin'
-                | 'medal'
-                | 'message'
-                | 'monitor'
-                | 'navigation-arrow'
-                | 'paper-plane-tilt'
-                | 'person-arms-spread'
-                | 'phone'
-                | 'question'
-                | 'scale'
-                | 'scales'
-                | 'seal-check'
-                | 'search'
-                | 'send'
-                | 'shield'
-                | 'shield-check'
-                | 'sign-in'
-                | 'sliders'
-                | 'sort-ascending'
-                | 'squares-four'
-                | 'star'
-                | 'stethoscope'
-                | 't-shirt'
-                | 'target'
-                | 'translate'
-                | 'upload'
-                | 'upload-simple'
-                | 'user'
-                | 'user-check'
-                | 'user-circle'
-                | 'user-plus'
-                | 'users'
-                | 'users-three'
-                | 'video'
-                | 'video-camera'
-                | 'warning'
-                | 'warning-circle'
-                | 'wheelchair'
-                | 'wifi-high'
-                | 'wind'
-              )
-            | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  labels?: {
-    /**
-     * Heading above an article’s attached files.
-     */
-    attachmentsHeading?: string | null;
-    related?: string | null;
-    toc?: string | null;
-    topics?: string | null;
-    /**
-     * Second breadcrumb link (the In the Loop hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
-     */
-    breadcrumbSectionLabel?: string | null;
-    /**
-     * Shown under a stream heading when that stream has no description of its own.
-     */
-    streamFallbackSubtitle?: string | null;
-    bylinePrefix?: string | null;
-    minReadSuffix?: string | null;
-    shareLinkedinLabel?: string | null;
-    shareCopyLabel?: string | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Host-specific boilerplate copy shown on event detail pages (AAMLE / VERIFY).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events-settings".
- */
-export interface EventsSetting {
-  id: number;
-  aamle?: {
-    /**
-     * Intro paragraph shown on every event by this host.
-     */
-    blurb?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    /**
-     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
-     */
-    callout?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    attendHeading?: string | null;
-    recapHeading?: string | null;
-    attendBody?: string | null;
-    registerLabel?: string | null;
-    contactLabel?: string | null;
-    /**
-     * Label for the button linking to the event on the host’s own site, e.g. "View this event on AAMLE". Only shown on events that have a Host event page URL.
-     */
-    hostEventLinkLabel?: string | null;
-  };
-  verify?: {
-    /**
-     * Intro paragraph shown on every event by this host.
-     */
-    blurb?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    /**
-     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
-     */
-    callout?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    attendHeading?: string | null;
-    recapHeading?: string | null;
-    attendBody?: string | null;
-    registerLabel?: string | null;
-    contactLabel?: string | null;
-    /**
-     * Label for the button linking to the event on the host’s own site, e.g. "View this event on AAMLE". Only shown on events that have a Host event page URL.
-     */
-    hostEventLinkLabel?: string | null;
-  };
-  /**
-   * Generic UI labels shown on every event detail page, regardless of host.
-   */
-  labels?: {
-    /**
-     * Heading above the presenter cards on an event page.
-     */
-    presentersHeading?: string | null;
-    /**
-     * Second breadcrumb link (the events hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
-     */
-    breadcrumbSectionLabel?: string | null;
-    /**
-     * Status pill for events still to come.
-     */
-    statusUpcomingLabel?: string | null;
-    /**
-     * Status pill for events whose date has passed.
-     */
-    statusPastLabel?: string | null;
-    /**
-     * Cost shown when an event has no cost set.
-     */
-    freeLabel?: string | null;
-    /**
-     * CPD line when points are set. Use {points} for the number.
-     */
-    cpdPointsTemplate?: string | null;
-    /**
-     * CPD line when eligible but no point count is set.
-     */
-    cpdEligibleLabel?: string | null;
-    /**
-     * Shown under a past event that has no recap AND no photos or downloads. If there are photos or downloads, the line below is used instead — this one would be telling people to ask for something already on the page.
-     */
-    concludedFallback?: string | null;
-    /**
-     * Shown under a past event that has no recap written yet but does have photos or downloads attached.
-     */
-    concludedWithMaterials?: string | null;
-    /**
-     * Link back to the events listing at the bottom of the page.
-     */
-    backToEventsLabel?: string | null;
-    /**
-     * Where the “Contact Us” button goes once registrations have closed. It used to reuse the event’s external registration link, which sent people to the booking page they could no longer use.
-     */
-    contactUrl?: string | null;
-    /**
-     * Heading above the recap’s contents list.
-     */
-    recapTocLabel?: string | null;
-    /**
-     * Heading above an event’s photo gallery.
-     */
-    galleryHeading?: string | null;
-    /**
-     * Heading above an event’s downloads / attachments list.
-     */
-    attachmentsHeading?: string | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Breadcrumb + fixed labels shown on every team member profile page.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team-settings".
- */
-export interface TeamSetting {
-  id: number;
-  labels?: {
-    /**
-     * Second breadcrumb link (the team index). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
-     */
-    breadcrumbSectionLabel?: string | null;
-    /**
-     * Sidebar label above the member’s role.
-     */
-    roleLabel?: string | null;
-    /**
-     * Sidebar label above each qualification.
-     */
-    qualificationLabel?: string | null;
-    /**
-     * Prefix for the bio heading, e.g. “About” in “About Wes”.
-     */
-    aboutPrefix?: string | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "custom-styles".
  */
@@ -16345,6 +16404,191 @@ export interface DesignSystem {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-settings_select".
+ */
+export interface ArticleSettingsSelect<T extends boolean = true> {
+  sidebarCards?:
+    | T
+    | {
+        icon?: T;
+        heading?: T;
+        body?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              anchor?: T;
+              icon?: T;
+            };
+        id?: T;
+      };
+  labels?:
+    | T
+    | {
+        attachmentsHeading?: T;
+        related?: T;
+        toc?: T;
+        topics?: T;
+        breadcrumbSectionLabel?: T;
+        streamFallbackSubtitle?: T;
+        bylinePrefix?: T;
+        minReadSuffix?: T;
+        shareLinkedinLabel?: T;
+        shareCopyLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events-settings_select".
+ */
+export interface EventsSettingsSelect<T extends boolean = true> {
+  aamle?:
+    | T
+    | {
+        blurb?: T;
+        callout?: T;
+        attendHeading?: T;
+        recapHeading?: T;
+        attendBody?: T;
+        registerLabel?: T;
+        contactLabel?: T;
+        hostEventLinkLabel?: T;
+      };
+  verify?:
+    | T
+    | {
+        blurb?: T;
+        callout?: T;
+        attendHeading?: T;
+        recapHeading?: T;
+        attendBody?: T;
+        registerLabel?: T;
+        contactLabel?: T;
+        hostEventLinkLabel?: T;
+      };
+  labels?:
+    | T
+    | {
+        presentersHeading?: T;
+        breadcrumbSectionLabel?: T;
+        statusUpcomingLabel?: T;
+        statusPastLabel?: T;
+        freeLabel?: T;
+        cpdPointsTemplate?: T;
+        cpdEligibleLabel?: T;
+        concludedFallback?: T;
+        concludedWithMaterials?: T;
+        backToEventsLabel?: T;
+        contactUrl?: T;
+        recapTocLabel?: T;
+        galleryHeading?: T;
+        attachmentsHeading?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team-settings_select".
+ */
+export interface TeamSettingsSelect<T extends boolean = true> {
+  labels?:
+    | T
+    | {
+        breadcrumbSectionLabel?: T;
+        roleLabel?: T;
+        qualificationLabel?: T;
+        aboutPrefix?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-profile_select".
+ */
+export interface SpecialistProfileSelect<T extends boolean = true> {
+  portalCta?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        subheading?: T;
+        tiles?:
+          | T
+          | {
+              icon?: T;
+              label?: T;
+              id?: T;
+            };
+        enquiryLabel?: T;
+        bookingLabel?: T;
+        cvLabel?: T;
+        sampleReportLabel?: T;
+        enquiryEmail?: T;
+      };
+  portalEnquirySubject?: T;
+  portalEnquiryType?: T;
+  labels?:
+    | T
+    | {
+        biography?: T;
+        assessmentAreas?: T;
+        qualifications?: T;
+        accreditations?: T;
+        assessmentTypes?: T;
+        claimTypes?: T;
+      };
+  breadcrumb?:
+    | T
+    | {
+        breadcrumbParentLabel?: T;
+        breadcrumbParentHref?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "specialist-availability_select".
+ */
+export interface SpecialistAvailabilitySelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  carouselEyebrow?: T;
+  carouselTitle?: T;
+  carouselSubtitle?: T;
+  enquiryEmail?: T;
+  enquirySubject?: T;
+  enquiryBodyIntro?: T;
+  enquiryBodyFooter?: T;
+  labels?:
+    | T
+    | {
+        modeInPersonLabel?: T;
+        modeTelehealthLabel?: T;
+        modeEitherLabel?: T;
+        selectionHint?: T;
+        clearLabel?: T;
+        sendEnquiryLabel?: T;
+        sessionsSelectedTemplate?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -16561,190 +16805,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialist-availability_select".
- */
-export interface SpecialistAvailabilitySelect<T extends boolean = true> {
-  heading?: T;
-  intro?: T;
-  carouselEyebrow?: T;
-  carouselTitle?: T;
-  carouselSubtitle?: T;
-  enquiryEmail?: T;
-  enquirySubject?: T;
-  enquiryBodyIntro?: T;
-  enquiryBodyFooter?: T;
-  labels?:
-    | T
-    | {
-        modeInPersonLabel?: T;
-        modeTelehealthLabel?: T;
-        modeEitherLabel?: T;
-        selectionHint?: T;
-        clearLabel?: T;
-        sendEnquiryLabel?: T;
-        sessionsSelectedTemplate?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "specialist-profile_select".
- */
-export interface SpecialistProfileSelect<T extends boolean = true> {
-  portalCta?:
-    | T
-    | {
-        eyebrow?: T;
-        heading?: T;
-        subheading?: T;
-        tiles?:
-          | T
-          | {
-              icon?: T;
-              label?: T;
-              id?: T;
-            };
-        enquiryLabel?: T;
-        bookingLabel?: T;
-        cvLabel?: T;
-        sampleReportLabel?: T;
-        enquiryEmail?: T;
-      };
-  portalEnquirySubject?: T;
-  portalEnquiryType?: T;
-  labels?:
-    | T
-    | {
-        biography?: T;
-        assessmentAreas?: T;
-        qualifications?: T;
-        accreditations?: T;
-        assessmentTypes?: T;
-      };
-  breadcrumb?:
-    | T
-    | {
-        breadcrumbParentLabel?: T;
-        breadcrumbParentHref?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "article-settings_select".
- */
-export interface ArticleSettingsSelect<T extends boolean = true> {
-  sidebarCards?:
-    | T
-    | {
-        icon?: T;
-        heading?: T;
-        body?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              anchor?: T;
-              icon?: T;
-            };
-        id?: T;
-      };
-  labels?:
-    | T
-    | {
-        attachmentsHeading?: T;
-        related?: T;
-        toc?: T;
-        topics?: T;
-        breadcrumbSectionLabel?: T;
-        streamFallbackSubtitle?: T;
-        bylinePrefix?: T;
-        minReadSuffix?: T;
-        shareLinkedinLabel?: T;
-        shareCopyLabel?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events-settings_select".
- */
-export interface EventsSettingsSelect<T extends boolean = true> {
-  aamle?:
-    | T
-    | {
-        blurb?: T;
-        callout?: T;
-        attendHeading?: T;
-        recapHeading?: T;
-        attendBody?: T;
-        registerLabel?: T;
-        contactLabel?: T;
-        hostEventLinkLabel?: T;
-      };
-  verify?:
-    | T
-    | {
-        blurb?: T;
-        callout?: T;
-        attendHeading?: T;
-        recapHeading?: T;
-        attendBody?: T;
-        registerLabel?: T;
-        contactLabel?: T;
-        hostEventLinkLabel?: T;
-      };
-  labels?:
-    | T
-    | {
-        presentersHeading?: T;
-        breadcrumbSectionLabel?: T;
-        statusUpcomingLabel?: T;
-        statusPastLabel?: T;
-        freeLabel?: T;
-        cpdPointsTemplate?: T;
-        cpdEligibleLabel?: T;
-        concludedFallback?: T;
-        concludedWithMaterials?: T;
-        backToEventsLabel?: T;
-        contactUrl?: T;
-        recapTocLabel?: T;
-        galleryHeading?: T;
-        attachmentsHeading?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team-settings_select".
- */
-export interface TeamSettingsSelect<T extends boolean = true> {
-  labels?:
-    | T
-    | {
-        breadcrumbSectionLabel?: T;
-        roleLabel?: T;
-        qualificationLabel?: T;
-        aboutPrefix?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "custom-styles_select".
  */
 export interface CustomStylesSelect<T extends boolean = true> {
@@ -16887,16 +16947,16 @@ export interface TaskSchedulePublish {
           value: number | Post;
         } | null)
       | ({
+          relationTo: 'events';
+          value: number | Event;
+        } | null)
+      | ({
           relationTo: 'specialists';
           value: number | Specialist;
         } | null)
       | ({
           relationTo: 'team';
           value: number | Team;
-        } | null)
-      | ({
-          relationTo: 'events';
-          value: number | Event;
         } | null);
     global?: string | null;
     user?: (number | null) | User;

@@ -17,7 +17,9 @@ export const Testimonials: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'authorRole',
-    group: 'Content',
+    group: 'Reference',
+    description:
+      'Client quotes. They appear in one place: the testimonial carousel on the homepage.',
     defaultColumns: ['authorRole', 'org', 'featured', 'order'],
   },
   // The card is two attribution lines — position, then organisation and location

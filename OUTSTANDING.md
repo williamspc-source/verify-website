@@ -25,6 +25,10 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 2 | Two e2e specs are flaky under a loaded dev server, and can 500 an unrelated route | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine, sometimes reporting a page as broken when it is not | ~10 min | Worth doing before handover |
 | 3 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** | After the deploy, not before |
 | 4 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min | Only if someone confirms which is intended |
+| 5 | Light-band breadcrumbs are darker and heavier than the reference | Cosmetic, ~25 pages | A slightly heavier trail than the reference draws | ~10 min + re-baseline | A decision, not a tidy-up — someone should confirm the lighter trail is wanted |
+| 6 | Three dead CSS rules on a `.ct-portal-card` class that never reaches the DOM | No | None — a live rule covers it | ~5 min | Fold into the next dead-CSS sweep |
+| 7 | `ServicesGrid` can generate links to service pages that do not exist | Latent | An editor who ticks "Link to service page" gets 404s | ~20 min | Before anyone builds a new services grid |
+| 8 | The enquiry call-to-action has five different wordings | Cosmetic | Inconsistent button copy; one seed/code disagreement | ~30 min + a repair | With the next copy sweep |
 
 ---
 
@@ -198,6 +202,39 @@ than done inside a feature pass.
 
 **Cost:** three lines deleted, one snapshot compare on `/contact` to confirm nothing moves. Worth
 folding into the next `findDeadCss.mjs` sweep rather than doing alone.
+
+---
+
+## 7. `ServicesGrid` can generate links to pages that do not exist
+
+The `services` collection has **no public route** — there is no `/services/<slug>` page, and
+`LINKABLE_COLLECTIONS` in `routes.ts` excludes it. The service pages a visitor sees are Pages.
+
+But `ServicesGrid` still offers **Link to service page** plus a `servicePathPrefix`, which together
+build `<prefix>/<slug>` hrefs. Every seeded grid sets `linkToService: false` and each Service instead
+carries a `linkOverride` pointing at a real Page (`seedServiceLinks.ts`), so nothing is broken today.
+
+**The hazard:** an editor who ticks that box on a new grid gets links that 404, and nothing warns
+them. The block's own comment still claims the collection drives "the dedicated service pages",
+which is stale.
+
+**Cost of fixing:** either drop the two fields and the code path (they have never been used in
+anger), or make the grid fall back to `linkOverride` and hide the toggle when no route exists.
+Either is a block-config change plus a snapshot compare. Documented in `ADMIN-GUIDE.md` §4 so an
+editor is at least told the card needs a Link override.
+
+---
+
+## 8. The enquiry call-to-action has five different wordings
+
+Across the site: **Make an Enquiry** (drawer), **Send Enquiry** (portal CTA), **Send enquiry**
+(availability grid, lowercase e), **Enquire →** (service cards, hardcoded and not editable), and
+**Contact Us** (nav). On the specialist profile the seed writes `Make an Enquiry` while the code
+fallback says `Send Enquiry`, so the two disagree about the same button.
+
+Not wrong, just inconsistent — and it is visitor-facing copy stored in the database, so fixing it
+means picking the canonical wording and writing an unconditional repair, not editing a fixture.
+Worth doing in the same pass as any other copy sweep.
 
 ---
 

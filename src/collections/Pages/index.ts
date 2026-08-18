@@ -95,7 +95,9 @@ export const Pages: CollectionConfig<'pages'> = {
     },
     preview: (data) => generatePreviewPath({ path: docPath(data as PageLike) }),
     useAsTitle: 'title',
-    group: 'Content',
+    group: 'Publishing',
+    description:
+      'The pages of the site. Each is built from blocks; a page’s web address comes from its Parent, so changing the parent changes the URL.',
   },
   fields: [
     {

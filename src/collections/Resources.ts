@@ -20,7 +20,9 @@ export const Resources: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    group: 'Content',
+    group: 'Reference',
+    description:
+      'Downloadable guides and checklists. They appear in one place: the Resources section of the In the Loop hub.',
     defaultColumns: ['title', 'resourceType', 'audience', 'order'],
   },
   fields: [

@@ -20,6 +20,8 @@ export const Media: CollectionConfig = {
   folders: true,
   admin: {
     group: 'Media',
+    description:
+      'Every uploaded image and file. Set alt text here, and fix a bad crop by moving the focal point rather than re-uploading.',
     defaultColumns: ['filename', 'alt', 'updatedAt'],
   },
   access: {

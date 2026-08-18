@@ -5,11 +5,14 @@ import { revalidateFooter } from './hooks/revalidateFooter'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
+  label: 'Footer',
   access: {
     read: () => true,
   },
   admin: {
     group: 'Site',
+    description:
+      'The footer on every page: link columns, contact details and opening hours. Contact fields left blank fall back to your primary Office.',
   },
   fields: [
     {

@@ -30,25 +30,29 @@ const BeforeDashboard: React.FC = () => {
 
       <ul className={`${baseClass}__instructions`}>
         <li>
-          <strong>Page content</strong> — <em>Pages</em>. Each page is built from blocks you can add,
+          <strong>Page content</strong> — <em>Publishing → Pages</em>. Each page is built from
+          blocks you can add,
           reorder and remove. A page&apos;s web address comes from its <em>Parent</em>, so changing
           the parent changes the URL.
         </li>
         <li>
-          <strong>Articles</strong> — <em>Posts</em>. Every article needs a <em>Stream</em>; that is
-          what gives it a web address. Do not delete a stream that still has articles in it.
+          <strong>Articles</strong> — <em>Publishing → Articles</em>. Every article needs a{' '}
+          <em>Stream</em>; that is what gives it a web address. Do not delete a stream that still
+          has articles in it.
         </li>
         <li>
-          <strong>People and panels</strong> — <em>Specialists</em>, <em>Team</em>, <em>Events</em>.
-          Saving one as a draft hides it from the site.
+          <strong>People and panels</strong> — <em>People → Specialists</em>,{' '}
+          <em>People → Team Members</em>, <em>Publishing → Events</em>. Saving one as a draft hides
+          it from the site.
         </li>
         <li>
-          <strong>Wording that appears on many pages</strong> — the <em>Globals</em> section
-          (Header, Footer, Site Settings, and the per-area settings groups).
+          <strong>Wording that appears on many pages</strong> — <em>Site</em> (Header, Footer,
+          Site Settings) and <em>Page settings</em> (the fixed labels on article, event, team and
+          specialist pages).
         </li>
         <li>
-          <strong>Colours, fonts, spacing and corners</strong> — <em>Globals → Site Settings</em>{' '}
-          (brand colours) and <em>Globals → Design System</em> (everything else). One change there
+          <strong>Colours, fonts, spacing and corners</strong> — <em>Site → Site Settings</em>{' '}
+          (brand colours) and <em>Design → Design System</em> (everything else). One change there
           re-themes the whole site.
         </li>
         <li>
@@ -59,10 +63,12 @@ const BeforeDashboard: React.FC = () => {
 
       <p>
         {'For anything the fields above cannot reach, see '}
-        <strong>Globals → Custom Styles</strong>
-        {', and the full styling reference kept alongside the code in '}
+        <strong>Design → Custom Styles</strong>
+        {'. Two guides are kept with the code: '}
+        <code>ADMIN-GUIDE.md</code>
+        {' explains what every item in this sidebar is for, and '}
         <code>src/Styles/HOOKS.md</code>
-        {'. If something needs a code change, that is a developer task — note what you need and pass it on.'}
+        {' is the styling reference. If something needs a code change, that is a developer task — note what you need and pass it on.'}
       </p>
     </div>
   )

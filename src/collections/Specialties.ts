@@ -19,6 +19,8 @@ export const Specialties: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
+    description:
+      'Medical specialties. They drive the Specialty List page and the specialist directory filters.',
     defaultColumns: ['title', 'slug'],
   },
   fields: [

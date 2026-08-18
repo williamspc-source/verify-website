@@ -2,6 +2,10 @@
 
 Everything visual on this site can be changed from the admin. This document tells you where.
 
+> **Looking for what something *is* rather than how it looks?** `ADMIN-GUIDE.md` (repo root) explains
+> every item in the admin sidebar — what it holds, where it appears on the site, and what happens if
+> you delete one. This file is the styling half.
+
 Start with **§1** if you only read one section: it explains why edits sometimes appear not to
 work, and how to guarantee they always do.
 
