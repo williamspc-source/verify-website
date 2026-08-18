@@ -453,7 +453,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
       showShield: false,
       heading: 'Information for [[Clients]]',
       subtitle:
-        'VERIFY provides medico-legal services for plaintiff and defendant lawyers, insurers and self-insurers — a balanced, unbiased approach that supports a fair and just legal process.',
+        'VERIFY provides medico-legal services for plaintiff and defendant lawyers, insurers, and self-insurers — a balanced, unbiased approach that supports a fair and just legal process.',
     },
     [
       // How we support you — two-column intro (text + image placeholder), then a

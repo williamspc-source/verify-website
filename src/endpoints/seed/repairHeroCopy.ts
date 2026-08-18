@@ -33,6 +33,24 @@ const HERO_SUBTITLE_FIXES: { slug: string; from: string; to: string }[] = [
     from: 'Our specialists are highly skilled professionals committed to the highest standards of professionalism, accuracy and impartiality.',
     to: 'Our specialists are highly skilled professionals committed to the highest standards of professionalism, accuracy, and impartiality.',
   },
+  // The other three hero subtitles carrying a three-item list without the final
+  // comma. Found by matching `A, B and C` against every stored hero subtitle —
+  // the whole set is four, and these are the remaining three.
+  {
+    slug: 'for-clients',
+    from: 'VERIFY provides medico-legal services for plaintiff and defendant lawyers, insurers and self-insurers — a balanced, unbiased approach that supports a fair and just legal process.',
+    to: 'VERIFY provides medico-legal services for plaintiff and defendant lawyers, insurers, and self-insurers — a balanced, unbiased approach that supports a fair and just legal process.',
+  },
+  {
+    slug: 'join-expert-panel',
+    from: "VERIFY partners with medical and allied-health specialists who value rigour, fairness and professional development. If you're interested in medico-legal work, we'd like to hear from you.",
+    to: "VERIFY partners with medical and allied-health specialists who value rigour, fairness, and professional development. If you're interested in medico-legal work, we'd like to hear from you.",
+  },
+  {
+    slug: 'privacy-policy',
+    from: 'VERIFY Medico-Legal Solutions Pty Ltd — how we collect, use and protect your personal information.',
+    to: 'VERIFY Medico-Legal Solutions Pty Ltd — how we collect, use, and protect your personal information.',
+  },
 ]
 
 export const repairHeroCopy = async ({ payload, req }: Ctx): Promise<void> => {

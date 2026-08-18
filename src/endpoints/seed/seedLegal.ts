@@ -116,7 +116,7 @@ export const seedLegal = async (ctx: Ctx): Promise<void> => {
       eyebrow: 'Legal',
       heading: 'Privacy Policy',
       subtitle:
-        'VERIFY Medico-Legal Solutions Pty Ltd — how we collect, use and protect your personal information.',
+        'VERIFY Medico-Legal Solutions Pty Ltd — how we collect, use, and protect your personal information.',
     },
     [
       proseSection([

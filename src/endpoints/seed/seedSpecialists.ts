@@ -380,7 +380,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
       showShield: true,
       heading: 'Join Our [[Expert Panel]]',
       subtitle:
-        "VERIFY partners with medical and allied-health specialists who value rigour, fairness and professional development. If you're interested in medico-legal work, we'd like to hear from you.",
+        "VERIFY partners with medical and allied-health specialists who value rigour, fairness, and professional development. If you're interested in medico-legal work, we'd like to hear from you.",
       links: [custom('#join-form', 'Join Expert Panel'), custom('tel:0733560469', '07 3356 0469')],
     },
     joinLayout,
