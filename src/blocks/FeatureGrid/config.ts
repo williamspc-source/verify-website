@@ -35,10 +35,11 @@ export const FeatureGrid: Block = {
         { label: 'Card (bordered)', value: 'card' },
         { label: 'Plain (no border)', value: 'plain' },
         { label: 'Banded (tinted header)', value: 'banded' },
+        { label: 'Soft (flat white, gentle hover)', value: 'soft' },
       ],
       admin: {
         description:
-          '“Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it.',
+          '“Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift.',
       },
     },
     {

@@ -445,7 +445,11 @@ See headline issue above. If reverting to Target's directory approach:
 ### 2. "How We Support You" section
 - **Broken rich text**: Current renders literal `[[report delivery]]` brackets instead of styled blue text.
 - **Missing image**: Target is two-column with an image placeholder on the right; Current is single-column, no image.
-- **List formatting downgraded (recurring pattern)**: Target presents "Appointment coordination," "Brief and document management," and "Quality-assured reporting" as a 3-column grid of bordered cards, each with an icon, heading, and description. Current collapses these into a plain inline bulleted list under an added intro line "What we help with" — same downgrade pattern seen on the IME/JME/Client-info-style sections on earlier pages.
+- ~~**List formatting downgraded (recurring pattern)**: Target presents "Appointment coordination," "Brief and document management," and "Quality-assured reporting" as a 3-column grid of bordered cards, each with an icon, heading, and description. Current collapses these into a plain inline bulleted list under an added intro line "What we help with".~~
+  **✅ STALE — corrected 2026-08-18, see Comparison 34.** They have been a 3-column card grid for some
+  time; the bulleted-list description was long out of date and would have sent the next reader looking
+  for a problem that no longer existed. What was actually wrong was the card *paint* — the shared
+  bordered card rather than the reference's quieter treatment — now an editable **Soft** card style.
 - **Extra button**: Current adds a "View Our Services" button not present in Target here.
 
 ### 3. "Comprehensive Medico-Legal Services" section
@@ -1932,6 +1936,84 @@ A `specialist-profile` family now reads zero across 37 reference selectors, and 
 Rai's restored chips on his directory card) plus the usual `/in-the-loop` frame; **zero** on the
 profile route itself, since the harness measures computed style and this pass changed content.
 int **134/134** (three new), e2e **19/19**.
+
+---
+
+## Comparison 34: /information-centre/for-clients — a field nobody set (2026-08-18)
+
+Reported: the three support cards do not match, and "OUR SERVICES" is completely different. Measured
+against the reference at 1440px, **34 differing declarations** across the two sections.
+
+### "Our Services" was one unset field
+
+The reference renders those eight cards as centred tiles — icon above a centred title, 172px minimum
+height. Ours rendered `display: block`, left-aligned, no minimum height, because the block's **Card
+alignment** field was never set and defaults to `left`. The homepage runs the *identical* grid with
+`cardAlign: 'center'`, so the two pages had been disagreeing with each other.
+
+Two more differences in that section were also field values, not CSS:
+
+| | Ours | Reference |
+|---|---|---|
+| Band | flat `--band-muted` grey | `--band-accent`, which is **byte-identical** to its gradient |
+| Padding | 120px (`spacious`) | 88px — exactly where `--space-normal` caps |
+
+So the section that looked "completely different" needed **three stored values**, not a port.
+
+### The card the reference uses on only two pages
+
+The rest is CSS, and the constraint that shaped it: the reference uses `.service-card` on **index.html
+and for-clients.html only**, both as centred tiles. We generalised the class across ~8 pages, which is
+why its shared geometry drifted. The reference-exact paint therefore went on
+`.services-grid.vf-cards--center` — a variant used by exactly those two pages — rather than the base
+class, which would have dragged six pages the reference never styled this way and taken four families
+that read zero with it.
+
+The homepage was wrong in the same way and is now correct too: measured against *its* reference,
+**0 differences**.
+
+### The support cards are a different card, so they are a different style
+
+The reference's `.client-support-item` is not its service tile: flat white rather than the shared
+gradient, wider radius, soft blue shadow, 46px icon, and a gentle `translateY(-2px)` hover instead of
+the neo-brutalist shift. That became a fourth **Card style** on Feature Grid — *Soft* — alongside
+Card / Plain / Banded, so any feature grid can take it. It replaces `.vf-client-support`, which set
+four of these declarations and left the rest to the shared card: the reason the section never matched.
+
+### Two bugs found by measuring, that reading could not have caught
+
+**I broke the tiles' hover while fixing their resting state.** The new
+`.services-grid.vf-cards--center .service-card` rule is (0,3,0); `.service-card:hover` is only (0,2,0).
+Adding a scoped resting shadow silently disabled the neo-brutalist hover the reference *does* specify.
+Caught by measuring hover, not by reading the file, and fixed by restating it at that specificity.
+
+**The reference's own hover cannot be measured with JavaScript on.** Its scroll-reveal sets an *inline*
+transform, which outranks the stylesheet's `:hover` rule — so the reference read as `matrix(1,0,0,1,0,0)`
+and looked like it had no hover at all. Measured with `javaScriptEnabled: false`, both sides match
+exactly: `translateY(-2px)` for support cards, `translate(-4px,-4px)` with a `6px 6px 0` hard shadow
+for the tiles, and no accent bar on either.
+
+**A stale Turbopack build, for the sixth time.** The intro scope rules were in the file, the class was
+in the DOM (`vf-section-bare vf-split-feature vf-client-overview`), and every value was unchanged.
+`rm -rf .next` and a restart, source untouched, and they applied. Checking *whether the class reached
+the DOM* is what separated "stale build" from "bad selector" in one step.
+
+### Extended beyond the report, deliberately
+
+The intro above the cards measured **10 further differences** (heading 700 vs 800 at a 2.5rem cap
+against 2.4rem, paragraph line-height, and a placeholder with no glyph where the reference draws a
+52px one). They are in the same section, so they were closed too rather than left behind — the
+`placeholderIcon` field built for reporting-services covered the glyph.
+
+### Two tool fixes
+
+`referenceCssDiff` now normalises whitespace around `/`, so `aspect-ratio: 4 / 3` stops reading as
+different from `4/3`; and the accent bar our cards draw — which no card in the reference has — is
+dropped on both these sections per your decision, leaving it on the pages that have grown to expect it.
+
+A `for-clients` family reads zero across 32 reference selectors. Snapshot moved **only** the two
+intended routes (`/information-centre/for-clients` 88 nodes, `/` 30) plus the usual `/in-the-loop`
+frame. int **134/134**, e2e **19/19**.
 
 ---
 

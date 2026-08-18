@@ -20,7 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 33 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 34 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -160,6 +160,14 @@ qualification rows showed one icon because the seed dropped the per-row value; a
 icon and 0 subtitle mismatches — and the icon rule is proven against the reference corpus by a test.
 Two guard holes were found and recorded, and one real difference (light-band breadcrumb colour, which
 affects ~25 pages) is deferred as `OUTSTANDING.md` §5 for a decision.
+
+`/information-centre/for-clients` followed (Comparison 34). The section that looked completely
+different needed **three stored field values**, not a port: Card alignment had never been set (the
+homepage's identical grid already had it), the band was flat grey where `--band-accent` is already
+byte-identical to the reference's gradient, and the padding preset was one step too large. The support
+cards became a new editable **Soft** card style. The homepage was wrong in the same way and now
+measures 0 against its own reference. Recurring item 7 in the design-diff was **corrected** — it had
+described these cards as a bulleted list long after they stopped being one.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 

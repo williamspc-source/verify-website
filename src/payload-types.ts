@@ -3706,9 +3706,9 @@ export interface FeatureGridBlock {
   background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'primary' | 'dark') | null;
   columns?: ('1' | '2' | '3' | '4') | null;
   /**
-   * “Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it.
+   * “Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift.
    */
-  cardStyle?: ('card' | 'plain' | 'banded') | null;
+  cardStyle?: ('card' | 'plain' | 'banded' | 'soft') | null;
   items?:
     | {
         /**

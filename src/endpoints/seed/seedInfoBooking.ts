@@ -467,6 +467,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         content: [
           {
             blockType: 'splitFeature',
+            cssClass: ['vf-client-overview'],
             rows: [
               {
                 eyebrow: 'How We Support You',
@@ -474,6 +475,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
                 imageSide: 'right',
                 imagePlaceholder: true,
                 placeholderLabel: 'Image Placeholder',
+                placeholderIcon: 'image',
                 body: plainTextToLexical(
                   'VERIFY supports legal firms, insurers and self-insurers with coordinated access to independent medical specialists, clear communication, and quality-assured reporting. Our role is to keep each matter moving with the right expert, the right material, and the right checks before the report reaches you.\n\nWe work with both instructing parties and specialists throughout the process, helping reduce administrative friction, clarify brief requirements, and manage the details that can affect timing, cost and report quality.',
                 ),
@@ -483,7 +485,9 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
           {
             blockType: 'featureGrid',
             columns: '3',
-            cardStyle: 'card',
+            // The reference's support cards are a quieter design than its service
+            // tiles — flat white, soft shadow, gentle hover. See `.vf-card--soft`.
+            cardStyle: 'soft',
             cssClass: ['vf-client-support'],
             items: [
               featureCard(
@@ -509,9 +513,12 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
       {
         blockType: 'section',
         anchorId: 'services',
-        background: 'muted',
-        paddingTop: 'spacious',
-        paddingBottom: 'spacious',
+        // `--band-accent` is byte-identical to the reference's
+        // `linear-gradient(135deg, #eef9ff 0%, #e6f4ff 48%, #d9efff 100%)`, and
+        // `--space-normal` caps at exactly its 88px. Both were simply set wrong.
+        background: 'accent',
+        paddingTop: 'normal',
+        paddingBottom: 'normal',
         content: [
           {
             blockType: 'servicesGrid',
@@ -527,6 +534,10 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
               : { category: 'medico-legal' as const, limit: 12 }),
             columns: '4',
             hideDescription: true,
+            // The reference renders these as centred tiles, and the homepage's
+            // identical grid already does. Unset here, it defaulted to `left`,
+            // which is the whole reason this section looked nothing like it.
+            cardAlign: 'center',
             // Link from each service's own `linkOverride` (set in seedHomepage) —
             // there is no /services/<slug> route, so auto-linking would 404.
             linkToService: false,

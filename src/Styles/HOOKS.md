@@ -498,3 +498,20 @@ removing the image later brings the placeholder back exactly as it was.
 - **Accreditations** are records shared between specialists (Specialists → Accreditations), and each
   one carries its own icon too. They all use the seal-check tick by default, which is what the design
   calls for; change it on the accreditation and it changes everywhere that accreditation appears.
+
+
+### Card styles on a Feature Grid, and what makes service cards centre
+
+**Pages → the page → the Feature Grid block → Card style.** There are now four:
+
+| Card style | What it looks like |
+|---|---|
+| **Card (bordered)** | The default — a bordered box with a subtle gradient. |
+| **Plain (no border)** | No border, no background. For points that should not look like cards. |
+| **Banded (tinted header)** | Icon and title on a pale blue panel across the top. |
+| **Soft** | Flat white, a wider corner, a soft blue shadow, and a gentle lift on hover instead of the bolder shift. The support cards on **Information for Clients** use this. |
+
+Separately, on a **Services Grid**, the **Card alignment** field is what turns the cards into centred
+tiles — icon centred above a centred title, all cards the same height. Left is the default and gives
+you a normal left-aligned card. The homepage and Information for Clients both use **Centred**; if a
+services grid ever looks unexpectedly ragged next to those, this is the field to check.

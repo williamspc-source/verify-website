@@ -72,6 +72,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
               // rendered either way.
               cardStyle === 'plain' && 'vf-card--plain',
               banded && 'vf-card--banded',
+              cardStyle === 'soft' && 'vf-card--soft',
               toClassName(elementClasses?.card),
             )}
           >

@@ -2292,6 +2292,41 @@
 .services-grid.vf-cards--center .service-icon svg { width: 24px; height: 24px; }
 /* Reference cards are icon + title only, so the title carries no trailing gap. */
 .services-grid.vf-cards--center .service-title { margin-bottom: 0; }
+
+/* The rest of the reference's paint for this card (styles.css:882-896, 902).
+   It goes on the centred variant rather than `.service-card` for a reason worth
+   keeping: the reference uses `.service-card` on exactly TWO pages — index.html
+   and for-clients.html — and both are these centred tiles. We generalised the
+   class across ~8 pages, so moving the base would drag six pages the reference
+   never styled this way, and take four families that currently read zero with
+   it. Scoped here it reaches the homepage and /for-clients, and nothing else. */
+.services-grid.vf-cards--center .service-card {
+  padding: 30px 18px;
+  box-shadow:
+    0 12px 32px color-mix(in srgb, var(--primary) 13%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--white) 95%, transparent);
+}
+.services-grid.vf-cards--center .service-icon {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+/* Restate the hover shadow at this specificity. The resting rule above is
+   (0,3,0) and `.service-card:hover` is only (0,2,0), so adding a scoped resting
+   shadow silently disabled the neo-brutalist hover the reference does specify —
+   caught by measuring hover, not by reading the file. */
+.services-grid.vf-cards--center .service-card:hover {
+  box-shadow: var(--vf-shadow-hard);
+}
+/* The accent bar is ours, not the reference's — no card in the reference draws
+   one. Dropped here and on `.vf-card--soft`, left alone elsewhere. */
+.services-grid.vf-cards--center .service-card::before { content: none; }
+/* The CTA row is a SIBLING of the grid, not a descendant, so it cannot be
+   reached by descent from the variant — hence the general sibling combinator.
+   Reference `.services-cta` is 40px; our shared default is 44px and stays that
+   way for the other grids that carry footer links. */
+.services-grid.vf-cards--center ~ .services-grid-actions { margin-top: 40px; }
+/* The reference turns the title brand-blue on hover alongside the icon
+   (styles.css:914). We had the icon half and not this one. */
+.services-grid.vf-cards--center .service-card:hover .service-title { color: var(--primary); }
 .services-cta { text-align: center; margin-top: 40px; }
 /* ── Educational Services (AAMLE) ──────────────────────────── */
 /* NOTE: the AAMLE feature-panel and sponsor-callout rules are NOT here — they
@@ -8893,16 +8928,84 @@
 }
 .ct-page .ct-portal-card__features .vf-icon-list__text { font-size: 0.86rem; }
 
-/* For-Clients "How We Support You" support cards (featureGrid) */
-.vf-client-support .services-grid { gap: 20px; }
-.vf-client-support .service-card {
+/* ── /information-centre/for-clients "How We Support You" intro ──────────────
+   Reference `.client-overview-*`, inline-only in for-clients.html. The heading
+   is deliberately heavier and slightly smaller than our shared section title
+   (800 at a 2.4rem cap, against 700 at 2.5rem), and the placeholder caption
+   takes the small uppercase treatment. Scoped, because every value here is a
+   one-off for this intro rather than a design anyone would reuse. */
+.vf-client-overview .section-label { margin-bottom: 14px; }
+.vf-client-overview .vf-split__title {
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+.vf-client-overview .vf-split__body p { line-height: 1.85; }
+.vf-client-overview .vf-split__media {
+  background: linear-gradient(145deg, var(--accent), var(--accent-light));
+}
+.vf-client-overview .vf-split__media--placeholder span {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+/* 52px here against the 44px reporting-services uses — the reference sizes this
+   placeholder glyph larger, and the box is larger with it. */
+.vf-client-overview .vf-split__placeholder-icon {
+  width: 52px;
+  height: 52px;
+}
+
+/* ── Feature Grid card style: "Soft" ──────────────────────────────────────────
+   The reference's `.client-support-item` (for-clients.html inline <style>) is a
+   genuinely different card from its service tiles: flat white rather than the
+   shared gradient, a wider radius, a soft blue shadow, a smaller icon tile, and
+   a gentle lift on hover instead of the bolder diagonal shift.
+
+   An editable style rather than a page scope, so any feature grid can take it.
+   This replaces `.vf-client-support`, which set four of these declarations and
+   left the rest to the shared card — the reason the section never matched. */
+.vf-card--soft {
+  background: var(--white);
+  background-image: none;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--white));
+  border-radius: var(--vf-radius-md);
+  padding: 32px 28px;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 7%, transparent);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  border-color: #cfe4f2;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
-.vf-client-support .service-desc { text-align: justify; }
+.vf-card--soft:hover {
+  background: var(--white);
+  border-color: color-mix(in srgb, var(--primary) 18%, var(--white));
+  box-shadow: 0 12px 36px color-mix(in srgb, var(--primary) 14%, transparent);
+  transform: translateY(-2px);
+}
+/* No accent bar, and no icon recolour on hover — neither is in the reference. */
+.vf-card--soft::before { content: none; }
+.vf-card--soft .service-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--vf-radius-chip);
+  margin-bottom: 18px;
+}
+.vf-card--soft:hover .service-icon {
+  background: var(--bg-light-1);
+  color: var(--primary);
+}
+.vf-card--soft .service-title {
+  line-height: 1.35;
+  margin: 0 0 10px;
+}
+.vf-card--soft .service-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  text-align: justify;
+}
 
 /* Shared info-centre eyebrow (Text atom small uppercase label) */
 .vf-ic-eyebrow {

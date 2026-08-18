@@ -141,6 +141,22 @@ const FAMILIES = {
   // Ours implements these through Split Feature *settings* (Row style, Text
   // density, Bullet style) rather than a class scoped to this page, so the
   // IMPLEMENTED_AS entries below map onto `.vf-split-feature--*` modifiers.
+  // /information-centre/for-clients. This one is split BOTH ways, which is why
+  // it needs both sources listed and neither can be trusted alone:
+  //   · `.client-overview*` / `.client-support*` are INLINE-ONLY — grep over
+  //     assets/ returns zero, and they appear on no other reference page.
+  //   · `.what-we-do` / `.services-grid` / `.service-*` / `.services-cta` are
+  //     SHARED-SHEET-ONLY — the page's inline block declares no base rules for
+  //     them at all.
+  // Trap: the page's inline `.client-services .services-grid` rules are DEAD —
+  // no element on the page carries `client-services` (the section is
+  // `what-we-do`), so they never match and must not be read as the grid's
+  // definition. The live inline override is `.what-we-do .services-cta` only.
+  'for-clients': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/information-centre/for-clients.html'],
+    match: /^\.(client-overview|client-support|what-we-do|what-header|services-grid|service-card|service-icon|service-title|services-cta)/,
+  },
   // /specialists/profiles/<slug>. Inline-only again — `grep profile-hero` over
   // assets/ returns only an OLDER, unused profile layout (`.profile-head`,
   // `.profile-body`, `.profile-aside`, `.profile-photo`), none of which this
@@ -212,6 +228,13 @@ const NOT_PORTED = {
   'specialist-profile': {
     '.profile-location-icon i':
       'Dead in the reference: the rule targets an `<i>` INSIDE `.profile-location-icon`, but on this page `.profile-location-icon` IS the `<i>` — so it never matches anything, and its `font-size: 16px` is not what renders. Measured: the chip icon takes its size from `.profile-location-icon` itself, which we implement as an SVG with an explicit 16px box. Porting the rule would mean porting a bug.',
+  },
+  'for-clients': {
+    '.what-header':
+      'Centring comes from the Tailwind `text-center` utility that <SectionHeader align="center"> emits, not from a rule in globals.css, so there is no declaration here for a CSS diff to match. Its 56px gap is carried by `.section-subtitle`\'s own bottom margin.',
+    '.service-icon i':
+      'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. `.service-icon svg` carries the same sizing \u2014 measured 24px on both sides.',
+    '.client-support-icon i': 'ditto.',
   },
   'reporting-services': {
     '.rs-services-header':
@@ -354,6 +377,55 @@ const IMPLEMENTED_AS = {
     '.as-how-step strong': ['.vf-process-step h4', '.as-how .vf-process-step h4'],
     '.as-how-step span': ['.vf-process-step p', '.as-how .vf-process-step p'],
   },
+  'for-clients': {
+    // ── The services tiles ──
+    // The reference's bare `.service-card` / `.service-icon` / `.service-title`
+    // ARE our centred variant: the reference uses this card on exactly two pages
+    // (index + for-clients) and both are centred tiles, where we generalised the
+    // class across ~8 pages. So each maps to base + `.vf-cards--center`.
+    '.what-we-do': ['.vf-section', '.vf-section--accent'],
+    '.what-header': '.vf-section-header',
+    '.what-header .section-subtitle': ['.section-subtitle', '.vf-section-header--centered .vf-section-header__subtitle'],
+    '.services-grid': '.services-grid',
+    '.service-card': ['.service-card', '.services-grid.vf-cards--center .service-card'],
+    '.service-card:hover': ['.service-card:hover', '.services-grid.vf-cards--center .service-card:hover'],
+    '.service-card:focus-visible': '.service-card:focus-visible',
+    '.service-icon': ['.service-icon', '.services-grid.vf-cards--center .service-icon'],
+    '.service-icon svg': ['.service-icon svg', '.services-grid.vf-cards--center .service-icon svg'],
+    '.service-card:hover .service-icon': '.service-card:hover .service-icon',
+    '.service-card:hover .service-title': '.services-grid.vf-cards--center .service-card:hover .service-title',
+    '.service-title': ['.service-title', '.services-grid.vf-cards--center .service-title'],
+    '.services-cta': '.services-grid-actions',
+    '.what-we-do .services-cta': ['.services-grid-actions', '.services-grid.vf-cards--center ~ .services-grid-actions'],
+
+    // ── The three support cards ──
+    // A Feature Grid on the "Soft" card style, which exists because this card is
+    // a different design from the tiles above — flat white, softer shadow, gentle
+    // hover — and is now available to any feature grid rather than this page.
+    '.client-support-grid': '.services-grid',
+    '.client-support-item': ['.service-card', '.vf-card--soft'],
+    '.client-support-item:hover': ['.service-card:hover', '.vf-card--soft:hover'],
+    '.client-support-icon': ['.service-icon', '.vf-card--soft .service-icon'],
+    '.client-support-icon svg': '.service-icon svg',
+    '.client-support-item h3': ['.service-title', '.vf-card--soft .service-title'],
+    '.client-support-item p': ['.service-desc', '.vf-card--soft .service-desc'],
+
+    // ── The intro above them ──
+    '.client-overview': ['.vf-section', '.vf-section--white'],
+    '.client-overview-main': '.vf-split',
+    '.client-overview-intro .section-label': ['.section-label', '.vf-client-overview .section-label'],
+    '.client-overview-intro .section-title': ['.section-title', '.vf-client-overview .vf-split__title'],
+    '.client-overview-intro p': ['.vf-split__body', '.vf-split__body p', '.vf-client-overview .vf-split__body p'],
+    '.client-overview-intro p:last-child': '.vf-split__body p:last-child',
+    '.client-overview-image': [
+      '.vf-split__media',
+      '.who-image-main',
+      '.vf-client-overview .vf-split__media',
+      '.vf-split__media--placeholder:has(.vf-split__placeholder-icon)',
+    ],
+    '.client-overview-image-icon': ['.vf-split__placeholder-icon', '.vf-client-overview .vf-split__placeholder-icon'],
+    '.client-overview-image span': '.vf-split__media--placeholder span',
+  },
   'specialist-profile': {
     // Ours renders the shared <Breadcrumbs> component, so the trail is
     // `.vf-breadcrumb*`. The CONTENT deliberately differs (Home > Specialist
@@ -426,6 +498,50 @@ const IMPLEMENTED_AS = {
  * printed in the summary so they stay visible.
  */
 const EXPLAINED = {
+  // Every for-clients entry was measured in the browser at 1440px on 2026-08-18
+  // before being excused. Both reported sections read 0 differences there, and
+  // the hover states were measured separately with the pointer parked first.
+  'for-clients': {
+    '.what-we-do': {
+      padding: "Section padding is the editor-controlled `--space-normal` preset, which caps at exactly the reference's 88px \u2014 measured identical. A clamp() cannot be compared to a literal.",
+      'padding-top': 'ditto.',
+      'padding-bottom': 'ditto.',
+    },
+    '.client-overview': {
+      padding: "ditto \u2014 the `spacious` preset against the reference's clamp(64px, 9vw, 100px).",
+      'padding-top': 'ditto.',
+      'padding-bottom': 'ditto.',
+      'border-bottom': 'A 1px #e4eff8 hairline under the section. Not ported: reaching the Section wrapper from inside the block would need a second scope class, and the rule divides white from the section below \u2014 which is now the `--band-accent` gradient starting at #eef9ff, so there is nothing left for it to divide. Revisit if that band changes.',
+    },
+    '.services-grid': { 'grid-template-columns': "Column count is the block's `columns` field, emitted as `--vf-cols`. Set to 4 here, so the rendered grid matches." },
+    '.client-support-grid': {
+      'grid-template-columns': 'ditto \u2014 `columns` is 3 on this block.',
+      'margin-top': "The reference's 52px is the gap between its intro and its card grid inside ONE section. Ours are two blocks, so that gap is the block rhythm rather than a margin on the grid.",
+    },
+    '.service-card': { border: 'Token vs literal: `color-mix(in srgb, var(--vf-shadow-color) 16%, transparent)` against `rgba(28,117,188,0.16)`. Measured identical \u2014 the shadow colour follows Primary.' },
+    '.service-card:focus-visible': { outline: 'ditto, at 35%.' },
+    '.client-support-item': { border: 'The reference hardcodes #cfe4f2; ours mixes it from the brand colour so a rebrand retints it. Measured rgb(214,230,243) against rgb(207,228,242) \u2014 within 1-2/255 on green and blue, 7 on red.' },
+    '.service-icon svg': {
+      width: 'The reference renders these icons as a Phosphor WEBFONT `<i>`, sized by `.service-icon i { font-size: 24px }` \u2014 its `svg` rule targets an implementation this page never uses. Ours are Phosphor React components, so the svg IS the icon and carries the 24px. Measured: both render 24px.',
+      height: 'ditto.',
+    },
+    '.services-cta': {
+      'text-align': "Ours is a flex row with `justify-content: center`, which centres the buttons themselves; the reference needs `text-align` because its `.services-cta` is a plain block.",
+      'margin-top': "Our shared default is 44px; the reference's 40px is applied where it actually uses this card, via `.services-grid.vf-cards--center ~ .services-grid-actions`. Measured 40px here and on the homepage.",
+    },
+    '.what-header .section-subtitle': {
+      'max-width': "The shared `.section-subtitle` cap of 600px against the reference's 640px for this one header.",
+      margin: 'Ours centres via `.vf-section-header--centered`, which sets `margin-inline: auto` rather than the shorthand.',
+      'margin-top': 'ditto.', 'margin-left': 'ditto.', 'margin-right': 'ditto.', 'margin-bottom': 'ditto.',
+      'line-height': 'Not declared on ours; inherited. Measured identical.',
+    },
+    '.client-overview-image': {
+      color: "The box's colour is inherited by its caption in the reference; ours declares it on the caption. Measured on the rendered caption: identical.",
+      'font-size': 'ditto \u2014 the reference sets the caption type on the BOX and inherits it down; ours sets it on the caption element. Measured on the rendered caption: 11.52px both.',
+      'letter-spacing': 'ditto \u2014 1.152px both.',
+      'text-transform': 'ditto \u2014 uppercase both.',
+    },
+  },
   // These three surfaced the moment `color` stopped being blanket-skipped for
   // aliased selectors. Every one was then MEASURED in the browser at 1440px on
   // 2026-08-18 before being excused — which is the only thing that separates an
@@ -666,6 +782,10 @@ function normalise(value, tokens) {
   // — a phantom on a declaration that renders identically. Applies to any escaped
   // glyph, not just this one.
   s = s.replace(/\\([0-9a-f]{1,6})\s?/gi, (_m, hex) => String.fromCodePoint(parseInt(hex, 16)))
+  // `aspect-ratio: 4 / 3` and `4/3` are the same value. Whitespace around a
+  // slash is not meaningful in any property that uses one (aspect-ratio, font
+  // shorthand, grid-area), and leaving it in reported a phantom.
+  s = s.replace(/\s*\/\s*/g, '/')
   for (const [name, val] of Object.entries(tokens)) s = s.split(`var(${name})`).join(val.toLowerCase())
   s = s.replace(/\b0\.5rem\b/g, '8px').replace(/\b1rem\b/g, '16px')
   s = s.replace(
