@@ -22,7 +22,7 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | # | Issue | Live today? | User impact | Effort | Recommendation |
 |---|---|---|---|---|---|
 | 1 | Migration not yet created on the box | — | **Blocks deploy** | ~20 min + a careful read | **Required, immediately before the push** |
-| 2 | Two e2e specs are flaky under a loaded dev server | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine | ~10 min | Worth doing before handover |
+| 2 | Two e2e specs are flaky under a loaded dev server, and can 500 an unrelated route | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine, sometimes reporting a page as broken when it is not | ~10 min | Worth doing before handover |
 | 3 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** | After the deploy, not before |
 | 4 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min | Only if someone confirms which is intended |
 
@@ -48,6 +48,20 @@ generous budget for a rendered page and a thin one for a cold Turbopack compile 
 **The fix** is to give those two assertions their own timeout (`{ timeout: 30_000 }`), or to warm
 `/admin` once in `beforeAll` before starting the clock. Not a longer global timeout — that would
 slow every genuine failure in the suite to a crawl.
+
+**Widened again 2026-08-18: it also produces outright 500s, not just timeouts.** A later full run
+failed with *"pages listed in a sitemap that do not render: /in-the-loop → 500"* — which reads like a
+broken route and is not one. The dev log settles it by counting rather than by argument: across that
+session `/in-the-loop` served **200 twenty-five times and 500 once**, and `/` served **200 one hundred
+and seven times and 500 once**. A genuinely broken route does not do that. The trigger is visible in
+the log immediately before each failure — `Pulling schema from database…`, i.e. `seedUser.ts` building
+its own Payload instance for the admin spec while the crawl that follows is already running. So the
+admin spec does not merely fail on its own timeout; it can take the *next* spec down with it.
+
+Two things follow. A 500 in this suite is not evidence of a broken page until it reproduces — check
+the ratio of 200s to 500s for that route in `.dev.log` first. And the `Ecmascript file had an error`
+line that appears nearby is a red herring: it is the pre-existing Edge-Runtime warning about
+`instrumentation.ts` calling `process.exit`, which is logged on every recompile and is unrelated.
 
 **Widened 2026-08-18: the link crawl itself does it too.** During the FAQ pass, a full run reported
 *"Links › every internal link resolves"* as the failure, with the three specs behind it skipped by

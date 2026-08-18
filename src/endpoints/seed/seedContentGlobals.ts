@@ -24,7 +24,7 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
         eyebrow: 'Online Booking Portal',
         heading: 'Book This Specialist',
         subheading:
-          'Register for the VERIFY booking portal to view live availability, submit referrals and track your matters.',
+          'Register for the VERIFY booking portal to view live availability, submit referrals, and track your matters.',
         tiles: [
           { icon: 'calendar-check', label: 'Specialist Availability' },
           { icon: 'clipboard-text', label: 'Download CV' },
