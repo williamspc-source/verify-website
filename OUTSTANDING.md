@@ -116,6 +116,37 @@ seventeen in `verify-website-design-diff.md` §5.
 
 ---
 
+## 5. Light-band breadcrumbs are darker and heavier than the reference
+
+Found while adding the `specialist-profile` family to `referenceCssDiff.mjs` — mapping the breadcrumb
+selectors rather than skipping them is what surfaced it, and no family had ever compared a
+**light-band** breadcrumb before. The `events` family maps one, but that hero is dark, where our
+tokens already match.
+
+Measured on `/specialists/profiles/dr-adam-parr` at 1440px:
+
+| | Ours | Reference |
+|---|---|---|
+| Link | `rgb(34, 34, 34)` | `rgb(115, 115, 115)` |
+| Separator | `rgb(34, 34, 34)`, 12.48px | `rgb(176, 176, 176)`, 10.6px |
+| Current item | `rgb(26, 58, 92)`, weight 700 | `rgb(65, 64, 66)`, weight 900 |
+
+**Not a page quirk.** The reference is consistent about these values — `#737373`, `#b0b0b0` and
+`#414042` appear **49, 23 and 46 times** across its pages — so ours is darker on *every* interior page
+with a breadcrumb, not just this one.
+
+**Cost of fixing:** three token values in the light `--bc-*` context (`globals.css:4025-4070`), plus
+the separator's `font-size: 0.85em`. Not a page-scoped override — scoping it would make this page
+disagree with the rest of the site, which is the opposite of the point. It is one small edit and a
+snapshot re-baseline, but it changes ~25 pages at once, which is why it is a decision and not a
+tidy-up: someone should confirm the lighter, quieter trail is wanted before it lands.
+
+Recorded per-declaration in `referenceCssDiff.mjs`'s `EXPLAINED` table under `specialist-profile`, each
+entry pointing back here. That keeps the family at zero so it can still catch the *next* regression —
+legitimate only because the entries say what the difference is rather than asserting equivalence.
+
+---
+
 ## 1. The outstanding migration
 
 Not a code fix, and not a defect. The local database has been kept in step by the Postgres adapter's

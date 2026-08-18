@@ -1852,6 +1852,89 @@ e2e **19/19**.
 
 ---
 
+## Comparison 33: specialist profiles — a data problem wearing a design problem's clothes (2026-08-18)
+
+You reported two things on `/specialists/profiles/<slug>`: the line under the name showed the
+specialty ("Spinal Surgery") instead of the job title, and every qualification carried the same icon.
+
+**The CSS was already correct.** Measuring 15 element groups against the reference at 1440px — hero,
+avatar, name, subtitle, chips, section labels, bio, area items, type items, sidebar card, sidebar
+title, list rows, icon, content band, grid — every one matched. The only deltas were a `color-mix`
+serialisation artefact and **0.03px** on an icon box. Nothing here was a porting failure; three
+fields were wired wrongly.
+
+| Defect | Cause |
+|---|---|
+| Subtitle showed the specialty | `specialty` is `required: true`, so the `specialty.title \|\| position` fallback could never reach `position` — a field seeded for all 26 and rendered on none |
+| All 96 qualifications showed `medal` | The per-row `icon` field existed; the seed dropped it, so the `\|\| 'medal'` fallback fired every time |
+| Accreditation icons hardcoded | `Accreditations.icon` was declared, described as driving "the profile chips", and read by nothing |
+
+### The icon rule is extracted from the reference, not invented
+
+Parsing all 26 reference profiles yields **86 distinct text→icon pairs with zero conflicts** —
+`graduation-cap` 33, `medal` 28, `seal-check` 17, `certificate` 8. A classifier over that corpus
+reproduces **all 86 exactly**, and getting there took two iterations: the first version missed
+`MRCPSYCH (UK)`, and the token added to fix it broke `FRACDS (OMS) RACDS`. A rule that reads sensibly
+is not a rule that is right.
+
+That proof is now a test (`tests/int/qualificationIcon.int.spec.ts`) which re-derives the corpus from
+the reference on every run rather than comparing against a pasted table — a table in a test can only
+prove the copy still matches itself. Proven red both ways: breaking the certificate branch fails with
+8 named mismatches, dropping `fracds` fails with exactly the one case an earlier version got wrong.
+
+### Verified by enumeration, not by looking
+
+All 26 profiles compared against the reference, panel by panel: **153 qualification and accreditation
+rows, 0 icon mismatches, 0 subtitle mismatches**, and 4 distinct icons rendering where there had been
+1. Icons were identified by SVG path fingerprint, because Phosphor React emits path data and never the
+slug — grepping our HTML for an icon name could only ever return "absent".
+
+Splitting the comparison **per panel** rather than per page is what found the one real content gap:
+`dr-amritash-rai` was missing all three of his accreditations (AMA 5, PIRS, GEPI 2). A whole-page row
+count had hidden it, because a shortfall in one panel cancelled against a surplus in the other.
+`dr-david-wheatley` keeps a deliberate difference — the reference prints one row reading "CIME, AMA 5"
+where ours holds two records, consistent with the taxonomy decision below.
+
+### Two guard holes found
+
+**The orphan-field guard cannot see a field with a common name.** It joins every consumer file into
+one haystack — deliberately, since per-collection scoping produced false positives — so a field called
+`icon` is satisfied by any of the **27 files** containing a `.icon` read. `Accreditations.icon` was
+green throughout. Recorded in `CLAUDE.md`; the same hole covers `title`, `description` and `link`.
+
+**`referenceCssDiff` did not decode CSS unicode escapes**, so `content: '\\203A'` read as differing from
+`content: '›'` — the same character. Fixed in `normalise()`, which covers any escaped glyph.
+
+### One thing deferred rather than done
+
+Mapping the breadcrumb selectors instead of skipping them surfaced a **real, closeable** difference:
+our light-band breadcrumb renders darker and heavier than the reference's (link `rgb(34,34,34)` vs
+`rgb(115,115,115)`; separator also darker and 12.48px vs 10.6px; current navy/700 vs `rgb(65,64,66)`/900).
+The reference is consistent — those three values appear 49/23/46 times across its pages — so ours
+differs on **every** interior page, not just this one. No family had compared a light-band breadcrumb
+before; the `events` one is on a dark hero, where our tokens already match.
+
+The fix is three token values, not a page-scoped override, and it changes ~25 pages at once. Logged
+as `OUTSTANDING.md` §5 with its cost, and recorded per-declaration in `EXPLAINED` so the family still
+reads zero and can catch the next regression — legitimate only because each entry says what the
+difference is and where the decision lives.
+
+### Approved deviations, unchanged
+
+The breadcrumb trail stays ours (Home › Specialist Panel › the doctor's name, against the reference's
+two-item generic trail); qualifications stay in the case they are typed rather than the reference's
+capitals; and the Assessment Types / Areas taxonomy keeps our wording — MVA/CTP as one record,
+"Expert Evidence / Witness", "Joint Medical Examination (JME)" — because those match the service names
+used elsewhere on the site and drive the Specialist Panel filters.
+
+A `specialist-profile` family now reads zero across 37 reference selectors, and the route joined
+`computedSnapshot.mjs` (15 of 29 routes → 16). Snapshot moved only `/specialists` (7 nodes — Amritash
+Rai's restored chips on his directory card) plus the usual `/in-the-loop` frame; **zero** on the
+profile route itself, since the harness measures computed style and this pass changed content.
+int **134/134** (three new), e2e **19/19**.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

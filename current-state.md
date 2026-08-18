@@ -20,7 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 32 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 33 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -40,7 +40,7 @@ One application serves both the public site and `/admin`.
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **131/131**, 6 files |
+| `pnpm test:int` | **134/134**, 7 files |
 | `pnpm test:e2e` | **19/19**, 59.2s |
 
 > The e2e run was against the **production** server on `:3000`, and the admin spec that
@@ -151,6 +151,15 @@ page had been reading **zero** in `referenceCssDiff.mjs` throughout, for two rea
 tool blanket-skipped `color` for any aliased selector, and one mapping was `null`ed with a
 justification that was simply untrue. Removing the `color` skip surfaced five more differences across
 three families — one real, four measured and explained.
+
+Specialist profiles followed (Comparison 33), and were **not** a CSS problem — 15 element groups
+measured clean against the reference. Three fields were wired wrongly: the subtitle showed the
+specialty because `specialty` is required and the `position` fallback could never be reached; all 96
+qualification rows showed one icon because the seed dropped the per-row value; and
+`Accreditations.icon` was read by nothing. All 26 profiles now verify by enumeration — 153 rows, 0
+icon and 0 subtitle mismatches — and the icon rule is proven against the reference corpus by a test.
+Two guard holes were found and recorded, and one real difference (light-band breadcrumb colour, which
+affects ~25 pages) is deferred as `OUTSTANDING.md` §5 for a decision.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 

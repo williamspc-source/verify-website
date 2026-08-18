@@ -94,9 +94,10 @@ const ROUTES = [
   '/contact',
   '/search',
   '/privacy-policy',
-  // Restyled in the banded-card pass, and the harness covers 15 of 29 pages.
+  // Restyled in the banded-card pass, and the harness covers 16 of 29 pages.
   '/services/medico-legal/ime',
   '/services/medico-legal/reporting-services',
+  '/specialists/profiles/dr-adam-parr',
   '/information-centre/for-clients',
   '/information-centre/for-claimants',
   '/make-a-booking',

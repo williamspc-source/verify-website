@@ -483,3 +483,18 @@ the photography exists. Per row:
 **To replace it, just upload an image to that row.** The whole placeholder disappears — box, caption
 and glyph together — and the photo takes its place. You do **not** need to untick anything, and
 removing the image later brings the placeholder back exactly as it was.
+
+
+### A specialist's job title, qualification icons and accreditations
+
+**Specialists → the specialist.**
+
+- **Position / title line** is what shows under the name on the profile — "Consultant Spinal Surgeon",
+  not the specialty. Leave it empty and the specialty is used instead, so the line is never blank.
+- **Qualifications** is a list, and each row has its **own icon**. The defaults follow the design: a
+  graduation cap for a degree, a medal for a fellowship, a certificate for a certificate or diploma.
+  Add a row and leave the icon empty and it picks the right one from the wording — set one and your
+  choice always wins.
+- **Accreditations** are records shared between specialists (Specialists → Accreditations), and each
+  one carries its own icon too. They all use the seal-check tick by default, which is what the design
+  calls for; change it on the accreditation and it changes everywhere that accreditation appears.

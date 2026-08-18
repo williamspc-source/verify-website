@@ -8,6 +8,7 @@ import React, { cache } from 'react'
 import RichText from '@/components/RichText'
 import { Media } from '@/components/Media'
 import { Icon } from '@/components/Icon'
+import { ACCREDITATION_ICON, qualificationIcon } from '@/utilities/qualificationIcon'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -95,10 +96,18 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
 
   const s = specialist as Specialist & Record<string, unknown>
   const photo = typeof s.photo === 'object' ? s.photo : null
-  const specialtyTitle =
+  // The reference prints the job title here ("Consultant Spinal Surgeon"), not
+  // the specialty. This used to prefer `specialty.title` — and since `specialty`
+  // is `required: true`, the `position` half could never be reached, so a field
+  // seeded for all 26 specialists rendered on none of them. `position` is
+  // optional, hence the fallback: a specialist added without one still gets a
+  // line rather than an empty gap.
+  const subtitle =
+    (s.position as string) ||
     (typeof s.specialty === 'object' && s.specialty
-      ? (s.specialty as { title?: string }).title
-      : '') || (s.position as string) || ''
+      ? ((s.specialty as { title?: string }).title ?? '')
+      : '') ||
+    ''
   const locations = relTitles(s.locations)
   const languages = Array.isArray(s.languages)
     ? (s.languages as { language?: string }[]).map((l) => l.language).filter(Boolean)
@@ -108,7 +117,15 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   const qualifications = Array.isArray(s.qualifications)
     ? (s.qualifications as { qualification?: string; icon?: string }[])
     : []
-  const accreditations = relTitles(s.accreditations)
+  // `relTitles` keeps only the title, which is why the accreditation icon could
+  // not reach the JSX and was hardcoded there instead — leaving `Accreditations.icon`
+  // an editor control that did nothing.
+  const accreditations = Array.isArray(s.accreditations)
+    ? (s.accreditations as unknown[])
+        .filter((x): x is { title?: string; icon?: string } => typeof x === 'object' && x !== null)
+        .map((x) => ({ title: x.title ?? '', icon: x.icon }))
+        .filter((x) => x.title)
+    : []
 
   return (
     <article>
@@ -137,7 +154,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
                 label={crumbSettings.navLabel}
               />
               <h1 className="profile-name">{s.title}</h1>
-              {specialtyTitle ? <p className="profile-specialty">{specialtyTitle}</p> : null}
+              {subtitle ? <p className="profile-specialty">{subtitle}</p> : null}
               <div className="profile-hero-meta">
                 {locations.length ? (
                   <div className="profile-location">
@@ -213,7 +230,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
                   <ul className="profile-qual-list">
                     {qualifications.map((q, i) => (
                       <li key={i}>
-                        <Icon name={q.icon || 'medal'} className="profile-qual-icon" />
+                        <Icon name={q.icon || qualificationIcon(q.qualification)} className="profile-qual-icon" />
                         {q.qualification}
                       </li>
                     ))}
@@ -228,9 +245,9 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
                   </div>
                   <ul className="profile-qual-list">
                     {accreditations.map((a) => (
-                      <li key={a}>
-                        <Icon name="seal-check" className="profile-qual-icon" />
-                        {a}
+                      <li key={a.title}>
+                        <Icon name={a.icon || ACCREDITATION_ICON} className="profile-qual-icon" />
+                        {a.title}
                       </li>
                     ))}
                   </ul>

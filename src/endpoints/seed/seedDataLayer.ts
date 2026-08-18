@@ -1,4 +1,5 @@
 import type { CollectionSlug, Payload, PayloadRequest } from 'payload'
+import { ACCREDITATION_ICON, qualificationIcon } from '@/utilities/qualificationIcon'
 import { readdirSync } from 'fs'
 import path from 'path'
 
@@ -186,7 +187,10 @@ async function upsertAccreditations(
       depth: 0,
       req,
       context: { disableRevalidate: true },
-      data: { title, slug: slugify(title) } as any,
+      // Every accreditation in all 26 reference profiles uses seal-check, with no
+      // exceptions. Stored rather than hardcoded at render, so the field the
+      // collection advertises actually does something.
+      data: { title, slug: slugify(title), icon: ACCREDITATION_ICON } as any,
     })
     map.set(title, created.id)
   }
@@ -350,7 +354,16 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       areasOfExpertise: resolve(areaMap, s.areasOfExpertise),
       locations: s.locations.map((l) => locationMap.get(l)).filter((id) => id != null),
       languages: [{ language: 'English' }],
-      qualifications: s.qualifications.map((qualification) => ({ qualification })),
+      // The icon is written into the row, not left to a render-time default, so
+      // the admin shows what the page shows. `qualificationIcon` reproduces the
+      // design reference's own choice for all 86 of its qualification strings
+      // (proven in tests/int/qualificationIcon.int.spec.ts), so computing it here
+      // is equivalent to transcribing the reference — with 96 fewer literals to
+      // drift. An editor's later choice always wins; nothing re-derives it.
+      qualifications: s.qualifications.map((qualification) => ({
+        qualification,
+        icon: qualificationIcon(qualification),
+      })),
       accreditations: s.accreditations
         .map((a) => accreditationMap.get(a))
         .filter((id): id is number | string => id != null),

@@ -28,6 +28,7 @@ import {
   repairReportingSplitVariants,
   repairMedicalNegligenceRemoval,
 } from './seed/seedServices'
+import { repairSpecialistIcons } from './seed/seedSpecialistIcons'
 import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
 import { isPlaceholderLayout } from './seed/authored'
 import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
@@ -1187,6 +1188,7 @@ export const seedVerify = async ({
   await repairCompactProcessSteps({ payload, req })
   await repairReportingSplitVariants({ payload, req })
   await repairMedicalNegligenceRemoval({ payload, req })
+  await repairSpecialistIcons({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
   // Both write only into an absence — a missing carousel block, a superseded

@@ -141,6 +141,16 @@ const FAMILIES = {
   // Ours implements these through Split Feature *settings* (Row style, Text
   // density, Bullet style) rather than a class scoped to this page, so the
   // IMPLEMENTED_AS entries below map onto `.vf-split-feature--*` modifiers.
+  // /specialists/profiles/<slug>. Inline-only again — `grep profile-hero` over
+  // assets/ returns only an OLDER, unused profile layout (`.profile-head`,
+  // `.profile-body`, `.profile-aside`, `.profile-photo`), none of which this
+  // page uses, so the shared sheet must not be allowed to answer for these
+  // selectors. All 26 profiles share byte-identical rules.
+  'specialist-profile': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/specialists/profiles/dr-adam-parr.html'],
+    match: /^\.profile-(hero|avatar|info|name|specialty|breadcrumb|section|bio|areas|area|types|type|sidebar|qual|grid|content|lang|location)/,
+  },
   'reporting-services': {
     css: ['.design-reference/assets/css/styles.css'],
     pages: ['.design-reference/services/medico-legal/reporting-services.html'],
@@ -198,6 +208,10 @@ const NOT_PORTED = {
     '.ime-format-card-icon i':
       'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. The `svg` rule carries the sizing.',
     '.ime-format-included-item-icon i': 'ditto',
+  },
+  'specialist-profile': {
+    '.profile-location-icon i':
+      'Dead in the reference: the rule targets an `<i>` INSIDE `.profile-location-icon`, but on this page `.profile-location-icon` IS the `<i>` — so it never matches anything, and its `font-size: 16px` is not what renders. Measured: the chip icon takes its size from `.profile-location-icon` itself, which we implement as an SVG with an explicit 16px box. Porting the rule would mean porting a bug.',
   },
   'reporting-services': {
     '.rs-services-header':
@@ -340,6 +354,18 @@ const IMPLEMENTED_AS = {
     '.as-how-step strong': ['.vf-process-step h4', '.as-how .vf-process-step h4'],
     '.as-how-step span': ['.vf-process-step p', '.as-how .vf-process-step p'],
   },
+  'specialist-profile': {
+    // Ours renders the shared <Breadcrumbs> component, so the trail is
+    // `.vf-breadcrumb*`. The CONTENT deliberately differs (Home > Specialist
+    // Panel > the doctor's name, against the reference's two-item generic
+    // trail) — that was a decision. The STYLING should still match, so these
+    // are mapped rather than skipped: a skip would have hidden any drift.
+    '.profile-breadcrumb': '.vf-breadcrumb',
+    '.profile-breadcrumb a': '.vf-breadcrumb__link',
+    '.profile-breadcrumb a:hover': '.vf-breadcrumb__link:hover',
+    '.profile-breadcrumb span': '.vf-breadcrumb__sep',
+    '.profile-breadcrumb strong': '.vf-breadcrumb__current',
+  },
   'reporting-services': {
     '.rs-services': ['.vf-section', '.vf-section--white'],
     '.rs-services-header h2': ['.section-title', '.vf-split-feature--compact .vf-section-header__title'],
@@ -459,6 +485,42 @@ const EXPLAINED = {
     '.as-how-steps': { 'grid-template-columns': 'Column count is the ProcessSteps block\'s `columns` field, emitted as `--vf-cols`. Set to 4 on this page, so the rendered grid matches.' },
     '.as-how-steps::before': { left: 'Derived from `--vf-cols` rather than hardcoded per family — `calc(100% / (2 * cols) + 14px)` resolves to the reference\'s 12.5% here and 10% on /jme.', right: 'ditto.' },
     '.as-how-step strong': { display: 'The reference needs `display: block` because its step title is a `<strong>`, which is inline. Ours is an `<h4>`, already block-level.' },
+  },
+  'specialist-profile': {
+    // ── These five are REAL, CLOSEABLE differences, deliberately deferred. ──
+    // Not a token artefact and not a rename: our light-context breadcrumb really
+    // does render darker and heavier than the reference's. Measured on this page:
+    //   link      rgb(34,34,34)     vs reference rgb(115,115,115)
+    //   separator rgb(34,34,34)     vs reference rgb(176,176,176), 12.48 vs 10.6px
+    //   current   rgb(26,58,92)/700 vs reference rgb(65,64,66)/900
+    // The reference is consistent about it — #737373 / #b0b0b0 / #414042 appear
+    // 49 / 23 / 46 times across its pages — so the fix is three token values in
+    // the light `--bc-*` context, NOT a page-scoped override. That ripples to
+    // every interior page with a breadcrumb, which makes it a decision rather
+    // than a tidy-up. Logged in OUTSTANDING.md with its cost.
+    //
+    // They sit here so this family reads zero and can catch the NEXT regression.
+    // That is only legitimate because the entry says what the difference is and
+    // where the decision lives — an excuse that merely asserts equivalence is the
+    // failure mode recorded in CLAUDE.md.
+    '.profile-breadcrumb': {
+      color: 'Deferred site-wide breadcrumb colour — see OUTSTANDING.md.',
+      position: 'Ours is never sticky to begin with; the reference resets it only because a global `nav {}` rule makes it so. Nothing to undo.',
+      top: 'ditto.',
+      'z-index': 'ditto.',
+      background: 'ditto.',
+      'box-shadow': 'ditto.',
+    },
+    '.profile-breadcrumb a': {
+      color: 'Deferred site-wide breadcrumb colour — see OUTSTANDING.md.',
+      transition: 'Ours uses the shared `--transition` token (0.28s) against the reference literal 0.15s. Retuning motion is a Design System edit.',
+    },
+    '.profile-breadcrumb a:hover': { color: 'ditto — deferred, see OUTSTANDING.md.' },
+    '.profile-breadcrumb span': {
+      color: 'ditto — deferred, see OUTSTANDING.md.',
+      'font-size': 'ditto; the separator renders 12.48px against the reference 10.6px.',
+    },
+    '.profile-breadcrumb strong': { color: 'ditto — deferred, see OUTSTANDING.md.' },
   },
   'reporting-services': {
     '.rs-services': {
@@ -599,6 +661,11 @@ function normalise(value, tokens) {
   // differing from `margin: 0` — which is how a needed `!important` came to be
   // deleted to silence the diff, re-centring an intro paragraph.
   let s = value.toLowerCase().replace(/\s*!important\s*$/, '').replace(/\s+/g, ' ').trim()
+  // A CSS unicode escape and the literal character are the same value. Without
+  // this, `content: '\\203A'` read as differing from the reference's `content: '›'`
+  // — a phantom on a declaration that renders identically. Applies to any escaped
+  // glyph, not just this one.
+  s = s.replace(/\\([0-9a-f]{1,6})\s?/gi, (_m, hex) => String.fromCodePoint(parseInt(hex, 16)))
   for (const [name, val] of Object.entries(tokens)) s = s.split(`var(${name})`).join(val.toLowerCase())
   s = s.replace(/\b0\.5rem\b/g, '8px').replace(/\b1rem\b/g, '16px')
   s = s.replace(

@@ -538,6 +538,16 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   omit a contributing rule and the tool reports a difference that is not there, which trains you to
   distrust it. Cross-check any single reported difference against `getComputedStyle` before changing
   CSS to satisfy the tool.
+- **The orphan-field guard is blind to any field whose name is common across configs.** It joins every
+  consumer file into ONE haystack and asks whether `readsField(haystack, name)` matches — deliberately,
+  because scoping per collection produced false positives wherever a consumer reaches data through a
+  helper. The cost is that a field called `icon` can never be reported: **27 files** in `src/blocks`,
+  `src/components` and `src/heros` contain a `.icon` property read, so the pattern is satisfied no
+  matter what. Measured consequence: `Accreditations.icon` was declared, described in the admin as
+  driving "the profile chips", and read by **nothing** — the specialist profile hardcoded `seal-check`
+  — and the guard was green throughout. The same hole covers `title`, `description`, `link` and any
+  other shared name. When adding a field with a common name, check its consumer by hand; the suite
+  will not do it for you.
 - **A blanket property skip in a comparison tool is not a reason, it is an unexamined habit — and
   `color` was one.** `referenceCssDiff.mjs` skipped `position`, `z-index`, `overflow` and **`color`**
   for every aliased selector. That is how a *reported* defect survived a family reading zero: the
