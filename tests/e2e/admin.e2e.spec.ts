@@ -1,9 +1,13 @@
 import { test, expect, Page } from '@playwright/test'
 import { login } from '../helpers/login'
-import { seedTestUser, cleanupTestUser, testUser } from '../helpers/seedUser'
+import { seedTestUser, cleanupTestUser, cleanupPage, testUser } from '../helpers/seedUser'
 
 test.describe('Admin Panel', () => {
   let page: Page
+
+  // Set by the create-view test below. Opening the Create New form autosaves an
+  // empty Pages draft immediately, so the suite has to take it away again.
+  let createdPageId: string | undefined
 
   test.beforeAll(async ({ browser }) => {
     await seedTestUser()
@@ -15,6 +19,7 @@ test.describe('Admin Panel', () => {
   })
 
   test.afterAll(async () => {
+    await cleanupPage(createdPageId!)
     await cleanupTestUser()
   })
 
@@ -47,5 +52,11 @@ test.describe('Admin Panel', () => {
     await expect(page).toHaveURL(/\/admin\/collections\/pages\/[a-zA-Z0-9-_]+/)
     const editViewArtifact = page.locator('#field-title')
     await expect(editViewArtifact).toBeVisible()
+
+    // The id Payload redirected to IS the autosaved draft — the URL assertion
+    // above only passes because one was created. Record it so afterAll can
+    // remove it; `create` itself is not an id.
+    const id = new URL(page.url()).pathname.split('/').pop()
+    if (id && id !== 'create') createdPageId = id
   })
 })

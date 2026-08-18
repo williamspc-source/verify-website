@@ -337,6 +337,11 @@ to those, so make them when you are ready.
 
 ## 10. Traps worth knowing
 
+- **Opening "Create New" creates the record straight away — before you type anything.** Pages,
+  Articles and Events save themselves continuously so live preview works, which means clicking
+  *Create New* to have a look and then navigating away leaves an empty `<No Title>` row behind. If
+  you open one by mistake, delete it before you leave. (74 of these had built up and were cleared on
+  18 Aug 2026 — one Article and one Event from clicking about, the rest from the test suite.)
 - **An article with no Stream has no web address.** It will not appear anywhere.
 - **Deleting a Stream strands every article in it.** Move them first.
 - **Changing a page's Parent changes its URL** and breaks saved links. Add a Redirect.
