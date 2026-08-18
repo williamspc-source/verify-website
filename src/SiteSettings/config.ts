@@ -2,6 +2,12 @@ import type { GlobalConfig } from 'payload'
 
 import { revalidateSiteSettings } from './hooks/revalidateSiteSettings'
 import { colorField } from '@/fields/colorField'
+// Shared with the buttons that send this email, so the wording cannot drift
+// between the admin default and what a visitor's mail app is handed.
+import {
+  REGISTRATION_ENQUIRY_BODY,
+  REGISTRATION_ENQUIRY_SUBJECT,
+} from '@/utilities/enquiryEmail'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -70,6 +76,46 @@ export const SiteSettings: GlobalConfig = {
         description:
           'The form that the site-wide “Make an Enquiry” drawer submits into. Every enquiry button on the site posts here, and the chosen form’s Emails tab decides who is notified. If this is empty the drawer tells visitors it is unavailable rather than silently discarding their enquiry — so set it, and check it after renaming any form.',
       },
+    },
+    {
+      type: 'collapsible',
+      label: 'Booking portal registration email',
+      admin: {
+        initCollapsed: true,
+        description:
+          'Portal access is by registration only, so the “Email Us to Register” button on Contact and the “Register an Account” button on Make a Booking open the visitor’s mail app with this message already written. Both buttons read the wording below, so editing it here changes it in both places. Clearing “Send to” deliberately disables those buttons rather than opening an addressless email.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'registrationEnquiryEmail',
+              type: 'text',
+              label: 'Send to',
+              defaultValue: 'admin@vmls.com.au',
+              admin: { width: '50%', description: 'Where the registration request is sent.' },
+            },
+            {
+              name: 'registrationEnquirySubject',
+              type: 'text',
+              label: 'Subject',
+              defaultValue: REGISTRATION_ENQUIRY_SUBJECT,
+              admin: { width: '50%' },
+            },
+          ],
+        },
+        {
+          name: 'registrationEnquiryBody',
+          type: 'textarea',
+          label: 'Body',
+          defaultValue: REGISTRATION_ENQUIRY_BODY,
+          admin: {
+            description:
+              'The visitor sees this in their mail app and fills in the blanks. Blank lines and spacing are kept exactly as typed.',
+          },
+        },
+      ],
     },
     {
       name: 'colors',

@@ -2237,3 +2237,63 @@ These patterns showed up on multiple pages throughout this review and are most e
 **Superseded by Comparison 22 (2026-08-17).** Items 1–6, 8 and 11–13 are verified resolved; that
 recommendation is spent. What remains of this list is item 9 (three Featured cards on In the Loop)
 and item 7 (unverified). The open work is now in Comparison 22 §A–F, not here.
+
+---
+
+## Comparison 37: a prefilled registration email, editable in one place (2026-08-18)
+
+Requested by the team, not a reference gap: portal access is by registration only, so a visitor
+should be able to click once and have the enquiry written for them — the same convenience the
+availability grid already offers. Two buttons: a new one on `/contact`'s Online Booking Portal card
+below **Call 07 3356 0469**, and `/make-a-booking`'s existing **Register an Account**, which merely
+navigated to `/contact`.
+
+### The copy is a port, the button is not
+
+The reference already wrote this email and ships it on **28** of its own pages as a `Send Enquiry`
+button — subject `VERIFY Booking Portal Access Request`, body asking for Full Name /
+Company/Organisation / Contact Number / Email Address. That wording is carried over **byte for byte**,
+trailing spaces after each label included, and the e2e test parses it out of
+`.design-reference/specialists/profiles/dr-adam-parr.html` rather than restating it, so a drift in
+the port cannot be absorbed by editing the assertion.
+
+**The Contact card button itself is a deliberate addition the reference does not have** — its card
+offers only the phone number. Recorded here so a later audit does not "correct" it away.
+`/make-a-booking`'s reference link points at `/contact.html`; sending it to the mail client instead
+is also deliberate, and the page's closing CTA band still offers the enquiry form.
+
+### Where it is edited
+
+One template in **Site Settings → Booking portal registration email** (send-to, subject, body). Both
+buttons read it at render, so one edit changes both — proven by setting the subject to
+`EDITOR WORDING TEST` and watching both pages change on the **first** reload.
+
+### The constraint that shaped it
+
+`CMSLink` cannot become async — three client components import it (`HighImpact`, `Header/Nav`,
+`Header/Component.client`). So the new `portalEnquiry` link type is resolved into a `mailto:` by the
+*block*, and is offered **only on the two blocks that resolve it** (`link({ portalEnquiry: true })`).
+Offering it everywhere would have produced a control an editor can set that renders an inert span —
+the failure this repo exists to prevent. The enum bears this out: `portalEnquiry` exists on
+`enum_pages_blocks_button_links_link_type` and `enum_bkchooser_halves_links_link_type` and on nothing
+else.
+
+TypeScript enforces it too. The resolver's return type narrows `type` to what `CMSLink` accepts, so a
+block that forwards raw links fails to compile — observed, not assumed: both call sites errored with
+`'portalEnquiry' is not assignable` before they were wired up.
+
+### Measured
+
+- `/contact` carried **3** plain `mailto:admin@vmls.com.au` links before this and **0** with a
+  subject, so every assertion is scoped to the portal card and keyed on the subject. Without that, an
+  unscoped "is there a mailto?" passes whether or not the button was ever added.
+- Blanking the recipient renders `data-link-unresolved` and **no** `mailto:?subject=` anywhere —
+  both states asserted, not just the working one.
+- The new button's computed style is **byte-identical** to the phone button above it.
+- Snapshot: `/contact` only (80 nodes, +5 real), plus the usual `/in-the-loop` scroll-reveal frame.
+  `/make-a-booking` is clean — only an href changed, and href is not a measured property.
+- The one non-obvious node: `.ct-portal-card__features` went `margin-top: 43.125px → 0px`. That is
+  `margin-top: auto` doing its job — the features block absorbs the card's slack, and a third button
+  consumed it. No overflow; the 1px separator and 22px padding are intact.
+
+All **13** diff families still zero; the new button is not in the reference, so none should move.

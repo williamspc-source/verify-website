@@ -66,6 +66,7 @@ Every rule below is here because that failure already happened once in this repo
 | **Never call `revalidatePath`/`revalidateTag` from `next/cache` directly.** Use `safeRevalidatePath` / `safeRevalidateTag` from `src/utilities/safeRevalidate.ts`, and honour `context.disableRevalidate`. | Next 16 throws when either is called outside a Server Action or route handler, and Payload runs `afterChange` *inside the transaction*. Building the **Create New** form state tripped it, so `/admin/collections/pages/create` rendered the sidebar and **no form at all** — zero inputs, HTTP 200, nothing in the browser console. No page or post could be created. Same for CLI and job writes, where the throw rolls the write back. |
 | **Never pass a named cacheLife profile to a tag purge.** `safeRevalidateTag(tag)` takes no profile and always sends `{ expire: 0 }`. Guarded by `adminControls.int.spec.ts`. | Every purge in the repo used to pass `'max'`. Given *any* profile Next sets `stale = now` but `expired = now + expire*1000` — and `max`'s expire is a **year**, which `areTagsExpired` (`expiredAt <= now`) never satisfies. So the tag went stale-while-revalidate instead of expiring. Measured under `next start`: after saving a Design System token, the editor's **first reload served the old value**, and three quick edits left the page two versions behind. Related: a tag purge only reaches the manifest of the process that calls it, so a `payload run` script cannot purge a separately running server. |
 | **`308` only for moves that will never change again.** Anything whose destination an editor can change is `307`. | `/posts/<slug>` 308'd to a stream-derived URL; browsers cache that forever, so reassigning an article's stream stranded everyone who had followed the old link. |
+| **`CMSLink` is imported by client components, so it cannot be async.** A link type needing a server lookup is resolved by the *block*, and offered only on blocks that resolve it (`link({ portalEnquiry: true })`). | Making it async would break `HighImpact`, `Header/Nav` and `Header/Component.client`. Offering `portalEnquiry` on every block instead would give an editor a type that renders an inert `data-link-unresolved` span wherever nothing resolves it — a control that can be set and silently does nothing. The resolver's return type narrows `type` to CMSLink's union, so a block that forwards raw links fails to compile; both call sites errored with `'portalEnquiry' is not assignable` before they were wired. |
 | **A component that hardcodes `appearance="inline"` must have `appearances: false` in its config**, or read `.appearance` itself. | `CMSLink` destructures `appearance`, so a literal after `{...link}` wins and the editor's stored choice is discarded. |
 | **Queries against draft-enabled collections pass `overrideAccess` explicitly.** The Local API defaults to `overrideAccess: true`. | A legacy `/specialists/<slug>` URL matched *unpublished* specialists and 308'd to a profile that 404s — while its own comment claimed it checked for published ones. |
 | **After any collection/global field change:** `pnpm generate:types` locally, `migrate:create` + `migrate` on the box. Dev auto-push hides schema drift. | The checked-in baseline silently fell behind by ~29 FK columns plus several new fields. |
@@ -564,6 +565,16 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   declared none — the detail descriptions rendered at **18px/30.6px against 12.8px/19.84px**, which is
   why those cards ran far taller than the reference's. The tool cannot check a claim like that; only
   reading the reference can. Treat every `null` mapping as an assertion needing evidence.
+- **A BEM parent class can be absent while all its children are present, and the page still looks
+  right.** `/contact`'s portal card renders correctly, and `.ct-portal-card` — the *bare* class —
+  never reaches the DOM at all; only `__head`, `__label`, `__text`, `__btn` and `__features` do. So
+  the three rules scoped to `.ct-page .ct-portal-card` (globals.css 9182, 9201, 9202) are dead, and
+  were invisible because a *separate* live rule (`.ct-enquiry-grid .ct-portal-card__btn`) already
+  supplies the same treatment. Checking for `ct-portal-card` with a substring grep says "present" —
+  every child class contains it. Split the class attribute into a set and test membership, and keep a
+  child class as the positive control. Note the fix is not simply to add the parent class: the dead
+  rule sets `margin: 12px 0 4px` where the live one sets `margin-top: 12px`, so restoring it would
+  move the page.
 - **A page-scoped `cssClass` is stored data, so CSS written against one is unreachable until a repair
   puts the class in the database.** `/specialists/join-expert-panel` had a complete, correct port of its
   enquiry band — the 1fr 1.5fr grid, the left-aligned intro, the form promoted to a card — hung off four

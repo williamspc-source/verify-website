@@ -11,6 +11,9 @@ export const Button: Block = {
   fields: [
     linkGroup({
       appearances: ['default', 'outline'],
+      // Offers "Registration enquiry email". Safe here because ButtonBlock
+      // resolves that type into a mailto before it reaches CMSLink.
+      portalEnquiry: true,
       overrides: { minRows: 1, maxRows: 4, label: 'Buttons' },
     }),
     { type: 'row', fields: [buttonSizeField, textAlignField] },

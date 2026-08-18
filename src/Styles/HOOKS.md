@@ -574,6 +574,32 @@ achieve this with a hand-written style class; it is one setting now, so any form
 and so does a dropdown, where it replaces the default "Select…" line. A placeholder is *not* a default
 value — it is never submitted, so it cannot arrive in an enquiry as if the visitor typed it.
 
+### A button that opens a prefilled email
+
+Portal access is by registration only, so two buttons open the visitor's mail app with the whole
+enquiry already written — they only fill in the blanks and hit send. **"Email Us to Register"** on
+Contact's Online Booking Portal card, and **"Register an Account"** on Make a Booking.
+
+**You edit the message in one place: Site Settings → Booking portal registration email.**
+
+| Field | What it is |
+|---|---|
+| **Send to** | Where the enquiry arrives. Currently `admin@vmls.com.au`. |
+| **Subject** | The subject line the visitor's mail app is given. |
+| **Body** | The message itself. Blank lines and spacing are kept exactly as you type them, so the `Full Name:` / `Company/Organisation:` prompts stay on their own lines. |
+
+Both buttons read the same settings, so changing the wording here changes it in both places — you do
+not need to find and edit each button.
+
+> **Clearing "Send to" switches the buttons off**, on purpose: they render as plain grey text instead
+> of links. An email with no recipient would open an empty compose window and look like it worked, so
+> a visibly dead button is the honest outcome. Put an address back and they return.
+
+To put this on another button: **Pages → the page → a Button block → the link → Registration enquiry
+email**. It needs no URL — the address and wording come from Site Settings. The option appears only on
+Button blocks and the Make a Booking chooser panels, which are the two that know how to build the
+email; it is deliberately absent elsewhere rather than offered and silently doing nothing.
+
 ### Two-column rows that are not 50/50
 
 **Pages → the page → the Row block → Column ratio.** Leave it unset for equal columns. The other

@@ -1,4 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 /**
  * Site-wide link audit.
@@ -445,6 +447,106 @@ test.describe('Links', () => {
         await page.close()
       }
       await context.close()
+    }
+  })
+
+  /**
+   * The registration enquiry email.
+   *
+   * Portal access is by registration only, so two buttons open the visitor's mail
+   * app with the request already written: "Email Us to Register" on /contact and
+   * "Register an Account" on /make-a-booking. Both read one template in Site
+   * Settings, so this asserts the *decoded* subject and body rather than the
+   * presence of a link.
+   *
+   * ── Why the crawl above does not cover this ──
+   * It filters `mailto:` out at both the collection and the fragment step (a
+   * mail client is not something Playwright can follow), so these buttons are
+   * invisible to it. Without these tests the feature would be entirely unguarded.
+   *
+   * ── Why the selectors are scoped ──
+   * /contact already carried three plain `mailto:admin@vmls.com.au` links before
+   * this feature existed — the hero meta item and the map's "Email Us" — so an
+   * unscoped "is there a mailto?" passes whether or not the button was ever
+   * added. Measured before the change: 3 mailtos on the page, 0 of them carrying
+   * a subject. Everything below is scoped to the portal card and keyed on the
+   * subject, so the assertion cannot be satisfied by the pre-existing links.
+   *
+   * The expected wording is parsed out of the design reference rather than
+   * copied into this file, so a drift in the port cannot be absorbed by editing
+   * the assertion — the same rule the CSS diff tool follows.
+   */
+  test('the registration buttons open a prefilled email matching the reference', async ({
+    page,
+    baseURL,
+  }) => {
+    const base = baseURL!
+
+    // The reference ships this exact email on 28 of its own pages.
+    const refHtml = readFileSync(
+      join(process.cwd(), '.design-reference/specialists/profiles/dr-adam-parr.html'),
+      'utf8',
+    )
+    const refMatch = refHtml.match(/href="(mailto:[^"]*Portal%20Access[^"]*)"/)
+    expect(refMatch, 'the design reference should contain the portal-access mailto').toBeTruthy()
+    const ref = new URL(refMatch![1])
+    const refSubject = ref.searchParams.get('subject')
+    const refBody = ref.searchParams.get('body')
+    expect(refBody, 'the reference body should be non-empty').toBeTruthy()
+
+    // ── /contact — scoped to the Online Booking Portal card ──
+    await page.goto(`${base}/contact`, { waitUntil: 'load' })
+    // Scoped to the portal card's own button area. NOT `.ct-portal-card` — that
+    // class is in globals.css but never reaches the DOM (the seed sets only the
+    // BEM children), so a selector built on it silently matches nothing.
+    const card = page.locator('.ct-portal-card__btn')
+    expect(
+      await card.count(),
+      'the portal card should hold Log In, Call, and the new email button',
+    ).toBe(3)
+
+    const pageMailtos = await page
+      .locator('a[href^="mailto:"]')
+      .evaluateAll((els) => els.map((e) => e.getAttribute('href') || ''))
+    expect(
+      pageMailtos.length,
+      'positive control: /contact has plain mailto links, so a bare "is there a mailto" check would pass regardless',
+    ).toBeGreaterThan(1)
+
+    const subjectBearing = pageMailtos.filter((h) => h.includes('subject='))
+    expect(
+      subjectBearing.length,
+      'exactly one mailto on /contact should carry a subject (it was 0 before this feature)',
+    ).toBe(1)
+
+    const cardLink = card.locator('a[href^="mailto:"]').first()
+    expect(await cardLink.count(), 'the email button should be inside the portal card').toBe(1)
+    expect((await cardLink.innerText()).trim()).toBe('Email Us to Register')
+
+    // ── Both buttons, decoded ──
+    const targets: { label: string; href: string }[] = [
+      { label: '/contact card button', href: (await cardLink.getAttribute('href')) || '' },
+    ]
+
+    await page.goto(`${base}/make-a-booking`, { waitUntil: 'load' })
+    const register = page
+      .locator('.booking-half-actions a', { hasText: 'Register an Account' })
+      .first()
+    expect(await register.count(), '"Register an Account" should be on /make-a-booking').toBe(1)
+    const registerHref = (await register.getAttribute('href')) || ''
+    expect(
+      registerHref,
+      '"Register an Account" used to navigate to /contact and should now open an email',
+    ).not.toBe('/contact')
+    targets.push({ label: '/make-a-booking Register an Account', href: registerHref })
+
+    for (const { label, href } of targets) {
+      expect(href.startsWith('mailto:'), `${label}: href is ${href.slice(0, 60)}`).toBe(true)
+      const url = new URL(href)
+      expect(url.pathname, `${label}: recipient`).toBe('admin@vmls.com.au')
+      expect(url.searchParams.get('subject'), `${label}: subject`).toBe(refSubject)
+      // Byte-for-byte, trailing spaces after each blank included.
+      expect(url.searchParams.get('body'), `${label}: body`).toBe(refBody)
     }
   })
 })

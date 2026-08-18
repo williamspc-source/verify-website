@@ -5,9 +5,15 @@ import type { ButtonBlock as Props } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { resolveRegistrationLinks } from '@/utilities/registrationEnquiry'
 
-export const ButtonBlock: React.FC<Props> = ({ links, size, align, cssClass }) => {
+export const ButtonBlock: React.FC<Props> = async ({ links, size, align, cssClass }) => {
   if (!Array.isArray(links) || links.length === 0) return null
+
+  // Turns any "Registration enquiry email" link into the mailto configured in
+  // Site Settings. No-ops (and reads no global) when the block has none.
+  const resolved = await resolveRegistrationLinks(links)
+
   return (
     <div
       className={cn(
@@ -16,7 +22,7 @@ export const ButtonBlock: React.FC<Props> = ({ links, size, align, cssClass }) =
         toClassName(cssClass),
       )}
     >
-      {links.map(({ link }, i) => (
+      {resolved.map(({ link }, i) => (
         <CMSLink
           key={i}
           {...link}

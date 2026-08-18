@@ -175,6 +175,32 @@ legitimate only because the entries say what the difference is rather than asser
 
 ---
 
+## 6. Three dead rules on a BEM parent class that never reaches the DOM
+
+Found while verifying Comparison 37, by splitting `/contact`'s class attributes into a set rather than
+grepping for a substring.
+
+`globals.css` scopes three rules to `.ct-page .ct-portal-card` — lines **9182**, **9201** and
+**9202**. The bare class **is not in the served HTML**. Only the children are (`__head`, `__label`,
+`__text`, `__btn`, `__features`), and `ct-page` itself is present, so the scoping is fine and only the
+parent hook is missing. A substring grep for `ct-portal-card` reports it present, because every child
+class contains that string — which is why it went unnoticed.
+
+Nothing is visibly wrong, because a **separate live rule** supplies the same treatment:
+`.ct-page .ct-enquiry-grid .ct-portal-card__btn` (line 10737) already sets the button margin and
+full-width sizing.
+
+**Why it is not simply "add the missing class":** the dead rule sets `margin: 12px 0 4px` where the
+live one sets `margin-top: 12px`. Restoring the parent class would introduce a 4px bottom margin on
+every portal-card button group and move the page. The safe fix is to **delete** the three dead rules,
+which is a tidy-up with a snapshot re-baseline attached rather than a bug fix — hence recorded rather
+than done inside a feature pass.
+
+**Cost:** three lines deleted, one snapshot compare on `/contact` to confirm nothing moves. Worth
+folding into the next `findDeadCss.mjs` sweep rather than doing alone.
+
+---
+
 ## 1. The outstanding migration
 
 Not a code fix, and not a defect. The local database has been kept in step by the Postgres adapter's

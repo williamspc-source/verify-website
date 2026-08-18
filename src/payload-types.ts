@@ -2318,7 +2318,7 @@ export interface ButtonBlock {
   links?:
     | {
         link: {
-          type?: ('reference' | 'custom' | 'enquiry') | null;
+          type?: ('reference' | 'custom' | 'enquiry' | 'portalEnquiry') | null;
           newTab?: boolean | null;
           /**
            * You can link to a draft. The link will 404 for visitors until that document is published.
@@ -10573,7 +10573,7 @@ export interface BookingChooserBlock {
         links?:
           | {
               link: {
-                type?: ('reference' | 'custom' | 'enquiry') | null;
+                type?: ('reference' | 'custom' | 'enquiry' | 'portalEnquiry') | null;
                 newTab?: boolean | null;
                 /**
                  * You can link to a draft. The link will 404 for visitors until that document is published.
@@ -15109,6 +15109,15 @@ export interface SiteSetting {
    */
   enquiryForm?: (number | null) | Form;
   /**
+   * Where the registration request is sent.
+   */
+  registrationEnquiryEmail?: string | null;
+  registrationEnquirySubject?: string | null;
+  /**
+   * The visitor sees this in their mail app and fills in the blanks. Blank lines and spacing are kept exactly as typed.
+   */
+  registrationEnquiryBody?: string | null;
+  /**
    * Overrides the site colour palette at runtime. Empty fields use the built-in defaults. The “on dark” colours below are used automatically wherever text sits on a dark or coloured band — set those rather than restyling individual sections. Font families and sizes live in Design System.
    */
   colors?: {
@@ -16489,6 +16498,9 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   shield?: T;
   socialImage?: T;
   enquiryForm?: T;
+  registrationEnquiryEmail?: T;
+  registrationEnquirySubject?: T;
+  registrationEnquiryBody?: T;
   colors?:
     | T
     | {

@@ -70,8 +70,10 @@ export const BookingChooser: Block = {
             },
             {
               link: {
-                type: 'custom',
-                url: '/contact',
+                // Opens the visitor's mail app with the registration request
+                // already written; the wording lives in Site Settings. Used to
+                // be a plain link to /contact.
+                type: 'portalEnquiry',
                 label: 'Register an Account',
                 appearance: 'outline',
               },
@@ -118,6 +120,8 @@ export const BookingChooser: Block = {
         { name: 'description', type: 'textarea' },
         linkGroup({
           appearances: false,
+          // Resolved to a mailto by BookingChooserBlock before it reaches CMSLink.
+          portalEnquiry: true,
           overrides: {
             name: 'links',
             label: 'Call-to-action buttons',

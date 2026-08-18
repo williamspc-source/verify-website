@@ -8,6 +8,11 @@ import { Section } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { accentText } from '@/utilities/accentText'
+import {
+  applyRegistrationHref,
+  getRegistrationEnquiryHref,
+  hasRegistrationLink,
+} from '@/utilities/registrationEnquiry'
 
 // accent value → design-reference panel modifier class.
 const accentClass: Record<string, string> = {
@@ -15,13 +20,20 @@ const accentClass: Record<string, string> = {
   dark: 'booking-half--dark',
 }
 
-export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = ({
+export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = async ({
   anchorId,
   halves,
   cssClass,
   bare,
 }) => {
   if (!Array.isArray(halves) || halves.length === 0) return null
+
+  // Read once for the whole block, then applied per panel below: awaiting inside
+  // the halves map would hand React an array of promises. Skipped entirely when
+  // no panel uses a registration link.
+  const registrationHref = halves.some((half) => hasRegistrationLink(half?.links))
+    ? await getRegistrationEnquiryHref()
+    : null
 
   return (
     <Section
@@ -33,7 +45,10 @@ export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = ({
       <div className="booking-split">
         {halves.map((half, i) => {
           const modifier = accentClass[half?.accent || 'blue'] || accentClass.blue
-          const links = Array.isArray(half?.links) ? half.links : []
+          const links = applyRegistrationHref(
+            Array.isArray(half?.links) ? half.links : [],
+            registrationHref,
+          )
           const hasContent =
             half?.icon || half?.eyebrow || half?.title || half?.description || links.length > 0
           if (!hasContent) return null

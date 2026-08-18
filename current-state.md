@@ -20,7 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 36 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 37 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -41,7 +41,7 @@ One application serves both the public site and `/admin`.
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
 | `pnpm test:int` | **134/134**, 7 files |
-| `pnpm test:e2e` | **19/19**, 59.2s |
+| `pnpm test:e2e` | **20/20**, 2.6m |
 
 > The e2e run was against the **production** server on `:3000`, and the admin spec that
 > `OUTSTANDING.md` §2 reports as intermittent did not flake. That is consistent with §2's diagnosis
@@ -190,6 +190,15 @@ a missing capability rather than missing content — Payload's form-builder decl
 `select` alone — so the plugin now adds one to text/email/textarea/number and the renderer reads it.
 Thirteen diff families read zero.
 
+**Comparison 37** is the first team-requested feature rather than a reference gap: the two
+"register for the booking portal" buttons — new on `/contact`'s portal card, retargeted on
+`/make-a-booking` — now open the visitor's mail app with the enquiry already written. The wording is
+one template in **Site Settings → Booking portal registration email**, read at render, so one edit
+changes both. The body is the design reference's own, byte for byte. `CMSLink` cannot be async (three
+client components import it), so the new `portalEnquiry` link type is resolved by the block and
+offered only on the two blocks that resolve it — enforced by the resolver's return type, so
+forwarding a raw link is a compile error rather than a dead button.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items
@@ -198,6 +207,9 @@ Each is measured and justified in `OUTSTANDING.md` — do not re-derive them:
 
 - **§2** `admin.e2e.spec.ts` fails intermittently in a full run — a default 5s timeout against a
   cold admin bundle, not an admin fault. Test-only.
+- **§6** Three dead CSS rules scoped to `.ct-portal-card`, a class that never reaches the DOM. Nothing
+  renders wrong — a separate live rule covers it — and restoring the class would *move* the page, so
+  the fix is deletion, in the next dead-CSS sweep.
 - **§3** The three Payload-template hero types render their title at weight 400. No page uses one,
   but the dropdown offers them. Removing them needs a data migration over `_pages_v` history.
 - **§4** `.contact-form` padding follows the reference's superseded rule. Needs someone who knows

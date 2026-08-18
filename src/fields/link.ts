@@ -19,6 +19,13 @@ export const appearanceOptions: Record<LinkAppearances, { label: string; value: 
 type LinkType = (options?: {
   appearances?: LinkAppearances[] | false
   disableLabel?: boolean
+  // Offers the "Registration enquiry email" type. Opt-in, because that type has
+  // to be resolved into a mailto by the *block* before it reaches CMSLink —
+  // CMSLink cannot read the global itself (it is imported by client components,
+  // so it cannot be async). On a block that does not resolve it the link would
+  // render as an inert span, i.e. a control an editor can set that silently does
+  // nothing. Only pass this from a block that calls getRegistrationEnquiryHref().
+  portalEnquiry?: boolean
   // When true, the whole link is optional — reference/url/label are not required,
   // so a row/card can render no CTA at all (reference pages with no button).
   optional?: boolean
@@ -29,6 +36,7 @@ export const link: LinkType = ({
   appearances,
   disableLabel = false,
   optional = false,
+  portalEnquiry = false,
   overrides = {},
 } = {}) => {
   const req = !optional
@@ -63,6 +71,14 @@ export const link: LinkType = ({
                 label: 'Open enquiry form',
                 value: 'enquiry',
               },
+              ...(portalEnquiry
+                ? [
+                    {
+                      label: 'Registration enquiry email',
+                      value: 'portalEnquiry',
+                    },
+                  ]
+                : []),
             ],
           },
           {

@@ -356,6 +356,27 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
                       }),
                     ],
                   },
+                  // Beyond the reference, which offers only the phone number
+                  // here: registration is enquiry-only, so this opens the
+                  // visitor's mail app with the request already written. Wording
+                  // is shared with Make a Booking via Site Settings.
+                  {
+                    blockType: 'button',
+                    size: 'md',
+                    align: 'left',
+                    cssClass: ['ct-portal-card__btn'],
+                    links: [
+                      {
+                        link: {
+                          type: 'portalEnquiry',
+                          label: 'Email Us to Register',
+                          icon: 'envelope-simple',
+                          appearance: 'outline',
+                          newTab: false,
+                        },
+                      },
+                    ],
+                  },
                   {
                     blockType: 'iconList',
                     heading: 'What you can do in the portal',
@@ -422,7 +443,13 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
                 icon: 'arrow-right',
                 newTab: true,
               }),
-              custom('/contact', 'Register an Account'),
+              {
+                link: {
+                  type: 'portalEnquiry',
+                  label: 'Register an Account',
+                  newTab: false,
+                },
+              },
             ],
           },
         ],
