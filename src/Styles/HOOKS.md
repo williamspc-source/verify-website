@@ -557,3 +557,38 @@ default look stays visible somewhere.
 Light blue (solid), Primary and Dark. It is the palest of the blues — noticeably lighter than "Light
 blue (solid)" — and is what the design reference bands the Claimants FAQ, the contact enquiry panel
 and the appointment-guide highlight cards with. Its value is editable like every other band token.
+
+### The enquiry form — a card, and placeholders
+
+**Pages → the page → the Form block.** Two things you can now set that used to need a developer:
+
+| Setting | Choices | What changes |
+|---|---|---|
+| **Card style** | None · **Card** | Card wraps the whole block — intro heading included — in a white panel with a soft shadow, so the heading sits *inside* the box rather than above it. |
+
+Used on **Contact**, the **homepage** enquiry band and **Join Our Expert Panel**. All three used to
+achieve this with a hand-written style class; it is one setting now, so any form can have it.
+
+**Placeholders** are the grey prompt text inside an empty field ("you@company.com", "07 XXXX XXXX").
+**Forms → the form → the field → Placeholder.** Every text, email, number and long-text field has one,
+and so does a dropdown, where it replaces the default "Select…" line. A placeholder is *not* a default
+value — it is never submitted, so it cannot arrive in an enquiry as if the visitor typed it.
+
+### Two-column rows that are not 50/50
+
+**Pages → the page → the Row block → Column ratio.** Leave it unset for equal columns. The other
+options — 1 : 1.5, 1.5 : 1, 1 : 2, 2 : 1 — apply to two-column rows only, and stack on mobile like any
+other row. The Join Expert Panel enquiry band is 1 : 1.5, a narrow intro beside a wider form.
+
+Beside it, **Gap** gained an **Extra wide** step (72px), which is what the design reference uses
+between the columns of those bands — one notch wider than Wide.
+
+### An icon list can be left-aligned
+
+**Pages → the page → the Icon List block → Heading align.** The eyebrow, heading and intro above the
+list were always centred, with no way to change it. Leave it unset for centred; choose Left for a list
+that sits in a column beside something else, as the Join Expert Panel contact details do.
+
+> **An icon list whose items are links styles itself as a contact list** — brand-blue links, a larger
+> icon and tighter spacing. There is no setting for it: adding links is the signal, because that is
+> what distinguishes contact details from a row of feature chips.

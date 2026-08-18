@@ -42,6 +42,24 @@ export const FormBlock: Block = {
       }),
       label: 'Intro Content',
     },
+    {
+      // Three pages hand-rolled this identical treatment as page-scoped classes
+      // (.ct-page .ct-enquiry-form, .vf-join-eoi__form, .vf-home-enquiry-formcard):
+      // promote the whole block to a white card so the intro heading sits INSIDE
+      // it, and neutralise the inner .contact-form chrome. One field replaces all
+      // three. No defaultValue — unset keeps the bare block that every other form
+      // renders today.
+      name: 'cardStyle',
+      type: 'select',
+      admin: {
+        description:
+          'Card wraps the whole block — intro heading included — in a white panel with a soft shadow.',
+      },
+      options: [
+        { label: 'None', value: 'none' },
+        { label: 'Card', value: 'card' },
+      ],
+    },
     cssClassField,
   ],
   graphQL: {

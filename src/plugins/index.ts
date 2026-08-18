@@ -3,7 +3,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
-import { Plugin } from 'payload'
+import { Field, Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -14,6 +14,20 @@ import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/reva
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 import { referencePath } from '@/utilities/routes'
+
+// `select` already has a placeholder in the plugin's own schema; these four do not.
+const PLACEHOLDER_BLOCKS = new Set(['text', 'email', 'textarea', 'number'])
+
+// Grey prompt text shown inside an empty input. Not a default value — a
+// placeholder is never submitted, which is why `defaultValue` cannot stand in
+// for it.
+const placeholderField: Field = {
+  name: 'placeholder',
+  type: 'text',
+  admin: {
+    description: 'Grey prompt shown inside the empty field, e.g. “you@company.com”.',
+  },
+}
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | VERIFY Medico-Legal Solutions` : 'VERIFY Medico-Legal Solutions'
@@ -108,6 +122,27 @@ export const plugins: Plugin[] = [
                   ]
                 },
               }),
+            }
+          }
+          // The plugin declares a `placeholder` field on `select` ONLY, so text,
+          // email, textarea and number could not carry the design reference's
+          // placeholder copy at all ("you@practice.com.au", "07 XXXX XXXX", …).
+          //
+          // Added HERE rather than through the plugin's own `fields` config,
+          // which merges with `deepMergeWithSourceArrays` — and that REPLACES
+          // arrays rather than concatenating them. Passing `{ fields: [...] }`
+          // there would wipe each block's real fields (name, label, width,
+          // required) and leave only the placeholder. Appending to the built
+          // blocks never restates what the plugin already defines.
+          if (field.type === 'blocks' && field.name === 'fields') {
+            return {
+              ...field,
+              blocks: field.blocks.map((block) =>
+                PLACEHOLDER_BLOCKS.has(block.slug) &&
+                !block.fields.some((f) => 'name' in f && f.name === 'placeholder')
+                  ? { ...block, fields: [...block.fields, placeholderField] }
+                  : block,
+              ),
             }
           }
           return field

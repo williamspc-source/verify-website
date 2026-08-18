@@ -15,6 +15,7 @@ export const RowBlock: React.FC<Props & { bare?: boolean }> = ({
   columns,
   gap,
   alignY,
+  columnRatio,
   cssClass,
   anchorId,
   bare,
@@ -29,6 +30,10 @@ export const RowBlock: React.FC<Props & { bare?: boolean }> = ({
         'vf-row',
         `vf-row--gap-${gap || 'normal'}`,
         alignY && alignY !== 'stretch' ? `vf-row--alignY-${alignY}` : undefined,
+        // Only meaningful with exactly two tracks — the ratio names two of them.
+        columnRatio && columnRatio !== 'equal' && cols.length === 2
+          ? `vf-row--ratio-${columnRatio}`
+          : undefined,
         toClassName(cssClass),
       )}
       style={{ '--row-cols': String(cols.length) } as React.CSSProperties}

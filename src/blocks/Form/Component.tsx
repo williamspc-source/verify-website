@@ -14,7 +14,11 @@ import { toClassName } from '@/utilities/cssClass'
 export type FormBlockType = {
   blockName?: string
   blockType?: 'formBlock'
+  cardStyle?: string | null
   cssClass?: string | string[] | null
+  // NOTE: `formTitle` has no field in config.ts, so nothing can populate it —
+  // the heading that renders comes from `introContent`. Left in place rather
+  // than removed in a pass about layout; it renders nothing today either way.
   formTitle?: string | null
   enableIntro: boolean
   form: FormType
@@ -51,6 +55,7 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
     form: { id: formID, confirmationMessage, confirmationType, redirect, submitButtonLabel } = {},
     introContent,
     formTitle,
+    cardStyle,
     cssClass,
   } = props
 
@@ -102,7 +107,12 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
 
   const renderField = (field: AnyField, index: number) => {
     if (!field?.blockType) return null
-    const { blockType, name, label, required, defaultValue, options } = field
+    const { blockType, name, label, required, defaultValue, options, placeholder } = field
+    // `placeholder` was never destructured, so the field the form-builder DOES
+    // define on `select` was silently inert, and text/email/textarea had no way
+    // to carry one at all. Both halves are fixed: the plugin now declares the
+    // field on those types (src/plugins/index.ts) and it is read here.
+    const ph = typeof placeholder === 'string' && placeholder ? placeholder : undefined
     const labelEl = label ? (
       <label htmlFor={name}>
         {label}
@@ -157,6 +167,7 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
           {labelEl}
           <textarea
             id={name}
+            placeholder={ph}
             defaultValue={defaultValue ?? ''}
             {...invalidProps}
             {...register(name, { required })}
@@ -176,7 +187,7 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
             {...invalidProps}
             {...register(name, { required })}
           >
-            <option value="">Select…</option>
+            <option value="">{ph ?? 'Select…'}</option>
             {opts.map((o, k) => (
               <option key={k} value={o.value}>
                 {o.label}
@@ -195,6 +206,7 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
         <input
           id={name}
           type={inputType}
+          placeholder={ph}
           defaultValue={defaultValue ?? ''}
           {...invalidProps}
           {...register(name, { required })}
@@ -207,7 +219,13 @@ export const FormBlock: React.FC<{ id?: string } & FormBlockType> = (props) => {
   const rows = groupFields(formFromProps?.fields as AnyField[])
 
   return (
-    <div className={cn('vf-form-block', toClassName(cssClass))}>
+    <div
+      className={cn(
+        'vf-form-block',
+        cardStyle === 'card' && 'vf-form-block--card',
+        toClassName(cssClass),
+      )}
+    >
       {enableIntro && introContent && !hasSubmitted && (
         <RichText className="mb-6" data={introContent} enableGutter={false} />
       )}

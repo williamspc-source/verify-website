@@ -2189,11 +2189,15 @@ export interface RowBlock {
   /**
    * Space between columns.
    */
-  gap?: ('none' | 'tight' | 'normal' | 'wide') | null;
+  gap?: ('none' | 'tight' | 'normal' | 'wide' | 'x-wide') | null;
   /**
    * How columns line up vertically.
    */
   alignY?: ('top' | 'center' | 'bottom' | 'stretch') | null;
+  /**
+   * Relative width of the columns. Applies to two-column rows only; leave unset for equal columns.
+   */
+  columnRatio?: ('equal' | '2-3' | '3-2' | '1-2' | '2-1') | null;
   /**
    * Each column becomes a grid track. Add columns to widen the row.
    */
@@ -7462,6 +7466,10 @@ export interface IconListBlock {
    */
   heading?: string | null;
   subheading?: string | null;
+  /**
+   * Alignment of the eyebrow, heading and intro above the list.
+   */
+  headingAlign?: ('center' | 'left') | null;
   columns?: ('1' | '2' | '3') | null;
   items?:
     | {
@@ -8607,6 +8615,10 @@ export interface FormBlock {
     [k: string]: unknown;
   } | null;
   /**
+   * Card wraps the whole block — intro heading included — in a white panel with a soft shadow.
+   */
+  cardStyle?: ('none' | 'card') | null;
+  /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
@@ -8647,6 +8659,10 @@ export interface Form {
             label?: string | null;
             width?: number | null;
             required?: boolean | null;
+            /**
+             * Grey prompt shown inside the empty field, e.g. “you@company.com”.
+             */
+            placeholder?: string | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'email';
@@ -8677,6 +8693,10 @@ export interface Form {
             width?: number | null;
             defaultValue?: number | null;
             required?: boolean | null;
+            /**
+             * Grey prompt shown inside the empty field, e.g. “you@company.com”.
+             */
+            placeholder?: string | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'number';
@@ -8714,6 +8734,10 @@ export interface Form {
             width?: number | null;
             defaultValue?: string | null;
             required?: boolean | null;
+            /**
+             * Grey prompt shown inside the empty field, e.g. “you@company.com”.
+             */
+            placeholder?: string | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'text';
@@ -8724,6 +8748,10 @@ export interface Form {
             width?: number | null;
             defaultValue?: string | null;
             required?: boolean | null;
+            /**
+             * Grey prompt shown inside the empty field, e.g. “you@company.com”.
+             */
+            placeholder?: string | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'textarea';
@@ -11675,6 +11703,7 @@ export interface SectionBlockSelect<T extends boolean = true> {
 export interface RowBlockSelect<T extends boolean = true> {
   gap?: T;
   alignY?: T;
+  columnRatio?: T;
   columns?:
     | T
     | {
@@ -12583,6 +12612,7 @@ export interface IconListBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  headingAlign?: T;
   columns?: T;
   items?:
     | T
@@ -12755,6 +12785,7 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  cardStyle?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;
@@ -13879,6 +13910,7 @@ export interface FormsSelect<T extends boolean = true> {
               label?: T;
               width?: T;
               required?: T;
+              placeholder?: T;
               id?: T;
               blockName?: T;
             };
@@ -13897,6 +13929,7 @@ export interface FormsSelect<T extends boolean = true> {
               width?: T;
               defaultValue?: T;
               required?: T;
+              placeholder?: T;
               id?: T;
               blockName?: T;
             };
@@ -13937,6 +13970,7 @@ export interface FormsSelect<T extends boolean = true> {
               width?: T;
               defaultValue?: T;
               required?: T;
+              placeholder?: T;
               id?: T;
               blockName?: T;
             };
@@ -13948,6 +13982,7 @@ export interface FormsSelect<T extends boolean = true> {
               width?: T;
               defaultValue?: T;
               required?: T;
+              placeholder?: T;
               id?: T;
               blockName?: T;
             };

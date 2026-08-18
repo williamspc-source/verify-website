@@ -18,6 +18,7 @@ export const IconListBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  headingAlign,
   columns,
   items,
   cssClass,
@@ -35,19 +36,18 @@ export const IconListBlock: React.FC<Props & { bare?: boolean }> = ({
       containerWidth={containerWidth}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
+      <SectionHeader
+        eyebrow={eyebrow}
+        title={heading}
+        subtitle={subheading}
+        align={headingAlign === 'left' ? 'left' : 'center'}
+      />
 
-      <ul
-        className="vf-icon-list"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-          gap: '0.75rem 2rem',
-          listStyle: 'none',
-          margin: 0,
-          padding: 0,
-        }}
-      >
+      {/* Geometry lives in CSS, driven by `--vf-cols` like every other grid
+          block. It used to be inline, which outranks every stylesheet including
+          Custom Styles — so the list gap could not be restyled from the admin,
+          nor by a variant. Values are unchanged. */}
+      <ul className="vf-icon-list" style={{ '--vf-cols': cols } as React.CSSProperties}>
         {items.map((item, i) => {
           const inner = (
             <>
@@ -58,12 +58,6 @@ export const IconListBlock: React.FC<Props & { bare?: boolean }> = ({
             </>
           )
 
-          const rowStyle: React.CSSProperties = {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.625rem',
-          }
-
           return (
             <li key={item.id || i} className="vf-icon-list__item">
               {isActiveLink(item.link) ? (
@@ -72,14 +66,10 @@ export const IconListBlock: React.FC<Props & { bare?: boolean }> = ({
                   appearance="inline"
                   className="vf-icon-list__inner vf-icon-list__link"
                 >
-                  <span className="vf-icon-list__inner-content" style={rowStyle}>
-                    {inner}
-                  </span>
+                  <span className="vf-icon-list__inner-content">{inner}</span>
                 </CMSLink>
               ) : (
-                <div className="vf-icon-list__inner" style={rowStyle}>
-                  {inner}
-                </div>
+                <div className="vf-icon-list__inner">{inner}</div>
               )}
             </li>
           )

@@ -303,6 +303,9 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
                         form: contactFormId,
                         enableIntro: true,
                         introContent: lexHeading('Send Us Your Enquiry', 'h3'),
+                        // Card comes from the block; the class is kept only for
+                        // this page's residual width/margin centring.
+                        cardStyle: 'card',
                         cssClass: ['ct-enquiry-form'],
                       },
                     ]

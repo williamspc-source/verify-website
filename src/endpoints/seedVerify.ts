@@ -32,6 +32,7 @@ import { repairSpecialistIcons } from './seed/seedSpecialistIcons'
 import { repairForClientsCards } from './seed/seedForClients'
 import { repairFaqVariants } from './seed/repairFaqVariants'
 import { repairHeroCopy } from './seed/repairHeroCopy'
+import { repairEnquiryLayout } from './seed/repairEnquiryLayout'
 import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
 import { isPlaceholderLayout } from './seed/authored'
 import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
@@ -831,11 +832,11 @@ export const seedVerify = async ({
           // Reference field-set (contact.html): no "Your Role"; "Type of Enquiry"
           // dropdown; Company optional; Message/Enquiry required.
           fields: [
-            { blockType: 'text', name: 'firstName', label: 'First Name', width: 50, required: true },
-            { blockType: 'text', name: 'lastName', label: 'Last Name', width: 50, required: true },
-            { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true },
-            { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false },
-            { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: false },
+            { blockType: 'text', name: 'firstName', label: 'First Name', width: 50, required: true, placeholder: 'First name' },
+            { blockType: 'text', name: 'lastName', label: 'Last Name', width: 50, required: true, placeholder: 'Last name' },
+            { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true, placeholder: 'you@company.com' },
+            { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false, placeholder: '07 XXXX XXXX' },
+            { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: false, placeholder: 'Your firm or company' },
             {
               blockType: 'select',
               name: 'enquiry_type',
@@ -850,6 +851,7 @@ export const seedVerify = async ({
               label: 'Message / Enquiry',
               width: 100,
               required: true,
+              placeholder: 'Please provide details of your enquiry...',
             },
           ],
           submitButtonLabel: 'SEND ENQUIRY',
@@ -969,11 +971,11 @@ export const seedVerify = async ({
     const enquiryFormId = await ensureForm(
       'Enquiry',
       [
-        { blockType: 'text', name: 'first_name', label: 'First Name', width: 50, required: true },
-        { blockType: 'text', name: 'last_name', label: 'Last Name', width: 50, required: true },
-        { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true },
-        { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false },
-        { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: false },
+        { blockType: 'text', name: 'first_name', label: 'First Name', width: 50, required: true, placeholder: 'First name' },
+        { blockType: 'text', name: 'last_name', label: 'Last Name', width: 50, required: true, placeholder: 'Last name' },
+        { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true, placeholder: 'you@company.com' },
+        { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false, placeholder: '07 XXXX XXXX' },
+        { blockType: 'text', name: 'company', label: 'Company / Organisation', width: 100, required: false, placeholder: 'Your firm or company' },
         {
           blockType: 'select',
           name: 'enquiry_type',
@@ -989,7 +991,7 @@ export const seedVerify = async ({
             'General Enquiry',
           ]),
         },
-        { blockType: 'textarea', name: 'message', label: 'Message / Enquiry', width: 100, required: true },
+        { blockType: 'textarea', name: 'message', label: 'Message / Enquiry', width: 100, required: true, placeholder: 'Please provide details of your enquiry...' },
       ],
       'Send Enquiry',
       'New website enquiry',
@@ -1000,17 +1002,21 @@ export const seedVerify = async ({
       // Reference field-set (join-expert-panel.html): Medical Specialty optional,
       // no Qualifications, plain Message, submit "Send Enquiry".
       [
-        { blockType: 'text', name: 'firstName', label: 'First Name', width: 50, required: true },
-        { blockType: 'text', name: 'lastName', label: 'Last Name', width: 50, required: true },
-        { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true },
-        { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false },
-        { blockType: 'text', name: 'specialty', label: 'Medical Specialty', width: 100, required: false },
+        { blockType: 'text', name: 'firstName', label: 'First Name', width: 50, required: true, placeholder: 'First name' },
+        { blockType: 'text', name: 'lastName', label: 'Last Name', width: 50, required: true, placeholder: 'Last name' },
+        { blockType: 'email', name: 'email', label: 'Email Address', width: 50, required: true, placeholder: 'you@practice.com.au' },
+        { blockType: 'text', name: 'phone', label: 'Phone Number', width: 50, required: false, placeholder: '07 XXXX XXXX' },
+        { blockType: 'text', name: 'specialty', label: 'Medical Specialty', width: 100, required: false, placeholder: 'e.g. Orthopaedic Surgery, Psychiatry' },
         {
+          // Required is a DELIBERATE deviation: the reference leaves Message
+          // optional, but an expression of interest with no message is not
+          // useful to the team. Confirmed 2026-08-18.
           blockType: 'textarea',
           name: 'message',
           label: 'Message',
           width: 100,
           required: true,
+          placeholder: 'Tell us about your medico-legal experience and areas of interest...',
         },
       ],
       'Send Enquiry',
@@ -1195,6 +1201,7 @@ export const seedVerify = async ({
   await repairForClientsCards({ payload, req })
   await repairFaqVariants({ payload, req })
   await repairHeroCopy({ payload, req })
+  await repairEnquiryLayout({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
   // Both write only into an absence — a missing carousel block, a superseded

@@ -20,7 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 35 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 36 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -179,6 +179,16 @@ field that supersedes it. The tooling gap mattered more than the CSS: `reference
 `ime` on `^\.ime-format` and `jme` on `^\.jme-process`, so both read zero while a second section on
 each of the same two pages was covered by nothing — four new families now cover them, and all
 **twelve** read zero.
+
+`/specialists/join-expert-panel` followed (Comparison 36), and was the sharpest instance yet of a
+recorded trap: the enquiry band's CSS was already written and correct, and **none of it could render**,
+because every rule hung off `cssClass` values that a seed fixture set and `authorPage` never delivered
+— zero `cssClass` rows for the page, ~110 lines of dead CSS. It is now three block fields (Row →
+Column ratio, Icon List → Heading align, Form → Card style), which also retired the two *other*
+page-scoped classes doing the same card job on Contact and the homepage. Placeholders turned out to be
+a missing capability rather than missing content — Payload's form-builder declares `placeholder` on
+`select` alone — so the plugin now adds one to text/email/textarea/number and the renderer reads it.
+Thirteen diff families read zero.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 

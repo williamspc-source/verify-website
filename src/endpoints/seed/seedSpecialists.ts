@@ -276,7 +276,10 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
       blockType: 'formBlock',
       form: eoiFormId,
       enableIntro: true,
-      cssClass: 'vf-join-eoi__form',
+      // Was `cssClass: 'vf-join-eoi__form'` — a page-scoped class, which is
+      // STORED DATA, so the CSS written against it never reached this page.
+      // `cardStyle` is a real field on the block and travels with it.
+      cardStyle: 'card',
       // Card header — matches the reference "Enquiry Form" title on the form card.
       introContent: {
         root: {
@@ -317,13 +320,14 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
     blockType: 'section',
     background: 'muted',
     anchorId: 'join-form',
-    cssClass: 'vf-join-eoi',
     content: [
       {
         blockType: 'row',
-        gap: 'wide',
+        // Reference `.join-form-layout`: 1fr 1.5fr with a 72px gap — 2 : 3 and
+        // the `x-wide` preset here.
+        gap: 'x-wide',
         alignY: 'top',
-        cssClass: 'vf-join-eoi__layout',
+        columnRatio: '2-3',
         columns: [
           // LEFT — "Get in Touch" info column (left-aligned).
           {
@@ -337,7 +341,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
                 subheading:
                   'Send us an enquiry form and our team will be in touch to discuss panel membership and next steps. Alternatively, reach us directly by email or phone.',
                 columns: '1',
-                cssClass: 'vf-join-eoi__contact',
+                headingAlign: 'left',
                 items: [
                   {
                     icon: 'envelope',
@@ -351,7 +355,6 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
                 blockType: 'callout',
                 style: 'reassurance',
                 icon: 'info',
-                cssClass: 'vf-join-eoi__note',
                 body: plainTextToLexical(
                   'We will be in touch within 2 business days to discuss the next steps and how we can best assist you.',
                 ),

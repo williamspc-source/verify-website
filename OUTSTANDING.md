@@ -137,6 +137,11 @@ Left alone deliberately: **one** page is not enough to call the inline value the
 sweep found no third case — it compared every declaration across all three sources, not just the
 seventeen in `verify-website-design-diff.md` §5.
 
+**Narrowed 2026-08-18.** This does **not** affect `/specialists/join-expert-panel`, which was the
+other page anyone was likely to check: it declares no inline `.contact-form` rule, so the shared
+sheet's 40px governs there and ours matches it exactly — measured 40px on both sides while closing
+Comparison 36. The open question is confined to the one page whose inline block says `28px 24px`.
+
 ---
 
 ## 5. Light-band breadcrumbs are darker and heavier than the reference

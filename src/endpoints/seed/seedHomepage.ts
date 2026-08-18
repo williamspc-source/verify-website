@@ -242,6 +242,9 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
         form: enquiryFormId,
         enableIntro: true,
         introContent: headingRichText('Send Us Your Enquiry', 'h3'),
+        // The card itself is now the block's own `cardStyle`; the class is kept
+        // only for the residual this page needs (a tighter 24px heading gap).
+        cardStyle: 'card',
         cssClass: ['vf-home-enquiry-formcard'],
       }
     : null

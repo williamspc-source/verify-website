@@ -300,6 +300,11 @@ export const gapField: Field = {
     { label: 'Tight', value: 'tight' },
     { label: 'Normal', value: 'normal' },
     { label: 'Wide', value: 'wide' },
+    // The design reference's asymmetric bands use 72px between columns (the
+    // join-expert-panel enquiry section and the JME split FAQ both do), which is
+    // a step wider than `wide`. Added as a preset rather than widening `wide`,
+    // which 20+ rows already use.
+    { label: 'Extra wide', value: 'x-wide' },
   ],
 }
 

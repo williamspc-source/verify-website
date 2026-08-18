@@ -427,7 +427,16 @@ See headline issue above. If reverting to Target's directory approach:
 - **Layout differs substantially**: Target uses a two-column layout — left side has an eyebrow ("GET IN TOUCH"), heading, intro paragraph, separate icon-led contact items (email, phone), and an info callout box ("We will be in touch within 2 business days..."); right side has a distinct card-styled "Enquiry Form" panel. Current collapses this into a single-column, unboxed layout with no eyebrow, contact details folded into a plain sentence within the intro paragraph instead of separate icon items, and no callout box — followed directly by a plain (non-card) form.
 - **Form fields differ**: Target's fields are First Name*, Last Name*, Email Address*, Phone Number, Medical Specialty, Message. Current relabels "Medical Specialty" as "Specialty / Discipline," relabels "Message" as "Tell us about your experience," and adds an extra "Qualifications" field not present in Target at all.
 - **Submit button label differs**: Target reads "SEND ENQUIRY"; Current reads "Submit Expression of Interest."
-- Recommend rebuilding this section to match Target's two-column layout with the card-styled form, restoring the separate contact-info block and callout, and confirming with the team whether the added "Qualifications" field and relabeled fields should be kept (they may be a deliberate refinement for this specific "join panel" context) or reverted to match Target exactly.
+- **CORRECTED 2026-08-18 — CLOSED in Comparison 36.** This entry read as still-outstanding for a long
+  time, and the fields half was in fact done: the fixture had been rebuilt (eyebrow, icon contact
+  items, callout, card, the exact six fields, "Send Enquiry", Qualifications dropped). What had NOT
+  been done was the only part that made any of it render — every layout rule hung off `cssClass`
+  values that a fixture edit cannot deliver to an authored page, so ~110 lines of correct CSS matched
+  nothing and the section still shipped single-column and uncarded. The lesson is not "rebuild the
+  section"; it is that a page-scoped class is stored data, and a fixture that sets one needs a repair.
+- Also missing, and never recorded here: the reference has a placeholder in every input. Payload's
+  form-builder defines `placeholder` on `select` only, so this was a missing capability rather than
+  missing content. Closed in Comparison 36.
 
 ### 5. Bottom CTA section — entire section not present in Target
 - **Target has no bottom CTA band on this page at all** — the page ends directly after the Enquiry Form section, straight into the footer.
@@ -2115,6 +2124,82 @@ measured in the browser: chevron rotates 45° → −135° and tints to `rgb(28,
 open on the Information Centre pages (asserted 2 open at once); /ime keeps one-at-a-time, per its
 field. The Style Guide's FAQ still renders the untouched card style, so the default stays visible.
 Snapshot moved only the four intended routes plus the usual `/in-the-loop` scroll-reveal frame.
+
+
+## Comparison 36: /specialists/join-expert-panel — 110 lines of CSS nobody could reach (2026-08-18)
+
+Reported: the enquiry section's styling and colouring are off, the "Enquiry Form" title sits outside
+the box, and the fields have no placeholders.
+
+### The styling half was never a CSS problem
+
+`globals.css` already held a complete, correct port of this section — the `1fr 1.5fr` grid, the
+left-aligned intro, blue contact links, and the form promoted to a card so its heading sits inside.
+**None of it could ever render.** Every rule hung off a `cssClass` value (`vf-join-eoi`, `__layout`,
+`__contact`, `__form`) that existed only in the seed fixture: `authorPage` early-returns on an
+authored page, so the class never reached the database. Measured: **zero** `cssClass` rows for this
+page, and no `vf-join-eoi*` class anywhere in the served HTML. One of the five, `.vf-join-eoi-form`,
+was single-hyphen against a BEM double-underscore fixture and could not have matched even if the data
+had been there.
+
+So the fix was not to write CSS. It was to stop expressing the design as stored data:
+
+| Was | Now |
+|---|---|
+| `cssClass: 'vf-join-eoi__layout'` | Row → **Column ratio** (1 : 1.5) + the new **Extra wide** (72px) gap |
+| `cssClass: 'vf-join-eoi__contact'` | Icon List → **Heading align: Left** |
+| `cssClass: 'vf-join-eoi__form'` | Form → **Card style** |
+| `cssClass: 'vf-join-eoi__note'` | nothing — the Callout's `reassurance` style already emits the reference's own `.join-form-note` markup, measured identical |
+
+The Form **Card style** field earns its keep beyond this page: `.ct-page .ct-enquiry-form`,
+`.vf-join-eoi__form` and `.vf-home-enquiry-formcard` were three hand-rolled versions of one treatment.
+All three are now the field, with only genuine per-page residuals left scoped — Contact's centred
+width cap, the homepage's 24px heading gap.
+
+### Placeholders were a missing capability, not missing content
+
+Payload's form-builder declares `placeholder` on `select` and on no other field type, and our renderer
+never read it. Both halves are fixed: the plugin's Forms collection override appends a **Placeholder**
+field to text/email/textarea/number, and `renderField` emits it — including on `select`, whose
+schema-supported placeholder had been silently inert behind a hardcoded "Select…".
+
+A trap worth recording: the plugin's own `fields` config merges with `deepMergeWithSourceArrays`,
+which **replaces** arrays rather than concatenating. Passing `{ fields: [placeholderField] }` there
+would have wiped each block's real fields — name, label, width, required — leaving only the
+placeholder. Appending to the built blocks in `formOverrides.fields` never restates what the plugin
+already defines.
+
+### Measured, not eyeballed
+
+Everything below was `getComputedStyle` at 1440px with JavaScript disabled on both sides:
+
+- Grid: **`424px 636px` with a 72px gap** — identical on both sides.
+- Card: 636px wide, 40px padding, 16px radius, same shadow colour.
+- Contact list: item 24.5px, icon 23.2px, list 65px tall, 16px gap — all identical.
+- Inputs were **48.45px against the reference's 43px**, and the submit **56px against 48px**. Both came
+  from our controls inheriting the body's 1.7 line-height where the reference's take the UA default.
+- The submit's padding is **13px 28px, not the 15px 32px `.form-submit` declares** — a global
+  `!important` block covering every `.btn` overrides it, so the reference never draws what it declares.
+  Porting the declaration would have been porting a button that does not exist.
+
+### Scope discipline
+
+The form metrics are scoped to `.contact-form`, not the shared `.form-group`. Unscoped, they reached
+the site-wide enquiry drawer and moved **every one of the 19 routes**; the reference gives its drawer
+its own `.enquiry-panel-body` sizing, and ours mirrors that. Scoped, the change touches exactly the
+three pages with an on-page form. Contact and the homepage moved *toward* their own reference —
+Contact's form now measures 43 / 180 / 48 against the reference's 43 / 180 / 48.
+
+### Result
+
+A new `join-expert-panel` diff family reads zero, and so do the other twelve. Snapshot moved only
+`/specialists/join-expert-panel` (59), `/contact` (30) and `/` (26), plus the usual `/in-the-loop`
+frame. Both reported items asserted in the served HTML: six non-empty placeholders on the on-page form
+(not the drawer's), and `<h3>Enquiry Form</h3>` inside the card, above the `<form>`.
+
+**Deliberate deviations, recorded:** Message stays **required** (the reference leaves it optional; an
+expression of interest with no message is not useful). The reference's intro sits **6px** lower than
+ours via a nudge on a wrapper we do not have — measured, not carried.
 
 
 ## Summary of recurring, cross-page issues

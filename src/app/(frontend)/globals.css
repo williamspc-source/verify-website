@@ -223,6 +223,7 @@
   --gap-tight: 1rem; /* 16px */
   --gap-normal: 2rem; /* 32px */
   --gap-wide: 3.5rem; /* 56px */
+  --gap-x-wide: 4.5rem; /* 72px — the design reference's two-column band gap */
 
   --size-heading-sm: clamp(1.1rem, 2vw, 1.25rem);
   --size-heading-md: clamp(1.35rem, 2.5vw, 1.6rem);
@@ -3202,10 +3203,126 @@
   transition: border-color var(--transition);
   outline: none;
 }
+/* Scoped to the in-page form, NOT the shared `.form-group`. The reference gives
+   its slide-out drawer its own `.enquiry-panel-body .form-group` sizing, and ours
+   mirrors that — so a change measured against the page form must not leak into
+   the drawer, which sits on all 19 routes. The reference declares no line-height
+   on its page-form controls, so they take the UA's `normal`; ours inherited the
+   body's 1.7 and rendered 5px taller (measured 48.45px against 43px). */
+.contact-form .form-group input,
+.contact-form .form-group select,
+.contact-form .form-group textarea {
+  line-height: normal;
+}
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus { border-color: var(--primary); box-shadow: var(--vf-shadow-ring); }
 .form-group textarea { resize: vertical; min-height: 110px; }
+/* Reference `.form-group textarea { min-height: 180px }`. Scoped to the in-page
+   form for the same reason as the line-height above — the drawer's textarea has
+   its own 120px floor. */
+.contact-form .form-group textarea { min-height: 180px; }
+/* Reference select chevron. Scoped to the page form for the same reason as the
+   metrics above — the drawer has its own select styling. */
+.contact-form .form-group select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23414042' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+}
+
+/* ── Form block: card style ──────────────────────────────────────────────────
+   Three pages hand-rolled this identical treatment as page-scoped classes
+   (.ct-page .ct-enquiry-form, .vf-join-eoi__form, .vf-home-enquiry-formcard):
+   promote the WHOLE block to a white card so the intro heading sits inside it,
+   then neutralise the inner .contact-form chrome so the card is not drawn twice.
+   It is now the Form block's `cardStyle` field, so any form can have it and no
+   page needs a class of its own. Absent by default — every other form on the
+   site renders exactly as before. */
+.vf-form-block--card {
+  background: var(--white);
+  border-radius: var(--vf-radius-md);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+}
+.vf-form-block--card .contact-form {
+  background: transparent;
+  border-radius: var(--vf-radius-none);
+  padding: 0;
+  box-shadow: none;
+  max-width: none;
+  margin: 0;
+}
+.vf-form-block--card .mb-6 { margin-bottom: 28px; }
+.vf-form-block--card .mb-6 :is(h2, h3, h4) {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .vf-form-block--card { padding: 28px 22px; }
+}
+
+/* ── Icon list used as a contact list ────────────────────────────────────────
+   Reference `.join-contact-list` / `.join-contact-item`: heading font, blue
+   links, a larger brand-coloured icon. Gated on `:has(a)` because that is what
+   distinguishes a contact list from the other use of this block — the Contact
+   page's portal-card feature chips, which carry no links and must not change.
+   Measured before writing: `.vf-icon-list__link` renders on exactly one page. */
+/* Base geometry, moved out of the component's inline styles (which outrank every
+   stylesheet, so none of this could be themed or varied). Values unchanged. */
+.vf-icon-list {
+  display: grid;
+  grid-template-columns: repeat(var(--vf-cols, 1), minmax(0, 1fr));
+  gap: 0.75rem 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vf-icon-list__inner-content,
+.vf-icon-list__inner:not(a) {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* The intro above a contact list runs smaller and tighter than the shared
+   section subtitle (reference `.join-form-intro > p`). Scoped to the block, so
+   the other use of Icon List — the Contact page's feature chips — is untouched. */
+.vf-icon-list-block:has(.vf-icon-list__link) .vf-section-header__subtitle {
+  font-size: 0.97rem;
+  line-height: 1.8;
+  margin: 0 0 32px;
+}
+
+/* A contact list (reference `.join-contact-list`) runs tighter and smaller than
+   the feature-chip use of this block. */
+.vf-icon-list:has(.vf-icon-list__link) { gap: 16px; }
+.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__inner-content,
+.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__inner:not(a) { gap: 13px; }
+/* Size only — NOT line-height. The reference's contact item inherits the body's
+   1.7 (measured 24.48px), and the item's height is text-driven at that value;
+   forcing `normal` here made the row icon-driven and 1.3px short. */
+.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__item,
+.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__link {
+  font-size: 0.9rem;
+}
+.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  flex-shrink: 0;
+}
+.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__item {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__icon { color: var(--primary); }
+.vf-icon-list__link { color: var(--primary); text-decoration: none; transition: color 0.15s; }
+.vf-icon-list__link:hover { color: var(--primary-strong); }
 /* The reference's submit button is a distinct treatment, not just a wide
    .btn-primary: full width, uppercase and tracked out, on a gradient with a
    resting glow (styles.css:2001-2019). Only the glow survived the port.
@@ -3225,6 +3342,17 @@
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
   border-color: transparent;
   box-shadow: var(--vf-glow-sm);
+}
+/* 13px 28px on a 48px floor is what the reference RENDERS, not what
+   `.form-submit` declares: its own 15px/32px/10px-radius is overridden by a
+   global `!important` block covering every `.btn`, so porting the declaration
+   would have drawn a button the reference never shows. Measured ref 48px tall
+   against our 56px. Scoped to the page form — the drawer shares this class but
+   the reference gives its drawer a separate `.enquiry-panel-submit`. */
+.contact-form .form-submit {
+  min-height: 48px;
+  padding: 13px 28px;
+  line-height: normal;
 }
 .form-submit:hover {
   background: linear-gradient(135deg, var(--primary-strong) 0%, var(--primary-deep) 100%);
@@ -5233,10 +5361,20 @@
   .vf-row--gap-tight { gap: var(--gap-tight); }
   .vf-row--gap-normal { gap: var(--gap-normal); }
   .vf-row--gap-wide { gap: var(--gap-wide); }
+  .vf-row--gap-x-wide { gap: var(--gap-x-wide); }
   .vf-row--alignY-top { align-items: start; }
   .vf-row--alignY-center { align-items: center; }
   .vf-row--alignY-bottom { align-items: end; }
   .vf-row--alignY-stretch { align-items: stretch; }
+
+  /* Asymmetric two-column bands. The grid is otherwise equal tracks derived from
+     the column count, which cannot express the design reference's 1fr 1.5fr
+     enquiry layout. Emitted only for rows with exactly two columns, and they
+     stack below 768px like every other row, so the ratio is a desktop concern. */
+  .vf-row--ratio-2-3 { grid-template-columns: 2fr 3fr; }
+  .vf-row--ratio-3-2 { grid-template-columns: 3fr 2fr; }
+  .vf-row--ratio-1-2 { grid-template-columns: 1fr 2fr; }
+  .vf-row--ratio-2-1 { grid-template-columns: 2fr 1fr; }
 
   .vf-col { min-width: 0; }
   .vf-col--span-1 { grid-column: span 1; }
@@ -8703,15 +8841,6 @@
 }
 
 /* ===== v2:89a386005596bf02dd235c38b13c49600d99fab0936575b987122f276875299f ===== */
-.vf-join-eoi .vf-section-header { text-align: left; margin-inline: 0; max-width: none; }
-.vf-join-eoi .vf-section-header__subtitle { margin-inline: 0; max-width: 640px; }
-.vf-join-eoi .vf-icon-list { max-width: 640px; }
-.vf-join-eoi .vf-icon-list__text { font-family: var(--font-heading); font-weight: 700; color: var(--text-dark); }
-.vf-join-eoi .vf-callout-block { margin-top: 20px; }
-.vf-join-eoi .vf-callout { max-width: 640px; }
-.vf-join-eoi-form .contact-form { max-width: 760px; margin-inline: auto; }
-.vf-join-eoi-form .mb-6 { max-width: 760px; margin-inline: auto; text-align: left; }
-.vf-join-eoi-form .mb-6 h3 { font-family: var(--font-heading); font-weight: 800; font-size: 1.4rem; color: var(--text-dark); margin-bottom: 8px; }
 
 /* ===== v2:3bbe89bee9f55cf614bde5025d0073efee4ae37d430a4a362234e5121a82db6f ===== */
 /* ══ Home page parity (Comparison 1) ═══════════════════════════════ */
@@ -9032,28 +9161,19 @@
 .ct-page .page-hero h1 .vf-accent { display: block; }
 
 /* Contact enquiry form — one centred card ("Send Us Your Enquiry" + fields) */
+/* The card itself is the Form block's `cardStyle` now. What stays here is the
+   only genuinely page-specific part: this form is a centred, width-capped panel
+   rather than a column of a grid. Its padding also tightens earlier than the
+   shared 600px breakpoint, which is why the clamp stays. */
 .ct-page .ct-enquiry-form {
   width: min(760px, calc(100% - 32px));
   margin: 48px auto;
-  background: var(--white);
-  border-radius: var(--vf-radius-md);
   padding: clamp(28px, 4vw, 40px);
-  box-shadow: var(--shadow-lg);
 }
-.ct-page .ct-enquiry-form .contact-form {
-  background: none;
-  box-shadow: none;
-  padding: 0;
-  border-radius: var(--vf-radius-none);
-}
-.ct-page .ct-enquiry-form .payload-richtext { margin-bottom: 0; }
-.ct-page .ct-enquiry-form h3 {
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin: 0 0 28px;
-}
+/* No `.payload-richtext { margin-bottom: 0 }` here any more. This page used to
+   carry the gap under the heading on the h3 itself and zero the wrapper; the
+   shared card does the opposite. Leaving both in place cancelled the gap
+   entirely — measured, the card lost 28px of height. */
 /* (The Contact page's uppercase/tracking override lived here. `.form-submit`
    now carries the reference's uppercase treatment itself, so every submit
    button matches without a per-page rule.) */
@@ -10029,86 +10149,19 @@
 }
 /* ═══ FINAL FIX — per-page parity CSS ═══ */
 /* ===== v2:63494f47b86f52461896df852c80454dfca5c78b6d5df5a8f475d4802bc44749 ===== */
-/* ═══ /join-expert-panel — Express Your Interest (two-column) + benefit cards ═══ */
+/* ═══ /join-expert-panel — benefit cards ═══════════════════════════════════ */
 
-/* ── Express Your Interest: two-column enquiry band (info + form card) ──────── */
-/* Row grid: 1fr 1.5fr on desktop, stacked on mobile. Base single-column rule is
-   unlayered so it overrides the layered .vf-row default at all widths, then the
-   min-width query restores the two-column layout above the reference 960px break. */
-.vf-join-eoi__layout { grid-template-columns: 1fr; }
-@media (min-width: 961px) {
-  .vf-join-eoi__layout {
-    grid-template-columns: 1fr 1.5fr;
-    gap: 72px;
-    align-items: start;
-  }
-}
+/* The whole "Express Your Interest" band used to live here, hung off four
+   page-scoped cssClass values (.vf-join-eoi, __layout, __contact, __form, plus a
+   single-hyphen .vf-join-eoi-form that never matched anything). None of it ever
+   rendered: a cssClass is STORED DATA, the fixture that set it early-returns on
+   an authored page, and no repair was written — so ~110 lines of correct CSS sat
+   dead while the page shipped centred and un-carded.
+   It is now three block FIELDS (Row → Column ratio, Icon List → Heading align,
+   Form → Card style), which travel with the block and cannot go missing. The
+   callout needs nothing: the Callout block's `reassurance` style emits the
+   reference's own .join-form-note markup, measured identical. */
 
-/* LEFT column — left-align the (component-forced-centre) IconList header. */
-.vf-join-eoi .vf-section-header {
-  text-align: left;
-  margin-inline: 0;
-  max-width: none;
-}
-.vf-join-eoi .vf-section-header__subtitle { margin-inline: 0; max-width: none; }
-
-/* Contact items — icon + link, heading font, primary-blue links. */
-.vf-join-eoi__contact .vf-icon-list { max-width: none; }
-.vf-join-eoi__contact .vf-icon-list__item { font-family: var(--font-heading); }
-.vf-join-eoi__contact .vf-icon-list__icon { color: var(--primary); }
-.vf-join-eoi__contact .vf-icon-list__text { font-weight: 700; color: var(--text-dark); }
-.vf-join-eoi__contact .vf-icon-list__link .vf-icon-list__text,
-.vf-join-eoi__contact .vf-icon-list__link { color: var(--primary); }
-.vf-join-eoi__contact .vf-icon-list__link:hover .vf-icon-list__text { color: var(--primary-strong); }
-
-/* "Within 2 business days" note — solid light-blue box (Callout sets colours
-   inline, so these need !important to win). */
-.vf-join-eoi__note .vf-callout {
-  background: var(--accent) !important;
-  border: 1px solid transparent !important;
-  border-left: 0 !important;
-  border-radius: 12px !important;
-  padding: 18px 20px !important;
-  gap: 13px !important;
-  align-items: flex-start !important;
-}
-.vf-join-eoi__note .vf-callout__icon { color: var(--primary) !important; }
-.vf-join-eoi__note .vf-callout__body,
-.vf-join-eoi__note .vf-callout__body p {
-  font-family: var(--font-heading);
-  font-size: 0.83rem;
-  font-weight: 600;
-  color: var(--primary-deep);
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* RIGHT column — promote the whole form block to the white card so the
-   "Enquiry Form" heading sits inside it; neutralise the inner .contact-form chrome. */
-.vf-join-eoi__form {
-  background: var(--white);
-  border-radius: var(--vf-radius-md);
-  padding: 40px;
-  box-shadow: var(--shadow-lg);
-}
-.vf-join-eoi__form .contact-form {
-  background: transparent;
-  border-radius: var(--vf-radius-none);
-  padding: 0;
-  box-shadow: none;
-  max-width: none;
-  margin: 0;
-}
-.vf-join-eoi__form .mb-6 { margin-bottom: 28px; }
-.vf-join-eoi__form .mb-6 h3 {
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin: 0;
-}
-
-/* ── "What We Offer Our Panel Specialists" — centred benefit cards ──────────── */
 .vf-join-benefits .service-card {
   display: flex;
   flex-direction: column;
@@ -10789,29 +10842,9 @@
 
 /* Right column — the whole FormBlock is the white card so the "Send Us Your
    Enquiry" heading sits inside it (reference .contact-form). */
-.vf-home-enquiry-formcard {
-  background: var(--white);
-  border-radius: var(--vf-radius-md);
-  padding: 40px;
-  box-shadow: var(--shadow-lg);
-}
-.vf-home-enquiry-formcard .contact-form {
-  background: transparent;
-  border-radius: var(--vf-radius-none);
-  padding: 0;
-  box-shadow: none;
-}
+/* Card comes from the block's `cardStyle`; this page's only residual is a
+   slightly tighter gap under the heading. */
 .vf-home-enquiry-formcard .mb-6 { margin-bottom: 24px; }
-.vf-home-enquiry-formcard .mb-6 :is(h2, h3, h4) {
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin: 0;
-}
-@media (max-width: 600px) {
-  .vf-home-enquiry-formcard { padding: 28px 22px; }
-}
 
 /* ── Educational tab: "What AAMLE Offers" intro + numbered feature panels ── */
 

@@ -17,6 +17,19 @@ export const IconList: Block = {
   fields: [
     ...sectionHeaderFields,
     {
+      // The header alignment used to be the literal `align="center"` in the
+      // component, so a left-aligned icon list was unreachable from the admin.
+      // No defaultValue: unset keeps meaning centred, so no existing icon list
+      // moves when this field appears.
+      name: 'headingAlign',
+      type: 'select',
+      admin: { description: 'Alignment of the eyebrow, heading and intro above the list.' },
+      options: [
+        { label: 'Centred', value: 'center' },
+        { label: 'Left', value: 'left' },
+      ],
+    },
+    {
       name: 'columns',
       type: 'select',
       defaultValue: '1',

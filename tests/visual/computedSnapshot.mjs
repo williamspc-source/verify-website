@@ -99,6 +99,7 @@ const ROUTES = [
   '/services/medico-legal/jme',
   '/services/medico-legal/reporting-services',
   '/specialists/profiles/dr-adam-parr',
+  '/specialists/join-expert-panel',
   '/information-centre/for-clients',
   '/information-centre/for-claimants',
   '/make-a-booking',

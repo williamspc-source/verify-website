@@ -564,6 +564,22 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   declared none — the detail descriptions rendered at **18px/30.6px against 12.8px/19.84px**, which is
   why those cards ran far taller than the reference's. The tool cannot check a claim like that; only
   reading the reference can. Treat every `null` mapping as an assertion needing evidence.
+- **A page-scoped `cssClass` is stored data, so CSS written against one is unreachable until a repair
+  puts the class in the database.** `/specialists/join-expert-panel` had a complete, correct port of its
+  enquiry band — the 1fr 1.5fr grid, the left-aligned intro, the form promoted to a card — hung off four
+  `vf-join-eoi*` classes that a seed fixture set and `authorPage` never delivered. Measured: **zero**
+  `cssClass` rows for that page, no `vf-join-eoi*` class in the served HTML, and ~110 lines of dead CSS
+  while the page shipped centred and uncarded. One of the five selectors was single-hyphen against a
+  BEM double-underscore fixture and could not have matched even with the data present. This is the
+  strongest argument for the "prefer a block variant over a page-scoped class" rule above: a **field
+  travels with the block**, and cannot be silently absent. When you do find CSS that renders nothing,
+  check whether its hook is stored data before assuming the selector is wrong.
+- **A form-builder `fields` override REPLACES arrays, it does not extend them.** The plugin merges with
+  `deepMergeWithSourceArrays`, whose documented behaviour is *"arrays in the target are replaced by the
+  source's"*. Passing `{ fields: [placeholderField] }` to `formBuilderPlugin({ fields: { text: … } })`
+  would wipe each block's real fields — name, label, width, required — and leave only the addition.
+  Append inside `formOverrides.fields` instead, where you can map over the built blocks without
+  restating anything the plugin already defines.
 - **A diff family's zero is scoped to its `match` regex, not to the page it is named after.** The `ime`
   family matches `/^\.ime-format/` and `jme` matches `/^\.jme-process/`. Both read zero for months while
   a *second* section on each of those same two pages — the `.ime-claim-*` and `.jme-faq-*` accordions —
@@ -600,9 +616,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   gate against a running `:3000`, keyed by structural index path rather than class name (class
   names are what the migrations change). Token replacements are value-preserving by
   construction, so the expected diff is empty; any diff is a real bug, not a tolerance.
-  It measures **40** properties over **18** routes — `width`/`height`/`gridTemplateColumns`/
+  It measures **40** properties over **19** routes — `width`/`height`/`gridTemplateColumns`/
   `transform` are in that set, which is what makes it catch a reflow and not just a repaint, but
-  18 routes is 18 of the site's 29 pages and it never triggers `:hover`. Capture immediately
+  19 routes is 19 of the site's 29 pages and it never triggers `:hover`. Capture immediately
   before a change and compare immediately after; baselines are gitignored because any content
   change invalidates them. `capture` refuses a non-200 — it used to bank the 404 page as a
   baseline for two routes that do not exist.
@@ -612,9 +628,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   Their carve-outs are deliberate and documented in the file headers.
 - `node tests/visual/referenceCssDiff.mjs <family> [--verbose]` — diffs every CSS declaration the
   design reference makes for a selector family against `globals.css`, and exits non-zero until the
-  count is zero. **Twelve families**: `events`, `services`, `ime`, `jme`, `admin-services`,
+  count is zero. **Thirteen families**: `events`, `services`, `ime`, `jme`, `admin-services`,
   `reporting-services`, `specialist-profile`, `for-clients`, `faq-claimants`, `faq-clients`,
-  `ime-claims`, `jme-faq`; all read zero, so any non-zero is something you just did. Resolves each side's
+  `ime-claims`, `jme-faq`, `join-expert-panel`; all read zero, so any non-zero is something you just did. Resolves each side's
   `:root` **separately** (both define `--radius`, and they disagree — 8px there, 0.5rem here),
   compares font tokens by *name* because the brand typeface is a deliberate deviation, and merges
   base+override rules where we implement a bespoke reference selector through a shared component.

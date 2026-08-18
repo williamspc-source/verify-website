@@ -192,6 +192,21 @@ const FAMILIES = {
   // markup in the whole of .design-reference carries those classes — the live
   // wrappers are `.claimant-faqs` / `.client-faqs`. Listed in NOT_PORTED so they
   // can never answer for a live selector.
+  // /specialists/join-expert-panel → the "Express Your Interest" enquiry band.
+  // Split BOTH ways: `.join-form*` / `.join-contact*` are INLINE-ONLY (grep over
+  // assets/ returns zero and no other reference page uses them), while
+  // `.contact-form`, `.form-*` and `.section-*` are SHARED-SHEET-ONLY — the
+  // page's inline block declares no base rules for the form at all.
+  //
+  // This family exists because none of this was measured: the whole band was
+  // implemented against four page-scoped cssClass values that never reached the
+  // database, so ~110 lines of correct CSS rendered nothing and no checker said
+  // so.
+  'join-expert-panel': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/specialists/join-expert-panel.html'],
+    match: /^\.(join-form|join-contact|contact-form|form-row|form-group|form-submit|form-confirm)/,
+  },
   'faq-claimants': {
     css: ['.design-reference/assets/css/styles.css'],
     pages: ['.design-reference/information-centre/for-claimants.html'],
@@ -285,6 +300,10 @@ const NOT_PORTED = {
   // inline blocks and used by no markup anywhere in .design-reference — the live
   // wrappers are `.claimant-faqs` / `.client-faqs`. Porting them would mean
   // porting a rule the reference itself does not render.
+  'join-expert-panel': {
+    '.join-form-section': 'Section band and padding are editor-controlled Section presets — `muted` and the `normal` padding preset. Not a rule in globals.css for a declaration diff to match. (The band differs slightly: reference #f0f2f4 against our --band-muted #f5f6f8, and padding 100px against the preset\'s 88px. Both are editor-owned values, recorded in EXPLAINED.)',
+    '.join-form-intro': 'A 6px optical nudge on a bespoke wrapper we do not have — our left column is a plain grid track. Measured: the reference\'s eyebrow sits 6px below the card top, ours flush at 0. Deliberately not carried; a field for a 6px offset would be worse than the offset.',
+  },
   'faq-claimants': {
     '.ic-faq-unified': 'Dead CSS in the reference — declared in both Information Centre pages, matched by no markup in the whole of .design-reference.',
     '.ic-faq-header': 'ditto',
@@ -509,6 +528,34 @@ const IMPLEMENTED_AS = {
     '.profile-breadcrumb span': '.vf-breadcrumb__sep',
     '.profile-breadcrumb strong': '.vf-breadcrumb__current',
   },
+  'join-expert-panel': {
+    // The whole band is block SETTINGS now, not a page scope. `.join-form-layout`
+    // is the Row's `columnRatio` + `gap` presets; `.join-contact-*` is the Icon
+    // List block; `.contact-form` the Form block's `cardStyle`.
+    '.join-form-layout': ['.vf-row', '.vf-row--gap-x-wide', '.vf-row--ratio-2-3', '.vf-row--alignY-top'],
+    '.join-contact-list': ['.vf-icon-list', '.vf-icon-list:has(.vf-icon-list__link)'],
+    // Our row is the inner flex wrapper, not the <li> — the reference puts both
+    // roles on one element.
+    '.join-contact-item': [
+      '.vf-icon-list__inner-content',
+      '.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__inner-content',
+      '.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__item',
+    ],
+    '.join-contact-item a': '.vf-icon-list__link',
+    '.join-contact-item a:hover': '.vf-icon-list__link:hover',
+    '.join-contact-icon': '.vf-icon-list:has(.vf-icon-list__link) .vf-icon-list__icon',
+    '.contact-form': ['.contact-form', '.vf-form-block--card'],
+    '.contact-form h3': ['.contact-form h3', '.vf-form-block--card .mb-6 :is(h2, h3, h4)'],
+    '.form-group textarea': ['.form-group textarea', '.contact-form .form-group textarea'],
+    '.form-submit': ['.form-submit', '.contact-form .form-submit'],
+    '.join-form-note p': '.join-form-note-body p',
+    '.join-form-intro > p': [
+      '.section-subtitle',
+      '.vf-section-header__subtitle',
+      '.vf-icon-list-block:has(.vf-icon-list__link) .vf-section-header__subtitle',
+    ],
+    '.form-group select': ['.form-group select', '.contact-form .form-group select'],
+  },
   'faq-claimants': {
     // Our divided look is a variant on the shared accordion, so every mapping is
     // the LIST form: the base rule plus the modifier that overrides it, merged in
@@ -715,6 +762,44 @@ const IMPLEMENTED_AS = {
  * printed in the summary so they stay visible.
  */
 const EXPLAINED = {
+  // Every entry measured in the browser at 1440px on 2026-08-18, JavaScript
+  // disabled on both sides, before being excused.
+  'join-expert-panel': {
+    '.join-form-layout': {
+      'grid-template-columns': 'Our `2fr 3fr` IS the reference\'s `1fr 1.5fr` — the Row block\'s ratio values avoid a decimal point, which would have to be escaped in the class selector. Measured identical: `424px 636px` on both sides.',
+      gap: 'The `x-wide` gap preset, which resolves to exactly the reference\'s 72px — measured 72px on both.',
+    },
+    '.contact-form': {
+      'box-shadow': 'Token vs literal: our --shadow-lg mixes from the brand colour, the reference hardcodes #1c75bc29. Measured identical — rgba(28,117,188,0.16) 0 8px 40px on both.',
+    },
+    '.form-group input:focus': {
+      'box-shadow': 'Our shared --vf-shadow-ring is a 12% ring against the reference\'s 10%. Measured rgba(28,117,188,0.12) against 0.10 — a 2% alpha difference on a focus ring, on a token ~20 other controls share. Not worth forking the token for this one form.',
+    },
+    '.form-group select:focus': { 'box-shadow': 'ditto.' },
+    '.form-group textarea:focus': { 'box-shadow': 'ditto.' },
+    '.form-submit': {
+      padding: 'DELIBERATE: 13px 28px is what the reference RENDERS, not what `.form-submit` declares. Its own 15px/32px is overridden by a global `!important` block covering every `.btn` (styles.css 116-140). Measured: the reference\'s button is 48px tall with 13px 28px padding; porting the declaration would draw a button the reference never shows.',
+      'padding-top': 'ditto.',
+      'padding-bottom': 'ditto.',
+      'padding-left': 'ditto.',
+      'padding-right': 'ditto.',
+      'border-radius': 'ditto — the same `!important` block forces var(--radius) (8px) over `.form-submit`\'s declared 10px.',
+      'box-shadow': 'Token vs literal. Measured identical: rgba(28,117,188,0.28) 0 4px 18px on both.',
+    },
+    '.form-submit:hover': {
+      background: 'Token vs literal: --primary-strong / --primary-deep resolve to the reference\'s #155fa0 / #0f4a80.',
+      'box-shadow': 'ditto, at 38%.',
+    },
+    '.join-contact-list': {
+      display: 'Ours is the Icon List block, a one-column grid; the reference is a flex column. Identical rendering for full-width children — measured: list 65px tall, 16px gap, items 24.5px, on both sides.',
+      'flex-direction': 'ditto — a single grid column stacks without needing one.',
+      'margin-bottom': 'The 32px below the list is the Callout block\'s own top margin here rather than the list\'s bottom margin. Measured 32px list-to-callout on both sides.',
+    },
+    '.join-contact-icon': {
+      'font-size': 'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph — so the size is width/height, not font-size. Measured 23.2 x 23.2px on both sides.',
+    },
+    '.join-form-note-icon': { 'font-size': 'ditto.' },
+  },
   // ── FAQ accordions ────────────────────────────────────────────────────────
   // Every entry below was measured in the browser at 1440px on 2026-08-18, with
   // JavaScript disabled on both sides, before being excused.
