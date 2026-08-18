@@ -45,6 +45,9 @@ import {
   Heartbeat,
   House,
   IdentificationCard,
+  // Aliased for the same reason as `Link` below: the bare name collides with a
+  // global (and with next/image in any file that imports both).
+  Image as ImageIcon,
   Info,
   Link as LinkIcon,
   List,
@@ -161,6 +164,7 @@ export const iconMap = {
   home: House,
   house: House,
   'identification-card': IdentificationCard,
+  image: ImageIcon,
   info: Info,
   link: LinkIcon,
   list: List,

@@ -24,13 +24,28 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
   motion,
   containerWidth,
   bare,
+  rowStyle,
+  density,
+  bulletStyle,
 }) => {
+  // Compared against the opt-in value, never the default, so a block stored
+  // before these fields existed (all three null) renders exactly as it did.
+  const divided = rowStyle === 'divided'
+  const compact = density === 'compact'
+  const dotBullets = bulletStyle === 'dot'
+
   if (!rows || rows.length === 0) return null
 
   return (
     <Section
       background={background as SectionBackground}
-      className={cn('vf-split-feature', toClassName(cssClass))}
+      className={cn(
+        'vf-split-feature',
+        divided && 'vf-split-feature--divided',
+        compact && 'vf-split-feature--compact',
+        dotBullets && 'vf-split-feature--dots',
+        toClassName(cssClass),
+      )}
       motion={motion}
       containerWidth={containerWidth}
       bare={bare}
@@ -48,6 +63,7 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
         const hasImage = row.image && typeof row.image === 'object'
         const placeholder = Boolean((row as { imagePlaceholder?: boolean }).imagePlaceholder)
         const placeholderLabel = (row as { placeholderLabel?: string | null }).placeholderLabel
+        const placeholderIcon = (row as { placeholderIcon?: string | null }).placeholderIcon
         // A placeholder keeps the two-column layout (reference grey box) even with
         // no real image; only rows with neither image nor placeholder go full-width.
         const twoColumn = hasImage || placeholder
@@ -65,9 +81,16 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
                 <Media resource={row.image} imgClassName="w-full h-full object-cover" />
               </div>
             ) : placeholder ? (
-              /* No icon: the reference's empty-photo box is the label alone
-                 (styles.css:749-770), the same treatment `.who-image-main` uses. */
+              /* This branch runs only when there is no image, which is what makes
+                 an upload replace the placeholder outright — glyph and label with
+                 it. `/services` leaves `placeholderIcon` unset, because that
+                 reference's empty-photo box is the label alone (styles.css:749-770,
+                 the treatment `.who-image-main` shares); reporting-services draws
+                 one, so it is a per-row choice rather than a fixed design. */
               <div className="vf-split__media vf-split__media--placeholder" aria-hidden>
+                {placeholderIcon ? (
+                  <Icon name={placeholderIcon} className="vf-split__placeholder-icon" />
+                ) : null}
                 {placeholderLabel ? <span>{placeholderLabel}</span> : null}
               </div>
             ) : null}
@@ -91,11 +114,15 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
               {row.bulletsLabel ? <div className="vf-split__bullets-label">{row.bulletsLabel}</div> : null}
               {row.bullets && row.bullets.length > 0 ? (
                 <ul className="vf-split__list">
+                  {/* `dot` replaces only the *default* tick. A bullet the editor
+                      gave an icon keeps it either way — hiding a chosen icon with
+                      CSS would discard the choice silently, and the CSS drops the
+                      dot for exactly these rows so the two never double up. */}
                   {row.bullets.map((b, j) => (
                     <li key={j}>
                       {b.icon ? (
                         <Icon name={b.icon} className="vf-split__check size-5" />
-                      ) : (
+                      ) : dotBullets ? null : (
                         <Check className="vf-split__check size-5" aria-hidden />
                       )}
                       <span>{b.text}</span>

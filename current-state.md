@@ -130,6 +130,14 @@ style** field, since the reference uses `1` on some pages and `01` on others. Th
 in `frontend.e2e.spec.ts` gained a narrow, re-proved exemption for the two headers that cap
 themselves on purpose.
 
+`/services/medico-legal/reporting-services` followed (Comparison 30), and changed how these ports are
+done. The four before it pinned their design to a page class; this one puts it in the block, as three
+independent Split Feature settings — **Row style**, **Text density**, **Bullet style** — plus a
+per-row **Placeholder icon**. Each defaults to what already rendered, so any split section can take
+the look and none of them moved. A `reporting-services` family reads zero, the page joined
+`computedSnapshot.mjs` (14 of 29 routes → 15), and uploading an image to a row still replaces the
+placeholder outright, which is proven rather than assumed.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items

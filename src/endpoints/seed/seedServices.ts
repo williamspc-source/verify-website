@@ -922,10 +922,14 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           'VERIFY offers a full spectrum of specialist reporting options — each designed to support your matter at the right stage, with the right level of clinical input.',
         background: 'white',
         cssClass: ['rs-services'],
+        rowStyle: 'divided',
+        density: 'compact',
+        bulletStyle: 'dot',
         rows: [
           {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
+            placeholderIcon: 'image',
             imageSide: 'left',
             anchorId: 'file-review',
             title: 'File Review',
@@ -943,6 +947,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
+            placeholderIcon: 'image',
             imageSide: 'right',
             anchorId: 'supplementary-report',
             title: 'Supplementary Report',
@@ -960,6 +965,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
+            placeholderIcon: 'image',
             imageSide: 'left',
             anchorId: 'medical-negligence',
             title: 'Medical Negligence',
@@ -977,6 +983,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
+            placeholderIcon: 'image',
             imageSide: 'right',
             anchorId: 'teleconference',
             title: 'Teleconference',
@@ -994,6 +1001,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
           {
             imagePlaceholder: true,
             placeholderLabel: 'Image Placeholder',
+            placeholderIcon: 'image',
             imageSide: 'left',
             anchorId: 'expert-evidence',
             title: 'Expert Evidence',
@@ -1440,3 +1448,85 @@ export const repairServicesFeatureIcon = async ({ payload, req }: Ctx): Promise<
 
 // The exact value the seed used to write. Anything else is an editor's choice.
 const SUPERSEDED_FEATURE_ICON = 'activity'
+
+/**
+ * Opts the /services/medico-legal/reporting-services rows into the three Split
+ * Feature presentation variants, and gives their placeholders the reference's
+ * glyph.
+ *
+ * The design itself lives in the block's settings rather than in CSS scoped to
+ * this page, so the fixture edit above is only half the job — `authorPage`
+ * early-returns on an authored page, and every existing install (the box
+ * included) holds the pre-variant block.
+ *
+ * ── Why the predicate is `placeholderIcon`, and nothing else ──
+ * The obvious predicate — "all four fields still unset" — does not work, and
+ * measuring it is the only way to find that out. A new column does NOT arrive
+ * null when its field declares a `defaultValue`: the adapter emits
+ * `ADD COLUMN … DEFAULT`, which Postgres backfills into every existing row. So
+ * the moment the schema pushed, this block already read `spaced/default/check`
+ * — indistinguishable from an editor who chose them. Confirmed against the
+ * local DB before this repair had ever run:
+ *
+ *   select row_style, density, bullet_style … → spaced|default|check
+ *   select count(*) filter (where placeholder_icon is not null) … → 0 of 5
+ *
+ * `placeholderIcon` is the one field here with no `defaultValue`, so it is the
+ * one that genuinely reads null on an install that predates this change — an
+ * absence no default and no editor produces. Keying on it makes the repair fire
+ * exactly once; afterwards every placeholder row has an icon and the predicate
+ * is false for good, so a later switch back to Spaced survives.
+ *
+ * The general rule, worth carrying: **a `defaultValue` forecloses using absence
+ * as a migration signal for that field.** Pick the field that has none.
+ */
+export const repairReportingSplitVariants = async ({ payload, req }: Ctx): Promise<void> => {
+  const res = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: 'reporting-services' } },
+    limit: 1,
+    depth: 0,
+    req,
+  })
+  type Row = { imagePlaceholder?: boolean | null; placeholderIcon?: string | null }
+  type Block = {
+    blockType?: string
+    rowStyle?: string | null
+    density?: string | null
+    bulletStyle?: string | null
+    rows?: Row[]
+  }
+  const page = res.docs[0] as { id: number | string; layout?: Block[] } | undefined
+  const layout = page?.layout
+  if (!page || !Array.isArray(layout)) return
+
+  let changed = false
+  const next = layout.map((block) => {
+    if (block?.blockType !== 'splitFeature') return block
+    const placeholderRows = (block.rows ?? []).filter((row) => row?.imagePlaceholder)
+    // No placeholder row means nothing here can carry the absence this keys on,
+    // so leave the block alone rather than guess.
+    if (placeholderRows.length === 0) return block
+    if (!placeholderRows.every((row) => !row?.placeholderIcon)) return block
+    changed = true
+    return {
+      ...block,
+      rowStyle: 'divided',
+      density: 'compact',
+      bulletStyle: 'dot',
+      rows: (block.rows ?? []).map((row) =>
+        row?.imagePlaceholder ? { ...row, placeholderIcon: 'image' } : row,
+      ),
+    }
+  })
+  if (!changed) return
+
+  await payload.update({
+    collection: 'pages',
+    id: page.id,
+    data: { layout: next } as never,
+    req,
+    context: { disableRevalidate: true },
+  })
+  payload.logger.info('— Repaired /services/medico-legal/reporting-services: split-feature variants')
+}

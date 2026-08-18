@@ -452,3 +452,34 @@ per-section rather than a site-wide setting:
 - **Padded — 01, 02, 03** — Information for Clients, Information for Claimants.
 
 Changing it affects only the block you are editing.
+
+### Split Feature rows have three looks, mixed and matched
+
+**Pages → the page → the Split Feature block.** Three independent settings near the top. Each one
+leaves everything else alone, so you can take any combination.
+
+| Setting | Choices | What changes |
+|---|---|---|
+| **Row style** | Spaced · **Divided by a rule** | Spaced leaves a gap between rows. Divided draws a hairline rule between them instead, with even padding either side — no rule above the first row. |
+| **Text density** | Default · **Compact** | Compact steps the *whole section* down a size: the section heading, the intro, each row's title, its body copy, its bullets and the caption inside an image placeholder. |
+| **Bullet style** | Tick icon · **Plain dot** | What marks a bullet that has no icon of its own. |
+
+`/services/medico-legal/reporting-services` is all three at once, and is what the design calls for.
+
+**A bullet with its own icon always keeps it.** Setting Bullet style to Plain dot changes only the
+bullets you have *not* given an icon — so you can mark three points with dots and one with a tick,
+and no choice you made gets thrown away.
+
+### Image placeholders, and how to replace one
+
+Each Split Feature row can show a pale blue box in place of a photo, so a page can be laid out before
+the photography exists. Per row:
+
+- **Show a grey image placeholder** — the tickbox that turns it on.
+- **Placeholder label** — the caption inside it, e.g. "Image Placeholder".
+- **Placeholder icon** — an optional glyph above the caption. Reporting Services uses the `image`
+  one; the /services rows deliberately have none.
+
+**To replace it, just upload an image to that row.** The whole placeholder disappears — box, caption
+and glyph together — and the photo takes its place. You do **not** need to untick anything, and
+removing the image later brings the placeholder back exactly as it was.

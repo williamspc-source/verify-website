@@ -107,6 +107,21 @@ const FAMILIES = {
     pages: ['.design-reference/services/medico-legal/admin-services.html'],
     match: /^\.as-how/,
   },
+  // /services/medico-legal/reporting-services → "Five Ways to Get the Specialist
+  // Opinion You Need". The strongest case of inline-only yet: `grep rs-service`
+  // over the WHOLE assets/ directory returns zero, and no other reference page
+  // uses an `.rs-` class, so this page's <style> block is the only source in
+  // existence for it. styles.css is still listed for `.container` /
+  // `.section-label`, which the section does use.
+  //
+  // Ours implements these through Split Feature *settings* (Row style, Text
+  // density, Bullet style) rather than a class scoped to this page, so the
+  // IMPLEMENTED_AS entries below map onto `.vf-split-feature--*` modifiers.
+  'reporting-services': {
+    css: ['.design-reference/assets/css/styles.css'],
+    pages: ['.design-reference/services/medico-legal/reporting-services.html'],
+    match: /^\.rs-service/,
+  },
 }
 
 /**
@@ -159,6 +174,12 @@ const NOT_PORTED = {
     '.ime-format-card-icon i':
       'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. The `svg` rule carries the sizing.',
     '.ime-format-included-item-icon i': 'ditto',
+  },
+  'reporting-services': {
+    '.rs-services-header':
+      'text-align comes from SectionHeader\'s `--centered` modifier, and the 28px gap below is carried on the subtitle instead. The `max-width: 640px` cap is a decided deviation — it wraps the reference\'s h2 to two lines, and this header is deliberately full width (approved 2026-08-18). Porting it would also need an entry in the heading-wrap guard\'s INTENTIONAL map, which it does not have.',
+    '.rs-services-rows':
+      'No counterpart element. The reference wraps its rows in a flex column; ours are siblings of the section header inside `.vf-section__inner` — which is why the first-row rule is an adjacent-sibling selector rather than `:first-child`.',
   },
 }
 
@@ -296,6 +317,45 @@ const IMPLEMENTED_AS = {
     '.as-how-step strong': ['.vf-process-step h4', '.as-how .vf-process-step h4'],
     '.as-how-step span': ['.vf-process-step p', '.as-how .vf-process-step p'],
   },
+  'reporting-services': {
+    '.rs-services': ['.vf-section', '.vf-section--white'],
+    '.rs-services-header h2': ['.section-title', '.vf-split-feature--compact .vf-section-header__title'],
+    '.rs-services-header h2 span': ['.section-title span', '.vf-accent'],
+    '.rs-services-header p': ['.section-subtitle', '.vf-split-feature--compact .vf-section-header__subtitle'],
+    '.rs-service-row': ['.vf-split', '.vf-split-feature--divided .vf-split'],
+    '.rs-service-row:first-child': '.vf-split-feature--divided .vf-section-header + .vf-split',
+    '.rs-service-row:last-child': '.vf-split-feature--divided .vf-split:last-child',
+    '.rs-service-row-img': [
+      '.vf-split__media',
+      '.rs-services .vf-split__media',
+      '.vf-split__media--placeholder',
+      '.vf-split__media--placeholder:has(.vf-split__placeholder-icon)',
+    ],
+    '.rs-service-row-img svg': '.vf-split__placeholder-icon',
+    '.rs-service-row-img-label': [
+      '.who-image-main',
+      '.vf-split-feature--compact .vf-split__media--placeholder span',
+      '.rs-services .vf-split__media--placeholder span',
+    ],
+    '.rs-service-row-content h3': ['.section-title', '.vf-split-feature--compact .vf-split__title'],
+    // Three deep: the reference puts colour, line-height, size and margin on one
+    // `<p class="rs-service-row-desc">`. Ours splits them between the body
+    // wrapper and the paragraphs inside it, so both compact rules are needed —
+    // omitting the wrapper reported line-height 1.75 while the browser measured
+    // the correct 1.8.
+    '.rs-service-row-desc': [
+      '.vf-split__body',
+      '.vf-split-feature--compact .vf-split__body',
+      '.vf-split-feature--compact .vf-split__body p',
+    ],
+    '.rs-service-row-when-label': ['.vf-split__bullets-label', '.vf-split-feature--compact .vf-split__bullets-label'],
+    '.rs-service-row-when-list': '.vf-split-feature--dots .vf-split__list',
+    '.rs-service-row-when-list li': [
+      '.vf-split-feature--dots .vf-split__list li',
+      '.vf-split-feature--compact .vf-split__list li',
+    ],
+    '.rs-service-row-when-list li::before': '.vf-split-feature--dots .vf-split__list li::before',
+  },
 }
 
 /**
@@ -358,6 +418,17 @@ const EXPLAINED = {
     '.as-how-steps': { 'grid-template-columns': 'Column count is the ProcessSteps block\'s `columns` field, emitted as `--vf-cols`. Set to 4 on this page, so the rendered grid matches.' },
     '.as-how-steps::before': { left: 'Derived from `--vf-cols` rather than hardcoded per family — `calc(100% / (2 * cols) + 14px)` resolves to the reference\'s 12.5% here and 10% on /jme.', right: 'ditto.' },
     '.as-how-step strong': { display: 'The reference needs `display: block` because its step title is a `<strong>`, which is inline. Ours is an `<h4>`, already block-level.' },
+  },
+  'reporting-services': {
+    '.rs-services': {
+      padding: 'Section padding is the editor-controlled `--space-normal` preset (56–88px), not a literal 80px.',
+      'padding-top': 'ditto.',
+      'padding-bottom': 'ditto.',
+    },
+    '.rs-service-row-img-label': {
+      color:
+        'The reference hardcodes #7aafc8. Ours mixes it from the brand colour — `color-mix(in srgb, var(--primary) 59%, var(--white))` — so a rebrand retints the caption instead of stranding it. Measured in the browser at rgb(121, 174, 216): within 1/255 on red and green, 16/255 bluer. No mix of the brand tokens lands closer, and hardcoding the literal would break the one thing this file exists to keep true.',
+    },
   },
 }
 

@@ -1645,6 +1645,83 @@ column count, and `display: block` on the step title — the reference needs it 
 
 ---
 
+## Comparison 30: /services/medico-legal/reporting-services — as settings, not a page scope (2026-08-18)
+
+"Five Ways to Get the Specialist Opinion You Need" had the right content and the wrong everything
+else. The cause was that the section had **almost no CSS of its own**: it is a `splitFeature` block,
+and `globals.css` scoped 22 lines to it (the bullet dots). Everything else fell through to the shared
+`.vf-split*` base, which is tuned for /ime, /jme and About.
+
+| | Was | Reference / now |
+|---|---|---|
+| Row separator | none — a 64px gap | **1px `--border-light` rule, 60px padding either side** |
+| Row title | 40px (full `.section-title` scale) | **25.6px, `-0.02em`, 14px below** |
+| "When to Request" | bold sentence-case body text | **9.6px, weight 800, `0.14em`, uppercase, brand blue** |
+| Body copy | 15.52px / 1.75 | **14.88px / 1.8, 20px below** |
+| Bullets | 18px, tick icons | **13.28px / 1.5, 5px dots at `top: 8px`** |
+| Gap under the description | 0px | **20px** |
+| Header h2 line-height | 48px | **46.08px** |
+| Placeholder | label only, 13.6px sentence case | **44px glyph above an 11.52px uppercase caption** |
+
+### The design is a setting, not a class scoped to this page
+
+The four page ports before this one (`.svc-learn-rows`, `.ime-formats`, `.jme-process`, `.as-how`)
+all pin their design to a page class. Asked whether that should be editable instead, and it should:
+the divider, the type scale and the dot bullets are **Row style**, **Text density** and **Bullet
+style** on the Split Feature block, plus a per-row **Placeholder icon**. Each defaults to what
+already rendered, so any split section site-wide can now take this look and none of them moved.
+Proven both ways: `/style-guide` takes the dots and gives them back (5 ticks → 0 → 5).
+
+Two things stayed page-scoped on purpose, and both are palette literals rather than design choices:
+the placeholder gradient tilts 145deg here where the shared base uses 135deg, and the caption is
+tinted differently. The base is shared with About, the homepage, /specialists and
+/information-centre, whose own references keep 135deg.
+
+### Three findings worth carrying
+
+**A `defaultValue` forecloses using absence as a migration signal.** The repair was written to fire
+when all four new fields were unset — sound, and wrong. A new column does not arrive null when its
+field declares a default: the adapter emits `ADD COLUMN … DEFAULT`, which Postgres backfills into
+every existing row. Measured before the repair had ever run, the block already read
+`spaced/default/check`, indistinguishable from an editor's choice. `placeholderIcon` is the only one
+of the four with no default, so it is the only genuine absence — and keying on it makes the repair
+fire exactly once. Verified both directions: cleared, it restores; with Spaced chosen by hand, that
+choice survives a re-seed.
+
+**"Visually inert" is not "unchanged", and the snapshot is what knows the difference.** The
+placeholder's `flex-direction: column; gap: 12px` was written unscoped, on the reasoning that
+stacking a single child does nothing. True — and it still moved `row-gap` from `normal` to `12px` on
+six boxes across `/`, `/about`, `/services` and `/ime`. Gated on
+`:has(.vf-split__placeholder-icon)`, the compare came back with **only** this route and the usual
+`/in-the-loop` sub-pixel scroll-reveal frame.
+
+**A negative assertion needs a positive control, again.** The first draft proved the dot variant on
+`/services` and reported "default ticks gone" — trivially true, because only reporting-services and
+`/style-guide` have any bullets at all. Re-pointed at `/style-guide`, where the count goes 5 → 0 → 5
+and the claim means something.
+
+### Departures, each recorded rather than quietly taken
+
+- **The header stays full width.** The reference caps it at 640px, which wraps its h2 to two lines.
+  Not ported, by decision — which is why the heading-wrap guard needed no `INTENTIONAL` entry here.
+  Its 19/19 staying put is the check that the cap was not ported by accident.
+- **The caption colour is derived, not literal.** The reference hardcodes `#7aafc8`; ours mixes it
+  from the brand colour so a rebrand retints it, landing within 1/255 on red and green and 16/255
+  bluer. In `EXPLAINED`, with the measurement.
+- **Stacking stays at our 860px, not the reference's 820px** — 860 is where every other `.vf-split`
+  stacks, and splitting it would leave a 40px band behaving unlike the rest of the site. The
+  reference's `order: -1` (image above text on *every* row when stacked) is ported; our base only
+  reset `order` to 0, leaving it below the text on reversed rows.
+- **`--compact` is deliberately not `.svc-learn-rows`' numbers.** /services is a different reference
+  page with a different scale (title `clamp(1.3rem, 2.2vw, 1.75rem)`, body `0.95rem`). Unifying them
+  would make both stop matching.
+
+A `reporting-services` family was added to `referenceCssDiff.mjs` and driven to **zero** across 18
+reference selectors; the other five families still read zero. The page also joined
+`computedSnapshot.mjs`, which covered 14 of 29 routes and now covers 15.
+
+---
+
 ## Summary of recurring, cross-page issues
 
 > **Re-audited 2026-08-17 — read Comparison 22 above before acting on anything here.** Nine of the

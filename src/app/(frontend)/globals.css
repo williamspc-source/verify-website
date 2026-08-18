@@ -8618,27 +8618,195 @@
   z-index: 1;
 }
 
-/* Reporting page "When to Request" lists: plain reference dots instead of
-   the SplitFeature checkmark icon. */
-.rs-services .vf-split__list {
-  list-style: none;
+/* ═══════════════════════════════════════════════════════════════════════════
+   Split Feature presentation variants.
+
+   These are the three designs the reporting-services reference asks for
+   (`.rs-service-row*`, declared ONLY in that page's inline <style> — unusually,
+   `assets/css/styles.css` carries no `.rs-` rules at all, so there is no second
+   copy to disagree with). Each is keyed to an admin choice rather than to that
+   page's class, so any Split Feature section can take it: Row style, Text
+   density and Bullet style on the block. Nothing here applies until an editor
+   opts in, which is why adding them moved no other page.
+
+   Contrast `.svc-learn-rows` below (~:9860), which page-scopes /services' own
+   row port. Its numbers are deliberately NOT these — that is a different
+   reference page with a different scale (title clamp 1.3–1.75rem, body
+   0.95rem). Do not "unify" the two; they would both stop matching.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Row style: divided ── reference `.rs-service-row`, inline lines 200-210.
+   The separator is the row's own border-top, suppressed on the first row.
+   The reference can say `:first-child` because it wraps its rows in
+   `.rs-services-rows`; ours are siblings of `.vf-section-header` inside
+   `.vf-section__inner`, so the first child is the header — and `:first-of-type`
+   fails identically, both being `div`. Hence the adjacent-sibling form. */
+.vf-split-feature--divided .vf-split {
+  align-items: center;
+  padding: 60px 0;
+  border-top: 1px solid var(--border-light);
+  scroll-margin-top: 100px;
 }
-.rs-services .vf-split__list li {
+.vf-split-feature--divided .vf-section-header + .vf-split {
+  border-top: none;
+}
+.vf-split-feature--divided .vf-split:last-child {
+  padding-bottom: 0;
+}
+/* Overrides the 64px stack gap on `.vf-split + .vf-split`; the rule padding
+   supplies the rhythm instead. */
+.vf-split-feature--divided .vf-split + .vf-split {
+  margin-top: 0;
+}
+
+/* ── Text density: compact ── reference `.rs-services-header h2/p`,
+   `.rs-service-row-content h3`, `.rs-service-row-desc` (inline lines 185-246).
+   The row h3 also carries `.section-title` (clamp cap 2.5rem); the two-class
+   selector is what steps it down to 1.6rem. */
+.vf-split-feature--compact .vf-section-header__title {
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+.vf-split-feature--compact .vf-section-header__subtitle {
+  font-size: 0.95rem;
+  line-height: 1.78;
+  margin-bottom: 28px;
+}
+.vf-split-feature--compact .vf-split__title {
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+.vf-split-feature--compact .vf-split__body {
+  color: var(--text-mid);
+  line-height: 1.8;
+}
+/* The base zeroes the last paragraph's margin (:4645) to avoid trailing space.
+   Deliberately not carried over here: the reference's 20px is what separates
+   the description from the "When to Request" label, and each row has exactly
+   one paragraph — so inheriting that zero closed the gap entirely. Measured at
+   0px against the reference's 20px before this was removed. */
+.vf-split-feature--compact .vf-split__body p {
+  font-size: 0.93rem;
+  margin-bottom: 20px;
+}
+/* `.vf-split__bullets-label`'s base sits inside @layer (~:1182), so this
+   unlayered rule wins regardless of specificity. */
+.vf-split-feature--compact .vf-split__bullets-label {
+  font-family: var(--font-heading);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.vf-split-feature--compact .vf-split__list li {
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+/* The placeholder caption steps down with everything else — the same treatment
+   `.svc-learn-rows` page-scopes for /services, offered here as a setting. Its
+   colour is not here: that is a per-page palette literal, below. */
+.vf-split-feature--compact .vf-split__media--placeholder span {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Bullet style: dot ── reference `.rs-service-row-when-list`, inline 256-278. */
+.vf-split-feature--dots .vf-split__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 22px;
+  padding: 0;
+}
+/* `list-item`, not `block`: `list-style: none` above already removes the marker,
+   and this leaves the computed display identical to the reference's default
+   rather than gratuitously different. */
+.vf-split-feature--dots .vf-split__list li {
+  display: list-item;
+  position: relative;
+  padding-left: 16px;
+  color: var(--text-dark);
+}
+.vf-split-feature--dots .vf-split__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--vf-radius-circle);
+  background: var(--primary);
+}
+/* A bullet the editor gave its own icon keeps the icon and drops the dot, so
+   the two never double up. The component renders no default tick under this
+   setting, so `.vf-split__check` is present only on those deliberate rows. */
+.vf-split-feature--dots .vf-split__list li:has(.vf-split__check) {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  padding-left: 0;
 }
-.rs-services .vf-split__list li .vf-split__check {
-  display: none;
+.vf-split-feature--dots .vf-split__list li:has(.vf-split__check)::before {
+  content: none;
 }
-.rs-services .vf-split__list li::before {
-  content: '';
-  flex-shrink: 0;
-  width: 5px;
-  height: 5px;
-  margin-top: 9px;
-  border-radius: var(--vf-radius-circle);
-  background: var(--primary);
+
+/* Placeholder glyph (row-level `placeholderIcon`). The tint is exact: the
+   reference's rgba(28,117,188,0.35) is --primary at 35%.
+
+   Gated on `:has()` rather than applied to every placeholder. Stacking a single
+   child is visually inert, so this was written unscoped at first — and the
+   computed-style snapshot still caught it changing `row-gap` from `normal` to
+   `12px` on six boxes across `/`, `/about`, `/services` and `/ime`. Inert is not
+   the same as unchanged, and "this variant moves no other page" is only worth
+   claiming if it is literally true. */
+.vf-split__media--placeholder:has(.vf-split__placeholder-icon) {
+  flex-direction: column;
+  gap: 12px;
+}
+.vf-split__placeholder-icon {
+  width: 44px;
+  height: 44px;
+  color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+/* The two genuinely page-specific literals here, deliberately not controls:
+   reporting-services' reference tilts the placeholder gradient 145deg where the
+   shared base uses 135deg, and tints its caption differently. The base is shared
+   with About, the homepage, /specialists and /information-centre, whose own
+   references keep 135deg, so it cannot move; `.svc-learn-rows` page-scopes the
+   same declaration for /services for the same reason.
+
+   The caption colour is the reference's literal #7aafc8. Taken as a mix of the
+   brand colour instead, so rebranding retints it — that lands within 1/255 on
+   red and green and 16/255 bluer, which is the closest a brand-derived value
+   gets. Recorded in referenceCssDiff's EXPLAINED table rather than hidden. */
+.rs-services .vf-split__media {
+  background: linear-gradient(145deg, var(--accent), var(--accent-light));
+}
+.rs-services .vf-split__media--placeholder span {
+  color: color-mix(in srgb, var(--primary) 59%, var(--white));
+}
+
+@media (max-width: 860px) {
+  .vf-split-feature--divided .vf-split {
+    padding: 48px 0;
+  }
+  /* The reference stacks at 820px and forces `order: -1` so the image sits
+     above the text on EVERY row; our shared base only resets order to 0, which
+     leaves it below on reversed rows. Matched at our 860px breakpoint rather
+     than the reference's 820px — 860 is where every other `.vf-split` stacks,
+     and splitting it would leave a 40px band behaving unlike the rest of the site. */
+  .vf-split-feature--divided .vf-split--reverse .vf-split__media {
+    order: -1;
+  }
 }
 
 /* JME benefits grid: clear any stray stuck focus outline on a card. */

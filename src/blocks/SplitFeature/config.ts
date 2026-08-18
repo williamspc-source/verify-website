@@ -24,6 +24,49 @@ export const SplitFeature: Block = {
   fields: [
     ...sectionHeaderFields,
     backgroundField,
+    // ── Presentation variants ────────────────────────────────────────────────
+    // Each design the reference asks for is a *setting* here rather than a rule
+    // scoped to one page's class, so any Split Feature section can take it. All
+    // three default to what already renders, so adding them moves nothing.
+    {
+      name: 'rowStyle',
+      type: 'select',
+      defaultValue: 'spaced',
+      options: [
+        { label: 'Spaced (gap between rows)', value: 'spaced' },
+        { label: 'Divided by a rule', value: 'divided' },
+      ],
+      admin: {
+        description:
+          '“Divided” separates each row with a hairline rule instead of a gap — the Reporting Services treatment.',
+      },
+    },
+    {
+      name: 'density',
+      type: 'select',
+      defaultValue: 'default',
+      options: [
+        { label: 'Default', value: 'default' },
+        { label: 'Compact', value: 'compact' },
+      ],
+      admin: {
+        description:
+          '“Compact” steps the whole section’s type down a size — heading, intro, row titles, body and bullets.',
+      },
+    },
+    {
+      name: 'bulletStyle',
+      type: 'select',
+      defaultValue: 'check',
+      options: [
+        { label: 'Tick icon', value: 'check' },
+        { label: 'Plain dot', value: 'dot' },
+      ],
+      admin: {
+        description:
+          'Marker for bullets that have no icon of their own. A bullet with its own icon always keeps it.',
+      },
+    },
     {
       name: 'rows',
       type: 'array',
@@ -38,7 +81,7 @@ export const SplitFeature: Block = {
           label: 'Show a grey image placeholder when no image is set',
           admin: {
             description:
-              'Keeps the two-column layout (reference grey box) until a real image is uploaded.',
+              'Keeps the two-column layout (reference grey box) until a real image is uploaded. Uploading an image above replaces the placeholder entirely — label and icon included — so you can leave this ticked.',
           },
         },
         {
@@ -49,6 +92,13 @@ export const SplitFeature: Block = {
             description: 'Optional caption inside the placeholder (e.g. "COMPANY PHOTO PLACEHOLDER").',
           },
         },
+        iconField({
+          name: 'placeholderIcon',
+          admin: {
+            condition: (_, sib) => Boolean((sib as { imagePlaceholder?: boolean })?.imagePlaceholder),
+            description: 'Optional glyph drawn above the placeholder caption.',
+          },
+        }),
         {
           name: 'imageSide',
           type: 'select',
