@@ -27,8 +27,8 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 4 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min | Only if someone confirms which is intended |
 | 5 | Light-band breadcrumbs are darker and heavier than the reference | Cosmetic, ~25 pages | A slightly heavier trail than the reference draws | ~10 min + re-baseline | A decision, not a tidy-up — someone should confirm the lighter trail is wanted |
 | 6 | Three dead CSS rules on a `.ct-portal-card` class that never reaches the DOM | No | None — a live rule covers it | ~5 min | Fold into the next dead-CSS sweep |
-| 7 | `ServicesGrid` can generate links to service pages that do not exist | Latent | An editor who ticks "Link to service page" gets 404s | ~20 min | Before anyone builds a new services grid |
-| 8 | The enquiry call-to-action has five different wordings | Cosmetic | Inconsistent button copy; one seed/code disagreement | ~30 min + a repair | With the next copy sweep |
+| 7 | A Service with no `linkOverride` would render a link to a page that does not exist | Latent — 0 broken links today | Only if someone adds one of the 6 override-less services to the one grid with linking on; `links.e2e.spec.ts` catches it | ~20 min + a schema change | Before anyone builds a new services grid |
+| 8 | The availability button says "Send enquiry"; form submits say "Send Enquiry" | Cosmetic | One word, one button | ~10 min + a repair | With the next copy sweep |
 
 ---
 
@@ -205,36 +205,61 @@ folding into the next `findDeadCss.mjs` sweep rather than doing alone.
 
 ---
 
-## 7. `ServicesGrid` can generate links to pages that do not exist
+## 7. A Service without a `linkOverride` would render a link to a page that does not exist
+
+**Measured 2026-08-18.** The first version of this entry got the mechanism wrong in a way that
+mattered, so the figures below are the measurement, not a recollection of it.
 
 The `services` collection has **no public route** — there is no `/services/<slug>` page, and
 `LINKABLE_COLLECTIONS` in `routes.ts` excludes it. The service pages a visitor sees are Pages.
+`ServicesGrid` nonetheless offers **Link to service page** plus a `servicePathPrefix`, which together
+build a `<prefix>/<slug>` href that would 404.
 
-But `ServicesGrid` still offers **Link to service page** plus a `servicePathPrefix`, which together
-build `<prefix>/<slug>` hrefs. Every seeded grid sets `linkToService: false` and each Service instead
-carries a `linkOverride` pointing at a real Page (`seedServiceLinks.ts`), so nothing is broken today.
+**What this entry first claimed, and why it was wrong.** It said *"every seeded grid sets
+`linkToService: false`"*, and treated that as the protection. Neither half holds:
 
-**The hazard:** an editor who ticks that box on a new grid gets links that 404, and nothing warns
-them. The block's own comment still claims the collection drives "the dedicated service pages",
-which is stale.
+- **`/information-centre/for-clients` has `linkToService: true`**, published. One of five live grids.
+- The protection is `hrefFor()` in `Component.tsx`, which prefers `linkOverride` and only falls back
+  to the generated path when there is none. All **8** services on that grid carry an override, so
+  every href on the page resolves to a real Page. Nothing is broken.
 
-**Cost of fixing:** either drop the two fields and the code path (they have never been used in
-anger), or make the grid fall back to `linkOverride` and hide the toggle when no route exists.
-Either is a block-config change plus a snapshot compare. Documented in `ADMIN-GUIDE.md` §4 so an
-editor is at least told the card needs a Link override.
+**The real, narrower risk:** **6 of 14 services have no `linkOverride`**. Four (`Brief Reduction
+Service`, `Surrogate Assessment Service`, `Interpreter Booking Service`, `Letter of Instruction
+Review`) sit only on grids with linking off, so they render as unlinked cards; two (`Educational
+Services / AAMLE`, `Medical Negligence`) are on no page at all. Add any of them to the for-clients
+grid — the one grid with linking on — and it renders `/services/<slug>` and 404s.
+
+**There is a net.** `links.e2e.spec.ts` enumerates every page from the five sitemaps and asserts each
+internal link resolves, so it would catch this. It has to be run, which is the whole of the exposure.
+
+**Cost of fixing:** either drop the two fields and the code path (`linkToService` has exactly one
+`true` in the database and it changes nothing), or keep them and hide the toggle when no route
+exists. Either is a block-config change, a schema change for the dropped columns, and a snapshot
+compare. The block's own comment still claims the collection drives "the dedicated service pages",
+which is stale and should go with it. `ADMIN-GUIDE.md` §4 already tells an editor the card needs a
+Link override.
 
 ---
 
-## 8. The enquiry call-to-action has five different wordings
+## 8. One enquiry button is cased differently from the others
 
-Across the site: **Make an Enquiry** (drawer), **Send Enquiry** (portal CTA), **Send enquiry**
-(availability grid, lowercase e), **Enquire →** (service cards, hardcoded and not editable), and
-**Contact Us** (nav). On the specialist profile the seed writes `Make an Enquiry` while the code
-fallback says `Send Enquiry`, so the two disagree about the same button.
+**Measured 2026-08-18**, across `/`, `/contact`, `/make-a-booking`, `/information-centre/for-clients`
+and a specialist profile.
 
-Not wrong, just inconsistent — and it is visitor-facing copy stored in the database, so fixing it
-means picking the canonical wording and writing an unconditional repair, not editing a fixture.
-Worth doing in the same pass as any other copy sweep.
+The availability grid's button reads **"Send enquiry"**; every form submit button reads **"Send
+Enquiry"**. Same action, different casing. That is the whole of it — a one-word fix to
+`SpecialistAvailability → labels.sendEnquiryLabel`, plus an unconditional repair, because it is
+stored copy and a fixture edit alone would not reach an existing install.
+
+**Two things this entry used to claim, both measured false — do not re-derive them:**
+
+- *"Five different wordings for one thing."* They are four wordings for four different actions, which
+  is correct differentiation rather than drift: **Make an Enquiry** opens the enquiry drawer, **Send
+  Enquiry** submits a form, **Enquire →** is a service-card link (16 of them on `/services`), and
+  **Contact Us** is the nav item.
+- *"On the specialist profile the seed and the code fallback disagree."* Not visible. The
+  `specialist-profile` global stores `Make an Enquiry` and that is what renders; the `Send Enquiry`
+  fallback in `profiles/[slug]/page.tsx` only fires when the field is empty, which it is not.
 
 ---
 
