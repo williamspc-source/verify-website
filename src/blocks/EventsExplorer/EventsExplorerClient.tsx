@@ -2,6 +2,7 @@
 import React, { useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { Icon } from '@/components/Icon'
+import { EventCalendar } from '@/components/EventCalendar'
 import { eventPath } from '@/utilities/routes'
 import { isEventPast, startOfDay } from '@/utilities/eventTiming'
 import { accentText } from '@/utilities/accentText'
@@ -64,8 +65,6 @@ type Props = {
   groups?: EventsExplorerGroups | null
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
 const eventUrl = (e: EventItem): string => eventPath(e.slug) ?? '/events'
 
 /**
@@ -93,8 +92,6 @@ const getTodayServer = (): null => null
 // on every render anyway. The unsubscribe is a no-op.
 const subscribeToNothing = (): (() => void) => () => {}
 
-const dayOf = (iso: string): string => String(new Date(iso).getDate())
-const monOf = (iso: string): string => MONTHS[new Date(iso).getMonth()] || ''
 const dateLabel = (iso: string): string => {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
@@ -193,13 +190,7 @@ const EventRow: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, cta
           />
         </div>
       ) : (
-        <div className="event-list-calendar-wrap">
-          <div className="event-list-calendar">
-            <span className="cal-rule" />
-            <span className="cal-day">{dayOf(event.date)}</span>
-            <span className="cal-month">{monOf(event.date)}</span>
-          </div>
-        </div>
+        <EventCalendar date={event.date} />
       )}
       <div className="event-list-content">
         <h2>{event.title}</h2>
@@ -239,12 +230,17 @@ const EventCard: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, ct
   const href = eventUrl(event)
   return (
     <article className="event-card">
-      <a className="event-card-media" href={href} aria-hidden tabIndex={-1}>
+      <a
+        className={`event-card-media${event.image ? '' : ' event-card-media--calendar'}`}
+        href={href}
+        aria-hidden
+        tabIndex={-1}
+      >
         {event.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={event.image} alt="" />
         ) : (
-          <span>{dateLabel(event.date)}</span>
+          <EventCalendar date={event.date} variant="card" />
         )}
       </a>
       <div className="event-card-body">

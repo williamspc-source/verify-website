@@ -169,6 +169,11 @@ export const Events: CollectionConfig<'events'> = {
               name: 'image',
               type: 'upload',
               relationTo: 'media',
+              label: 'Event photo',
+              admin: {
+                description:
+                  'Optional. Shown on the events listings and on the Events hub cards. Without one, the event falls back to a date calendar showing the day and month — so a missing photo never leaves an empty panel. Cropped to fill, so a landscape image works best.',
+              },
             },
             {
               name: 'excerpt',

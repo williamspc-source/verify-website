@@ -12207,3 +12207,35 @@
    renders the shared sheet's 700, which is what globals.css declares. Hence a
    field rather than a change to `.section-title` itself. */
 .vf-headings--heavy .section-title { font-weight: 800; }
+
+/* ── The date-calendar fallback inside a card's 260px media panel ─────────────
+   Same glyph as the listing rows (`<EventCalendar variant="card" />`), so an
+   event without a photo looks identical on /events and on the two listing pages.
+   Before this they disagreed: the rows drew the calendar while both card sites
+   printed the date as text on the blue gradient.
+
+   The gradient is dropped to white here because the glyph is grey (#b8b8b8) and
+   would not read against it. Scoped to `--calendar`, which the components add
+   ONLY on the no-image branch, so the gradient still backs an <img> — and any
+   other consumer of `.event-card-media` is untouched.
+
+   The wrap's 3px accent rule is the separator between glyph and content on a
+   listing row. On a card the panel already has the body beside it, and the
+   reference's own card has no such rule, so `.is-card` drops it. */
+.event-card-media--calendar {
+  background: var(--white);
+  background-image: none;
+}
+.event-list-calendar-wrap.is-card {
+  width: 100%;
+  height: 100%;
+  border-right: 0;
+  /* `.event-card-media` sets uppercase + 0.1em tracking for the reference's
+     "Event image" caption. Both INHERIT, and `.cal-day`/`.cal-month` redeclare
+     neither — so the hub rendered "20 AUG" letter-spaced while the listing rows
+     rendered "20 Aug". Measured 56.0px against 47.5px for the same month.
+     A computed-style comparison of the calendar's own box missed this entirely:
+     the properties that differed were ones neither calendar rule declares. */
+  text-transform: none;
+  letter-spacing: normal;
+}

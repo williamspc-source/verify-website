@@ -91,6 +91,10 @@ const ROUTES = [
   '/specialists',
   '/in-the-loop',
   '/events',
+  // The two listing pages render their rows CLIENT-side, so they were absent
+  // from this list while being the pages a reader would assume it covered.
+  '/events/upcoming-events',
+  '/events/past-events',
   '/contact',
   '/search',
   '/privacy-policy',

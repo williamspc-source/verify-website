@@ -297,6 +297,38 @@ measurement, so the `join-expert-panel` family reads zero honestly rather than b
 
 ---
 
+## 10. Two deliberate departures from the reference on the events listings
+
+**Decided 2026-08-19** (`verify-website-design-diff.md` Comparison 40). Both will read as *defects*
+to anyone diffing `/events/upcoming-events` or `/events/past-events` against the reference, and the
+`events` diff family reads **zero either way** — it compares declarations, not which branch renders
+— so without this entry they will eventually be "fixed".
+
+**1. A date calendar where the reference draws a photo placeholder.** The reference renders a blue
+`Event Photo` box on every row. We render an outlined calendar glyph with the day and month, on the
+listings *and* the `/events` hub cards. The reference's own `.event-list-calendar*` rules
+(`events.css:749–806`) are dead in the reference — leftovers its JS never uses — which is how we came
+to have them.
+
+Chosen because a placeholder box tells a visitor nothing while the date is the single most useful
+thing about an event. It is only ever a **fallback**: uploading **Event photo** on the event shows
+the photograph instead, in both places.
+
+*To reverse it:* render `.event-list-photo` with a `<span>` label instead of `<EventCalendar />` in
+the three call sites (`EventsExplorerClient`'s `EventRow` and `EventCard`, `ArchiveBlock`'s event
+card), delete `src/components/EventCalendar/`, and delete the calendar CSS. The `.event-list-photo`
+rules are already in globals.css and already match the reference.
+
+**2. No pagination control on a single page.** The reference always draws `‹ 1 ›`; ours returns
+`null` at `pages <= 1` (`EventsExplorerClient.tsx`, `Pagination`). Visible on `/upcoming-events`,
+which has 2 events; `/past-events` has 14 and shows the control normally.
+
+Chosen because a control that cannot go anywhere is noise. *To reverse it:* delete the
+`if (pages <= 1) return null` guard — the rest of the component already matches the reference's
+`renderPagination` verbatim, disabled arrows included.
+
+---
+
 ## 1. The outstanding migration
 
 Not a code fix, and not a defect. The local database has been kept in step by the Postgres adapter's

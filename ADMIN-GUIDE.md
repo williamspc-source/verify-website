@@ -118,6 +118,11 @@ most common way to lose an article.
 the whole of the day it is held, not until its start time. Registration is controlled separately by
 **Registration closes at**, so an event can be running and still taking expressions of interest.
 
+**Event photo** is worth setting. It is shown on the two listing pages and on the `/events` hub
+cards. Leave it empty and the event falls back to a date calendar showing the day and month — so a
+missing photo never leaves an empty panel, and you can add photos gradually rather than all at once.
+It is cropped to fill its panel, so a landscape image works best.
+
 **After the event**, the same record becomes the write-up: add a **Recap**, a **Photo gallery** and
 **Downloads**. HOOKS.md §9 has the full list of what an event page can hold.
 

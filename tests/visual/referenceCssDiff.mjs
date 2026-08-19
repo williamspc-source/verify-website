@@ -84,6 +84,14 @@ import { readFileSync } from 'node:fs'
 // ── Families ────────────────────────────────────────────────────────────────
 // Add one per porting job. `match` decides which selectors are in scope.
 const FAMILIES = {
+  // ⚠ This family's zero is NOT evidence that the events pages look like the
+  // reference. The reference's `.event-list-calendar*` / `.cal-*` rules
+  // (events.css:749-806) are DEAD there — its JS renders a blue "Event Photo"
+  // placeholder on every row and never that glyph. We ported the rules
+  // faithfully, so every declaration matches and the count reads zero, while the
+  // pages rendered a completely different panel. A declaration diff compares
+  // rules, not which BRANCH of a component renders; nothing here can catch that.
+  // Our calendar fallback is deliberate — see OUTSTANDING.md.
   events: {
     css: ['.design-reference/assets/css/events.css'],
     pages: [

@@ -2023,6 +2023,9 @@ export interface Event {
    * Optional — link to a Location for structured filtering. The free-text "location" above is still shown if set.
    */
   locationRef?: (number | null) | Location;
+  /**
+   * Optional. Shown on the events listings and on the Events hub cards. Without one, the event falls back to a date calendar showing the day and month — so a missing photo never leaves an empty panel. Cropped to fill, so a landscape image works best.
+   */
   image?: (number | null) | Media;
   /**
    * Short summary used in listings.

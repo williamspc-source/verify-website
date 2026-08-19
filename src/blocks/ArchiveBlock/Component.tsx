@@ -15,6 +15,7 @@ import RichText from '@/components/RichText'
 
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
+import { EventCalendar } from '@/components/EventCalendar'
 import { Icon } from '@/components/Icon'
 import { cn } from '@/utilities/ui'
 import { bgClasses, type SectionBackground } from '@/components/Section'
@@ -291,14 +292,20 @@ const EventCard: React.FC<{
 
   return (
     <article className="event-card">
-      <a className="event-card-media" href={href}>
-        {/* The reference prints a fixed "Event image" here. We print the date
-            instead, so a panel still awaiting a photograph tells the visitor
-            something. Matches EventsExplorer's card, which shares this design. */}
+      {/* The reference prints a fixed "Event image" here; we draw the date, so a
+          panel still awaiting a photograph tells the visitor something. The
+          previous comment claimed this "matches EventsExplorer's card" — it did
+          not: this printed the date as text on a blue gradient while the listing
+          rows drew a calendar glyph, and the same event looked like two designs
+          depending on the page. All three sites now share <EventCalendar />. */}
+      <a
+        className={`event-card-media${image ? '' : ' event-card-media--calendar'}`}
+        href={href}
+      >
         {image ? (
           <Media resource={image} fill imgClassName="event-card-photo" />
         ) : (
-          <span>{dateLabel || 'Event image'}</span>
+          <EventCalendar date={event.date} variant="card" />
         )}
       </a>
       <div className="event-card-body">

@@ -2418,3 +2418,86 @@ p` line-height (1.75 vs 1.85), and the centred subtitle's 600 vs 640px. Each is 
 ~29 pages use. `.vf-client-overview` (globals.css:9231) already encodes exactly this treatment as a
 page scope for /for-clients, whose reference intro is the same pattern — so the honest fix is one
 shared "editorial intro" variant serving both, not a second page scope. Recorded in `OUTSTANDING.md`.
+
+## Comparison 40: /events listings — the rows already matched; the fallback did not (2026-08-19)
+
+Reported from a side-by-side of `/events/upcoming-events` and `/events/past-events`.
+
+**The row styling was already correct.** Measured in the browser at 1440px against
+`.design-reference/assets/css/events.css`, every property matched: grid `310px 1fr`, gap 32px,
+padding `28px 0 34px`, separator `1px #eeeeee`, content `padding-right: 24px`, title 32px/300/1.25
+in `#1c75bc` with 18px below, meta grid `minmax(0,1fr) minmax(140,220)` at `14px 36px`/14.4px, 18px
+icons, dotted-underlined location link, excerpt 14.88px/1.65/max-800px, button min-width 118px,
+`9px 18px`, `1px #b8b8b8`, radius 8, 11.2px. The `events` family covers all of it — 119 selectors,
+zero.
+
+Only three things differed.
+
+**1. The no-photo fallback (the visible one).** The reference draws a blue "Event Photo" placeholder
+on every row. Ours drew an outlined calendar glyph. The reference's own `.event-list-calendar*`
+rules (`events.css:749–806`) are **dead there** — leftovers its JS never renders. We ported them and
+made them our default render path.
+
+*Decision: keep the calendar.* It tells a visitor the date; a placeholder box tells them nothing. A
+deliberate deviation, recorded in `OUTSTANDING.md` §10 so it is not read as a defect later.
+
+**2. Pagination on a single page.** The reference always draws `‹ 1 ›`; ours returns `null` at
+`pages <= 1`, which is why `/upcoming-events` (2 events) showed none. *Decision: keep hiding it.*
+Also §10.
+
+**3. The time dash.** `12:00 pm – 1:00 pm` against the reference's hyphen. *Decision: match* —
+fixture plus `repairEventTimeDash.ts`, keyed on the superseded en dash so it fires once and cannot
+touch a label an editor has reworded. 16 of 16 converted, verified by query.
+
+### The real defect: four fallbacks, three of them disagreeing
+
+| Site | Was |
+|---|---|
+| List rows (`/upcoming-events`, `/past-events`) | calendar glyph |
+| Hub cards (`/events`) | date as text on a blue gradient |
+| `ArchiveBlock` event cards | date as text on a blue gradient |
+| `ArchiveBlock` compact (`.ni-event-card`) | day/month badge |
+
+The same event looked like two designs depending on the page. The third renders on no page today
+(`/in-the-loop` uses `event_style: 'compact'`) but is editor-selectable, so leaving it would have
+re-created the drift the moment someone chose it. The fourth is a **different reference component**
+(`.ni-event-date-badge`, which the reference does define and render) and was left alone.
+
+All three now share `src/components/EventCalendar/index.tsx` — presentational, no hooks, so it is
+valid in both the client and server trees. It also absorbs the two duplicate month-abbreviation
+tables that let them drift in the first place. `variant="card"` drops `.event-card-media`'s gradient
+to white so the grey glyph reads.
+
+**`Events.image` was a bare unlabelled upload** — no label, no description, and 0 of 16 events used
+it. Now **"Event photo"**, described as replacing the calendar in listings and cards. That is the
+editable half: the calendar is only ever the fallback.
+
+### Two things the property-by-property check missed, and how
+
+**The stale build.** Both new CSS rules were ignored in the browser — including one at (0,2,0)
+against (0,1,0), which cannot lose on specificity. Fetching the served stylesheets and grepping
+found `.event-card-media` present and both new selectors **absent**: Turbopack had not recompiled.
+`rm -rf .next` + restart, source unchanged. Fifth occurrence.
+
+**An inherited property neither calendar rule declares.** After the fix the hub still rendered
+"20 **AUG**" letter-spaced where the listing rendered "20 Aug" — `.event-card-media` sets
+`text-transform: uppercase` and `letter-spacing: 0.1em` for the reference's caption, both inherit,
+and `.cal-day`/`.cal-month` redeclare neither. A computed-style comparison of the calendar's own box
+reported **identical** throughout, because the properties that differed were ones I had not thought
+to measure. Caught by looking at a screenshot. Fixed on `.is-card`; month box now 47.5px on both,
+was 56.0px against 47.5px.
+
+### Verified
+
+- Calendar computed box **identical** across `/events`, `/upcoming-events` and `/past-events` —
+  size, border, radius, colour, day and month type, transform and tracking.
+- **Both states:** attaching a photo to one event rendered `<img>` on both `/events` and
+  `/upcoming-events` while the other six/one still drew the calendar; detached afterwards, back to
+  0 of 16.
+- **Break test:** reverting the hub to the date-text fallback reproduced the original mismatch live
+  in the browser; restoring brought the fix back.
+- `computedSnapshot` (with the two listing routes **added to `ROUTES`**, which had never covered
+  them): `/events` 14 changed / 7 removed / 35 added — the panel's markup; the two listing pages
+  **0 changed**, so the dash is purely textual; `/in-the-loop` one node differing by `matrix(…4.920)`
+  → `(…4.980)`, a scroll-reveal frame.
+- All 13 diff families zero. tsc 0, lint 0.

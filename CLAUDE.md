@@ -658,6 +658,29 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   carried its own 800 since it was ported, and `document.querySelectorAll('.vf-headings--heavy')`
   returned **0** on that page. A control selected by `querySelector` position rather than by the
   property under test will eventually select something with its own reason to differ.
+- **A declaration diff cannot see which BRANCH of a component renders.** The reference's
+  `.event-list-calendar*` rules (`events.css:749-806`) are **dead in the reference** — leftovers its
+  JS never uses, since it draws a blue "Event Photo" placeholder on every row. We ported them
+  faithfully, which made every declaration match, so the `events` family read zero across **119**
+  selectors while the pages rendered a completely different panel from the reference. A family's
+  zero says the rules agree; it says nothing about which rule the markup reaches for. Where a
+  component picks between two treatments, the guard has to be a rendered-DOM assertion.
+- **A computed-style comparison only covers the properties you thought to list.** After unifying the
+  events date glyph, a 10-property check reported the hub and the listing rows **identical** — and a
+  screenshot showed "20 AUG" on one and "20 Aug" on the other. `.event-card-media` sets
+  `text-transform: uppercase` and `letter-spacing: 0.1em`, both of which **inherit**, and
+  `.cal-day`/`.cal-month` redeclare neither, so the difference lived entirely outside the list.
+  Measured 56.0px against 47.5px for the same month. Same family as the `font-weight: unset` trap:
+  when a ported element sits inside a differently-styled parent, enumerate the *inherited*
+  properties — `text-transform`, `letter-spacing`, `font-weight`, `color`, `line-height`,
+  `text-align` — not just the ones either rule declares.
+- **`computedSnapshot`'s `ROUTES` is a claim about coverage, and it was wrong about `/events`.** It
+  listed `/events` but neither `/events/upcoming-events` nor `/events/past-events` — the two pages
+  whose rows a reader would assume it covered. Both added before capturing the baseline, per the
+  rule already recorded; a route added afterwards has nothing to compare against and reads as clean.
+  Worth noting their rows render **client-side**, so `curl | grep` finds zero `.event-list-row` on a
+  page that has eight — `networkidle` plus the harness's settle does capture them (verified: 90
+  article nodes), but any check on these pages must drive a browser.
 - **A regex bulk edit across a fixture file reaches further than the page you are editing.** Adding
   one field to five rows via `perl -0pi -e` matched **13** — every row in `seedServices.ts` with the
   same two-line preamble, including `/services`, which must not have it. It was caught by reading
