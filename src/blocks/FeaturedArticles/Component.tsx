@@ -1,3 +1,4 @@
+import { mediaSrc } from '@/utilities/mediaSrc'
 import type { Post, Category, Stream } from '@/payload-types'
 import type { Where } from 'payload'
 
@@ -33,8 +34,6 @@ const formatDate = (value?: string | null): string => {
   return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`
 }
 
-const mediaUrl = (m: unknown): string | null =>
-  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
 
 // Resolve a post's byline name from the free-text author fields, falling back
 // to a linked Team member / Specialist (source relationship), then authors.
@@ -84,7 +83,7 @@ const toSlide = (post: Post, badgeLabel: string, bylinePrefix: string): Featured
   const byline = bylineParts.length ? `${bylinePrefix} ${bylineParts.join('  ·  ')}` : null
 
   return {
-    imageUrl: mediaUrl(post.heroImage),
+    imageUrl: mediaSrc(post.heroImage, 565 * 2), // .ni-featured-img, measured 565px
     badge: badgeLabel,
     category: postTagLabel(post, stream, badgeLabel),
     title: post.title,

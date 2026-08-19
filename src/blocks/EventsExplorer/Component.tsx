@@ -1,4 +1,5 @@
 import type { Event } from '@/payload-types'
+import { mediaSrc } from '@/utilities/mediaSrc'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -26,8 +27,6 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   'specialist-seminar': 'Specialist Seminar',
 }
 
-const mediaUrl = (m: unknown): string | null =>
-  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
 
 // Field reads are typed defensively because payload-types have not been
 // regenerated for this block yet.
@@ -47,7 +46,13 @@ type Props = {
   bare?: boolean
 }
 
-const serialise = (e: Event): EventItem => ({
+/**
+ * `photoWidth` is the CSS width the event photo renders at, measured:
+ * 310px in a list row, 260px in a hub card. Doubled for retina inside
+ * `mediaSrc`, which then serves the smallest generated size that covers it
+ * rather than the original upload.
+ */
+const serialise = (e: Event, photoWidth: number): EventItem => ({
   id: String(e.id),
   title: e.title,
   slug: e.slug ?? '',
@@ -60,7 +65,7 @@ const serialise = (e: Event): EventItem => ({
   cost: e.cost ?? '',
   excerpt: e.excerpt ?? '',
   registrationUrl: e.registrationUrl ?? '',
-  image: mediaUrl(e.image),
+  image: mediaSrc(e.image, photoWidth * 2),
 })
 
 // Server block: fetches ALL events once (published only) and hands plain,
@@ -87,7 +92,7 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
     sort: 'date',
   })
 
-  const events = res.docs.map(serialise)
+  const events = res.docs.map((e) => serialise(e, cardStyle === 'card' ? 260 : 310))
 
   const hasHeader = Boolean(eyebrow || heading || subheading)
 

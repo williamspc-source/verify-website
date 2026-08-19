@@ -125,7 +125,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
             <div>
               <div className="staff-photo">
                 {photo ? (
-                  <Media resource={photo} imgClassName="staff-photo-img" />
+                  <Media resource={photo} imgClassName="staff-photo-img" size="320px" />
                 ) : null}
               </div>
 

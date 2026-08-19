@@ -54,7 +54,7 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
   for (const s of specialistsRes.docs) {
     const specId = relId(s.specialty)
     if (!specId) continue
-    const photo = mediaFocal(s.photo)
+    const photo = mediaFocal(s.photo, 150) // .spec-photo-img, measured 150px
     const person: RosterPerson = {
       id: String(s.id),
       name: s.title,

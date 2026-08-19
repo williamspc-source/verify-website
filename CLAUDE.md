@@ -681,6 +681,32 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   Worth noting their rows render **client-side**, so `curl | grep` finds zero `.event-list-row` on a
   page that has eight — `networkidle` plus the harness's settle does capture them (verified: 90
   article nodes), but any check on these pages must drive a browser.
+- **An invalid `sizes` attribute fails by making the browser fetch the LARGEST candidate, and
+  nothing anywhere says so.** `ImageMedia` emitted `(max-width: 1920px) 3840w, …`; `w` is a **srcset**
+  descriptor and is not a valid `sizes` length, so the browser discarded the entire list, fell back to
+  the `100vw` default and assumed every image spanned the viewport. No error, no console warning, no
+  layout symptom — images were merely several times too big. Measured: a **1440×1651** file into a
+  **320×367** box on a 4669 KB page. The list was also ordered widest-first, and `sizes` is
+  first-match-wins, so the 1920 entry would have won at every viewport even with a valid unit. Read
+  the attribute the browser actually receives, and compare `naturalWidth` against the rendered box.
+- **A component that already applies a focal `object-position` must only ever be handed a WIDTH-ONLY
+  derivative.** Payload's `square` and `og` sizes CROP — measured, `square` turns a 5246×6016 original
+  into 500×**500**, aspect 0.872 → 1.0 — while our person cards crop again in CSS from the editor's
+  focal point. Handing over a pre-cropped file crops twice and shifts every face on the site, and it
+  would pass any byte or ratio check while doing so. The width-only ladder
+  (`thumbnail`/`small`/`medium`/`large`/`xlarge`) preserves aspect exactly.
+- **"Which derivative do I serve" has a fallback case that is the MAJORITY, not an edge.** Payload
+  only generates a size smaller than the source, so a modest upload has **none**. Three of the four
+  photos on `/about/meet-the-team` are 300×300 originals with zero derivatives; a helper that assumed
+  `sizes.small` exists would have broken the common case while fixing the rare one. Prove both states
+  in a single reading — the sized and the unsized rendering side by side — because a check pointed
+  only at the big photo says nothing about the four beside it.
+- **A rounded derivative is not the same aspect ratio as its original.** Payload rounds
+  1359 × (600/4267) to **191**, so the logo's generated size is 0.07% wider than the source. With CSS
+  setting a height and `width: auto`, the rendered logo moved 182.094px → 182.188px — 63 nodes in the
+  computed snapshot, and the only layout movement from an image-sizing pass. Harmless here, but it
+  means "sizes preserve the aspect ratio" is *approximately* true, and a comment claiming it exactly
+  is wrong.
 - **A regex bulk edit across a fixture file reaches further than the page you are editing.** Adding
   one field to five rows via `perl -0pi -e` matched **13** — every row in `seedServices.ts` with the
   same two-line preamble, including `/services`, which must not have it. It was caught by reading

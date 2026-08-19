@@ -1,4 +1,5 @@
 'use client'
+import { mediaSrc } from '@/utilities/mediaSrc'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { Icon } from '@/components/Icon'
@@ -9,8 +10,6 @@ import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { accentText, stripAccent } from '@/utilities/accentText'
 
-const mediaUrl = (m: unknown): string | null =>
-  m && typeof m === 'object' && 'url' in m ? ((m as { url?: string | null }).url ?? null) : null
 
 type Slide = NonNullable<Props['slides']>[number]
 
@@ -20,7 +19,7 @@ const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean; className?
   hidden,
   className,
 }) => {
-  const img = mediaUrl(slide.image)
+  const img = mediaSrc(slide.image, 367 * 2) // .events-offer-visual, measured 367px
   const pills = (slide.pills || []).filter((p) => p.text)
   return (
     <article

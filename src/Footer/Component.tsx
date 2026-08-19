@@ -1,3 +1,4 @@
+import { resolveBrandLogo } from '@/components/Logo/Logo'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getPrimaryOffice } from '@/utilities/primaryOffice'
 import Link from 'next/link'
@@ -85,9 +86,12 @@ export async function Footer() {
   const hours =
     (Array.isArray(footer?.hours) && footer.hours.length ? footer.hours : office?.hours) || []
 
+  // Through resolveBrandLogo, NOT the raw `.url`. The header already builds its
+  // URL that way; reading `.url` here produced a second, differently-formed URL
+  // for the very same file, so the 119 KB logo was fetched twice on every page.
+  // Measured 264px in the footer.
   const logoSrc =
-    (typeof settings?.logoFooter === 'object' && settings?.logoFooter?.url) ||
-    (typeof settings?.logo === 'object' && settings?.logo?.url) ||
+    resolveBrandLogo(settings?.logoFooter ?? settings?.logo, 264)?.src ||
     '/assets/images/logo.png'
 
   return (

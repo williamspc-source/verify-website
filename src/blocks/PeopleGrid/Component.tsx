@@ -36,7 +36,8 @@ const firstLocationTitle = (locations: Specialist['locations']): string | null =
 // No specialty badge overlay on the photo and no qualification/degree pills
 // (those live on the full specialist profile, not the panel card).
 const specialistToCard = (s: Specialist, linkProfiles: boolean): PersonCardData => {
-  const photo = mediaFocal(s.photo)
+  // Circle avatar; the widest instance measured 255px on the experts carousel.
+  const photo = mediaFocal(s.photo, 255)
   return {
     name: s.title,
     position: s.position,
@@ -51,7 +52,8 @@ const specialistToCard = (s: Specialist, linkProfiles: boolean): PersonCardData 
 // Team members render as rectangular photo cards (full-bleed headshot on top,
 // name + role beneath) — the design-reference "Meet the Team" treatment.
 const teamToCard = (t: Team, linkProfiles: boolean): PersonCardData => {
-  const photo = mediaFocal(t.photo)
+  // .vf-team-card__image, measured 265px on /about/meet-the-team.
+  const photo = mediaFocal(t.photo, 265)
   return {
     name: t.title,
     position: t.role,

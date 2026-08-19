@@ -174,7 +174,7 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
           note: sess.notes || null,
         })
       }
-      const photo = mediaFocal(sp.photo)
+      const photo = mediaFocal(sp.photo, 150) // .sa-photo-img, measured 150px
       return {
         id: String(sp.id),
         name: sp.title,
@@ -194,7 +194,7 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
 
   // ── Featured carousel: driven by the "Advertise availability" toggle ──
   const featured: PersonCardData[] = specialists.map((sp: Specialist) => {
-    const photo = mediaFocal(sp.photo)
+    const photo = mediaFocal(sp.photo, 255) // .expert-avatar, measured 255px
     return {
     name: sp.title,
     position: sp.position ?? null,

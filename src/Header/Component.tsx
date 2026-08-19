@@ -12,7 +12,7 @@ export async function Header() {
   const headerData = await getCachedGlobal('header', 2)()
   const settings = await getCachedGlobal('site-settings', 1)()
 
-  const logo = resolveBrandLogo(settings?.logo)
+  const logo = resolveBrandLogo(settings?.logo, 182) // .nav-logo img, measured 182px
 
   return <HeaderClient data={headerData} logo={logo} />
 }

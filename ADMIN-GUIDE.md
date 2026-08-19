@@ -266,6 +266,16 @@ search engines read.
 **Fix a bad crop with the focal point, not a new upload.** If a portrait crops through someone's
 face, open the image and move the focal point; every place that image is used re-crops around it.
 
+**Upload at full quality — do not shrink images by hand.** The site makes its own smaller copies and
+serves whichever one fits the space, so a large photo is now an advantage (it stays sharp on a retina
+screen) rather than a problem. This was not always true: a 5246×6016 headshot was once sent to
+visitors at full size and, squeezed into a small card, actually looked *worse* than the low-resolution
+photos beside it. Fixed on 2026-08-19.
+
+**One thing still worth knowing:** save photographs as **JPEG**, not PNG. PNG is lossless and is the
+right choice for a logo, but a PNG photograph is roughly ten times the file size of the identical
+JPEG, and the site cannot convert between formats. See OUTSTANDING.md §11.
+
 ### Forms, and Form Submissions
 
 **Forms** are the enquiry forms used across the site. **Form Submissions** is the record of what

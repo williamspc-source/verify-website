@@ -179,7 +179,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
     ...(Array.isArray(event.presenters) ? event.presenters : []).flatMap((rel) => {
       if (!rel || typeof rel !== 'object' || typeof rel.value !== 'object') return []
       const person = rel.value as { title?: string | null; slug?: string | null; position?: string | null; role?: string | null; photo?: unknown }
-      const photo = mediaFocal(person.photo)
+      const photo = mediaFocal(person.photo, 104) // circle avatar, --vf-avatar-size 104px
       return [
         {
           name: person.title ?? '',

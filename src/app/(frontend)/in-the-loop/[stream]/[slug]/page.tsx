@@ -123,7 +123,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
     (author.photo && typeof author.photo === 'object' && author.photo) ||
     (src && typeof src.photo === 'object' && src.photo) ||
     null
-  const authorFocal = mediaFocal(authorPhoto)
+  const authorFocal = mediaFocal(authorPhoto, 56) // article byline avatar
 
   const toc = tocFromContent(post)
 

@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react'
 
+import { mediaSrc } from './mediaSrc'
+
 /**
  * Image framing helpers driven by Payload's native focal point.
  *
@@ -24,15 +26,20 @@ type MediaLike = {
  * populated media object (a bare id / missing), so callers can fall back to a
  * sensible default.
  */
-export const mediaFocal = (m: unknown): FocalMedia => {
+export const mediaFocal = (m: unknown, boxWidth?: number): FocalMedia => {
   if (m && typeof m === 'object') {
     const o = m as MediaLike
     const hasFocal = typeof o.focalX === 'number' || typeof o.focalY === 'number'
     const focus = hasFocal
       ? `${typeof o.focalX === 'number' ? o.focalX : 50}% ${typeof o.focalY === 'number' ? o.focalY : 50}%`
       : null
+    // `boxWidth` is the CSS width the photo renders at; doubling it keeps a
+    // retina screen sharp. Omit it and the original file is served, which is
+    // what every caller used to get — a 5246px headshot into a 265px card.
+    // Callers pass a measured width, not a guess.
+    const sized = typeof boxWidth === 'number' ? mediaSrc(o, boxWidth * 2) : null
     return {
-      url: typeof o.url === 'string' ? o.url : null,
+      url: sized ?? (typeof o.url === 'string' ? o.url : null),
       focus,
       zoom: typeof o.zoom === 'number' ? o.zoom : null,
     }

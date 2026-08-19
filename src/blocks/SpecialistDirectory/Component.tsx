@@ -84,7 +84,7 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
   })
 
   const specialists: DirectorySpecialist[] = docs.map((s) => {
-    const photo = mediaFocal(s.photo)
+    const photo = mediaFocal(s.photo, 150) // .spec-photo-img, measured 150px
     return {
       id: String(s.id),
       name: s.title,

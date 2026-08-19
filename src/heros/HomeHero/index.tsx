@@ -1,3 +1,4 @@
+import { mediaSrc } from '@/utilities/mediaSrc'
 import React from 'react'
 
 import type { Page } from '@/payload-types'
@@ -10,7 +11,6 @@ import { toClassName } from '@/utilities/cssClass'
 import { accentText } from '@/utilities/accentText'
 import { DefinitionPanel } from './DefinitionPanel'
 import { getCachedGlobal } from '@/utilities/getGlobals'
-import { getMediaUrl } from '@/utilities/getMediaUrl'
 
 type HomeHeroProps = Page['hero']
 
@@ -25,8 +25,11 @@ export const HomeHero = async (props: HomeHeroProps) => {
   const settings = (await getCachedGlobal('site-settings', 1)()) as {
     shield?: { url?: string | null; updatedAt?: string | null } | null
   }
+  // Measured 50px on screen. The bundled fallback is a static 1166px / 73 KB PNG
+  // that mediaSrc cannot help with (no derivatives exist for a file outside the
+  // Media collection) — noted in OUTSTANDING.md; an uploaded shield IS sized.
   const shieldSrc = settings?.shield?.url
-    ? getMediaUrl(settings.shield.url, settings.shield.updatedAt)
+    ? (mediaSrc(settings.shield, 50 * 2) ?? '/assets/images/VERIFY Shield.png')
     : '/assets/images/VERIFY Shield.png'
   const definition = (props as { definition?: { term?: string | null; pronunciation?: string | null; text?: string | null; definitionStyle?: string | null; interaction?: string | null } }).definition
   const cssClass = (props as { cssClass?: string | string[] | null }).cssClass

@@ -2521,3 +2521,86 @@ calendar's own 4px border both untouched. `computedSnapshot` 9370 → 9370 nodes
 exactly the number of calendar wraps on the three pages (2 + 8 + 7) — each differing only in
 `borderRightColor`, which is unobservable at zero width; plus the usual `/in-the-loop` scroll-reveal
 frame.
+
+## Comparison 41: images were served at their original size, everywhere (2026-08-19)
+
+Reported as "why does my photo look pixelated compared to the others?" It was not low-resolution —
+it was the only one being served at full size. 5246×6016 / **3094 KB** squeezed into a 265×265 card,
+which the browser then shrank ~10× in one step; that aliases on fine detail (patterned jacket, glasses,
+hair). The other three photos are 300×300 originals shrinking 1.13×, so nothing aliases. **A higher-
+resolution upload looked worse than its lower-resolution neighbours**, which is why the symptom read
+as the opposite of the cause.
+
+Two independent defects, both silent.
+
+**1. Fourteen sites rendered a plain `<img>` at the original URL.** No optimisation at all —
+`/about/meet-the-team` measured **3810 KB across 17 images, 0 optimised**.
+
+**2. The shared `<Media>` component emitted an invalid `sizes` attribute.** It built
+`(max-width: 1920px) 3840w, …`; `w` is a **srcset** descriptor and is not a valid `sizes` length, so
+the browser discarded the whole list, fell back to `100vw` and picked the largest candidate. The list
+was also ordered widest-first, and `sizes` is first-match-wins, so the 1920 entry would have won at
+every viewport even had the unit been valid. Measured on `/about/team/<slug>`: a **1440×1651** file
+into a **320×367** box, page weight **4669 KB**.
+
+Payload had been generating seven derivatives on every upload since day one. Apart from `og` in
+`generateMeta`, **not one was used anywhere.**
+
+### The fix
+
+- **`src/utilities/mediaSrc.ts`** — picks the smallest generated size covering the box (CSS width ×2
+  for retina), falling back to the original. It replaced three duplicated `mediaUrl()` copies.
+- **Width-only sizes, never `square` or `og`.** Both crop: `square` turns 5246×6016 into 500×**500**,
+  aspect 0.872 → 1.0. Every consumer already crops with `object-fit: cover` plus a focal-point
+  `object-position`, so a pre-cropped file would crop twice and shift every face on the site. The
+  width-only ladder preserves aspect exactly (`small` is 600×688, still 0.872).
+- **Falling back is the normal case.** Payload only generates a derivative larger than nothing —
+  three of the four team photos are 300×300 with **no** derivatives and must keep serving the original.
+- `mediaFocal()` gained a box width; every person card, directory, availability row and event
+  presenter flows through it, so one change fixed the set. **Every width was measured in the browser,
+  not guessed** (265 team, 150 directory, 255 carousel, 182/264 logo, 320/230 profiles).
+- `sizes` replaced with a valid ascending ladder capped at the container; explicit `size` passed at
+  the small-box profile photos.
+- `quality` 100 → **82**, with `next.config.ts` narrowed to `qualities: [82]` so 100 cannot creep
+  back. Measured on a headshot at w=640: **168.8 KB → 28.5 KB**, and a 2×-magnified crop of the same
+  region shows no visible difference.
+- **The logo was fetched twice on every page.** The header built a cache-tagged URL, the footer read
+  `.url` raw, so the two differed by a query string and neither hit the other's cache entry — the
+  same 4267×1359 / 119 KB PNG, downloaded twice. Both now go through `resolveBrandLogo`, and it is
+  sized (600×191).
+
+### Measured, before → after
+
+| Route | Before | After |
+|---|---|---|
+| `/` | 2285 KB | 1732 KB |
+| `/about/meet-the-team` | 3810 KB | **552 KB** |
+| `/about/team/spencer-winchester` | 4669 KB | **66 KB** |
+| `/specialists` | 8261 KB | 2066 KB |
+| `/events` | 238 KB | 42 KB |
+| `/in-the-loop` | 238 KB | 42 KB |
+| **total** | **19,501 KB** | **4,500 KB** |
+
+Duplicate fetches: 1 per route → **0**. Worst CMS oversize ratio: 23.4× → **3.29×**.
+
+### Verified
+
+- **Framing did not move**, which was the real risk: one measurement shows Spencer on his `600×688`
+  derivative at `object-fit: cover` / `object-position: 51% 29%`, and four colleagues on their
+  originals at `50% 1%` — **both states of the fallback in a single reading**, since a check that saw
+  only the derivative case would prove nothing about the four that have none.
+- `computedSnapshot` 9370 → 9370 nodes, **0 missing, 0 new**, 64 changed — 63 of them the logo's
+  `width` moving by **0.1px**, because Payload rounds 1359 × (600/4267) to 191 and the derivative's
+  aspect ratio is therefore 0.07% wider than the original's; the CSS sets a height with `width: auto`,
+  so the logo grew from 182.094px to 182.188px. The 64th is the usual `/in-the-loop` scroll-reveal
+  frame. That is the only layout movement on the site.
+- **New guard `tests/e2e/images.e2e.spec.ts`**, six routes, three assertions — oversize ratio, single-
+  image byte ceiling, duplicate fetches — **each proven red by its own break** and green after.
+  Thresholds set from measurement: 4× (binding case is the shared logo at 3.29×) and 600 KB.
+- All 13 diff families zero. tsc 0, lint 0.
+
+### Left open
+
+`OUTSTANDING.md` §11 (derivatives are PNG — ~1.5 MB still recoverable, but closing it means
+regenerating every existing upload) and §12 (the bundled shield, a static asset outside the
+optimiser's reach at 23.4×). Both measured, neither blocking.

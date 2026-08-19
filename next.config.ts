@@ -23,7 +23,13 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/file/**',
       },
     ],
-    qualities: [100],
+    // Kept in step with IMAGE_QUALITY in src/components/Media/ImageMedia —
+    // Next throws on any quality not listed here, so the two must agree.
+    // Was [100]: measured on a headshot at w=640, q100 is 168.8 KB against
+    // q82's 28.5 KB, and a 2x-magnified crop of the same region shows no
+    // visible difference. 100 is deliberately NOT allowed, so it cannot creep
+    // back in unnoticed.
+    qualities: [82],
     remotePatterns: [
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)

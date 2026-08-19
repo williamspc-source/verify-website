@@ -143,7 +143,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
           <div className="profile-hero-inner">
             <div className="profile-avatar">
               {photo ? (
-                <Media resource={photo} alt={s.title} />
+                <Media resource={photo} alt={s.title} size="230px" />
               ) : (
                 <span>{initials(s.title)}</span>
               )}

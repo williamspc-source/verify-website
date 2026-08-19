@@ -331,6 +331,59 @@ Chosen because a control that cannot go anywhere is noise. *To reverse it:* dele
 
 ---
 
+## 11. Photo derivatives are PNG, which costs ~1.5 MB across two pages
+
+**Measured 2026-08-19**, after the image-sizing fix (`verify-website-design-diff.md` Comparison 41).
+Every route now serves a correctly-sized derivative, and the six heaviest routes fell from
+**19,501 KB to 4,500 KB**. What is left is almost entirely format:
+
+| Route | Now | Largest single image |
+|---|---|---|
+| `/` | 1732 KB | `Dr Timothy Doyle-15-600x600.png` — **477 KB** |
+| `/specialists` | 2066 KB | `Dr Simon Perkins-15-300x300.png` — **148 KB** |
+
+Payload generates each derivative in the **source's** format, and the specialist headshots were
+uploaded as PNG. A 600×600 PNG photograph is ~477 KB where the same image as JPEG or WebP is ~30 KB —
+PNG is lossless and simply wrong for photographs. The `<Media>`/next-image path converts to WebP
+automatically, which is why `/about/team/<slug>` is only 66 KB; the plain-`<img>` sites cannot.
+
+**Two ways to close it, both with a real cost:**
+
+1. **Add `formatOptions: { format: 'webp' }` to the `imageSizes` in `src/collections/Media.ts`.**
+   Config is a two-line change, but Payload only generates derivatives **on upload** — every existing
+   media doc would need its file re-processed, locally *and* on the box, and there is no built-in
+   "regenerate sizes" command.
+2. **Re-upload the specialist headshots as JPEG.** No code at all, and an editor can do it, but it
+   relies on whoever uploads next knowing to do the same.
+
+Estimated saving: roughly 1.5 MB per visit across those two routes. Not done now because the
+reported fault — a photo rendering pixelated — is fixed and verified, and because option 1's
+regeneration step is a migration-shaped task that deserves its own pass.
+
+The guard (`tests/e2e/images.e2e.spec.ts`) caps a single CMS image at **600 KB** specifically to
+accommodate these PNGs; that ceiling should come down when this is closed.
+
+---
+
+## 12. The bundled homepage shield is a 1166px PNG in a 50px box
+
+**Measured 2026-08-19.** `/assets/images/VERIFY Shield.png` is 73 KB at 1166px wide and renders 50px
+on the homepage — **23.4× oversized**, the worst ratio left on the site.
+
+It is a **bundled static asset**, not a Media upload, so `mediaSrc` has no derivatives to choose from
+and `next.config.ts`'s `localPatterns` only permits `/api/media/file/**` through the optimiser. The
+code path *does* size it correctly when Site Settings → Brand assets → Shield is set; it is unset, so
+the fallback file is what renders.
+
+Cheapest fix: upload a shield through Site Settings (then it is sized like everything else), or
+re-export the bundled PNG at ~100px. Either is minutes of work; neither is code.
+
+This is why the image guard scopes its ratio check to CMS-served URLs — including the static asset
+would have meant either failing on day one or setting the threshold to 24×, which would excuse every
+real regression.
+
+---
+
 ## 1. The outstanding migration
 
 Not a code fix, and not a defect. The local database has been kept in step by the Postgres adapter's
