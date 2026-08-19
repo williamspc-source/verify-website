@@ -11618,11 +11618,16 @@
   border-top: 0;
 }
 
+/* No rule between the calendar and the event. The reference DECLARES
+   `border-right: 3px solid #cbe5fa` here (events.css:753) but never draws it —
+   the whole `.event-list-calendar-wrap` rule is dead there, since its JS renders
+   a photo placeholder and never this wrapper. So the line was ported from a rule
+   the reference does not render, and it appeared on the listing rows while the
+   /events hub cards had none. Recorded in referenceCssDiff's EXPLAINED. */
 .event-list-calendar-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 3px solid var(--accent);
 }
 
 .event-list-calendar {
@@ -12229,7 +12234,6 @@
 .event-list-calendar-wrap.is-card {
   width: 100%;
   height: 100%;
-  border-right: 0;
   /* `.event-card-media` sets uppercase + 0.1em tracking for the reference's
      "Event image" caption. Both INHERIT, and `.cal-day`/`.cal-month` redeclare
      neither — so the hub rendered "20 AUG" letter-spaced while the listing rows

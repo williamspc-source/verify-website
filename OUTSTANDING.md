@@ -308,7 +308,9 @@ to anyone diffing `/events/upcoming-events` or `/events/past-events` against the
 `Event Photo` box on every row. We render an outlined calendar glyph with the day and month, on the
 listings *and* the `/events` hub cards. The reference's own `.event-list-calendar*` rules
 (`events.css:749–806`) are dead in the reference — leftovers its JS never uses — which is how we came
-to have them.
+to have them. For the same reason we do **not** draw the 3px accent rule that block declares
+(`events.css:753`): the reference never renders it, and it had made the listing rows disagree with
+the hub cards. That omission is in `referenceCssDiff`'s `EXPLAINED` for `events`.
 
 Chosen because a placeholder box tells a visitor nothing while the date is the single most useful
 thing about an event. It is only ever a **fallback**: uploading **Event photo** on the event shows

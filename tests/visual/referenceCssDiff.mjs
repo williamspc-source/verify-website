@@ -1033,6 +1033,10 @@ const EXPLAINED = {
   // 2026-08-18 before being excused — which is the only thing that separates an
   // explanation from the habit that hid the /ime label bug in the first place.
   events: {
+    '.event-list-calendar-wrap': {
+      'border-right':
+        'Removed deliberately on 2026-08-19. The reference DECLARES this 3px rule but never draws it: the whole `.event-list-calendar-wrap` block is dead there (events.css:749-806), because its JS renders a blue "Event Photo" placeholder on every row and never this wrapper. So the line was ported from a rule the reference does not render — and it showed on the listing rows while the /events hub cards, which draw the same calendar, had none. Verified in the browser: border-right 0px on both, and no other border on the row changed (the `1px #eeeeee` separator is untouched).',
+    },
     '.events-hero-breadcrumb': {
       color:
         '`--bc-link` is context-dependent by design — it has three definitions, and on a dark band resolves to exactly the reference literal. Measured on /events: ours rgba(255, 255, 255, 0.65), reference rgba(255, 255, 255, 0.65). A single-value resolver cannot follow that, so it cannot close in the tool.',

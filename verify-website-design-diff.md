@@ -2501,3 +2501,23 @@ was 56.0px against 47.5px.
   **0 changed**, so the dash is purely textual; `/in-the-loop` one node differing by `matrix(…4.920)`
   → `(…4.980)`, a scroll-reveal frame.
 - All 13 diff families zero. tsc 0, lint 0.
+
+### Follow-up, same day: the blue rule between calendar and content
+
+Reported on review: a 3px accent line sat between the calendar and the event text on the listing
+rows, and neither the reference nor the `/events` hub cards have one.
+
+The reference **declares** it — `border-right: 3px solid #cbe5fa`, `events.css:753` — and never draws
+it, because that whole `.event-list-calendar-wrap` block is dead there. So the line was ported from a
+rule the reference does not render, which is the same root cause as the calendar itself. It also made
+the listing rows disagree with the hub cards, whose `.is-card` variant had already dropped it.
+
+Removed from the base rule, which makes `.is-card`'s `border-right: 0` redundant; that goes too.
+Recorded in `referenceCssDiff`'s `EXPLAINED` for `events`, since the declaration diff correctly
+reports our omission against a rule the reference does declare.
+
+Verified: `border-right-width` 0px on all three pages, the row's `1px #eeeeee` separator and the
+calendar's own 4px border both untouched. `computedSnapshot` 9370 → 9370 nodes, **17** changed —
+exactly the number of calendar wraps on the three pages (2 + 8 + 7) — each differing only in
+`borderRightColor`, which is unobservable at zero width; plus the usual `/in-the-loop` scroll-reveal
+frame.
