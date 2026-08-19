@@ -65,6 +65,33 @@ export const headerBandField: Field = {
   },
 }
 
+/**
+ * Section heading weight. Defaults to `default`, which emits NO class, so adding
+ * this field to a block moves nothing — the same discipline as `headerBandField`
+ * above.
+ *
+ * Exists because the design reference's Join the Expert Panel page is the only
+ * one of its 108 pages that overrides `.section-title`'s weight (to 800, in its
+ * own inline <style>); every other page renders the shared sheet's 700, which is
+ * what globals.css declares. Porting that 800 globally would have re-weighted
+ * every heading on the site to satisfy one page — the same mistake already
+ * recorded for `.page-hero h1`, which was "aligned" from 800 to 700 across 59
+ * pages. A block field keeps it to the blocks that ask for it.
+ */
+export const headingWeightField: Field = {
+  name: 'headingWeight',
+  type: 'select',
+  defaultValue: 'default',
+  options: [
+    { label: 'Default', value: 'default' },
+    { label: 'Heavy', value: 'heavy' },
+  ],
+  admin: {
+    description:
+      'Weight of this section’s heading. “Heavy” is the bolder treatment used on Join the Expert Panel. Leave as “Default” to match the rest of the site.',
+  },
+}
+
 export const alignField: Field = {
   name: 'align',
   type: 'select',

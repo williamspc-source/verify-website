@@ -6,6 +6,7 @@ import {
   elementClassesField,
   gridDisplayFields,
   iconField,
+  headingWeightField,
   sectionHeaderFields,
 } from '@/fields/blockFields'
 
@@ -36,10 +37,11 @@ export const FeatureGrid: Block = {
         { label: 'Plain (no border)', value: 'plain' },
         { label: 'Banded (tinted header)', value: 'banded' },
         { label: 'Soft (flat white, gentle hover)', value: 'soft' },
+        { label: 'Benefit (plain icon, centred)', value: 'benefit' },
       ],
       admin: {
         description:
-          '“Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift.',
+          '“Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift. “Benefit” is the centred treatment used for “Why Join VERIFY” on Join the Expert Panel — no icon tile, just a large plain icon above a centred title, with the description justified.',
       },
     },
     {
@@ -82,6 +84,7 @@ export const FeatureGrid: Block = {
         },
       ],
     },
+    headingWeightField,
     cssClassField,
     elementClassesField,
     ...gridDisplayFields,

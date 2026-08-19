@@ -2337,3 +2337,84 @@ sections.
 - `computedSnapshot`: `/specialists/profiles/dr-adam-parr` only (22 nodes, +3), plus the usual
   `/in-the-loop` scroll-reveal frame. The `specialist-profile` diff family stays at zero — it
   compares declarations, not content, so it could never have caught this either way.
+
+## Comparison 39: /specialists/join-expert-panel — the benefit cards were never styled at all (2026-08-19)
+
+Reported from a side-by-side screenshot: the "Why Join VERIFY" cards have the wrong hover, the
+icons are not centred, and the body copy is not justified. All three are **one** cause, and the CSS
+was not the problem — it was correct and **unreachable**.
+
+`seedSpecialists.ts` set `cssClass: 'vf-join-benefits'` on the Feature Grid. `authorPage`
+early-returns on an authored page and no repair was written, so the class never reached the
+database. Measured before the fix:
+
+- `pages_texts` held **65** `cssClass` rows sitewide and **zero** for this page (positive control:
+  `ct-page` present, so the query works).
+- Served markup was `class="service-card vf-card"` — no page class, no modifier.
+- So ~50 lines at `globals.css:10165–10198` were dead and the cards fell back to `.service-card`.
+
+A sitewide audit found this is the **only** genuinely dead page-scoped class left; the one other
+candidate, `vf-join-eoi__form`, survives only inside comments.
+
+**This is the second occurrence on the same page.** The "Express Your Interest" band failed
+identically through four `.vf-join-eoi*` classes, and the comment explaining that failure sat
+directly above the block that repeated it.
+
+### Everything that differed, not just the three reported
+
+| | Reference | Was |
+|---|---|---|
+| background | flat `#fff` | gradient `#fff → #f7fbff` |
+| border / radius / padding | `#cfe4f2` / `16px` / `32px 28px` | `primary/.16` / `12px` / `28px 22px` |
+| resting shadow | `0 4px 20px primary/.07` | `0 12px 32px primary/.13` |
+| align-items / text-align | `center` / `center` | `normal` / `start` |
+| icon | no tile, `2.4rem`, `.85` | 48×48 tile, `#cbe5fa` |
+| hover transform / shadow | `translateY(-2px)` / soft blur | `translate(-4px,-4px)` / `6px 6px 0` hard |
+| title weight | `800` | `700` |
+| body size / line-height / align | `.93rem` / `1.75` / justify | `14px` / `1.6` / start |
+
+### The fix — two block fields, no page scope
+
+Per the rule this repo already states (and the comment that failed to stop it): a field travels with
+the block and cannot be silently absent.
+
+- **`FeatureGrid.cardStyle: 'benefit'`** → `.vf-card--benefit`. Also carries the reference's own
+  960/640 column ladder, scoped with `:has()` so the nine other blocks sharing `.services-grid`
+  keep the shared 1024px rule. Measured 3/2/1 columns at 1000/900/500px.
+- **`headingWeight: 'heavy'`** → `.vf-headings--heavy .section-title`, opted into by FeatureGrid and
+  SplitFeature. Needed because this page is the **only one of the reference's 108** to override
+  `.section-title`'s weight to 800 — every other page renders the shared sheet's 700, which is what
+  globals.css declares. Porting it globally would have been the `.page-hero h1` mistake again.
+- `repairJoinBenefits.ts` sets both on existing installs. Its header states plainly that `cardStyle`
+  has a default and therefore cannot itself be the migration signal — the pinning to one page and
+  one block is what makes it safe.
+
+### Why nothing caught it
+
+`referenceCssDiff.mjs`'s `join-expert-panel` family matched only the enquiry form —
+**9 of the page's 46 reference selectors** — and read zero throughout. Widened to `^\.join-` plus the
+shared `section-*` trio: **50 selectors** now, with `IMPLEMENTED_AS` mappings for the aliasing and
+44 `EXPLAINED` declarations, each measured on 2026-08-19 rather than asserted.
+
+### Verified
+
+- Resting: `align-items/text-align: center`, radius 16px, padding `32px 28px`, `background-image:
+  none`, border `#cfe4f2`, shadow `0 4px 20px primary/.07`; icon no tile, 38.4px, opacity .85,
+  margin-bottom 18px; body `justify` 14.88px/26.04px; title weight 800.
+- Hover changes **only** shadow and transform (`matrix(1,0,0,1,0,-2)`) — no border flip, no
+  background change, matching a reference `:hover` that sets exactly those two.
+- **Break test:** commenting out the modifier returned the page to the tile-and-diagonal look live
+  in the browser, and restoring it brought the fix back — so the measurement is not a stale build.
+- `computedSnapshot`: 8666 → 8666 nodes, **53 changed on this route only**, plus 5 off-target nodes
+  differing solely in opacity/transform (the scroll-reveal signature). Counted from the JSON, not
+  the printed diff, which truncates.
+- All **13** diff families zero. tsc 0, lint 0.
+
+### Left open, deliberately
+
+The intro band's remaining gaps are all on selectors shared sitewide — `.section-label`
+margin-bottom (12 vs 14px), `.section-title` margin-bottom (16 vs 20px) and clamp, `.vf-split__body
+p` line-height (1.75 vs 1.85), and the centred subtitle's 600 vs 640px. Each is 2–4px on a class
+~29 pages use. `.vf-client-overview` (globals.css:9231) already encodes exactly this treatment as a
+page scope for /for-clients, whose reference intro is the same pattern — so the honest fix is one
+shared "editorial intro" variant serving both, not a second page scope. Recorded in `OUTSTANDING.md`.

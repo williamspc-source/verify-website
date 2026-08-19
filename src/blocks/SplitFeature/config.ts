@@ -14,6 +14,7 @@ import {
   displayFields,
   elementClassesField,
   iconField,
+  headingWeightField,
   sectionHeaderFields,
 } from '@/fields/blockFields'
 
@@ -146,6 +147,7 @@ export const SplitFeature: Block = {
         anchorIdField,
       ],
     },
+    headingWeightField,
     cssClassField,
     elementClassesField,
     ...displayFields,

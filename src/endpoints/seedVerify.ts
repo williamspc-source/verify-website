@@ -34,6 +34,7 @@ import { repairFaqVariants } from './seed/repairFaqVariants'
 import { repairHeroCopy } from './seed/repairHeroCopy'
 import { repairEnquiryLayout } from './seed/repairEnquiryLayout'
 import { repairPortalEnquiry } from './seed/repairPortalEnquiry'
+import { repairJoinBenefits } from './seed/repairJoinBenefits'
 import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
 import { isPlaceholderLayout } from './seed/authored'
 import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
@@ -1204,6 +1205,7 @@ export const seedVerify = async ({
   await repairHeroCopy({ payload, req })
   await repairEnquiryLayout({ payload, req })
   await repairPortalEnquiry({ payload, req })
+  await repairJoinBenefits({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
   // Both write only into an absence — a missing carousel block, a superseded

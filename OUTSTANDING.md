@@ -263,6 +263,40 @@ stored copy and a fixture edit alone would not reach an existing install.
 
 ---
 
+## 9. The Join the Expert Panel intro is 2–4px off, on selectors ~29 pages share
+
+**Measured 2026-08-19 at 1440/1100/900px**, after the benefit cards on that page were fixed
+(`verify-website-design-diff.md` Comparison 39). The intro band above them still differs from the
+reference in four places, and every one is a **shared** selector:
+
+| Selector | Reference | Ours | Gap |
+|---|---|---|---|
+| `.section-label` margin-bottom | 14px | 12px | 2px |
+| `.section-title` margin-bottom | 20px | 16px | 4px |
+| `.section-title` font-size clamp | max 2.4rem | max 2.5rem | 1.6px at 1440, **0 at ≤1100** |
+| `.vf-split__body p` line-height | 1.85 | 1.75 | 1.55px per line |
+| centred subtitle `max-width` | 640px | 600px | 40px |
+
+Each is a class every section heading, eyebrow or split body on the site uses, so closing any of
+them to satisfy one page changes ~29 pages — the shape of the `.page-hero h1` mistake, which moved
+59 pages and was written up as a *correction*.
+
+**The cost of fixing it properly is one variant, not five edits.** `.vf-client-overview`
+(`globals.css:9231`) **already encodes exactly this treatment** — `font-size: clamp(1.7rem,3vw,2.4rem)`,
+`font-weight: 800`, `margin-bottom: 20px`, plus `.vf-client-overview .vf-split__body p { line-height:
+1.85 }` — as a page scope for `/for-clients`, whose reference intro is the same editorial pattern.
+So the honest fix is a single shared "editorial intro" density on SplitFeature serving both pages,
+which would also let that page scope be deleted. Roughly: one field, one rule block, a repair for
+each of the two pages, and a `computedSnapshot` run to prove `/for-clients` does not move.
+
+Not done now because the reported fault was the benefit cards, which are fixed and verified, and
+because a second page-scoped class here would repeat the exact bug Comparison 39 was about.
+
+Each difference is recorded per-declaration in `referenceCssDiff.mjs`'s `EXPLAINED` with its
+measurement, so the `join-expert-panel` family reads zero honestly rather than by omission.
+
+---
+
 ## 1. The outstanding migration
 
 Not a code fix, and not a defect. The local database has been kept in step by the Postgres adapter's

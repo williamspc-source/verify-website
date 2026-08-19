@@ -19,6 +19,7 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
   subheading,
   background,
   rows,
+  headingWeight,
   cssClass,
   elementClasses,
   motion,
@@ -44,6 +45,7 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
         divided && 'vf-split-feature--divided',
         compact && 'vf-split-feature--compact',
         dotBullets && 'vf-split-feature--dots',
+        headingWeight === 'heavy' && 'vf-headings--heavy',
         toClassName(cssClass),
       )}
       motion={motion}

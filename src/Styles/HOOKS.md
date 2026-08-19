@@ -510,7 +510,7 @@ removing the image later brings the placeholder back exactly as it was.
 
 ### Card styles on a Feature Grid, and what makes service cards centre
 
-**Pages → the page → the Feature Grid block → Card style.** There are now four:
+**Pages → the page → the Feature Grid block → Card style.** There are now five:
 
 | Card style | What it looks like |
 |---|---|
@@ -518,6 +518,14 @@ removing the image later brings the placeholder back exactly as it was.
 | **Plain (no border)** | No border, no background. For points that should not look like cards. |
 | **Banded (tinted header)** | Icon and title on a pale blue panel across the top. |
 | **Soft** | Flat white, a wider corner, a soft blue shadow, and a gentle lift on hover instead of the bolder shift. The support cards on **Information for Clients** use this. |
+| **Benefit (plain icon, centred)** | Centred, with a large plain blue icon instead of an icon tile, and the description justified. The **Why Join VERIFY** cards on *Join the Expert Panel* use this. It also drops to two columns at 960px and one at 640px, rather than the shared 1024px breakpoint. |
+
+### Making a section's heading heavier
+
+**Pages → the page → the block → Heading weight**, on a Feature Grid or a Split Feature. **Default**
+matches every other heading on the site; **Heavy** is a bolder cut. Only *Join the Expert Panel*
+uses it — the design reference makes that one page's headings heavier than the rest, and this field
+is how that stays confined to that page instead of re-weighting all of them.
 
 Separately, on a **Services Grid**, the **Card alignment** field is what turns the cards into centred
 tiles — icon centred above a centred title, all cards the same height. Left is the default and gives

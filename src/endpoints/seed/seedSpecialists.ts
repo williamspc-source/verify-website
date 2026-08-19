@@ -187,6 +187,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
   const joinLayout: unknown[] = [
     {
       blockType: 'splitFeature',
+      headingWeight: 'heavy',
       rows: [
         {
           eyebrow: 'About Our Panel',
@@ -215,10 +216,15 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
           subheading:
             'We partner with specialists who value quality, impartiality and professional growth. Here is what you can expect as a VERIFY panel member.',
           columns: '3',
-          cardStyle: 'card',
+          headingWeight: 'heavy',
           // Reference benefit cards are centre-aligned with a plain large primary
-          // icon (no icon box) and justified body copy — see vf-join-benefits CSS.
-          cssClass: 'vf-join-benefits',
+          // icon (no icon box) and justified body copy. This was a page-scoped
+          // `cssClass: 'vf-join-benefits'`, which never reached the database —
+          // authorPage early-returns on an authored page, so the class was absent
+          // sitewide and ~50 lines of correct CSS rendered nothing. A card STYLE
+          // travels with the block and is visible in the admin, so it cannot go
+          // silently missing. Existing installs are fixed by repairJoinBenefits.
+          cardStyle: 'benefit',
           items: [
             {
               icon: 'clipboard-text',

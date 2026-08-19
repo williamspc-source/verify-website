@@ -3766,9 +3766,9 @@ export interface FeatureGridBlock {
   background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   columns?: ('1' | '2' | '3' | '4') | null;
   /**
-   * “Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift.
+   * “Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift. “Benefit” is the centred treatment used for “Why Join VERIFY” on Join the Expert Panel — no icon tile, just a large plain icon above a centred title, with the description justified.
    */
-  cardStyle?: ('card' | 'plain' | 'banded' | 'soft') | null;
+  cardStyle?: ('card' | 'plain' | 'banded' | 'soft' | 'benefit') | null;
   items?:
     | {
         /**
@@ -4019,6 +4019,10 @@ export interface FeatureGridBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Weight of this section’s heading. “Heavy” is the bolder treatment used on Join the Expert Panel. Leave as “Default” to match the rest of the site.
+   */
+  headingWeight?: ('default' | 'heavy') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -6810,6 +6814,10 @@ export interface SplitFeatureBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Weight of this section’s heading. “Heavy” is the bolder treatment used on Join the Expert Panel. Leave as “Default” to match the rest of the site.
+   */
+  headingWeight?: ('default' | 'heavy') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -12106,6 +12114,7 @@ export interface FeatureGridBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  headingWeight?: T;
   cssClass?: T;
   elementClasses?:
     | T
@@ -12545,6 +12554,7 @@ export interface SplitFeatureBlockSelect<T extends boolean = true> {
         anchorId?: T;
         id?: T;
       };
+  headingWeight?: T;
   cssClass?: T;
   elementClasses?:
     | T

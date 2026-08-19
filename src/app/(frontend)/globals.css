@@ -9300,6 +9300,91 @@
   text-align: justify;
 }
 
+/* ── Card style: "Benefit" ───────────────────────────────────────────────────
+   The centred treatment behind "Why Join VERIFY" on /specialists/join-expert-panel
+   (reference: join-expert-panel.html inline <style>, .join-benefit-card, 141-169 —
+   these selectors appear NOWHERE in assets/css/styles.css, so the usual
+   "declared twice, the inline copy wins" caveat does not apply).
+
+   Deliberately a standalone rule set rather than a layer on top of `--soft`,
+   even though the two share most of their paint: `--soft` is live on
+   /for-clients, where the icon TILE is correct. Independent variants cannot
+   move each other.
+
+   Unlayered, and declared after `.service-card:hover` (2235), which is how it
+   wins the equal-specificity tie and replaces the neo-brutalist diagonal shift
+   with the reference's gentle lift. */
+.vf-card--benefit {
+  background: var(--white);
+  background-image: none;
+  border: 1px solid #cfe4f2;
+  border-radius: var(--vf-radius-md); /* 16px — equal to the reference literal */
+  padding: 32px 28px;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 7%, transparent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.vf-card--benefit::before { content: none; }
+.vf-card--benefit:hover {
+  background: var(--white);
+  border-color: #cfe4f2;
+  box-shadow: 0 12px 36px color-mix(in srgb, var(--primary) 14%, transparent);
+  transform: translateY(-2px);
+}
+/* The reference card has TWO flex children — the icon, and a <div> wrapping the
+   h3 and p — so its `gap: 18px` falls only between icon and text, while the h3
+   carries its own 8px below it. Our markup is flat (icon, h3, p as siblings),
+   where that gap would ALSO open between h3 and p and render 26px where the
+   reference renders 8px. Reproduce the spacing with margins; do not port the gap. */
+.vf-card--benefit .service-icon {
+  width: auto;
+  height: auto;
+  background: transparent;
+  border-radius: var(--vf-radius-none);
+  margin-bottom: 18px;
+  font-size: 2.4rem;
+  color: var(--primary);
+  opacity: 0.85;
+  flex-shrink: 0;
+  line-height: 1;
+}
+/* No icon recolour on hover — the reference's :hover sets shadow and transform
+   and nothing else. */
+.vf-card--benefit:hover .service-icon {
+  background: transparent;
+  color: var(--primary);
+}
+.vf-card--benefit .service-icon svg { width: 2.4rem; height: 2.4rem; }
+.vf-card--benefit .service-title {
+  font-weight: 800;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+.vf-card--benefit .service-desc {
+  font-size: 0.93rem;
+  line-height: 1.75;
+  margin: 0;
+  text-align: justify;
+}
+/* The reference's own column ladder (960/640), scoped to this variant with
+   `:has()` so the nine other blocks sharing `.services-grid` keep the shared
+   1024px rule. Same reasoning as the note at the `.ime-formats` breakpoint.
+   The first query restores 3 columns between 961-1024px, where the shared rule
+   would otherwise have already dropped to 2; `:has()` gives (0,2,0) against its
+   (0,1,0), and these are declared later. */
+@media (max-width: 1024px) {
+  .services-grid:has(.vf-card--benefit) { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 960px) {
+  .services-grid:has(.vf-card--benefit) { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .services-grid:has(.vf-card--benefit) { grid-template-columns: 1fr; }
+}
+
 /* Shared info-centre eyebrow (Text atom small uppercase label) */
 .vf-ic-eyebrow {
   font-family: var(--font-heading);
@@ -10160,42 +10245,19 @@
    It is now three block FIELDS (Row → Column ratio, Icon List → Heading align,
    Form → Card style), which travel with the block and cannot go missing. The
    callout needs nothing: the Callout block's `reassurance` style emits the
-   reference's own .join-form-note markup, measured identical. */
+   reference's own .join-form-note markup, measured identical.
 
-.vf-join-benefits .service-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  border-radius: var(--vf-radius-md);
-  padding: 32px 28px;
-  border: 1px solid #cfe4f2;
-  box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 7%, transparent);
-}
-.vf-join-benefits .service-card::before { display: none; }
-.vf-join-benefits .service-card:hover {
-  border-color: #cfe4f2;
-  box-shadow: 0 12px 36px color-mix(in srgb, var(--primary) 14%, transparent);
-  transform: translateY(-2px);
-}
-/* Plain large primary icon — no icon box. */
-.vf-join-benefits .service-icon {
-  width: auto;
-  height: auto;
-  background: transparent;
-  border-radius: var(--vf-radius-none);
-  margin-bottom: 16px;
-  font-size: 2.4rem;
-  color: var(--primary);
-  opacity: 0.85;
-}
-.vf-join-benefits .service-card:hover .service-icon {
-  background: transparent;
-  color: var(--primary);
-}
-.vf-join-benefits .service-icon svg { width: 2.4rem; height: 2.4rem; }
-.vf-join-benefits .service-title { text-align: center; }
-.vf-join-benefits .service-desc { text-align: justify; }
+   AND THEN IT HAPPENED AGAIN, DIRECTLY BELOW THIS COMMENT. The benefit cards
+   were ported to `.vf-join-benefits` — one more page-scoped cssClass, set by the
+   same fixture, blocked by the same early-return, with no repair. Measured:
+   `pages_texts` held 65 cssClass rows sitewide and ZERO for this page, so the
+   served card was a bare `.service-card` — an icon tile, left-aligned text and
+   the neo-brutalist diagonal hover, against a reference that is centred, plainly
+   iconed and gently lifted. ~50 lines of correct CSS, dead, while a comment
+   explaining that exact failure sat immediately above them.
+   The cards are now the Feature Grid's `cardStyle: 'benefit'` — see
+   `.vf-card--benefit`, declared beside the other card styles. Nothing
+   page-scoped remains on this page. */
 
 /* ===== v2:8e5c0250a4bd68aa22a5bb53575f574dc9be6a0b2bbc40e18a1ecf3f4727fff0 ===== */
 /* none */
@@ -12134,3 +12196,14 @@
 .vf-home-hero.vf-section--pb-normal { padding-bottom: var(--space-normal); }
 .vf-home-hero.vf-section--pb-spacious { padding-bottom: var(--space-spacious); }
 .vf-home-hero.vf-section--pb-xl { padding-bottom: var(--space-xl); }
+
+/* ── Section heading weight: "Heavy" ─────────────────────────────────────────
+   Block field `headingWeight`, default emits nothing. Both the Feature Grid's
+   SectionHeader title and the Split Feature's row title carry `.section-title`,
+   so one rule serves both blocks.
+
+   Ported from join-expert-panel.html's inline <style> (72, 88), which is the
+   ONLY page of the reference's 108 to override this weight — every other page
+   renders the shared sheet's 700, which is what globals.css declares. Hence a
+   field rather than a change to `.section-title` itself. */
+.vf-headings--heavy .section-title { font-weight: 800; }

@@ -627,6 +627,37 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   both sides on /ime, one colour, spanning an identical 763px; 6 on both on /jme, same colour, identical
   440px. Count the rendered artefacts before either "fixing" a construction or excusing it — and note
   that the reference used *both* constructions across its own pages, so some family must carry the note.
+- **A page-scoped `cssClass` can fail the same way twice on the same page, directly beneath the
+  comment warning about it.** `/specialists/join-expert-panel` had its enquiry band rebuilt as block
+  fields precisely because four `.vf-join-eoi*` classes never reached the database — and the block
+  immediately below that write-up was hung off `.vf-join-benefits`, which never reached it either.
+  Measured: **65** `cssClass` rows sitewide, **zero** for that page, so ~50 lines of correct CSS were
+  dead and the cards rendered the bare `.service-card` — icon tile, left-aligned text, the
+  neo-brutalist diagonal hover — against a reference that is centred, plainly iconed and gently
+  lifted. The user reported three separate faults; there was one cause. A sitewide audit
+  (`pages_texts.path LIKE '%cssClass%'` against every class the fixtures set) found it was the last
+  one. **When a fix "does nothing", check whether its hook is stored data before re-reading the CSS**
+  — and note the audit needs both lists sorted, since `comm` on unsorted input silently reports
+  garbage (caught here only because the positive control `ct-page` failed).
+- **Before porting a value the reference declares, count how many of its 108 pages declare it.**
+  `/specialists/join-expert-panel` sets `.section-title { font-weight: 800 }` in its inline block;
+  every other reference page renders the shared sheet's 700, which is what globals.css declares.
+  Changing the global to close a one-page diff is the `.page-hero h1` mistake — that one moved 59
+  pages and was written up as a *correction*, which is what stopped anyone re-checking it. One
+  `grep` over all pages answers it; here it returned exactly one file, so the fix was a block field
+  (`headingWeight`) rather than a global edit.
+- **A diff family that reads zero may be measuring almost none of its page.** The
+  `join-expert-panel` family matched only the enquiry form — **9 of that page's 46 reference
+  selectors** — and read zero for months while the section above it shipped unstyled. This is the
+  `match`-regex trap already recorded, now with a second instance on a different page, so treat
+  "family X is zero" as a claim about a regex and never about a page. Print the selectors a family
+  collects and check them against the sections that exist.
+- **A control has to be the thing you meant to test.** Checking that the new `headingWeight` field
+  had not leaked, `/for-clients`' first `.section-title` measured **800** — apparently a site-wide
+  leak. It was not: that heading is a `.vf-split__title` inside `.vf-client-overview`, which has
+  carried its own 800 since it was ported, and `document.querySelectorAll('.vf-headings--heavy')`
+  returned **0** on that page. A control selected by `querySelector` position rather than by the
+  property under test will eventually select something with its own reason to differ.
 - **A regex bulk edit across a fixture file reaches further than the page you are editing.** Adding
   one field to five rows via `perl -0pi -e` matched **13** — every row in `seedServices.ts` with the
   same two-line preamble, including `/services`, which must not have it. It was caught by reading

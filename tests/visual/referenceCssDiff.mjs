@@ -205,7 +205,15 @@ const FAMILIES = {
   'join-expert-panel': {
     css: ['.design-reference/assets/css/styles.css'],
     pages: ['.design-reference/specialists/join-expert-panel.html'],
-    match: /^\.(join-form|join-contact|contact-form|form-row|form-group|form-submit|form-confirm)/,
+    // WIDENED. The regex used to be `join-form|join-contact|contact-form|form-*`,
+    // which collected 9 of this page's 46 reference selectors and read zero for
+    // months — while the benefit cards it did NOT cover were shipping against a
+    // page-scoped cssClass that never reached the database. The family's own
+    // comment above describes that failure for the enquiry band and the regex
+    // still could not see the section directly above it.
+    // `.join-` now covers all four `join-*` sections; the `section-*` trio is the
+    // shared header the benefits and intro bands both use.
+    match: /^\.(join-|contact-form|form-row|form-group|form-submit|form-confirm|section-label|section-title|section-subtitle)/,
   },
   'faq-claimants': {
     css: ['.design-reference/assets/css/styles.css'],
@@ -302,6 +310,12 @@ const NOT_PORTED = {
   // porting a rule the reference itself does not render.
   'join-expert-panel': {
     '.join-form-section': 'Section band and padding are editor-controlled Section presets — `muted` and the `normal` padding preset. Not a rule in globals.css for a declaration diff to match. (The band differs slightly: reference #f0f2f4 against our --band-muted #f5f6f8, and padding 100px against the preset\'s 88px. Both are editor-owned values, recorded in EXPLAINED.)',
+    '.join-benefits':
+      'Section band and padding are editor-controlled Section presets — the `accent` band and the `normal` padding preset — so there is no globals.css rule for a declaration diff to match. Reference: a #eef6fc→#f8fbfe gradient with clamp(56px,8vw,88px) padding, against our --band-accent and the preset\'s 88px. Same shape as `.join-form-section` below.',
+    '.join-intro':
+      'Ditto: the `white` band with the `normal` padding preset. Reference declares clamp(64px,9vw,100px) padding and a 1px #e4eff8 bottom rule; the band is editor-owned and the hairline is not carried — the next section\'s accent band already provides the visual break.',
+    '.join-intro-image-placeholder svg':
+      'Our image placeholder renders its label only; the reference also draws a picture glyph. Measured on this page: the placeholder\'s single child is a bare <span>, so there is no element for the rule to land on. Cosmetic, and the whole placeholder disappears the moment an editor uploads an image. Same exception already recorded for the /services and /for-clients placeholders.',
     '.join-form-intro': 'A 6px optical nudge on a bespoke wrapper we do not have — our left column is a plain grid track. Measured: the reference\'s eyebrow sits 6px below the card top, ours flush at 0. Deliberately not carried; a field for a 6px offset would be worse than the offset.',
   },
   'faq-claimants': {
@@ -529,6 +543,48 @@ const IMPLEMENTED_AS = {
     '.profile-breadcrumb strong': '.vf-breadcrumb__current',
   },
   'join-expert-panel': {
+    // ── Benefits band ("Why Join VERIFY") ──
+    // The Feature Grid's `benefit` card style. Was a page-scoped
+    // `.vf-join-benefits`, which never reached the database — see the CSS
+    // comment beside `.vf-card--benefit`.
+    '.join-benefits-grid': '.services-grid',
+    '.join-benefit-card': '.vf-card--benefit',
+    '.join-benefit-card:hover': '.vf-card--benefit:hover',
+    '.join-benefit-icon': ['.service-icon', '.vf-card--benefit .service-icon'],
+    // List form: the reference declares the whole treatment on one element,
+    // while ours splits base type onto `.service-title` / `.service-desc` and
+    // only the overrides onto the variant. Naming just the variant would
+    // under-report and produce a phantom difference.
+    '.join-benefit-card h3': ['.service-title', '.vf-card--benefit .service-title'],
+    '.join-benefit-card p': ['.service-desc', '.vf-card--benefit .service-desc'],
+
+    // ── Shared centred section header, used by the benefits band ──
+    '.join-section-header': ['.vf-section-header', '.vf-section-header--centered'],
+    '.join-section-header .section-title': [
+      '.section-title',
+      '.vf-section-header__title',
+      '.vf-headings--heavy .section-title',
+    ],
+    '.join-section-header .section-subtitle': [
+      '.section-subtitle',
+      '.vf-section-header__subtitle',
+      '.vf-section-header--centered .vf-section-header__subtitle',
+    ],
+
+    // ── Intro band ── a Split Feature with the media on the right and an image
+    // placeholder, not a bespoke section.
+    '.join-intro-grid': ['.vf-split', '.vf-split--reverse'],
+    '.join-intro-text .section-label': '.section-label',
+    '.join-intro-text .section-title': [
+      '.section-title',
+      '.vf-split__title',
+      '.vf-headings--heavy .section-title',
+    ],
+    '.join-intro-text p': ['.vf-split__body', '.vf-split__body p'],
+    '.join-intro-text p:last-child': '.vf-split__body p:last-child',
+    '.join-intro-image-placeholder': ['.vf-split__media', '.vf-split__media--placeholder'],
+    '.join-intro-image-label': '.vf-split__media--placeholder span',
+
     // The whole band is block SETTINGS now, not a page scope. `.join-form-layout`
     // is the Row's `columnRatio` + `gap` presets; `.join-contact-*` is the Icon
     // List block; `.contact-form` the Form block's `cardStyle`.
@@ -765,6 +821,71 @@ const EXPLAINED = {
   // Every entry measured in the browser at 1440px on 2026-08-18, JavaScript
   // disabled on both sides, before being excused.
   'join-expert-panel': {
+    // ── Benefits band ── measured 2026-08-19 at 1440px.
+    '.join-benefit-card': {
+      gap: 'Deliberately not ported. The reference card has TWO flex children — the icon and a <div> wrapping h3+p — so its 18px gap falls only between icon and text, while the h3 carries its own 8px. Our markup is flat (icon, h3, p as siblings), where the same gap would ALSO open between h3 and p: 26px where the reference renders 8px. Reproduced with margins instead — measured icon margin-bottom 18px, h3 margin 0 0 8px, p margin 0, which is the reference\'s rendered spacing exactly.',
+    },
+    '.join-benefits-grid': {
+      'grid-template-columns':
+        'The column count is the Feature Grid\'s editable "Columns" field, carried as `--vf-cols` — the reference hardcodes repeat(3, 1fr). Measured identical: three 364px tracks at 1440px, and the variant reproduces the reference\'s own 960/640 ladder (measured 3/2/1 columns at 1000/900/500px).',
+    },
+    // ── Shared centred section header ──
+    '.join-section-header': {
+      'text-align':
+        'Renders, from a different rule. SectionHeader emits `text-center` alongside `vf-section-header--centered`, so the declaration lives on the utility class rather than the BEM one. Measured: text-align center on the header.',
+      'margin-bottom':
+        'Attributed differently, not missing. The reference puts 52px below the header and 0 under its subtitle; ours puts 0 on the header and 48px on the subtitle. The rendered gap between the intro copy and the first card is therefore 48px here against the reference\'s 52px — a 4px difference, measured, not the 52px the declaration diff implies. Both are the shared centred-header rules used by every section on the site; a 4px change there would move ~29 pages.',
+    },
+    '.join-section-header .section-title': {
+      'font-size':
+        'Editor-owned type scale. Our clamp is the reference SHARED sheet\'s own value, which 107 of its 108 pages render; only this page\'s inline block steps it up. Measured 40/33/27.2px at 1440/1100/900px against the reference\'s 41.6/38.5/31.5px. The weight — the visible half, and the part legible in a side-by-side — is closed by the `headingWeight` field; the remaining size delta is 1.6px at desktop.',
+    },
+    '.join-section-header .section-subtitle': {
+      margin:
+        'Same attribution as the header\'s margin-bottom above: the reference zeroes the subtitle and spaces the header, we do the reverse. `margin-inline: auto` is present on our side and carries an !important that the CLAUDE.md note explains — measured centred, 600px wide inside a 1132px container.',
+      'margin-top': 'ditto — part of the same `margin: 0 auto 0` shorthand.',
+      'margin-right': 'ditto.',
+      'margin-bottom': 'ditto.',
+      'margin-left': 'ditto.',
+      'max-width':
+        'The shared centred-header rule, 600px against the reference\'s page-specific 640px. Measured 600px rendered. Shared by every centred section header on the site, so this is a 40px change to ~29 pages to satisfy one; the copy fits on two lines either way.',
+    },
+    // ── Intro band ──
+    // NOTE: `.vf-client-overview` (globals.css:9231) already encodes exactly this
+    // treatment — 2.4rem/800, margin-bottom 20px, body line-height 1.85 — as a
+    // PAGE SCOPE for /for-clients, whose reference intro is the same pattern.
+    // The honest next step is one shared "editorial intro" variant serving both,
+    // rather than a second page scope. Recorded in OUTSTANDING.md.
+    '.join-intro-text .section-label': {
+      'margin-bottom':
+        'The shared `.section-label` rule, 12px against this page\'s 14px. Measured 12px. A 2px change to a class used by every eyebrow on the site.',
+    },
+    '.join-intro-text .section-title': {
+      'font-size':
+        'As the header title above: the shared sheet\'s clamp. Measured 40/33/27.2px at 1440/1100/900px against the reference\'s 38.4/33/27.2 — identical at and below 1100px, 1.6px larger at 1440px.',
+      'margin-bottom':
+        'Shared `.section-title` spacing, 16px against 20px. Measured 16px. 4px, on a class every section heading uses.',
+    },
+    '.join-intro-text p': {
+      'line-height':
+        'Shared `.vf-split__body p`, 1.75 against this page\'s 1.85. Measured 27.16px against the reference\'s 28.71px — 1.55px per line. See the `.vf-client-overview` note above: that page scope sets 1.85 for the same reference pattern.',
+    },
+    '.join-intro-image-placeholder': {
+      background:
+        'A per-page palette literal. Ours is the brand gradient (--accent → --accent-light at 135deg); the reference tilts this one page to 145deg. Measured identical stops — rgb(203,229,250) → rgb(147,208,247) — with only the angle differing, which is the case CLAUDE.md names as legitimately page-scoped.',
+      'flex-direction':
+        'Inert against our markup. Our placeholder has exactly ONE child — measured, a single <span> — so a column direction changes nothing. Deliberately gated behind `:has(.vf-split__placeholder-icon)` after an ungated version moved row-gap on six boxes across four unrelated routes.',
+      gap: 'ditto — inert with a single child, and gated for the same reason.',
+    },
+    '.join-intro-image-label': {
+      'font-family':
+        'Our placeholder caption keeps the shared treatment (measured 13.6px, weight 600, no tracking, sentence case) rather than this page\'s uppercase 0.72rem/0.1em. Only this page of the reference\'s 108 styles the caption at all — verified by grep — and the whole placeholder disappears the moment an editor uploads an image, which is the same reason its glyph is in NOT_PORTED.',
+      'font-size': 'ditto.',
+      'font-weight': 'ditto — ours is already 600, reported only because the rule as a whole is unmatched.',
+      'letter-spacing': 'ditto.',
+      'text-transform': 'ditto.',
+      color: 'ditto — measured rgba(28,117,188,0.5) on both sides.',
+    },
     '.join-form-layout': {
       'grid-template-columns': 'Our `2fr 3fr` IS the reference\'s `1fr 1.5fr` — the Row block\'s ratio values avoid a decimal point, which would have to be escaped in the class selector. Measured identical: `424px 636px` on both sides.',
       gap: 'The `x-wide` gap preset, which resolves to exactly the reference\'s 72px — measured 72px on both.',

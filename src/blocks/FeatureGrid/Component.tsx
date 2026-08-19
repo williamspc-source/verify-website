@@ -16,6 +16,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
   columns,
   cardStyle,
   items,
+  headingWeight,
   cssClass,
   elementClasses,
   motion,
@@ -42,7 +43,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
   return (
     <Section
       background={background as SectionBackground}
-      className={cn('vf-feature-grid', toClassName(cssClass))}
+      className={cn('vf-feature-grid', headingWeight === 'heavy' && 'vf-headings--heavy', toClassName(cssClass))}
       motion={motion}
       containerWidth={containerWidth}
       hoverEffect={hoverEffect}
@@ -73,6 +74,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
               cardStyle === 'plain' && 'vf-card--plain',
               banded && 'vf-card--banded',
               cardStyle === 'soft' && 'vf-card--soft',
+              cardStyle === 'benefit' && 'vf-card--benefit',
               toClassName(elementClasses?.card),
             )}
           >
