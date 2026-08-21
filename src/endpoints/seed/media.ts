@@ -1,3 +1,4 @@
+import { seedCreate, seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 import { readdirSync, statSync } from 'fs'
 import path from 'path'
@@ -125,7 +126,7 @@ export async function getOrCreateMedia(
   })
   if (existing.docs[0]) return existing.docs[0].id
   try {
-    const created = await payload.create({
+    const created = await seedCreate(payload, {
       collection: 'media',
       // Headshots: seed the focal point at (near) top-centre to match the design
       // reference's `object-position: top center` on the carousel/avatar images.
@@ -178,7 +179,7 @@ export async function syncMediaFile(
   if (doc.filesize === bytes) return 'unchanged'
 
   try {
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'media',
       id: mediaId,
       data: {} as never,
@@ -276,7 +277,7 @@ export async function syncPeoplePhotos(
 
       const mediaId = await getOrCreateMedia(ctx, absPath, person.title)
       if (!mediaId) continue
-      await payload.update({
+      await seedUpdate(payload, {
         collection,
         id: rec.id,
         data: { photo: mediaId } as never,

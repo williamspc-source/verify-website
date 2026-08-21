@@ -1,3 +1,4 @@
+import { richTextToPlain } from '@/utilities/lexicalText'
 import React from 'react'
 
 import type { VideoEmbedBlock as Props } from '@/payload-types'
@@ -47,8 +48,10 @@ export const VideoEmbedBlock: React.FC<Props & { bare?: boolean }> = ({
   const src = buildSrc(provider, videoId, url)
   if (!src) return null
 
-  // Strip [[accent]] markers when falling back to the heading for the a11y title.
-  const title = videoTitle || heading?.replace(/\[\[|\]\]/g, '') || 'Video'
+  // The iframe title is an ATTRIBUTE, so it needs words rather than a tree.
+  // `richTextToPlain` reads either shape and strips the [[accent]] markers, which
+  // is what the hand-rolled replace above it used to do for the string case.
+  const title = videoTitle || richTextToPlain(heading) || 'Video'
 
   return (
     <Section

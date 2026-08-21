@@ -1,3 +1,5 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { ProcessStepsBlock as Props } from '@/payload-types'
@@ -9,7 +11,6 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 
 type Step = NonNullable<Props['steps']>[number]
 
@@ -87,11 +88,11 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
         containerWidth={containerWidth}
         bare={bare}
       >
-        {eyebrow || heading || subheading ? (
+        {hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading) ? (
           <div className="process-header">
-            {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-            {heading ? <h2 className="section-title">{accentText(heading)}</h2> : null}
-            {subheading ? <p className="section-subtitle">{subheading}</p> : null}
+            <InlineRichText as="div" className="section-label" data={eyebrow} />
+            <InlineRichText as="h2" className="section-title" data={heading} />
+            <InlineRichText as="p" className="section-subtitle" data={subheading} />
           </div>
         ) : null}
         {rows.map((row, r) => (
@@ -135,9 +136,9 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
       >
         <div className="claimant-process-inner">
           <div className="claimant-process-left">
-            {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-            {heading ? <h2 className="section-title">{accentText(heading)}</h2> : null}
-            {subheading ? <p>{subheading}</p> : null}
+            <InlineRichText as="div" className="section-label" data={eyebrow} />
+            <InlineRichText as="h2" className="section-title" data={heading} />
+            <InlineRichText as="p" data={subheading} />
             {/* An uploaded photo replaces the placeholder outright — caption and
                 glyph with it — which is what lets an editor leave the checkbox
                 ticked forever. Same precedence as SplitFeature's media column. */}
@@ -187,11 +188,11 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
         containerWidth={containerWidth}
         bare={bare}
       >
-        {eyebrow || heading || subheading || introRich ? (
+        {hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading) || introRich ? (
           <div className="aamle-edu-intro">
             <div className="aamle-edu-intro-left">
-              {eyebrow ? <span className="aamle-edu-intro-label">{eyebrow}</span> : null}
-              {heading ? <h3 className="aamle-edu-intro-heading">{accentText(heading)}</h3> : null}
+              <InlineRichText as="span" className="aamle-edu-intro-label" data={eyebrow} />
+              <InlineRichText as="h3" className="aamle-edu-intro-heading" data={heading} />
             </div>
             {/* The rich intro wins when set; `subheading` stays as the fallback so
                 existing content keeps rendering and the plain field is still usable. */}
@@ -206,7 +207,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
               </div>
             ) : subheading ? (
               <div className="aamle-edu-intro-right">
-                <p className="aamle-edu-intro-desc">{subheading}</p>
+                <InlineRichText as="p" className="aamle-edu-intro-desc" data={subheading} />
               </div>
             ) : null}
           </div>

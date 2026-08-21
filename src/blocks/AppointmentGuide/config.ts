@@ -1,29 +1,15 @@
 import type { Block } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 import {
   anchorIdField,
   cssClassField,
   iconField,
   sectionHeaderFields,
+  richBodyField,
 } from '@/fields/blockFields'
 
-const richBody = {
-  name: 'body',
-  type: 'richText' as const,
-  editor: lexicalEditor({
-    features: ({ rootFeatures }) => [
-      ...rootFeatures,
-      FixedToolbarFeature(),
-      InlineToolbarFeature(),
-    ],
-  }),
-}
+const richBody = richBodyField('body')
 
 // The For-Claimants "Appointment Guide": a top-level type toggle (In-Person /
 // Videolink), each holding a set of tabs, each tab holding icon-led item lists,

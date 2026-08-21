@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 import path from 'path'
 
@@ -209,7 +210,7 @@ export const repairContentImages = async (ctx: Ctx): Promise<void> => {
       return b[t.field] ? b : { ...b, [t.field]: mediaId }
     })
 
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: { layout: next } as never,

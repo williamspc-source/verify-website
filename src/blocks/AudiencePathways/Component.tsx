@@ -1,3 +1,5 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { AudiencePathwaysBlock as Props } from '@/payload-types'
@@ -5,7 +7,6 @@ import type { AudiencePathwaysBlock as Props } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import { Section, type SectionBackground } from '@/components/Section'
 import { cn } from '@/utilities/ui'
-import { accentText } from '@/utilities/accentText'
 import { toClassName } from '@/utilities/cssClass'
 
 export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
@@ -21,7 +22,7 @@ export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
   bare,
 }) => {
   const cards = Array.isArray(pathways) ? pathways : []
-  const hasHeader = Boolean(eyebrow || heading || subheading)
+  const hasHeader = hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading)
   if (cards.length === 0 && !hasHeader) return null
 
   return (
@@ -35,9 +36,9 @@ export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
     >
       {hasHeader ? (
         <div className="ime-pathways-header">
-          {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-          {heading ? <h2>{accentText(heading)}</h2> : null}
-          {subheading ? <p>{subheading}</p> : null}
+          <InlineRichText as="div" className="section-label" data={eyebrow} />
+          <InlineRichText as="h2" data={heading} />
+          <InlineRichText as="p" data={subheading} />
         </div>
       ) : null}
 

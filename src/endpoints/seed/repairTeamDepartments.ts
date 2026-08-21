@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 import { TEAM } from './data/team'
@@ -74,7 +75,7 @@ export const repairTeamDepartments = async ({ payload, req }: Ctx): Promise<void
       unmapped.push(member.slug ?? String(member.id))
       continue
     }
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'team',
       id: member.id,
       data: { department: departmentId } as never,

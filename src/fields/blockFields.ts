@@ -2,10 +2,12 @@ import type { Block, Field } from 'payload'
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
+  buildEditorState,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
 import { iconOptions } from '@/components/Icon'
+import { textColorField } from './richTextColors'
 
 // Shared admin field helpers so blocks stay consistent and DRY. Everything a
 // block renders is editable through these fields.
@@ -200,25 +202,125 @@ export const gridDisplayFields: Field[] = [
 ]
 
 // Eyebrow + heading + subheading, used by most blocks via a SectionHeader.
-export const sectionHeaderFields: Field[] = [
-  {
-    name: 'eyebrow',
-    type: 'text',
-    admin: { description: 'Small uppercase label above the heading (optional).' },
-  },
-  {
-    // A textarea, not a text input, purely so a line break is typable — see the
-    // note in src/utilities/accentText.tsx. Same varchar column either way.
-    name: 'heading',
-    type: 'textarea',
+/**
+ * A default value for a rich-text field — as a FUNCTION, deliberately.
+ *
+ * Payload writes a literal `defaultValue` straight into the DDL, and both ways
+ * of doing that for a `jsonb` column fail:
+ *
+ *  · a plain string produces `"heading" jsonb DEFAULT 'What Sets Us [[Apart]]'`,
+ *    which Postgres rejects as invalid JSON;
+ *  · the correct Lexical object produces a JSON literal that is *not escaped* —
+ *    so the apostrophe in "Minimising Your Client's Report Costs" closes the SQL
+ *    string and the statement dies with a bare syntax error (42601), naming the
+ *    table and not the field. Apostrophes in real copy are not an edge case.
+ *
+ * A function cannot be serialised into DDL, so Payload leaves the column with no
+ * database default and applies this when a document is created instead — which
+ * is where a default belongs anyway. The editor still gets the copy pre-filled.
+ *
+ * `buildEditorState` is Payload's own builder, so the value is byte-identical to
+ * what the editor would have saved had someone typed it.
+ */
+export const richTextDefault = (text: string) => () => buildEditorState({ text })
+
+/**
+ * A rich-text field for a ONE-LINE piece of copy — a heading, an eyebrow, a card
+ * title, a button label.
+ *
+ * Same vocabulary as `richBodyField`: bold, italic, underline, link. What
+ * differs is the admin presentation. A heading field that looks like a body
+ * editor invites an editor to put a list or a second paragraph in a heading, and
+ * the gutter, drag handle and "add block" affordances are all noise on a field
+ * holding four words.
+ *
+ * The four `admin` flags below are the whole of the compact treatment and are
+ * built into this Payload version — no custom component. `hideInsertParagraphAtEnd`
+ * is the one that matters most: without it every heading field carries a
+ * permanent "click to add a paragraph" target beneath it.
+ *
+ * On pressing Enter: Lexical always stores `root → paragraph → text`, so a second
+ * line is a second *paragraph* in the JSON no matter what the editor sees. That
+ * is handled at render time — `InlineRichText` renders paragraph breaks as
+ * `<br>`, preserving the two-line heading lockups that were literal newlines in
+ * a textarea before.
+ */
+export const inlineRichTextField = (name: string, overrides: Partial<Field> = {}): Field =>
+  ({
+    name,
+    type: 'richText',
+    editor: lexicalEditor({
+      features: ({ rootFeatures }) => [
+        ...rootFeatures,
+        FixedToolbarFeature(),
+        InlineToolbarFeature(),
+      ],
+      admin: {
+        hideGutter: true,
+        hideInsertParagraphAtEnd: true,
+        hideDraggableBlockElement: true,
+      },
+    }),
+    ...overrides,
     admin: {
-      rows: 2,
-      description:
-        'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.',
+      className: 'vf-inline-richtext',
+      ...(overrides.admin ?? {}),
     },
-  },
-  { name: 'subheading', type: 'textarea' },
+  }) as Field
+
+/**
+ * The eyebrow / heading / subheading trio, spread into 26 block configs.
+ *
+ * All three are rich text. An editor can bold or italicise a phrase, add a link,
+ * and set the colour of the whole line from `textColour` — which is what a
+ * WordPress user expects of a heading and what these fields could not do while
+ * they were `text` and `textarea`.
+ *
+ * The heading used to be a `textarea` purely so a line break was typable, for
+ * the two-line lockups ("Ensuring Accuracy," / "Empowering Justice"). Pressing
+ * Enter in a rich-text field makes a second *paragraph* instead, and
+ * `InlineRichText` renders a paragraph break as `<br>` — so the lockups render
+ * exactly as they did, and the reason for the textarea is gone.
+ *
+ * `[[bracketed]]` text still paints in the brand accent, inside rich text as
+ * well as in a plain string. It is not superseded by `textColour`: the bracket
+ * colours a *phrase*, the field colours the *line*.
+ */
+export const sectionHeaderFields: Field[] = [
+  inlineRichTextField('eyebrow', {
+    admin: { description: 'Small uppercase label above the heading (optional).' },
+  }),
+  inlineRichTextField('heading', {
+    admin: {
+      description:
+        'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.',
+    },
+  }),
+  inlineRichTextField('subheading'),
+  textColorField({
+    description:
+      'Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.',
+  }),
 ]
+
+/**
+ * `sectionHeaderFields` with fixed design-reference copy pre-filled.
+ *
+ * Three blocks each had their own `sectionHeaderFields.map(...)` doing this, and
+ * all three broke the same way when the fields became rich text: Payload writes
+ * a field's default into the DDL, so a string default on a `jsonb` column
+ * produced `"heading" jsonb DEFAULT 'What Sets Us [[Apart]]'` and Postgres
+ * refused the whole `CREATE TABLE` with a JSON parse error — naming the table,
+ * not the field.
+ *
+ * Taking plain strings and lifting them here means a caller cannot make that
+ * mistake again: there is nowhere to put a raw string.
+ */
+export const sectionHeaderFieldsWithDefaults = (defaults: Record<string, string>): Field[] =>
+  sectionHeaderFields.map((field) => {
+    const name = 'name' in field ? (field.name as string) : ''
+    return name in defaults ? { ...field, defaultValue: richTextDefault(defaults[name]!) } : field
+  }) as Field[]
 
 // Optional HTML id so a section/row/item can be targeted by in-page hash links
 // and the header nav sub-menu (e.g. #file-review, #surrogate). Slug-validated so

@@ -1,3 +1,4 @@
+import { seedCreate, seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 import { isUnauthored } from './authored'
 
@@ -108,7 +109,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     })
     const existing = res.docs[0]
     if (!existing) {
-      await payload.create({
+      await seedCreate(payload, {
         collection: 'services',
         data: { slug, ...createData } as never,
         req,
@@ -119,7 +120,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     const current = existing as unknown as Record<string, unknown>
     const drift = Object.entries(normalise).filter(([k, v]) => current[k] !== v)
     if (drift.length > 0) {
-      await payload.update({
+      await seedUpdate(payload, {
         collection: 'services',
         id: existing.id,
         data: Object.fromEntries(drift) as never,
@@ -548,7 +549,7 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
     },
   ]
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: rec.id,
     data: { hero, layout } as never,

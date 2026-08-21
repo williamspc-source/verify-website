@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
@@ -35,7 +36,7 @@ export const repairEventTimeDash = async ({ payload, req }: Ctx): Promise<void> 
 
   for (const doc of docs) {
     if (typeof doc.timeLabel !== 'string') continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'events',
       id: doc.id,
       data: { timeLabel: doc.timeLabel.split(EN_DASH).join('-') } as never,

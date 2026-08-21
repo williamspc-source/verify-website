@@ -1,11 +1,12 @@
 'use client'
 
+import { InlineRichText } from '@/components/RichText/Inline'
+import { type RichTextValue } from '@/utilities/lexicalText'
 import Link from 'next/link'
 import React, { useMemo, useState, useSyncExternalStore } from 'react'
 
 import { Icon } from '@/components/Icon'
 import { initialsOf } from '@/components/PersonCard'
-import { accentText } from '@/utilities/accentText'
 import { focalImgStyle } from '@/utilities/focalPoint'
 import { specialistPath } from '@/utilities/routes'
 
@@ -48,8 +49,8 @@ export type DirectorySpecialist = {
 
 type Props = {
   specialists: DirectorySpecialist[]
-  kicker: string
-  heading: string
+  kicker: RichTextValue
+  heading: RichTextValue
   enableSearch: boolean
   enableSpecialty: boolean
   enableLocation: boolean
@@ -246,8 +247,8 @@ export const DirectoryClient: React.FC<Props> = ({
       <div className="specialist-filter-panel" aria-label="Specialist directory filters">
         <div className="specialist-filter-head">
           <div>
-            <div className="specialist-filter-kicker">{kicker}</div>
-            <h2>{accentText(heading)}</h2>
+            <InlineRichText as="div" className="specialist-filter-kicker" data={kicker} />
+            <InlineRichText as="h2" data={heading} />
           </div>
           {isFiltering ? (
             <div className="specialist-filter-count" aria-live="polite">

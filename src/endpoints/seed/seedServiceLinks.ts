@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
@@ -34,7 +35,7 @@ export const repairServiceLinks = async ({ payload, req }: Ctx): Promise<void> =
     })
     const doc = res.docs[0] as { id: number | string; linkOverride?: string | null } | undefined
     if (!doc || doc.linkOverride === href) continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'services',
       id: doc.id,
       data: { linkOverride: href } as never,

@@ -1,3 +1,4 @@
+import { hasRichText } from '@/utilities/lexicalText'
 import configPromise from '@payload-config'
 import { getPayload, type Where } from 'payload'
 import React from 'react'
@@ -204,7 +205,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
   //     control that appears to have worked and produced nothing legible;
   //   - `bare` blocks are nested inside another Section/Row and have already
   //     dropped their banding, so a second band there is meaningless.
-  const hasHeader = Boolean(eyebrow || heading || subheading)
+  const hasHeader = hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading)
   const splitHeader = Boolean(headerBackground && headerBackground !== 'default' && hasHeader && !bare)
 
   return (

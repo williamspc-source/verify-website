@@ -1,3 +1,4 @@
+import { hasRichText } from '@/utilities/lexicalText'
 import React from 'react'
 
 import type { WhyVerifyBlock as Props } from '@/payload-types'
@@ -24,7 +25,7 @@ export const WhyVerifyBlock: React.FC<Props & { bare?: boolean }> = ({
   bare,
 }) => {
   const hasItems = Array.isArray(items) && items.length > 0
-  const hasHeader = Boolean(eyebrow || heading || subheading)
+  const hasHeader = hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading)
   if (!hasItems && !hasHeader) return null
 
   const hasImage = image && typeof image === 'object'

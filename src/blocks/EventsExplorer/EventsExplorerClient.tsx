@@ -1,11 +1,12 @@
 'use client'
+import { InlineRichText } from '@/components/RichText/Inline'
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
 import React, { useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { Icon } from '@/components/Icon'
 import { EventCalendar } from '@/components/EventCalendar'
 import { eventPath } from '@/utilities/routes'
 import { isEventPast, startOfDay } from '@/utilities/eventTiming'
-import { accentText } from '@/utilities/accentText'
 import { cn } from '@/utilities/ui'
 import { pastBandClass, type EventsExplorerSeparator } from './separator'
 
@@ -277,18 +278,19 @@ const EventCard: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, ct
 // to the right. Absent from the build entirely until now, which is why the
 // upcoming/past sections had a bare label and no intro or button.
 const SectionHeader: React.FC<{
-  eyebrow?: string
-  heading?: string
+  eyebrow?: RichTextValue
+  heading?: RichTextValue
   intro?: string
   linkLabel?: string
   linkUrl?: string
 }> = ({ eyebrow, heading, intro, linkLabel, linkUrl }) => {
-  if (!eyebrow && !heading && !intro && !linkLabel) return null
+  // `hasRichText`, not truthiness: an empty rich-text value is a truthy object.
+  if (!hasRichText(eyebrow) && !hasRichText(heading) && !intro && !linkLabel) return null
   return (
     <div className="events-section-header">
       <div>
-        {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-        {heading ? <h2>{accentText(heading)}</h2> : null}
+        <InlineRichText as="div" className="section-label" data={eyebrow} />
+        <InlineRichText as="h2" data={heading} />
         {intro ? <p>{intro}</p> : null}
       </div>
       {linkLabel && linkUrl ? (

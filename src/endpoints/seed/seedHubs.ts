@@ -1,3 +1,4 @@
+import { seedCreate, seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 import { isUnauthored } from './authored'
 
@@ -91,7 +92,7 @@ async function authorPage(
     payload.logger.info(`— ${slug} already authored, skipping`)
     return
   }
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: rec.id,
     data: { hero, layout, ...(meta ? { meta } : {}), ...(pageCss ? { cssClass: pageCss } : {}) } as never,
@@ -143,7 +144,7 @@ async function ensureResource({ payload, req }: Ctx, data: ResourceSeed): Promis
       req,
     })
     if (existing.docs.length > 0) return
-    await payload.create({
+    await seedCreate(payload, {
       collection: 'resources',
       data: data as never,
       req,
@@ -245,7 +246,7 @@ const ensureNewsletterForm = async ({ payload, req }: Ctx): Promise<string | num
   })
   if (existing.docs[0]?.id) return existing.docs[0].id
 
-  const created = await payload.create({
+  const created = await seedCreate(payload, {
     collection: 'forms',
     depth: 0,
     req,

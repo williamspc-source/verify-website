@@ -1,10 +1,5 @@
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
-import {
-  DefaultNodeTypes,
-  SerializedBlockNode,
-  SerializedLinkNode,
-  type DefaultTypedEditorState,
-} from '@payloadcms/richtext-lexical'
+import { type DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
 import {
   type JSXConverters,
   JSXConvertersFunction,
@@ -12,53 +7,15 @@ import {
   RichText as ConvertRichText,
 } from '@payloadcms/richtext-lexical/react'
 
-import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
+import { CodeBlock } from '@/blocks/Code/Component'
 
-import type {
-  BannerBlock as BannerBlockProps,
-  CallToActionBlock as CTABlockProps,
-  MediaBlock as MediaBlockProps,
-} from '@/payload-types'
 import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { cn } from '@/utilities/ui'
-import { accentText } from '@/utilities/accentText'
 import { headingId, headingIdAt, type TextishNode } from '@/utilities/headingId'
-import { referencePath, IN_THE_LOOP_PATH } from '@/utilities/routes'
+import { TEXT_FORMAT, internalDocToHref, textConverter, type NodeTypes } from './shared'
 
-type NodeTypes =
-  | DefaultNodeTypes
-  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps>
-
-const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
-  const { value, relationTo } = linkNode.fields.doc!
-  if (typeof value !== 'object') {
-    throw new Error('Expected value to be an object')
-  }
-  // Same single resolver CMSLink uses. Previously this branched on `posts` and
-  // fell through to docPath() for everything else, so a rich-text link to a
-  // specialist produced a top-level `/<slug>` that 404s.
-  //
-  // `referencePath` returns null in more cases than one: a Post with no stream, a
-  // document with no slug, and any `relationTo` outside LINKABLE_COLLECTIONS. The
-  // Lexical link converter has to return a string, so there is no "render it
-  // unlinked" option here as there is in CMSLink — the hub is the least-wrong
-  // destination for an editor-authored internal link we cannot resolve, and it is
-  // a real page rather than a 404.
-  return referencePath(relationTo, value) ?? IN_THE_LOOP_PATH
-}
-
-// Lexical text-format bitmask (bold/italic/etc.), mirrored so we can re-wrap
-// accent-transformed text without importing from deep inside the package.
-const TEXT_FORMAT = {
-  BOLD: 1,
-  ITALIC: 2,
-  STRIKETHROUGH: 4,
-  UNDERLINE: 8,
-  CODE: 16,
-  SUBSCRIPT: 32,
-  SUPERSCRIPT: 64,
-} as const
+export { TEXT_FORMAT, internalDocToHref, textConverter, type NodeTypes }
 
 /**
  * Payload's default heading converter emits `<h2>` with no id, so nothing in a
@@ -96,24 +53,7 @@ const buildConverters =
     // anchored `file-review` next to a rich-text "## File Review" would be two
     // elements holding one id, and the browser picks which one a link means.
     ...(headingIds ? headingWithIdConverter : null),
-    // Honour the VERIFY [[accent]] convention in rich-text body copy (headings use
-    // accentText() directly). Reproduces the default text converter's format
-    // handling so bold/italic/etc. still work, with the [[…]] → .vf-accent split
-    // applied to the innermost text node.
-    text: ({ node }) => {
-      const { format } = node
-      let content: React.ReactNode = accentText(node.text)
-      if (format & TEXT_FORMAT.BOLD) content = <strong>{content}</strong>
-      if (format & TEXT_FORMAT.ITALIC) content = <em>{content}</em>
-      if (format & TEXT_FORMAT.STRIKETHROUGH)
-        content = <span style={{ textDecoration: 'line-through' }}>{content}</span>
-      if (format & TEXT_FORMAT.UNDERLINE)
-        content = <span style={{ textDecoration: 'underline' }}>{content}</span>
-      if (format & TEXT_FORMAT.CODE) content = <code>{content}</code>
-      if (format & TEXT_FORMAT.SUBSCRIPT) content = <sub>{content}</sub>
-      if (format & TEXT_FORMAT.SUPERSCRIPT) content = <sup>{content}</sup>
-      return content
-    },
+    ...textConverter,
     blocks: {
       banner: ({ node }) => <BannerBlock className="col-start-2 mb-4" {...node.fields} />,
       mediaBlock: ({ node }) => (

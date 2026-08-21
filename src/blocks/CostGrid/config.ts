@@ -1,12 +1,13 @@
 import type { Block, Field } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
-import { anchorIdField, cssClassField, iconField, sectionHeaderFields } from '@/fields/blockFields'
+import {
+  anchorIdField,
+  cssClassField,
+  iconField,
+  richBodyField,
+  sectionHeaderFieldsWithDefaults,
+} from '@/fields/blockFields'
 
 // Sensible defaults for the section header, mirroring the design reference
 // (information-centre/for-clients.html → .cost-header). Reuses the shared
@@ -18,10 +19,7 @@ const headerDefaults: Record<string, string> = {
   subheading:
     'Most avoidable reporting costs arise from brief size, late material, or appointment changes. Early, focused instructions help us keep the process efficient.',
 }
-const costHeaderFields: Field[] = sectionHeaderFields.map((field) => {
-  const name = 'name' in field ? (field.name as string) : ''
-  return name in headerDefaults ? { ...field, defaultValue: headerDefaults[name] } : field
-}) as Field[]
+const costHeaderFields: Field[] = sectionHeaderFieldsWithDefaults(headerDefaults)
 
 // Cost / inclusions grid on a dark band: translucent white cards, each with an
 // icon, title and description, plus a trailing emphasis note. Mirrors the
@@ -67,22 +65,13 @@ export const CostGrid: Block = {
         { name: 'description', type: 'textarea' },
       ],
     },
-    {
-      name: 'note',
+    richBodyField('note', {
       label: 'Emphasis note',
-      type: 'richText',
       admin: {
         description:
           'Trailing emphasis paragraph below the cards (supports links, e.g. terms & conditions).',
       },
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => [
-          ...rootFeatures,
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ],
-      }),
-    },
+    }),
     anchorIdField,
     cssClassField,
   ],

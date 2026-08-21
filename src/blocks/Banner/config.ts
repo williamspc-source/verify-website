@@ -1,10 +1,6 @@
+import { richBodyField } from '@/fields/blockFields'
 import type { Block } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 export const Banner: Block = {
   slug: 'banner',
@@ -21,17 +17,7 @@ export const Banner: Block = {
       ],
       required: true,
     },
-    {
-      name: 'content',
-      type: 'richText',
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
-        },
-      }),
-      label: false,
-      required: true,
-    },
+    richBodyField('content', { label: false, required: true }),
   ],
   interfaceName: 'BannerBlock',
 }

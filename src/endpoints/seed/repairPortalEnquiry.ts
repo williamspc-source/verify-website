@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
@@ -129,7 +130,7 @@ export const repairPortalEnquiry = async ({ payload, req }: Ctx): Promise<void> 
             ]
           : [b],
       )
-      await payload.update({
+      await seedUpdate(payload, {
         collection: 'pages',
         id: contact.id,
         data: { layout: next } as never,
@@ -190,7 +191,7 @@ export const repairPortalEnquiry = async ({ payload, req }: Ctx): Promise<void> 
     ]
   })
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: booking.id,
     data: { layout: next } as never,

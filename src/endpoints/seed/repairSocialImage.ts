@@ -1,3 +1,4 @@
+import { seedUpdateGlobal } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 import path from 'path'
 
@@ -70,7 +71,7 @@ export const repairSocialImage = async (ctx: Ctx): Promise<void> => {
     return
   }
 
-  await payload.updateGlobal({
+  await seedUpdateGlobal(payload, {
     slug: 'site-settings',
     data: { socialImage: mediaId } as never,
     req,

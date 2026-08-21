@@ -1,9 +1,10 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { MissionPillarsBlock as Props } from '@/payload-types'
 
 import { Section, type SectionBackground } from '@/components/Section'
-import { accentText } from '@/utilities/accentText'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
@@ -33,11 +34,11 @@ export const MissionPillarsBlock: React.FC<Props & { bare?: boolean }> = ({
       motion={motion}
       id={anchorId || undefined}
     >
-      {eyebrow || heading || subheading ? (
+      {hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading) ? (
         <div className="mv-mission-header">
-          {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-          {heading ? <h2 className="section-title">{accentText(heading)}</h2> : null}
-          {subheading ? <p className="mv-mission-statement">{subheading}</p> : null}
+          <InlineRichText as="div" className="section-label" data={eyebrow} />
+          <InlineRichText as="h2" className="section-title" data={heading} />
+          <InlineRichText as="p" className="mv-mission-statement" data={subheading} />
         </div>
       ) : null}
 

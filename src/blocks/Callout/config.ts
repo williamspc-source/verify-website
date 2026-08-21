@@ -1,13 +1,10 @@
 import type { Block } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@/fields/linkGroup'
-import { cssClassField, iconField } from '@/fields/blockFields'
+import { cssClassField, iconField,
+  richBodyField,
+} from '@/fields/blockFields'
 
 // A standalone info/note callout usable directly in a page or Row column (unlike
 // the Lexical-only `banner`). Covers the recurring "Good to know" notes, blue info
@@ -39,17 +36,7 @@ export const Callout: Block = {
     },
     { name: 'tag', type: 'text', admin: { description: 'Optional pill label, e.g. "Good to know".' } },
     { name: 'heading', type: 'text' },
-    {
-      name: 'body',
-      type: 'richText',
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => [
-          ...rootFeatures,
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ],
-      }),
-    },
+    richBodyField('body'),
     // Appearance is left in place deliberately. A callout link renders as
     // `.process-note-link`, a single treatment, so the choice has no effect —
     // but removing the field drops a populated column, and this schema has been

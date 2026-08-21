@@ -1,3 +1,5 @@
+import { InlineRichText } from '@/components/RichText/Inline'
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
 import type { Event } from '@/payload-types'
 import { mediaSrc } from '@/utilities/mediaSrc'
 
@@ -9,7 +11,6 @@ import { Section } from '@/components/Section'
 import type { SectionBackground } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 
 import { EventsExplorerClient } from './EventsExplorerClient'
 import type {
@@ -25,10 +26,17 @@ import { EVENT_TYPE_LABELS } from '@/utilities/eventTypeLabels'
 
 // Field reads are typed defensively because payload-types have not been
 // regenerated for this block yet.
+//
+// The three header fields are `RichTextValue`, not `string`. This block declares
+// its own props rather than using the generated block type, so when they became
+// rich text NOTHING failed to compile — `RenderBlocks` spreads a block loosely,
+// so the lie stayed inside this file. It surfaced as `a.includes is not a
+// function` from `accentText` during a production build of /events, which names
+// neither the field nor the block.
 type Props = {
-  eyebrow?: string | null
-  heading?: string | null
-  subheading?: string | null
+  eyebrow?: RichTextValue
+  heading?: RichTextValue
+  subheading?: RichTextValue
   mode?: 'all' | 'upcoming-only' | 'past-only' | null
   pageSize?: number | null
   showSearch?: boolean | null
@@ -98,7 +106,7 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
 
   const events = res.docs.map((e) => serialise(e, cardStyle === 'card' ? 260 : 310))
 
-  const hasHeader = Boolean(eyebrow || heading || subheading)
+  const hasHeader = hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading)
 
   return (
     <Section
@@ -119,9 +127,9 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
       {hasHeader ? (
         <div className="events-section-header events-explorer-header">
           <div>
-            {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-            {heading ? <h2>{accentText(heading)}</h2> : null}
-            {subheading ? <p>{subheading}</p> : null}
+            <InlineRichText as="div" className="section-label" data={eyebrow} />
+            <InlineRichText as="h2" data={heading} />
+            <InlineRichText as="p" data={subheading} />
           </div>
         </div>
       ) : null}

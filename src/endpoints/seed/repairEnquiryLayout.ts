@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
@@ -138,7 +139,7 @@ export const repairEnquiryLayout = async ({ payload, req }: Ctx): Promise<void> 
       return b
     })
 
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: { layout: next } as never,
@@ -167,7 +168,7 @@ export const repairEnquiryLayout = async ({ payload, req }: Ctx): Promise<void> 
     const next = fields.map((f) =>
       f?.name && byName[f.name] && !f.placeholder ? { ...f, placeholder: byName[f.name] } : f,
     )
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'forms',
       id: form.id,
       data: { fields: next } as never,

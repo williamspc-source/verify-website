@@ -12363,3 +12363,84 @@
   text-transform: none;
   letter-spacing: normal;
 }
+
+/* ── Editor-chosen text colour (`textColour` → `vf-tc-*`) ─────────────────────
+   Generated from ONE list: `src/fields/richTextColors.ts`. The select stores a
+   key, never a colour, so every one of these resolves through a design token
+   that Site Settings already owns — a rebrand repaints every coloured word at
+   once instead of leaving hexes stranded in the database.
+   `tests/int/richTextColors.int.spec.ts` asserts this block and that list agree;
+   if you add a colour there, add its rule here or the guard goes red.
+
+   ── Why `!important`, deliberately ──
+   This is an editor's explicit choice, and it has to beat rules it cannot see.
+   Section headings are painted by `.section-title { color: var(--text-dark) }`
+   (0,1,0), but a dozen page-scoped ports are more specific than that —
+   `.vf-client-overview .vf-split__title` is 0,2,0, `.ct-page .ct-portal-card …`
+   is 0,3,0 — and every one of them would silently win over a plain `.vf-tc-*`.
+   The editor would pick a colour, save, and see nothing change, which is exactly
+   the failure this repo's first invariant forbids. Specificity cannot be won
+   here without guessing how deep the deepest scoped rule is, so the flag states
+   the intent instead: an explicit choice outranks a default.
+   The scope is narrow — `color` only, and only on an element an editor coloured. */
+.vf-tc-heading {
+  color: var(--text-dark) !important;
+}
+.vf-tc-body {
+  color: var(--text-mid) !important;
+}
+.vf-tc-brand {
+  color: var(--primary) !important;
+}
+.vf-tc-deep {
+  color: var(--primary-deep) !important;
+}
+.vf-tc-bright {
+  color: var(--secondary-bright) !important;
+}
+.vf-tc-muted {
+  color: var(--steel) !important;
+}
+.vf-tc-white {
+  color: var(--text-on-dark) !important;
+}
+
+/* On a dark band these two would disappear rather than read as a choice: brand
+   blue is low-contrast on navy and deep navy is all but invisible. They
+   re-point, the same way `.vf-section--primary .vf-accent` already does.
+   `heading` and `body` need nothing here — `.vf-on-dark` re-points the tokens
+   they resolve through, which is what carries a card's text colour with it when
+   an editor switches that card from light to dark. */
+.vf-on-dark .vf-tc-brand,
+.vf-section--primary .vf-tc-brand,
+.vf-section--dark .vf-tc-brand {
+  color: var(--accent-on-dark) !important;
+}
+.vf-on-dark .vf-tc-deep,
+.vf-section--primary .vf-tc-deep,
+.vf-section--dark .vf-tc-deep {
+  color: var(--text-on-dark) !important;
+}
+
+/* `[[bracketed]]` text keeps the accent colour inside a coloured element. Two
+   mechanisms overlap here on purpose — the element carries the editor's colour,
+   the bracket carries the brand accent — and this rule is what decides which
+   wins, rather than leaving it to source order. */
+.vf-tc-heading .vf-accent,
+.vf-tc-body .vf-accent,
+.vf-tc-brand .vf-accent,
+.vf-tc-deep .vf-accent,
+.vf-tc-bright .vf-accent,
+.vf-tc-muted .vf-accent,
+.vf-tc-white .vf-accent {
+  color: var(--primary);
+}
+.vf-on-dark .vf-tc-heading .vf-accent,
+.vf-on-dark .vf-tc-body .vf-accent,
+.vf-on-dark .vf-tc-brand .vf-accent,
+.vf-on-dark .vf-tc-deep .vf-accent,
+.vf-on-dark .vf-tc-bright .vf-accent,
+.vf-on-dark .vf-tc-muted .vf-accent,
+.vf-on-dark .vf-tc-white .vf-accent {
+  color: var(--accent-on-dark);
+}

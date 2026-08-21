@@ -1,3 +1,4 @@
+import { seedUpdateGlobal } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 import { SPECIALIST_INDEX_PATH } from '@/utilities/routes'
@@ -17,7 +18,7 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
   const opts = { req, depth: 0, context: { disableRevalidate: true } } as const
 
   // 1) Specialist Profile — Online Booking Portal CTA band (portal-opt4).
-  await payload.updateGlobal({
+  await seedUpdateGlobal(payload, {
     slug: 'specialist-profile',
     data: {
       portalCta: {
@@ -48,7 +49,7 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
     specialistProfile as { breadcrumb?: { breadcrumbParentHref?: string | null } } | null
   )?.breadcrumb?.breadcrumbParentHref
   if (parentHref === '/specialist-panel') {
-    await payload.updateGlobal({
+    await seedUpdateGlobal(payload, {
       slug: 'specialist-profile',
       data: { breadcrumb: { breadcrumbParentHref: SPECIALIST_INDEX_PATH } },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,7 +59,7 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
   }
 
   // 2) Article settings — the two fixed sidebar CTA cards on In-the-Loop articles.
-  await payload.updateGlobal({
+  await seedUpdateGlobal(payload, {
     slug: 'article-settings',
     data: {
       sidebarCards: [
@@ -82,7 +83,7 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
   payload.logger.info('— Seeded Article settings sidebar cards')
 
   // 3) Events settings — host boilerplate for AAMLE vs VERIFY event detail pages.
-  await payload.updateGlobal({
+  await seedUpdateGlobal(payload, {
     slug: 'events-settings',
     data: {
       // `blurb` and `callout` are richText. The `**…**` runs are parsed into

@@ -1,4 +1,7 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
+
+import { matchTracker, storedText, type MatchTracker } from './repairMatch'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
@@ -125,29 +128,51 @@ export const BLOCK_ANCHORS: { blockType: string; heading: string; anchorId: stri
   // two of this accordion's four items, so it links to the grid as a whole.
   {
     blockType: 'servicesGrid',
-    heading: 'Four Services. [[One Less Thing to Manage.]]',
+    // Written WITHOUT the `[[accent]]` brackets: the comparison runs through
+    // `storedText`, which strips them, so that the same literal keeps matching
+    // whether the heading is stored as a string or as rich text.
+    heading: 'Four Services. One Less Thing to Manage.',
     anchorId: 'as-services-section',
   },
 ]
 
-/** Set a missing/incorrect `anchorId` on each appointmentGuide type. */
-const applyGuideAnchors = (node: unknown, count: { n: number }): unknown => {
-  if (Array.isArray(node)) return node.map((n) => applyGuideAnchors(n, count))
+/**
+ * Set a missing/incorrect `anchorId` on each appointmentGuide type.
+ *
+ * `found` records that a table entry matched a block in the database, which is a
+ * different question from whether anything was *written*: this repair is
+ * idempotent, so on a healthy second run it changes nothing and must still
+ * report that it found its targets. Counting writes instead would make every
+ * clean re-run look like total drift.
+ */
+const applyGuideAnchors = (
+  node: unknown,
+  count: { n: number },
+  found: { blocks: MatchTracker; types: MatchTracker },
+): unknown => {
+  if (Array.isArray(node)) return node.map((n) => applyGuideAnchors(n, count, found))
   if (!node || typeof node !== 'object') return node
   const obj = node as Record<string, unknown>
   const out: Record<string, unknown> = {}
-  for (const [k, v] of Object.entries(obj)) out[k] = applyGuideAnchors(v, count)
+  for (const [k, v] of Object.entries(obj)) out[k] = applyGuideAnchors(v, count, found)
+  const heading = storedText(out.heading)
   const blockAnchor = BLOCK_ANCHORS.find(
-    (a) => a.blockType === out.blockType && a.heading === out.heading,
+    (a) => a.blockType === out.blockType && a.heading === heading,
   )
-  if (blockAnchor && out.anchorId !== blockAnchor.anchorId) {
-    out.anchorId = blockAnchor.anchorId
-    count.n++
+  if (blockAnchor) {
+    found.blocks.hit(blockAnchor.heading)
+    if (out.anchorId !== blockAnchor.anchorId) {
+      out.anchorId = blockAnchor.anchorId
+      count.n++
+    }
   }
   if (out.blockType === 'appointmentGuide' && Array.isArray(out.types)) {
     out.types = (out.types as Record<string, unknown>[]).map((t) => {
-      const want = APPOINTMENT_TYPE_ANCHORS[String(t?.label ?? '').trim()]
-      if (!want || t?.anchorId === want) return t
+      const label = storedText(t?.label)
+      const want = APPOINTMENT_TYPE_ANCHORS[label]
+      if (!want) return t
+      found.types.hit(label)
+      if (t?.anchorId === want) return t
       count.n++
       return { ...t, anchorId: want }
     })
@@ -215,13 +240,25 @@ export const repairLinkTargets = async ({ payload, req }: Ctx): Promise<void> =>
   let pagesTouched = 0
   let linksFixed = 0
 
+  // Only these two tables are tracked. Their keys are headings and labels that
+  // must still be on the page; the URL tables above key on wording that is meant
+  // to disappear once repaired, so zero matches there is success. See
+  // `repairMatch.ts`.
+  const found = {
+    blocks: matchTracker(
+      'BLOCK_ANCHORS',
+      BLOCK_ANCHORS.map((a) => a.heading),
+    ),
+    types: matchTracker('APPOINTMENT_TYPE_ANCHORS', Object.keys(APPOINTMENT_TYPE_ANCHORS)),
+  }
+
   for (const page of pages.docs) {
     const layout = (page as { layout?: unknown }).layout
     if (!layout) continue
     const count = { n: 0 }
-    const next = applyGuideAnchors(rewrite(layout, count), count)
+    const next = applyGuideAnchors(rewrite(layout, count), count, found)
     if (count.n === 0) continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: { layout: next } as never,
@@ -235,4 +272,7 @@ export const repairLinkTargets = async ({ payload, req }: Ctx): Promise<void> =>
   payload.logger.info(
     `— Repaired link targets and anchors (${linksFixed} changes across ${pagesTouched} pages)`,
   )
+
+  found.blocks.report(payload)
+  found.types.report(payload)
 }

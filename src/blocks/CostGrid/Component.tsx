@@ -1,3 +1,5 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { CostGridBlock as Props } from '@/payload-types'
@@ -5,7 +7,6 @@ import type { CostGridBlock as Props } from '@/payload-types'
 import RichText from '@/components/RichText'
 import { Icon } from '@/components/Icon'
 import { Section } from '@/components/Section'
-import { accentText } from '@/utilities/accentText'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
@@ -24,7 +25,7 @@ export const CostGridBlock: React.FC<Props & { bare?: boolean }> = ({
   bare,
 }) => {
   const hasCards = Array.isArray(cards) && cards.length > 0
-  const hasHeader = Boolean(eyebrow || heading || subheading)
+  const hasHeader = hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading)
   if (!hasCards && !hasHeader && !note) return null
 
   return (
@@ -36,9 +37,9 @@ export const CostGridBlock: React.FC<Props & { bare?: boolean }> = ({
     >
       {hasHeader ? (
         <div className="cost-header">
-          {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-          {heading ? <h2 className="section-title">{accentText(heading)}</h2> : null}
-          {subheading ? <p className="section-subtitle">{subheading}</p> : null}
+          <InlineRichText as="div" className="section-label" data={eyebrow} />
+          <InlineRichText as="h2" className="section-title" data={heading} />
+          <InlineRichText as="p" className="section-subtitle" data={subheading} />
         </div>
       ) : null}
 

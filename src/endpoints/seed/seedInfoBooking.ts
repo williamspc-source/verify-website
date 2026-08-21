@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 import { isUnauthored } from './authored'
 
@@ -121,7 +122,7 @@ async function authorPage(
     payload.logger.info(`— ${slug} already authored, skipping`)
     return
   }
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: rec.id,
     data: { hero, layout, ...(pageCss ? { cssClass: pageCss } : {}) } as never,
@@ -160,7 +161,7 @@ async function authorPageReplace(
     payload.logger.info(`— ${slug} already authored, skipping`)
     return
   }
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: rec.id,
     data: { hero, layout, ...(pageCss ? { cssClass: pageCss } : {}) } as never,

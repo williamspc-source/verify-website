@@ -1,0 +1,41 @@
+/**
+ * Admin styling for the VERIFY CMS.
+ *
+ * Loaded by `src/app/(payload)/layout.tsx`, which imports it directly — there is
+ * no `css` key in `payload.config.ts` and there does not need to be. The file
+ * shipped with the Payload template and sat empty until now, which is easy to
+ * mistake for "not wired up": it is, and a rule added here applies.
+ */
+
+/**
+ * One-line rich text (`inlineRichTextField`).
+ *
+ * A heading, an eyebrow, a card title. The editor's own `hideGutter`,
+ * `hideDraggableBlockElement` and `hideInsertParagraphAtEnd` flags remove the
+ * block-editing furniture; what is left is the height, which otherwise reserves
+ * several lines of space for a field holding four words and makes a block's edit
+ * panel scroll for no reason.
+ *
+ * A max-height rather than a fixed one: a two-line heading lockup is legitimate
+ * content here, so the box grows to fit it and only stops the field claiming a
+ * body editor's worth of the panel.
+ */
+/* Selectors verified against the rendered admin, not guessed: the chain is
+   `.vf-inline-richtext > .rich-text-lexical__wrap > .editor-container >
+   .editor-scroller > .editor > .ContentEditable__root`. An earlier version of
+   this rule targeted `.field-type.rich-text .rich-text-lexical`, which matches
+   nothing in this Payload version — the CSS was correct-looking and completely
+   inert, which is the failure mode this repo keeps recording for page-scoped
+   styles. */
+.vf-inline-richtext {
+  .editor-container {
+    min-height: 0;
+  }
+
+  .ContentEditable__root {
+    min-height: 0;
+    max-height: 8rem;
+    overflow-y: auto;
+    padding-block: 0.5rem;
+  }
+}

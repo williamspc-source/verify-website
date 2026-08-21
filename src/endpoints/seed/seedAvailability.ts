@@ -1,3 +1,4 @@
+import { seedCreate, seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 /* =====================================================================
@@ -92,7 +93,7 @@ export const seedAvailability = async ({
       payload.logger.info(`— Availability: specialist not found, skipping: ${slug}`)
       continue
     }
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'specialists',
       id,
       depth: 0,
@@ -126,7 +127,7 @@ export const seedAvailability = async ({
     const specialist = idBySlug.get(slug)
     if (!specialist) continue
     for (const slot of slots) {
-      await payload.create({
+      await seedCreate(payload, {
         collection: 'availability-sessions',
         depth: 0,
         req,

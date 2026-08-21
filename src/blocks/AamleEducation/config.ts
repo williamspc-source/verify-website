@@ -1,10 +1,5 @@
 import type { Block } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 import { link } from '@/fields/link'
 import {
@@ -14,6 +9,7 @@ import {
   cssClassField,
   iconField,
   motionField,
+  richBodyField,
 } from '@/fields/blockFields'
 
 // AAMLE educational-services section (Services page "Educational Services").
@@ -74,18 +70,9 @@ export const AamleEducation: Block = {
     },
 
     // ── Intro paragraph ──
-    {
-      name: 'description',
-      type: 'richText',
+    richBodyField('description', {
       admin: { description: 'Short intro paragraph under the badge. Bold is supported.' },
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => [
-          ...rootFeatures,
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ],
-      }),
-    },
+    }),
 
     // ── Offering checklist (icon + label rows) ──
     {

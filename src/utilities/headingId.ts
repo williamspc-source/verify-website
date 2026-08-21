@@ -1,4 +1,7 @@
 import { stripAccent } from './accentText'
+import { lexicalNodeText, type TextishNode } from './lexicalText'
+
+export { lexicalNodeText, type TextishNode }
 
 /**
  * Anchor ids for rich-text headings.
@@ -21,20 +24,12 @@ import { stripAccent } from './accentText'
  */
 
 /**
- * Structural view of a Lexical node — the minimum needed to read a heading's
- * text without depending on the editor's serialised types.
- *
- * `type` is load-bearing, not decoration. Without at least one property in
- * common with `SerializedLexicalNode` (`{ type, version }`) this is a TypeScript
- * *weak type*, and passing a real heading node's `children` to it fails with
- * TS2559 "has no properties in common".
+ * `TextishNode` and `lexicalNodeText` now live in `./lexicalText`, because the
+ * same walk answers "what does this heading say" and "what does this converted
+ * copy field say" — and two walks would be two things that can drift, which is
+ * the fault this module's own header describes. They are re-exported above so
+ * every existing importer keeps working.
  */
-export type TextishNode = {
-  type?: string
-  tag?: string
-  text?: string
-  children?: TextishNode[]
-}
 
 /** Heading label → anchor id. */
 export const slugify = (s: string): string =>
@@ -43,10 +38,6 @@ export const slugify = (s: string): string =>
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-
-/** Plain text of a Lexical node, including any nested link/format children. */
-export const lexicalNodeText = (node: TextishNode): string =>
-  node.text ?? (Array.isArray(node.children) ? node.children.map(lexicalNodeText).join('') : '')
 
 /**
  * The heading as a reader sees it. `[[double brackets]]` are the VERIFY accent

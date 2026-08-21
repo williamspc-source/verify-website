@@ -1,3 +1,5 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { LeadershipSpotlightBlock as Props } from '@/payload-types'
@@ -7,7 +9,6 @@ import { CMSLink } from '@/components/Link'
 import { Icon } from '@/components/Icon'
 import { Media } from '@/components/Media'
 import { Section, type SectionBackground } from '@/components/Section'
-import { accentText } from '@/utilities/accentText'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
@@ -37,7 +38,14 @@ export const LeadershipSpotlightBlock: React.FC<Props & { bare?: boolean }> = ({
   const hasBadge = Boolean(name || role || badge)
   const hasLink = Boolean(link && link.label)
   const hasContent =
-    eyebrow || heading || subheading || tagline || body || creds.length > 0 || hasLink || hasBadge
+    hasRichText(eyebrow) ||
+    hasRichText(heading) ||
+    hasRichText(subheading) ||
+    tagline ||
+    body ||
+    creds.length > 0 ||
+    hasLink ||
+    hasBadge
 
   if (!hasContent && !hasPhoto) return null
 
@@ -73,13 +81,13 @@ export const LeadershipSpotlightBlock: React.FC<Props & { bare?: boolean }> = ({
         </div>
 
         <div className="leadership-content">
-          {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-          {heading ? (
-            <h2 className={cn('section-title', toClassName(elementClasses?.heading))}>
-              {accentText(heading)}
-            </h2>
-          ) : null}
-          {subheading ? <p className="leadership-subheading">{subheading}</p> : null}
+          <InlineRichText as="div" className="section-label" data={eyebrow} />
+          <InlineRichText
+            as="h2"
+            className={cn('section-title', toClassName(elementClasses?.heading))}
+            data={heading}
+          />
+          <InlineRichText as="p" className="leadership-subheading" data={subheading} />
           {tagline ? <div className="leadership-tagline">{tagline}</div> : null}
           {body ? <RichText data={body} enableGutter={false} enableProse={false} /> : null}
           {creds.length > 0 ? (

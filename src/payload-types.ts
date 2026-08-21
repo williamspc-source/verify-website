@@ -3104,12 +3104,58 @@ export interface FAQBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Lay the questions out in one or two columns, or side by side — heading and intro in a left column with the questions beside them (the services-page treatment).
    */
@@ -3309,12 +3355,58 @@ export interface GatewayCardsBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -3796,12 +3888,58 @@ export interface FeatureGridBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -4114,12 +4252,58 @@ export interface ProcessStepsBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -4476,12 +4660,58 @@ export interface SpecialtyGridBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -4921,12 +5151,58 @@ export interface PeopleGridBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -5193,12 +5469,58 @@ export interface ServicesGridBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -5616,12 +5938,58 @@ export interface TestimonialsGridBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -5723,12 +6091,58 @@ export interface StatsBandBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -5792,12 +6206,58 @@ export interface TabsBlockType {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -6439,12 +6899,58 @@ export interface SplitFeatureBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -7512,12 +8018,58 @@ export interface ContactDetailsBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Pull phone / email / address / hours from the Footer + Site Settings globals.
    */
@@ -7666,12 +8218,58 @@ export interface IconListBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Alignment of the eyebrow, heading and intro above the list.
    */
@@ -7821,12 +8419,58 @@ export interface MapEmbedBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   kind?: ('map' | 'embed') | null;
   /**
    * Optional — pull the address + office info panel from an Office record.
@@ -8104,12 +8748,58 @@ export interface LeadershipSpotlightBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -8746,12 +9436,58 @@ export interface VideoEmbedBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Where the video is hosted.
    */
@@ -9337,12 +10073,58 @@ export interface SpecialistDirectoryBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -9417,12 +10199,58 @@ export interface SpecialtyDirectoryBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -9457,12 +10285,58 @@ export interface ResourcesGridBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -9670,12 +10544,58 @@ export interface AppointmentGuideBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Small uppercase label shown above the appointment-type toggle. Defaults to "Select your appointment type".
    */
@@ -10183,15 +11103,61 @@ export interface MissionPillarsBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Intro paragraph shown under the heading (optional).
    */
-  subheading?: string | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Each pillar is auto-numbered 01, 02, 03… in display order.
    */
@@ -10229,12 +11195,58 @@ export interface ValueCardsBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -10277,12 +11289,58 @@ export interface WhyVerifyBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Each reason renders as a +/− disclosure row: the title is always visible and the body expands on click.
    */
@@ -10440,12 +11498,58 @@ export interface AudiencePathwaysBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Section background colour.
    */
@@ -10956,12 +12060,58 @@ export interface CostGridBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Translucent cards on the dark band (e.g. cost-control tips or inclusions).
    */
@@ -11253,12 +12403,58 @@ export interface EventsExplorerBlock {
   /**
    * Small uppercase label above the heading (optional).
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
-   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to force a line break.
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   */
+  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
   /**
    * Show upcoming and past, or restrict to one. The split uses the visitor’s current date.
    */
@@ -12173,6 +13369,7 @@ export interface FAQBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   columns?: T;
   itemStyle?: T;
   toggleStyle?: T;
@@ -12213,6 +13410,7 @@ export interface GatewayCardsBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   columns?: T;
   cards?:
@@ -12278,6 +13476,7 @@ export interface FeatureGridBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   columns?: T;
   cardStyle?: T;
@@ -12329,6 +13528,7 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   variant?: T;
   numberStyle?: T;
@@ -12378,6 +13578,7 @@ export interface SpecialtyGridBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   source?: T;
   taxonomy?: T;
@@ -12428,6 +13629,7 @@ export interface PeopleGridBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   headerBackground?: T;
   source?: T;
@@ -12489,6 +13691,7 @@ export interface ServicesGridBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   source?: T;
   category?: T;
@@ -12542,6 +13745,7 @@ export interface TestimonialsGridBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   source?: T;
   featuredOnly?: T;
@@ -12578,6 +13782,7 @@ export interface StatsBandBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   stats?:
     | T
@@ -12609,6 +13814,7 @@ export interface TabsBlockTypeSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   tabs?:
     | T
@@ -12711,6 +13917,7 @@ export interface SplitFeatureBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   rowStyle?: T;
   density?: T;
@@ -12840,6 +14047,7 @@ export interface ContactDetailsBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   useGlobal?: T;
   items?:
     | T
@@ -12865,6 +14073,7 @@ export interface IconListBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   headingAlign?: T;
   columns?: T;
   items?:
@@ -12893,6 +14102,7 @@ export interface MapEmbedBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   kind?: T;
   office?: T;
   embedUrl?: T;
@@ -12933,6 +14143,7 @@ export interface LeadershipSpotlightBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   photo?: T;
   placeholderIcon?: T;
@@ -13016,6 +14227,7 @@ export interface VideoEmbedBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   provider?: T;
   aspect?: T;
   videoId?: T;
@@ -13139,6 +14351,7 @@ export interface SpecialistDirectoryBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   enableSearch?: T;
   enableSpecialty?: T;
@@ -13173,6 +14386,7 @@ export interface SpecialtyDirectoryBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   showFilterBar?: T;
   showRosters?: T;
@@ -13191,6 +14405,7 @@ export interface ResourcesGridBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   source?: T;
   variant?: T;
@@ -13217,6 +14432,7 @@ export interface AppointmentGuideBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   selectLabel?: T;
   types?:
     | T
@@ -13274,6 +14490,7 @@ export interface MissionPillarsBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   pillars?:
     | T
     | {
@@ -13295,6 +14512,7 @@ export interface ValueCardsBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   cards?:
     | T
@@ -13318,6 +14536,7 @@ export interface WhyVerifyBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   items?:
     | T
     | {
@@ -13343,6 +14562,7 @@ export interface AudiencePathwaysBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   background?: T;
   pathways?:
     | T
@@ -13422,6 +14642,7 @@ export interface CostGridBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   cards?:
     | T
     | {
@@ -13501,6 +14722,7 @@ export interface EventsExplorerBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   subheading?: T;
+  textColour?: T;
   mode?: T;
   pageSize?: T;
   showSearch?: T;

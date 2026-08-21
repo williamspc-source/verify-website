@@ -1,3 +1,4 @@
+import { seedCreate, seedUpdate } from './seedWrite'
 import type { CollectionSlug, Payload, PayloadRequest } from 'payload'
 import { ACCREDITATION_ICON, qualificationIcon } from '@/utilities/qualificationIcon'
 import path from 'path'
@@ -112,7 +113,7 @@ async function upsertTerms(
       map.set(term.slug, existing.docs[0].id)
       continue
     }
-    const created = await payload.create({
+    const created = await seedCreate(payload, {
       collection,
       depth: 0,
       req,
@@ -152,7 +153,7 @@ async function upsertLocations(
       map.set(title, existing.docs[0].id)
       continue
     }
-    const created = await payload.create({
+    const created = await seedCreate(payload, {
       collection: 'locations',
       depth: 0,
       req,
@@ -183,7 +184,7 @@ async function upsertAccreditations(
       map.set(title, existing.docs[0].id)
       continue
     }
-    const created = await payload.create({
+    const created = await seedCreate(payload, {
       collection: 'accreditations',
       depth: 0,
       req,
@@ -213,7 +214,7 @@ async function createIfNew(
     req,
   })
   if (existing.docs[0]) return false
-  await payload.create({
+  await seedCreate(payload, {
     collection,
     depth: 0,
     req,
@@ -309,7 +310,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       ...(sp.order != null ? { order: sp.order } : {}),
     })
     if (!Object.keys(data).length) continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'specialties',
       id,
       req,
@@ -330,7 +331,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       ...(ct.order != null ? { order: ct.order } : {}),
     })
     if (!Object.keys(data).length) continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'claim-types',
       id,
       req,
@@ -346,7 +347,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
     const current = await payload.findByID({ collection: 'assessment-types', id, depth: 0, req })
     const data = onlyBlank(current, { description: at.description })
     if (!Object.keys(data).length) continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'assessment-types',
       id,
       req,
@@ -518,7 +519,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       .map((k) => postIdBySlug.get(POSTS[(i + k) % nPosts].slug))
       .filter((id): id is number | string => id != null)
     if (!relIds.length) continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'posts',
       id: selfId,
       data: { relatedPosts: relIds } as never,
@@ -551,7 +552,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   })
   if (existingTestimonials.totalDocs === 0) {
     for (const t of TESTIMONIALS) {
-      await ctx.payload.create({
+      await seedCreate(ctx.payload, {
         collection: 'testimonials',
         depth: 0,
         req: ctx.req,

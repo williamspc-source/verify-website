@@ -6,7 +6,7 @@ import {
   cssClassField,
   iconField,
   motionField,
-  sectionHeaderFields,
+  sectionHeaderFieldsWithDefaults,
 } from '@/fields/blockFields'
 
 // Sensible starter copy for the section header. Applied by cloning the shared
@@ -19,11 +19,7 @@ const headerDefaults: Record<string, string> = {
     'VERIFY delivers accurate and consistent medico-legal support, guided by a strong understanding of both legal and medical demands. We bridge that gap through careful coordination and trusted service.',
 }
 
-const whyHeaderFields: Field[] = sectionHeaderFields.map((f) =>
-  'name' in f && typeof f.name === 'string' && f.name in headerDefaults
-    ? { ...f, defaultValue: headerDefaults[f.name] }
-    : f,
-) as Field[]
+const whyHeaderFields: Field[] = sectionHeaderFieldsWithDefaults(headerDefaults)
 
 // The six "what sets us apart" reasons from the about-verify reference, provided
 // as defaults so a fresh block renders the full accordion out of the box. Every

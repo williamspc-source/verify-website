@@ -1,3 +1,4 @@
+import { seedCreate, seedUpdate, seedUpdateGlobal } from './seed/seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 import { readFileSync } from 'fs'
 import path from 'path'
@@ -525,7 +526,7 @@ export const seedVerify = async ({
       // a code fixture.
       const currentParent = parentIdOf(doc)
       if (currentParent == null && intendedParent) {
-        await payload.update({
+        await seedUpdate(payload, {
           collection: 'pages',
           id: doc.id,
           depth: 0,
@@ -540,7 +541,7 @@ export const seedVerify = async ({
       continue
     }
 
-    const created = await payload.create({
+    const created = await seedCreate(payload, {
       collection: 'pages',
       depth: 0,
       req,
@@ -576,7 +577,7 @@ export const seedVerify = async ({
   })
 
   // ── Header global ──
-  await payload.updateGlobal({
+  await seedUpdateGlobal(payload, {
     slug: 'header',
     depth: 0,
     req,
@@ -654,7 +655,7 @@ export const seedVerify = async ({
   payload.logger.info('— Populated header global')
 
   // ── Footer global ──
-  await payload.updateGlobal({
+  await seedUpdateGlobal(payload, {
     slug: 'footer',
     depth: 0,
     req,
@@ -704,7 +705,7 @@ export const seedVerify = async ({
   payload.logger.info('— Populated footer global')
 
   // ── Specialist Availability settings global ──
-  await payload.updateGlobal({
+  await seedUpdateGlobal(payload, {
     slug: 'specialist-availability',
     depth: 0,
     req,
@@ -735,7 +736,7 @@ export const seedVerify = async ({
   {
     const existingStyles = await payload.findGlobal({ slug: 'custom-styles', depth: 0, req })
     if (!existingStyles?.presets?.length) {
-      await payload.updateGlobal({
+      await seedUpdateGlobal(payload, {
         slug: 'custom-styles',
         depth: 0,
         req,
@@ -767,7 +768,7 @@ export const seedVerify = async ({
       JSON.stringify(layout[0]).includes('scaffolded and ready for content')
 
     if (page && isPlaceholder) {
-      await payload.update({
+      await seedUpdate(payload, {
         collection: 'pages',
         id: page.id,
         depth: 0,
@@ -796,7 +797,7 @@ export const seedVerify = async ({
     })
     const page = av.docs[0]
     if (page && isPlaceholderLayout(page.layout)) {
-      await payload.update({
+      await seedUpdate(payload, {
         collection: 'pages',
         id: page.id,
         depth: 0,
@@ -830,7 +831,7 @@ export const seedVerify = async ({
 
     let formId = existingForm.docs[0]?.id
     if (!formId) {
-      const created = await payload.create({
+      const created = await seedCreate(payload, {
         collection: 'forms',
         depth: 0,
         req,
@@ -918,7 +919,7 @@ export const seedVerify = async ({
         payload.logger.info(`— ${title} form already exists, skipping`)
         return existing.docs[0].id
       }
-      const created = await payload.create({
+      const created = await seedCreate(payload, {
         collection: 'forms',
         depth: 0,
         req,
@@ -1019,7 +1020,7 @@ export const seedVerify = async ({
         : currentEnquiryForm
 
     if (currentEnquiryFormId == null) {
-      await payload.updateGlobal({
+      await seedUpdateGlobal(payload, {
         slug: 'site-settings',
         depth: 0,
         req,
@@ -1048,7 +1049,7 @@ export const seedVerify = async ({
       const logoFile = readFileSync(path.join(publicDir, 'verify-logo.png'))
       const faviconFile = readFileSync(path.join(publicDir, 'favicon.png'))
 
-      const logoDoc = await payload.create({
+      const logoDoc = await seedCreate(payload, {
         collection: 'media',
         req,
         data: { alt: 'VERIFY Medico-Legal Solutions logo' },
@@ -1060,7 +1061,7 @@ export const seedVerify = async ({
         },
       })
 
-      const faviconDoc = await payload.create({
+      const faviconDoc = await seedCreate(payload, {
         collection: 'media',
         req,
         data: { alt: 'VERIFY shield' },
@@ -1072,7 +1073,7 @@ export const seedVerify = async ({
         },
       })
 
-      await payload.updateGlobal({
+      await seedUpdateGlobal(payload, {
         slug: 'site-settings',
         depth: 0,
         req,
@@ -1119,7 +1120,7 @@ export const seedVerify = async ({
     }
 
     if (Object.keys(repaired).length) {
-      await payload.updateGlobal({
+      await seedUpdateGlobal(payload, {
         slug: 'site-settings',
         depth: 0,
         req,

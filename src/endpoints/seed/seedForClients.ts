@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
@@ -99,7 +100,7 @@ export const repairForClientsCards = async ({ payload, req }: Ctx): Promise<void
     return block
   })
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: page.id,
     data: { layout: next } as never,

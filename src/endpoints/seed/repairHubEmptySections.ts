@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
@@ -113,7 +114,7 @@ export const repairHubEmptySections = async ({ payload, req }: Ctx): Promise<voi
     return { ...b, hideWhenEmpty: true }
   })
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: page.id,
     data: { layout: next } as never,

@@ -1,10 +1,5 @@
 import type { Block } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 import { link } from '@/fields/link'
 import {
@@ -16,6 +11,7 @@ import {
   iconField,
   headingWeightField,
   sectionHeaderFields,
+  richBodyField,
 } from '@/fields/blockFields'
 
 export const SplitFeature: Block = {
@@ -118,17 +114,7 @@ export const SplitFeature: Block = {
           ],
         },
         { name: 'title', type: 'text', required: true },
-        {
-          name: 'body',
-          type: 'richText',
-          editor: lexicalEditor({
-            features: ({ rootFeatures }) => [
-              ...rootFeatures,
-              FixedToolbarFeature(),
-              InlineToolbarFeature(),
-            ],
-          }),
-        },
+        richBodyField('body'),
         {
           name: 'bulletsLabel',
           type: 'text',

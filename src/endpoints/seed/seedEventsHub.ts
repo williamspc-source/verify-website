@@ -1,4 +1,7 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
+
+import { storedText } from './repairMatch'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
@@ -38,6 +41,10 @@ type Ctx = { payload: Payload; req: PayloadRequest }
 
 /** Headings the events hub has carried before now. Matched exactly: anything
  *  else is an editor's wording and is left alone. */
+// Compared through `storedText` on BOTH sides wherever these are used. Two of
+// these literals carry `[[accent]]` brackets, and `storedText` strips them — so
+// normalising only the stored value would mean the literal could never match
+// again, silently, which is the whole failure this pass is closing.
 const SUPERSEDED_EVENTS_HEADINGS = [
   'Medico-Legal [[Education Events]]',
   // Briefly seeded before the hero was aligned to the reference.
@@ -224,8 +231,12 @@ const correctSlide = (slide: Slide): Slide | null => {
   let changed = false
 
   for (const key of ['title', 'body', 'visualLabel'] as const) {
-    const current = slide[key]
-    if (typeof current === 'string' && SUPERSEDED_SLIDE_TEXT[current]) {
+    // `storedText` rather than a `typeof === 'string'` guard: these fields are
+    // becoming rich text, and a type guard would turn this repair into a silent
+    // no-op the moment they do. The write below hands back a string, which the
+    // seed's write wrapper lifts into a Lexical value for a converted field.
+    const current = storedText(slide[key])
+    if (current && SUPERSEDED_SLIDE_TEXT[current]) {
       next[key] = SUPERSEDED_SLIDE_TEXT[current]
       changed = true
     }
@@ -235,10 +246,12 @@ const correctSlide = (slide: Slide): Slide | null => {
     next.accent = 'seminars'
   }
 
-  const title = (next.title as string) || (slide.title as string)
+  const title = storedText(next.title) || storedText(slide.title)
   const pillFix = SUPERSEDED_PILLS[title]
   if (pillFix && Array.isArray(slide.pills)) {
-    const current = (slide.pills as { text?: string }[]).map((p) => p?.text).filter(Boolean)
+    const current = (slide.pills as { text?: unknown }[])
+      .map((p) => storedText(p?.text))
+      .filter(Boolean)
     if (JSON.stringify(current) === JSON.stringify(pillFix.from)) {
       next.pills = pillFix.to.map((text) => ({ text }))
       changed = true
@@ -321,7 +334,7 @@ export const repairEventsHub = async ({ payload, req }: Ctx): Promise<void> => {
     const needsPageSize = current.pageSize === 8
     // Deleting a value, unlike filling one, needs an exact match against text
     // this seed wrote — an editor's own subheading is left in place.
-    const dropSubheading = SUPERSEDED_EXPLORER_SUBHEADINGS.includes(current.subheading as string)
+    const dropSubheading = SUPERSEDED_EXPLORER_SUBHEADINGS.map(storedText).includes(storedText(current.subheading))
     if (needsCard || groupChanged || needsPageSize || dropSubheading) {
       layout[explorerAt] = {
         ...current,
@@ -348,11 +361,12 @@ export const repairEventsHub = async ({ payload, req }: Ctx): Promise<void> => {
   if (hero) {
     const nextHero = { ...hero }
     let heroChanged = false
-    if (SUPERSEDED_EVENTS_HEADINGS.includes(hero.heading as string) && hero.heading !== EVENTS_HEADING) {
+    if (SUPERSEDED_EVENTS_HEADINGS.map(storedText).includes(storedText(hero.heading)) &&
+      storedText(hero.heading) !== storedText(EVENTS_HEADING)) {
       nextHero.heading = EVENTS_HEADING
       heroChanged = true
     }
-    if (SUPERSEDED_EVENTS_SUBTITLES.includes(hero.subtitle as string)) {
+    if (SUPERSEDED_EVENTS_SUBTITLES.map(storedText).includes(storedText(hero.subtitle))) {
       nextHero.subtitle = EVENTS_SUBTITLE
       heroChanged = true
     }
@@ -368,7 +382,7 @@ export const repairEventsHub = async ({ payload, req }: Ctx): Promise<void> => {
   }
 
   if (changes.length) {
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: data as never,
@@ -401,7 +415,7 @@ const applyEventsPageClass = async ({ payload, req }: Ctx): Promise<void> => {
     const raw = (page as { cssClass?: unknown }).cssClass
     const classes = Array.isArray(raw) ? (raw as string[]) : raw ? [String(raw)] : []
     if (classes.includes(EVENTS_PAGE_CLASS)) continue
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: { cssClass: [...classes, EVENTS_PAGE_CLASS] } as never,
@@ -453,7 +467,7 @@ export const repairFeaturedCategories = async ({ payload, req }: Ctx): Promise<v
     const categoryId = category.docs[0]?.id
     if (!categoryId) continue
 
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'posts',
       id: post.id,
       data: { categories: [categoryId] } as never,

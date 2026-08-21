@@ -1,16 +1,12 @@
 import type { Block } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 import {
   anchorIdField,
   cssClassField,
   iconField,
   sectionHeaderFields,
+  richBodyField,
 } from '@/fields/blockFields'
 
 export const FAQ: Block = {
@@ -161,18 +157,7 @@ export const FAQ: Block = {
           'Optional image. Shown beneath the heading in the “Side by side” layout (first item that has one wins); ignored in the 1- and 2-column layouts.',
       },
         },
-        {
-          name: 'answer',
-          type: 'richText',
-          required: true,
-          editor: lexicalEditor({
-            features: ({ rootFeatures }) => [
-              ...rootFeatures,
-              FixedToolbarFeature(),
-              InlineToolbarFeature(),
-            ],
-          }),
-        },
+        richBodyField('answer', { required: true }),
         anchorIdField,
       ],
     },

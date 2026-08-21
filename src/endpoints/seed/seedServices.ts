@@ -1,4 +1,7 @@
+import { seedCreate, seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
+
+import { storedText } from './repairMatch'
 import { isUnauthored } from './authored'
 
 import { plainTextToLexical } from './data/richText'
@@ -46,7 +49,7 @@ async function authorPage(
     payload.logger.info(`— ${slug} already authored, skipping`)
     return
   }
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: rec.id,
     data: { hero, layout } as never,
@@ -91,7 +94,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
       req,
     })
     if (found.docs[0]) {
-      await payload.update({
+      await seedUpdate(payload, {
         collection: 'services',
         id: found.docs[0].id,
         data: data as never,
@@ -100,7 +103,7 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
       })
       return found.docs[0].id
     }
-    const created = await payload.create({
+    const created = await seedCreate(payload, {
       collection: 'services',
       data: data as never,
       req,
@@ -1287,7 +1290,7 @@ export const repairCompactProcessSteps = async ({ payload, req }: Ctx): Promise<
     })
     if (!changed) continue
 
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: { layout: next } as never,
@@ -1341,7 +1344,7 @@ export const repairJmeSpecialistCarousel = async ({ payload, req }: Ctx): Promis
   })
   if (!changed) return
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: page.id,
     data: { layout: next } as never,
@@ -1385,7 +1388,7 @@ export const repairImeFormatsCardStyle = async ({ payload, req }: Ctx): Promise<
   })
   if (!changed) return
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: page.id,
     data: { layout: next } as never,
@@ -1441,7 +1444,7 @@ export const repairServicesFeatureIcon = async ({ payload, req }: Ctx): Promise<
   })
   if (!changed) return
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: page.id,
     data: { layout: next } as never,
@@ -1526,7 +1529,7 @@ export const repairReportingSplitVariants = async ({ payload, req }: Ctx): Promi
   })
   if (!changed) return
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: page.id,
     data: { layout: next } as never,
@@ -1585,12 +1588,15 @@ export const repairMedicalNegligenceRemoval = async ({ payload, req }: Ctx): Pro
   const page = found.docs[0] as { id: number | string; layout?: Block[] } | undefined
   const layout = page?.layout
   if (!page || !Array.isArray(layout)) return
-  if (!layout.some((b) => b?.blockType === 'splitFeature' && b.heading === SUPERSEDED_REPORTING_HEADING)) {
+  if (!layout.some((b) => b?.blockType === 'splitFeature' && storedText(b.heading) === storedText(SUPERSEDED_REPORTING_HEADING))) {
     return
   }
 
   const next = layout.map((block) => {
-    if (block?.blockType !== 'splitFeature' || block.heading !== SUPERSEDED_REPORTING_HEADING) {
+    if (
+      block?.blockType !== 'splitFeature' ||
+      storedText(block.heading) !== storedText(SUPERSEDED_REPORTING_HEADING)
+    ) {
       return block
     }
     return {
@@ -1604,7 +1610,7 @@ export const repairMedicalNegligenceRemoval = async ({ payload, req }: Ctx): Pro
     }
   })
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: page.id,
     data: { layout: next } as never,
@@ -1642,7 +1648,7 @@ export const repairMedicalNegligenceRemoval = async ({ payload, req }: Ctx): Pro
       }
     })
     if (proseChanged) {
-      await payload.update({
+      await seedUpdate(payload, {
         collection: 'pages',
         id: parent.id,
         data: { layout: nextParent } as never,
@@ -1689,7 +1695,7 @@ export const repairMedicalNegligenceRemoval = async ({ payload, req }: Ctx): Pro
   })
   if (!gridChanged) return
 
-  await payload.update({
+  await seedUpdate(payload, {
     collection: 'pages',
     id: servicesPage.id,
     data: { layout: nextServices } as never,

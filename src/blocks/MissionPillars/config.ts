@@ -6,6 +6,7 @@ import {
   containerWidthField,
   cssClassField,
   motionField,
+  richTextDefault,
   sectionHeaderFields,
 } from '@/fields/blockFields'
 
@@ -15,10 +16,10 @@ import {
 const missionHeaderFields: Field[] = sectionHeaderFields.map((field) => {
   if (!('name' in field)) return field
   if (field.name === 'eyebrow') {
-    return { ...field, defaultValue: 'Our Mission' }
+    return { ...field, defaultValue: richTextDefault('Our Mission') }
   }
   if (field.name === 'heading') {
-    return { ...field, defaultValue: 'Excellence in [[Medico-Legal Reporting]]' }
+    return { ...field, defaultValue: richTextDefault('Excellence in [[Medico-Legal Reporting]]') }
   }
   if (field.name === 'subheading') {
     return {
@@ -27,8 +28,9 @@ const missionHeaderFields: Field[] = sectionHeaderFields.map((field) => {
       admin: {
         description: 'Intro paragraph shown under the heading (optional).',
       },
-      defaultValue:
+      defaultValue: richTextDefault(
         'VERIFY provides high levels of support to both our clients and medical specialists throughout every step of the medico-legal process. At VERIFY, we dedicate ourselves to achieving excellence in medico-legal reporting through:',
+      ),
     }
   }
   return field

@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
@@ -68,7 +69,7 @@ export const repairBlockBands = async ({ payload, req }: Ctx): Promise<void> => 
 
     if (!touched) continue
 
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: { layout } as never,

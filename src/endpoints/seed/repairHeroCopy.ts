@@ -1,4 +1,7 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
+
+import { storedText } from './repairMatch'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
@@ -66,9 +69,24 @@ export const repairHeroCopy = async ({ payload, req }: Ctx): Promise<void> => {
       | { id: number | string; hero?: { subtitle?: string | null } | null }
       | undefined
     const subtitle = page?.hero?.subtitle
-    if (!page || typeof subtitle !== 'string' || !subtitle.includes(from)) continue
+    if (!page || !storedText(subtitle).includes(from)) continue
 
-    await payload.update({
+    // The detection above reads a string or a rich-text tree; the correction
+    // below can only rewrite a string. Say so rather than skipping: a repair
+    // that quietly declines to fire is the exact failure this file's header
+    // warns about, and after the rich-text conversion this branch is how a
+    // superseded sentence announces that it now needs re-doing as a tree edit.
+    if (typeof subtitle !== 'string') {
+      const message =
+        `repairHeroCopy: /${slug} still holds superseded wording, but its hero subtitle is ` +
+        `rich text and this repair can only rewrite a plain string. Correct it in the admin, ` +
+        `or rewrite this repair to edit the Lexical tree.`
+      payload.logger.error(`— ${message}`)
+      if (process.env.NODE_ENV !== 'production') throw new Error(message)
+      continue
+    }
+
+    await seedUpdate(payload, {
       collection: 'pages',
       id: page.id,
       data: { hero: { ...page.hero, subtitle: subtitle.replace(from, to) } } as never,

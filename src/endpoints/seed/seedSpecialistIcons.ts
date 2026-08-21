@@ -1,3 +1,4 @@
+import { seedUpdate } from './seedWrite'
 import type { Payload, PayloadRequest } from 'payload'
 
 import { ACCREDITATION_ICON, qualificationIcon } from '@/utilities/qualificationIcon'
@@ -50,7 +51,7 @@ export const repairSpecialistIcons = async ({ payload, req }: Ctx): Promise<void
     qualRows += next.length - rows.filter((r) => r?.icon).length
     specialists += 1
 
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'specialists',
       id: doc.id,
       data: { qualifications: next } as never,
@@ -76,7 +77,7 @@ export const repairSpecialistIcons = async ({ payload, req }: Ctx): Promise<void
   for (const doc of accs.docs as { id: number | string; icon?: string | null }[]) {
     if (doc.icon) continue
     accCount += 1
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'accreditations',
       id: doc.id,
       data: { icon: ACCREDITATION_ICON } as never,
@@ -110,7 +111,7 @@ export const repairSpecialistIcons = async ({ payload, req }: Ctx): Promise<void
     const ids = seed.accreditations.map((t) => byTitle.get(t)).filter((id) => id != null)
     if (!ids.length) continue
     filled += 1
-    await payload.update({
+    await seedUpdate(payload, {
       collection: 'specialists',
       id: doc.id,
       data: { accreditations: ids } as never,

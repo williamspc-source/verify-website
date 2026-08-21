@@ -1,10 +1,5 @@
 import type { Block, Field } from 'payload'
 
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
 
 import { link } from '@/fields/link'
 import {
@@ -15,6 +10,7 @@ import {
   elementClassesField,
   iconField,
   sectionHeaderFields,
+  richBodyField,
 } from '@/fields/blockFields'
 
 // Founder / leadership spotlight — a two-column band pairing a portrait (with a
@@ -75,17 +71,7 @@ export const LeadershipSpotlight: Block = {
         '"I built VERIFY because I knew what the industry needed — and I knew it wasn\'t being delivered."',
       admin: { description: 'Short italic pull-quote shown above the body copy.' },
     },
-    {
-      name: 'body',
-      type: 'richText',
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => [
-          ...rootFeatures,
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ],
-      }),
-    },
+    richBodyField('body'),
     {
       name: 'credentials',
       type: 'array',
