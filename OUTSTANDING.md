@@ -40,7 +40,7 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 17 | An article is bylined to someone who is not on the team | Yes | A byline that does not link, where the others do | ~5 min + a reseed | Needs a content decision first |
 | 18 | The reference-diff exceptions rest on measurements older than the stylesheet | No | None — but the tool's exceptions cannot be trusted until re-taken | ~45 min | Before the next port that leans on them |
 | 20 | Per-word text colour is not offered, only per-element | By design | None — [[brackets]] cover the common case | ~10 lines + importmap | Only if someone asks |
-| 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~20 lines of custom Lexical | Low priority |
+| 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~40 lines **+ two pinned Lexical deps** | Only with the pin guarded |
 | 22 | Payload boots in ~7s, and two specs were silently skipped for it | Dev/test only | A suite can report green while checking nothing | Unknown | Watch the admin, not the boot |
 | 19 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min for an unlisted style-guide page | A decision — doing nothing is defensible |
 
@@ -611,12 +611,23 @@ were textareas, verified in the database as a `linebreak` node and on the page b
 **Live today?** Only in the admin, and only as a mild oddity: the editor shows
 two paragraphs where the page shows two lines of one heading.
 
-**Cost of fixing:** ~20 lines. A client feature via `createClientFeature`
-intercepting `INSERT_PARAGRAPH_COMMAND` to dispatch `INSERT_LINE_BREAK_COMMAND`,
-wired into `inlineRichTextField` only, plus an `importMap` entry. It was left out
-because it is the only genuinely novel Lexical code the conversion would need,
-and the visible result is already right — so the risk bought nothing a visitor
-could see.
+**Cost of fixing — measured by writing it, not estimated.** The code itself is
+about 40 lines: a `createClientFeature` plugin registering
+`INSERT_PARAGRAPH_COMMAND` at `COMMAND_PRIORITY_LOW` and dispatching
+`INSERT_LINE_BREAK_COMMAND`, its `createServerFeature` half, a line in
+`inlineRichTextField`, and a `generate:importmap` run. It compiles and reads
+cleanly.
+
+What stopped it is the dependency. `lexical` and `@lexical/react` are **not
+installed** — Payload vendors them, and pnpm does not hoist them — so the feature
+needs both added to `package.json` and **pinned to the version
+`@payloadcms/richtext-lexical` vendors** (0.41.0 today). Two copies of Lexical in
+one bundle is a subtle and unpleasant failure, and the pin has to be re-checked on
+every Payload upgrade. That is a standing maintenance cost for an editing nicety
+whose rendered output is already correct, so it was not taken.
+
+If it is ever wanted: add the two packages at the exact vendored version, and add
+a guard that fails when they drift from it.
 
 ---
 
