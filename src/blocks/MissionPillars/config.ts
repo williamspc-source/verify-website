@@ -8,6 +8,7 @@ import {
   motionField,
   richTextDefault,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Reuse the shared eyebrow/heading/subheading helper, but seed the fixed
@@ -54,7 +55,7 @@ export const MissionPillars: Block = {
         description: 'Each pillar is auto-numbered 01, 02, 03… in display order.',
         initCollapsed: false,
       },
-      fields: [{ name: 'text', type: 'textarea', required: true }],
+      fields: [inlineRichTextField('text', { required: true })],
       defaultValue: [
         {
           text: 'Delivering expert, evidence-based medico-legal reports with accuracy, clarity, and integrity — reflecting the highest professional standards.',

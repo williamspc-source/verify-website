@@ -552,7 +552,21 @@ export interface Page {
                   value: number | Event;
                 } | null);
             url?: string | null;
-            label: string;
+            label: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
             /**
              * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
              */
@@ -1095,7 +1109,21 @@ export interface Team {
   } | null;
   qualifications?:
     | {
-        qualification: string;
+        qualification: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         id?: string | null;
       }[]
     | null;
@@ -1746,7 +1774,21 @@ export interface Specialty {
    */
   keyAreas?:
     | {
-        area: string;
+        area: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         id?: string | null;
       }[]
     | null;
@@ -2853,7 +2895,21 @@ export interface ButtonBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -3222,7 +3278,21 @@ export interface ContentBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -3415,7 +3485,21 @@ export interface CallToActionBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -4119,7 +4203,21 @@ export interface GatewayCardsBlock {
                       value: number | Event;
                     } | null);
                 url?: string | null;
-                label: string;
+                label: {
+                  root: {
+                    type: string;
+                    children: {
+                      type: any;
+                      version: number;
+                      [k: string]: unknown;
+                    }[];
+                    direction: ('ltr' | 'rtl') | null;
+                    format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                    indent: number;
+                    version: number;
+                  };
+                  [k: string]: unknown;
+                };
                 /**
                  * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
                  */
@@ -4264,7 +4362,21 @@ export interface GatewayCardsBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -4658,7 +4770,21 @@ export interface FeatureGridBlock {
          */
         bullets?:
           | {
-              text: string;
+              text: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              };
               id?: string | null;
             }[]
           | null;
@@ -5272,7 +5398,21 @@ export interface ProcessStepsBlock {
          */
         bullets?:
           | {
-              text: string;
+              text: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              };
               id?: string | null;
             }[]
           | null;
@@ -5667,7 +5807,21 @@ export interface SpecialtyGridBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -5984,7 +6138,21 @@ export interface PeopleGridBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -6297,7 +6465,21 @@ export interface ServicesGridBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -7062,7 +7244,21 @@ export interface TabsBlockType {
   background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   tabs?:
     | {
-        label: string;
+        label: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         /**
          * Optional tab icon.
          */
@@ -7613,7 +7809,21 @@ export interface AamleEducationBlock {
           value: number | Event;
         } | null);
     url?: string | null;
-    label: string;
+    label: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
     /**
      * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
      */
@@ -8313,7 +8523,21 @@ export interface SplitFeatureBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label?: string | null;
+          label?: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          } | null;
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -8557,7 +8781,21 @@ export interface CTABandBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -8903,7 +9141,21 @@ export interface CalloutBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -9651,7 +9903,21 @@ export interface MapEmbedBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -9880,7 +10146,21 @@ export interface Office {
     | null;
   parking?:
     | {
-        name: string;
+        name: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         address?: string | null;
         walkTime?: {
           root: {
@@ -10226,7 +10506,21 @@ export interface LeadershipSpotlightBlock {
    */
   credentials?:
     | {
-        cred: string;
+        cred: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         id?: string | null;
       }[]
     | null;
@@ -10258,7 +10552,21 @@ export interface LeadershipSpotlightBlock {
           value: number | Event;
         } | null);
     url?: string | null;
-    label: string;
+    label: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
     /**
      * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
      */
@@ -10629,7 +10937,21 @@ export interface PortalCtaBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -11214,7 +11536,21 @@ export interface ArchiveBlock {
             value: number | Event;
           } | null);
       url?: string | null;
-      label?: string | null;
+      label?: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      } | null;
       /**
        * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
        */
@@ -11461,7 +11797,21 @@ export interface SlideCarouselBlock {
         image?: (number | null) | Media;
         pills?:
           | {
-              text: string;
+              text: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              };
               id?: string | null;
             }[]
           | null;
@@ -12662,7 +13012,21 @@ export interface AppointmentGuideBlock {
                     };
                     bullets?:
                       | {
-                          text: string;
+                          text: {
+                            root: {
+                              type: string;
+                              children: {
+                                type: any;
+                                version: number;
+                                [k: string]: unknown;
+                              }[];
+                              direction: ('ltr' | 'rtl') | null;
+                              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                              indent: number;
+                              version: number;
+                            };
+                            [k: string]: unknown;
+                          };
                           id?: string | null;
                         }[]
                       | null;
@@ -12773,7 +13137,21 @@ export interface MissionPillarsBlock {
    */
   pillars?:
     | {
-        text: string;
+        text: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         id?: string | null;
       }[]
     | null;
@@ -13369,7 +13747,21 @@ export interface AudiencePathwaysBlock {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -13716,7 +14108,21 @@ export interface BookingChooserBlock {
                       value: number | Event;
                     } | null);
                 url?: string | null;
-                label: string;
+                label: {
+                  root: {
+                    type: string;
+                    children: {
+                      type: any;
+                      version: number;
+                      [k: string]: unknown;
+                    }[];
+                    direction: ('ltr' | 'rtl') | null;
+                    format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                    indent: number;
+                    version: number;
+                  };
+                  [k: string]: unknown;
+                };
                 /**
                  * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
                  */
@@ -17859,7 +18265,21 @@ export interface ArticleSetting {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -18744,7 +19164,21 @@ export interface SpecialistProfile {
       };
       [k: string]: unknown;
     } | null;
-    claimTypes?: string | null;
+    claimTypes?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
   };
   /**
    * The middle crumb of the trail shown at the top of every profile. The first crumb — “Home” — is shared site-wide (Site Settings → Breadcrumbs); the last is the specialist’s own name.
@@ -18918,7 +19352,21 @@ export interface Header {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */
@@ -19065,7 +19513,21 @@ export interface Header {
                       value: number | Event;
                     } | null);
                 url?: string | null;
-                label: string;
+                label: {
+                  root: {
+                    type: string;
+                    children: {
+                      type: any;
+                      version: number;
+                      [k: string]: unknown;
+                    }[];
+                    direction: ('ltr' | 'rtl') | null;
+                    format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                    indent: number;
+                    version: number;
+                  };
+                  [k: string]: unknown;
+                };
                 /**
                  * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
                  */
@@ -19212,7 +19674,21 @@ export interface Header {
                             value: number | Event;
                           } | null);
                       url?: string | null;
-                      label: string;
+                      label: {
+                        root: {
+                          type: string;
+                          children: {
+                            type: any;
+                            version: number;
+                            [k: string]: unknown;
+                          }[];
+                          direction: ('ltr' | 'rtl') | null;
+                          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                          indent: number;
+                          version: number;
+                        };
+                        [k: string]: unknown;
+                      };
                       /**
                        * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
                        */
@@ -19368,7 +19844,21 @@ export interface Header {
             value: number | Event;
           } | null);
       url?: string | null;
-      label: string;
+      label: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
       /**
        * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
        */
@@ -19559,7 +20049,21 @@ export interface Footer {
                       value: number | Event;
                     } | null);
                 url?: string | null;
-                label: string;
+                label: {
+                  root: {
+                    type: string;
+                    children: {
+                      type: any;
+                      version: number;
+                      [k: string]: unknown;
+                    }[];
+                    direction: ('ltr' | 'rtl') | null;
+                    format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                    indent: number;
+                    version: number;
+                  };
+                  [k: string]: unknown;
+                };
                 /**
                  * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
                  */
@@ -19732,7 +20236,21 @@ export interface Footer {
                 value: number | Event;
               } | null);
           url?: string | null;
-          label: string;
+          label: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           /**
            * Optional #id on the target page, e.g. "file-review" to land on the File Review section. Enter it without the #. Must match that section's Anchor ID.
            */

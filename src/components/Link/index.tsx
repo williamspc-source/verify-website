@@ -1,3 +1,5 @@
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import { Button, type ButtonProps } from '@/components/ui/button'
 import { cn } from '@/utilities/ui'
 import { Icon } from '@/components/Icon'
@@ -12,7 +14,7 @@ type CMSLinkType = {
   children?: React.ReactNode
   className?: string
   icon?: string | null
-  label?: string | null
+  label?: RichTextValue
   newTab?: boolean | null
   reference?: {
     relationTo: LinkableCollection
@@ -48,7 +50,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     const content = (
       <>
         {iconEl}
-        {label}
+        <InlineRichText data={label} />
         {children}
       </>
     )
@@ -90,11 +92,11 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   // shows the editor exactly which link needs attention, and `data-link-unresolved`
   // gives the guard suite and anyone debugging something to grep for.
   if (!href) {
-    if (!label && !children) return null
+    if (!hasRichText(label) && !children) return null
     return (
       <span className={cn(className)} data-link-unresolved="true">
         {iconEl}
-        {label}
+        <InlineRichText data={label} />
         {children}
       </span>
     )
@@ -108,7 +110,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     return (
       <Link className={cn(className)} href={href || url || ''} {...newTabProps}>
         {iconEl}
-        {label && label}
+        <InlineRichText data={label} />
         {children && children}
       </Link>
     )
@@ -118,7 +120,7 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     <Button asChild className={className} size={size} variant={appearance}>
       <Link className={cn(className)} href={href || url || ''} {...newTabProps}>
         {iconEl}
-        {label && label}
+        <InlineRichText data={label} />
         {children && children}
       </Link>
     </Button>

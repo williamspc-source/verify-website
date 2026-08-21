@@ -71,7 +71,7 @@ export const SlideCarousel: Block = {
           type: 'array',
           labels: { singular: 'Pill', plural: 'Pills' },
           maxRows: 6,
-          fields: [{ name: 'text', type: 'text', required: true }],
+          fields: [inlineRichTextField('text', { required: true })],
         },
       ],
     },

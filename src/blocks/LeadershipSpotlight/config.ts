@@ -64,7 +64,7 @@ export const LeadershipSpotlight: Block = {
       type: 'array',
       labels: { singular: 'Credential', plural: 'Credentials' },
       admin: { description: 'Credential pills, e.g. "25+ Years — Personal Injury Law".' },
-      fields: [{ name: 'cred', type: 'text', required: true }],
+      fields: [inlineRichTextField('cred', { required: true })],
     },
     link({ appearances: false }),
     cssClassField,

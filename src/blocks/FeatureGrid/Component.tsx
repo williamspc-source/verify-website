@@ -101,7 +101,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
             {Array.isArray(item.bullets) && item.bullets.length > 0 ? (
               <ul className="vf-feature-bullets">
                 {item.bullets.map((b, j) => (
-                  <li key={j}>{b.text}</li>
+                  <InlineRichText as="li" key={j} data={b.text} />
                 ))}
               </ul>
             ) : null}

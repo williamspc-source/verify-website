@@ -60,7 +60,7 @@ export const FeatureGrid: Block = {
           type: 'array',
           labels: { singular: 'Bullet', plural: 'Bullets' },
           admin: { description: 'Optional simple bulleted list.' },
-          fields: [{ name: 'text', type: 'text', required: true }],
+          fields: [inlineRichTextField('text', { required: true })],
         },
         inlineRichTextField('detailsLabel', { admin: { description: 'Optional label above a nested detail list (e.g. "What\'s Included").' } }),
         {

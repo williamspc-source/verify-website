@@ -1,4 +1,5 @@
 import type { Field, GroupField } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import deepMerge from '@/utilities/deepMerge'
 import { iconOptions } from '@/components/Icon'
@@ -162,15 +163,11 @@ export const link: LinkType = ({
       type: 'row',
       fields: [
         ...linkTypes,
-        {
-          name: 'label',
-          type: 'text',
-          admin: {
-            width: '50%',
-          },
+        inlineRichTextField('label', {
           label: 'Label',
           required: req,
-        },
+          admin: { width: '50%' },
+        }),
       ],
     })
   } else {

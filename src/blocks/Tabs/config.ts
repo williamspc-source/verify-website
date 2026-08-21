@@ -9,6 +9,7 @@ import {
   elementClassesField,
   iconField,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 import { TAB_CONTENT_BLOCKS } from '../tabContent'
 
@@ -28,7 +29,7 @@ export const TabsBlock: Block = {
         {
           type: 'row',
           fields: [
-            { name: 'label', type: 'text', required: true, admin: { width: '70%' } },
+            inlineRichTextField('label', { required: true, admin: { width: '70%' } }),
             iconField({ admin: { width: '30%', description: 'Optional tab icon.' } }),
           ],
         },

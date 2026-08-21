@@ -47,7 +47,7 @@ export const Specialties: CollectionConfig = {
       label: 'Key areas',
       labels: { singular: 'Key area', plural: 'Key areas' },
       admin: { description: 'Short tags shown under the specialty (e.g. Hip & knee, Trauma).' },
-      fields: [{ name: 'area', type: 'text', required: true }],
+      fields: [inlineRichTextField('area', { required: true })],
     },
     {
       name: 'order',

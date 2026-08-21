@@ -191,7 +191,7 @@ export const Offices: CollectionConfig = {
       label: 'Parking',
       labels: { singular: 'Car park', plural: 'Car parks' },
       fields: [
-        { name: 'name', type: 'text', required: true },
+        inlineRichTextField('name', { required: true }),
         { name: 'address', type: 'text' },
         {
           type: 'row',

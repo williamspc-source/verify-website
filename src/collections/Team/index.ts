@@ -104,7 +104,7 @@ export const Team: CollectionConfig<'team'> = {
             {
               name: 'qualifications',
               type: 'array',
-              fields: [{ name: 'qualification', type: 'text', required: true }],
+              fields: [inlineRichTextField('qualification', { required: true })],
             },
             {
               name: 'sections',

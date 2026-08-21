@@ -83,7 +83,7 @@ export const AppointmentGuide: Block = {
                 {
                   name: 'bullets',
                   type: 'array',
-                  fields: [{ name: 'text', type: 'text', required: true }],
+                  fields: [inlineRichTextField('text', { required: true })],
                 },
               ],
             },

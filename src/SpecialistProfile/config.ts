@@ -135,15 +135,13 @@ export const SpecialistProfile: GlobalConfig = {
           fields: [
             inlineRichTextField('assessmentTypes', { defaultValue: richTextDefault('Assessment Types'),
               admin: { width: '50%' } }),
-            {
-              // Claim Types used to be concatenated into the Assessment Types
-              // list, so a claim type never appeared under its own name on any
-              // profile — two separately-maintained taxonomies rendered as one.
-              name: 'claimTypes',
-              type: 'text',
-              defaultValue: 'Claim Types',
+            // Claim Types used to be concatenated into the Assessment Types
+            // list, so a claim type never appeared under its own name on any
+            // profile — two separately-maintained taxonomies rendered as one.
+            inlineRichTextField('claimTypes', {
+              defaultValue: richTextDefault('Claim Types'),
               admin: { width: '50%' },
-            },
+            }),
           ],
         },
       ],

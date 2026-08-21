@@ -172,7 +172,7 @@ export const ProcessSteps: Block = {
           type: 'array',
           labels: { singular: 'Bullet', plural: 'Bullets' },
           admin: { description: 'Optional bulleted list under the description.' },
-          fields: [{ name: 'text', type: 'text', required: true }],
+          fields: [inlineRichTextField('text', { required: true })],
         },
       ],
     },

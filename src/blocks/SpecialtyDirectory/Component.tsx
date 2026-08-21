@@ -76,8 +76,11 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
     title: sp.title,
     description: (sp as { description?: string | null }).description ?? null,
     categoryId: relId((sp as { category?: unknown }).category),
-    keyAreas: Array.isArray((sp as { keyAreas?: { area?: string }[] }).keyAreas)
-      ? (sp as { keyAreas: { area?: string }[] }).keyAreas.map((k) => k.area).filter((a): a is string => Boolean(a))
+    // Flattened: these become filter chips the client also matches on.
+    keyAreas: Array.isArray((sp as { keyAreas?: { area?: RichTextValue }[] }).keyAreas)
+      ? (sp as { keyAreas: { area?: RichTextValue }[] }).keyAreas
+          .map((k) => richTextToPlain(k.area))
+          .filter(Boolean)
       : [],
     specialists: bySpecialty.get(String(sp.id)) ?? [],
   }))

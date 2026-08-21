@@ -94,7 +94,7 @@ export const LeadershipSpotlightBlock: React.FC<Props & { bare?: boolean }> = ({
             <div className="leader-credentials">
               {creds.map((c, i) => (
                 <span key={i} className="leader-cred">
-                  {c.cred}
+                  <InlineRichText data={c.cred} />
                 </span>
               ))}
             </div>

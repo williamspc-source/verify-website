@@ -1,10 +1,12 @@
 'use client'
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useId, useState } from 'react'
 
 import { cn } from '@/utilities/ui'
 import { Icon } from '@/components/Icon'
 
-type TabItem = { label: string; icon?: string | null; panel: React.ReactNode }
+type TabItem = { label: RichTextValue; icon?: string | null; panel: React.ReactNode }
 
 export const TabsClient: React.FC<{
   items: TabItem[]
@@ -57,7 +59,7 @@ export const TabsClient: React.FC<{
                 <Icon name={item.icon} className="size-5" />
               </span>
             ) : null}
-            {item.label}
+            <InlineRichText data={item.label} />
           </button>
         )
       })}

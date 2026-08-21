@@ -47,7 +47,7 @@ export const MissionPillarsBlock: React.FC<Props & { bare?: boolean }> = ({
           {pillars!.map((pillar, i) => (
             <div key={i} className="mv-pillar">
               <div className="mv-pillar-num">{String(i + 1).padStart(2, '0')}</div>
-              <div className="mv-pillar-text">{pillar.text}</div>
+              <InlineRichText as="div" className="mv-pillar-text" data={pillar.text} />
             </div>
           ))}
         </div>

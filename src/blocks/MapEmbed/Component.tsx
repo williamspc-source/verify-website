@@ -236,7 +236,13 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
             {parking.map((p, i) => (
               <React.Fragment key={p.id || i}>
                 <div className="ct-info-item-line" style={i > 0 ? { marginTop: 6 } : undefined}>
-                  {p.href ? <ExtLink href={p.href}>{p.name}</ExtLink> : p.name}
+                  {p.href ? (
+                    <ExtLink href={p.href}>
+                      <InlineRichText data={p.name} />
+                    </ExtLink>
+                  ) : (
+                    <InlineRichText data={p.name} />
+                  )}
                   {p.address ? ` (${p.address})` : null}
                   {hasRichText(p.walkTime) ? (
                     <>
@@ -302,7 +308,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
                     appearance="inline"
                     className={cn('btn', outline ? 'btn-outline' : 'btn-primary')}
                   >
-                    <span>{link.label}</span>
+                    <InlineRichText as="span" data={link.label} />
                   </CMSLink>
                 )
               })}

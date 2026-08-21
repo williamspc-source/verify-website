@@ -240,7 +240,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
                 {Array.isArray(step.bullets) && step.bullets.length > 0 ? (
                   <ul className="aamle-feature-panel-list">
                     {step.bullets.map((b, j) => (
-                      <li key={j}>{b.text}</li>
+                      <InlineRichText as="li" key={j} data={b.text} />
                     ))}
                   </ul>
                 ) : null}
@@ -290,7 +290,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
             {Array.isArray(step.bullets) && step.bullets.length > 0 ? (
               <ul className="vf-process-step-bullets">
                 {step.bullets.map((b, j) => (
-                  <li key={j}>{b.text}</li>
+                  <InlineRichText as="li" key={j} data={b.text} />
                 ))}
               </ul>
             ) : null}
