@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import { hasRichText } from '@/utilities/lexicalText'
 import React from 'react'
 
@@ -65,7 +66,11 @@ export const WhyVerifyBlock: React.FC<Props & { bare?: boolean }> = ({
               />
             ) : (
               <div className="who-image-main why-image-main">
-                {placeholderLabel || '[ Company Image Placeholder ]'}
+                {hasRichText(placeholderLabel) ? (
+                  <InlineRichText data={placeholderLabel} />
+                ) : (
+                  '[ Company Image Placeholder ]'
+                )}
               </div>
             )}
           </div>

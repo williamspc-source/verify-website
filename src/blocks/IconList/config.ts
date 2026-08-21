@@ -5,6 +5,7 @@ import {
   displayFields,
   iconField,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // A simple single-line "icon + text" list (e.g. the booking-portal "What you can
@@ -49,7 +50,7 @@ export const IconList: Block = {
           type: 'row',
           fields: [
             iconField({ admin: { width: '30%' } }),
-            { name: 'text', type: 'text', required: true, admin: { width: '70%' } },
+            inlineRichTextField('text', { required: true, admin: { width: '70%' } }),
           ],
         },
         {

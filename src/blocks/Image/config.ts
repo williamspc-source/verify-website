@@ -6,6 +6,7 @@ import {
   imageWidthField,
   roundedField,
   textAlignField,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Atom block (nestable-only): a single image with width/rounding/alignment and an
@@ -18,11 +19,7 @@ export const Image: Block = {
     { name: 'media', type: 'upload', relationTo: 'media', required: true, label: 'Image' },
     { type: 'row', fields: [imageWidthField, roundedField] },
     { type: 'row', fields: [imageShadowField, textAlignField] },
-    {
-      name: 'caption',
-      type: 'text',
-      admin: { description: 'Optional caption shown below the image.' },
-    },
+    inlineRichTextField('caption', { admin: { description: 'Optional caption shown below the image.' } }),
     cssClassField,
   ],
 }

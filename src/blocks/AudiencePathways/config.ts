@@ -7,6 +7,7 @@ import {
   cssClassField,
   displayFields,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Dual audience-pathway cards (design ref: services/medico-legal/ime.html →
@@ -52,17 +53,9 @@ export const AudiencePathways: Block = {
             { label: 'Claimant (light blue)', value: 'claimant' },
           ],
         },
-        {
-          name: 'eyebrow',
-          type: 'text',
-          admin: { description: 'Small uppercase audience label, e.g. "For Clients".' },
-        },
-        { name: 'title', type: 'text', admin: { description: 'Card heading (h3).' } },
-        {
-          name: 'description',
-          type: 'textarea',
-          admin: { description: 'Short intro paragraph under the card heading.' },
-        },
+        inlineRichTextField('eyebrow', { admin: { description: 'Small uppercase audience label, e.g. "For Clients".' } }),
+        inlineRichTextField('title', { admin: { description: 'Card heading (h3).' } }),
+        inlineRichTextField('description', { admin: { description: 'Short intro paragraph under the card heading.' } }),
         {
           name: 'steps',
           type: 'array',
@@ -70,17 +63,9 @@ export const AudiencePathways: Block = {
           labels: { singular: 'Step', plural: 'Steps' },
           admin: { description: 'Numbered steps (numbers are added automatically).' },
           fields: [
-            {
-              name: 'title',
-              type: 'text',
-              required: true,
-              admin: { description: 'Bold step lead-in.' },
-            },
-            {
-              name: 'description',
-              type: 'textarea',
-              admin: { description: 'Step detail text.' },
-            },
+            inlineRichTextField('title', { required: true,
+              admin: { description: 'Bold step lead-in.' } }),
+            inlineRichTextField('description', { admin: { description: 'Step detail text.' } }),
           ],
         },
         link({ appearances: false, overrides: { label: 'CTA link' } }),

@@ -8,6 +8,7 @@ import {
   DIVIDER_STYLE_OPTIONS,
   DIVIDER_WIDTH_OPTIONS,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // The separator controls exist only to tell the Upcoming group from the Past
@@ -99,30 +100,30 @@ export const EventsExplorer: Block = {
         {
           type: 'row',
           fields: [
-            { name: 'upcomingEyebrow', type: 'text', label: 'Upcoming · eyebrow', admin: { width: '50%' } },
+            inlineRichTextField('upcomingEyebrow', { label: 'Upcoming · eyebrow', admin: { width: '50%' } }),
             { name: 'upcomingHeading', type: 'text', label: 'Upcoming · heading', admin: { width: '50%' } },
           ],
         },
-        { name: 'upcomingIntro', type: 'textarea', label: 'Upcoming · intro' },
+        inlineRichTextField('upcomingIntro', { label: 'Upcoming · intro' }),
         {
           type: 'row',
           fields: [
-            { name: 'upcomingLinkLabel', type: 'text', label: 'Upcoming · link label', admin: { width: '50%' } },
+            inlineRichTextField('upcomingLinkLabel', { label: 'Upcoming · link label', admin: { width: '50%' } }),
             { name: 'upcomingLinkUrl', type: 'text', label: 'Upcoming · link URL', admin: { width: '50%' } },
           ],
         },
         {
           type: 'row',
           fields: [
-            { name: 'pastEyebrow', type: 'text', label: 'Past · eyebrow', admin: { width: '50%' } },
+            inlineRichTextField('pastEyebrow', { label: 'Past · eyebrow', admin: { width: '50%' } }),
             { name: 'pastHeading', type: 'text', label: 'Past · heading', admin: { width: '50%' } },
           ],
         },
-        { name: 'pastIntro', type: 'textarea', label: 'Past · intro' },
+        inlineRichTextField('pastIntro', { label: 'Past · intro' }),
         {
           type: 'row',
           fields: [
-            { name: 'pastLinkLabel', type: 'text', label: 'Past · link label', admin: { width: '50%' } },
+            inlineRichTextField('pastLinkLabel', { label: 'Past · link label', admin: { width: '50%' } }),
             { name: 'pastLinkUrl', type: 'text', label: 'Past · link URL', admin: { width: '50%' } },
           ],
         },

@@ -1,3 +1,5 @@
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { ContactDetailsBlock as Props } from '@/payload-types'
@@ -14,10 +16,10 @@ import { toClassName } from '@/utilities/cssClass'
 type ContactItem = {
   key: string
   icon?: string | null
-  label: string
-  value: string
+  label: RichTextValue
+  value: RichTextValue
   href?: string | null
-  note?: string | null
+  note?: RichTextValue
 }
 
 /**
@@ -126,15 +128,15 @@ export const ContactDetailsBlock: React.FC<Props & { bare?: boolean }> = async (
               </span>
             ) : null}
             <div>
-              <p className="contact-item-label">{label}</p>
+              <InlineRichText as="p" className="contact-item-label" data={label} />
               {href ? (
                 <a href={href} className="contact-item-value">
-                  {value}
+                  <InlineRichText data={value} />
                 </a>
               ) : (
-                <p className="contact-item-value">{value}</p>
+                <InlineRichText as="p" className="contact-item-value" data={value} />
               )}
-              {note ? <p className="contact-item-note">{note}</p> : null}
+              <InlineRichText as="p" className="contact-item-note" data={note} />
             </div>
           </div>
         ))}

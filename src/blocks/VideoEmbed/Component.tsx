@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import { richTextToPlain } from '@/utilities/lexicalText'
 import React from 'react'
 
@@ -81,7 +82,7 @@ export const VideoEmbedBlock: React.FC<Props & { bare?: boolean }> = ({
             />
           </div>
         </div>
-        {caption ? <figcaption className="vf-video-embed__caption">{caption}</figcaption> : null}
+        <InlineRichText as="figcaption" className="vf-video-embed__caption" data={caption} />
       </figure>
     </Section>
   )

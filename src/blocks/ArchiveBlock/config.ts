@@ -13,6 +13,7 @@ import {
   backgroundField,
   cssClassField,
   hideWhenEmptyField,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 export const Archive: Block = {
@@ -173,14 +174,10 @@ export const Archive: Block = {
         { label: '4', value: '4' },
       ],
     },
-    {
-      name: 'readMoreLabel',
-      type: 'text',
-      label: 'Read-more link label',
+    inlineRichTextField('readMoreLabel', { label: 'Read-more link label',
       admin: {
         description: 'Text for the per-card link (article & staff-narrative cards). Defaults to "Read More →".',
-      },
-    },
+      } }),
     {
       name: 'viewAllLink',
       type: 'group',

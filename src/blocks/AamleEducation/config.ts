@@ -87,7 +87,7 @@ export const AamleEducation: Block = {
           type: 'row',
           fields: [
             iconField({ admin: { width: '40%', description: 'Small icon for this row.' } }),
-            { name: 'label', type: 'text', required: true, admin: { width: '60%' } },
+            inlineRichTextField('label', { required: true, admin: { width: '60%' } }),
           ],
         },
       ],

@@ -1,3 +1,5 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { FeatureGridBlock as Props } from '@/payload-types'
@@ -85,14 +87,17 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
                 </div>
               ) : null}
               <h3 className="service-title vf-card__title">
-                {item.title}
-                {item.titleSuffix ? (
-                  <span className="vf-card__title-suffix"> {item.titleSuffix}</span>
+                <InlineRichText data={item.title} />
+                {hasRichText(item.titleSuffix) ? (
+                  <span className="vf-card__title-suffix">
+                    {' '}
+                    <InlineRichText data={item.titleSuffix} />
+                  </span>
                 ) : null}
               </h3>
             </Head>
             <Body>
-            {item.description ? <p className="service-desc">{item.description}</p> : null}
+            <InlineRichText as="p" className="service-desc" data={item.description} />
             {Array.isArray(item.bullets) && item.bullets.length > 0 ? (
               <ul className="vf-feature-bullets">
                 {item.bullets.map((b, j) => (
@@ -103,7 +108,7 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
             {item.detailsLabel || (Array.isArray(item.details) && item.details.length > 0) ? (
               <div className="vf-feature-details">
                 {item.detailsLabel ? (
-                  <div className="vf-feature-details__label">{item.detailsLabel}</div>
+                  <InlineRichText as="div" className="vf-feature-details__label" data={item.detailsLabel} />
                 ) : null}
                 {Array.isArray(item.details)
                   ? item.details.map((d, j) => (
@@ -114,8 +119,8 @@ export const FeatureGridBlock: React.FC<Props & { bare?: boolean }> = ({
                           </span>
                         ) : null}
                         <div>
-                          <strong>{d.title}</strong>
-                          {d.description ? <p>{d.description}</p> : null}
+                          <InlineRichText as="strong" data={d.title} />
+                          <InlineRichText as="p" data={d.description} />
                         </div>
                       </div>
                     ))

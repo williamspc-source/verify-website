@@ -1,5 +1,7 @@
 'use client'
 
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useState } from 'react'
 import Link from 'next/link'
 
@@ -59,8 +61,8 @@ export const SpecialtyClient: React.FC<{
   showFilterBar: boolean
   showRosters: boolean
   showKeyAreas: boolean
-  allTabLabel?: string | null
-  emptyLabel?: string | null
+  allTabLabel?: RichTextValue
+  emptyLabel?: RichTextValue
 }> = ({ categories, entries, showFilterBar, showRosters, showKeyAreas, allTabLabel, emptyLabel }) => {
   const [cat, setCat] = useState<string>('all')
   // Open the first (visible) card by default; multiple cards may be open at once.
@@ -98,7 +100,7 @@ export const SpecialtyClient: React.FC<{
             onClick={() => handleFilter('all')}
           >
             <Icon name="squares-four" className="vf-specialty-filter-tile__icon" />
-            {allTabLabel || 'All Specialties'}
+            {hasRichText(allTabLabel) ? <InlineRichText data={allTabLabel} /> : 'All Specialties'}
           </button>
           {categories.map((c) => (
             <button
@@ -121,7 +123,11 @@ export const SpecialtyClient: React.FC<{
       <div className="vf-specialty-cards">
         {visible.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground">
-            {emptyLabel || 'No specialties in this category yet.'}
+            {hasRichText(emptyLabel) ? (
+              <InlineRichText data={emptyLabel} />
+            ) : (
+              'No specialties in this category yet.'
+            )}
           </p>
         ) : null}
 

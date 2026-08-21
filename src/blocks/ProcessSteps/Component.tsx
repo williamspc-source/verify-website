@@ -111,7 +111,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
                       <Icon name={step.icon} />
                     </div>
                   ) : null}
-                  {step.title ? <h4>{step.title}</h4> : null}
+                  <InlineRichText as="h4" data={step.title} />
                   <Body data={step.description} />
                 </div>
               )
@@ -154,7 +154,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
             ) : imagePlaceholder ? (
               <div className="claimant-process-media claimant-process-media--placeholder" aria-hidden>
                 {placeholderIcon ? <Icon name={placeholderIcon} /> : null}
-                {placeholderLabel ? <span>{placeholderLabel}</span> : null}
+                <InlineRichText as="span" data={placeholderLabel} />
               </div>
             ) : null}
           </div>
@@ -163,7 +163,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
               <div key={i} className="claimant-step">
                 <div className="claimant-step-num">{num(i, numberStyle)}</div>
                 <div className="claimant-step-content">
-                  {step.title ? <h3>{step.title}</h3> : null}
+                  <InlineRichText as="h3" data={step.title} />
                   <Body data={step.description} />
                 </div>
               </div>
@@ -223,7 +223,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
                     <Icon name={step.icon} />
                   </div>
                 ) : null}
-                {step.title ? <h4 className="aamle-feature-panel-title">{step.title}</h4> : null}
+                <InlineRichText as="h4" className="aamle-feature-panel-title" data={step.title} />
                 {step.badge ? (
                   <span
                     className={cn(
@@ -231,7 +231,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
                       step.badgeStyle === 'accent' && 'aamle-feature-panel-badge--accent',
                     )}
                   >
-                    {step.badge}
+                    <InlineRichText data={step.badge} />
                   </span>
                 ) : null}
               </div>
@@ -284,8 +284,8 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
                 <Icon name={step.icon} />
               </div>
             ) : null}
-            {step.badge ? <span className="vf-process-step-badge">{step.badge}</span> : null}
-            {step.title ? <h4 className="vf-card__title">{step.title}</h4> : null}
+            <InlineRichText as="span" className="vf-process-step-badge" data={step.badge} />
+            <InlineRichText as="h4" className="vf-card__title" data={step.title} />
             <Body data={step.description} />
             {Array.isArray(step.bullets) && step.bullets.length > 0 ? (
               <ul className="vf-process-step-bullets">

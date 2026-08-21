@@ -7,6 +7,7 @@ import {
   iconField,
   sectionHeaderFields,
   richBodyField,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 export const FAQ: Block = {
@@ -144,7 +145,7 @@ export const FAQ: Block = {
         {
           type: 'row',
           fields: [
-            { name: 'question', type: 'text', required: true, admin: { width: '70%' } },
+            inlineRichTextField('question', { required: true, admin: { width: '70%' } }),
             iconField({ admin: { width: '30%', description: 'Optional icon.' } }),
           ],
         },
@@ -184,8 +185,8 @@ export const FAQ: Block = {
       label: 'Help card (optional)',
       admin: { description: 'A "still have questions?" card shown after the list.' },
       fields: [
-        { name: 'heading', type: 'text' },
-        { name: 'body', type: 'textarea' },
+        inlineRichTextField('heading'),
+        inlineRichTextField('body'),
         {
           type: 'row',
           fields: [

@@ -1,4 +1,6 @@
 'use client'
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useEffect, useId, useState } from 'react'
 
 import { cn } from '@/utilities/ui'
@@ -8,16 +10,20 @@ import { cn } from '@/utilities/ui'
 // selected-type + selected-tab state and toggles visibility — no data or
 // rich-text rendering happens here. Markup + classes mirror the design
 // reference's `.ag-*` appointment-guide structure (namespaced `vf-ag-*`).
-export type ClientTab = { label: string; iconNode: React.ReactNode; panel: React.ReactNode }
+export type ClientTab = {
+  label: RichTextValue
+  iconNode: React.ReactNode
+  panel: React.ReactNode
+}
 export type ClientType = {
-  label: string
-  sublabel?: string | null
+  label: RichTextValue
+  sublabel?: RichTextValue
   anchorId?: string | null
   iconNode: React.ReactNode
   tabs: ClientTab[]
 }
 
-export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: string | null }> = ({
+export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: RichTextValue }> = ({
   types,
   selectLabel,
 }) => {
@@ -72,7 +78,13 @@ export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: string |
     <div className="vf-ag">
       {types.length > 1 ? (
         <>
-          <p className="vf-ag-select-label">{selectLabel || 'Select your appointment type'}</p>
+          <p className="vf-ag-select-label">
+            {hasRichText(selectLabel) ? (
+              <InlineRichText data={selectLabel} />
+            ) : (
+              'Select your appointment type'
+            )}
+          </p>
           <div className="vf-ag-type-toggle" role="tablist" aria-label="Appointment type">
             {types.map((t, i) => {
               const selected = i === activeTypeIdx
@@ -90,9 +102,9 @@ export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: string |
                     <span className="vf-ag-type-icon-wrap">{t.iconNode}</span>
                   ) : null}
                   <span className="vf-ag-type-text">
-                    <span className="vf-ag-type-btn-label">{t.label}</span>
-                    {t.sublabel ? (
-                      <span className="vf-ag-type-btn-sub">{t.sublabel}</span>
+                    <InlineRichText as="span" className="vf-ag-type-btn-label" data={t.label} />
+                    {hasRichText(t.sublabel) ? (
+                      <InlineRichText as="span" className="vf-ag-type-btn-sub" data={t.sublabel} />
                     ) : null}
                   </span>
                 </button>
@@ -120,7 +132,7 @@ export const GuideClient: React.FC<{ types: ClientType[]; selectLabel?: string |
                   {tab.iconNode ? (
                     <span className="vf-ag-tab-icon">{tab.iconNode}</span>
                   ) : null}
-                  <span className="vf-ag-tab-label">{tab.label}</span>
+                  <InlineRichText as="span" className="vf-ag-tab-label" data={tab.label} />
                 </button>
               )
             })}

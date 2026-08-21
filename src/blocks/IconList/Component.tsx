@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { IconListBlock as Props } from '@/payload-types'
@@ -54,7 +55,7 @@ export const IconListBlock: React.FC<Props & { bare?: boolean }> = ({
               {item.icon ? (
                 <Icon name={item.icon} className="vf-icon-list__icon" />
               ) : null}
-              <span className="vf-icon-list__text">{item.text}</span>
+              <InlineRichText as="span" className="vf-icon-list__text" data={item.text} />
             </>
           )
 

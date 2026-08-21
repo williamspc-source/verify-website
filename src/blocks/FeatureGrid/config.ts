@@ -8,6 +8,7 @@ import {
   iconField,
   headingWeightField,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 export const FeatureGrid: Block = {
@@ -51,13 +52,9 @@ export const FeatureGrid: Block = {
       labels: { singular: 'Feature', plural: 'Features' },
       fields: [
         iconField(),
-        { name: 'title', type: 'text', required: true },
-        {
-          name: 'titleSuffix',
-          type: 'text',
-          admin: { description: 'Optional second-line / type label under the title (e.g. "In-Person").' },
-        },
-        { name: 'description', type: 'textarea' },
+        inlineRichTextField('title', { required: true }),
+        inlineRichTextField('titleSuffix', { admin: { description: 'Optional second-line / type label under the title (e.g. "In-Person").' } }),
+        inlineRichTextField('description'),
         {
           name: 'bullets',
           type: 'array',
@@ -65,11 +62,7 @@ export const FeatureGrid: Block = {
           admin: { description: 'Optional simple bulleted list.' },
           fields: [{ name: 'text', type: 'text', required: true }],
         },
-        {
-          name: 'detailsLabel',
-          type: 'text',
-          admin: { description: 'Optional label above a nested detail list (e.g. "What\'s Included").' },
-        },
+        inlineRichTextField('detailsLabel', { admin: { description: 'Optional label above a nested detail list (e.g. "What\'s Included").' } }),
         {
           name: 'details',
           type: 'array',
@@ -78,8 +71,8 @@ export const FeatureGrid: Block = {
           admin: { description: 'Nested icon + title + description sub-items (e.g. Assessment Format cards).' },
           fields: [
             iconField(),
-            { name: 'title', type: 'text', required: true },
-            { name: 'description', type: 'textarea' },
+            inlineRichTextField('title', { required: true }),
+            inlineRichTextField('description'),
           ],
         },
       ],

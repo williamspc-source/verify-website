@@ -7,6 +7,7 @@ import {
   iconField,
   richBodyField,
   sectionHeaderFieldsWithDefaults,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Sensible defaults for the section header, mirroring the design reference
@@ -61,8 +62,8 @@ export const CostGrid: Block = {
       ],
       fields: [
         iconField(),
-        { name: 'title', type: 'text', required: true },
-        { name: 'description', type: 'textarea' },
+        inlineRichTextField('title', { required: true }),
+        inlineRichTextField('description'),
       ],
     },
     richBodyField('note', {

@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { ValueCardsBlock as Props } from '@/payload-types'
@@ -47,8 +48,8 @@ export const ValueCardsBlock: React.FC<Props & { bare?: boolean }> = ({
       <div className="values-grid">
         {cards.map((card, i) => (
           <div key={i} className="value-card">
-            {card.title ? <h3>{card.title}</h3> : null}
-            {card.description ? <p>{card.description}</p> : null}
+            <InlineRichText as="h3" data={card.title} />
+            <InlineRichText as="p" data={card.description} />
           </div>
         ))}
       </div>

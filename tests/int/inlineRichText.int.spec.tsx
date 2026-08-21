@@ -101,6 +101,20 @@ describe('InlineRichText', () => {
     expect(out).toContain('<br/>')
   })
 
+  it('wraps in nothing when no element was asked for', () => {
+    // The default used to be a <span>, which added 48 elements across the site
+    // and nested `<span class="ni-card-link"><span>…</span></span>`. A wrapper
+    // is not free: `.parent span` selectors start matching it.
+    const out = html(<InlineRichText data={state('Read More')} />)
+    expect(out).toBe('Read More')
+  })
+
+  it('still wraps when there is something to hang on the element', () => {
+    expect(html(<InlineRichText className="x" data={state('Read More')} />)).toContain('<span')
+    expect(html(<InlineRichText colour="brand" data={state('Read More')} />)).toContain('vf-tc-brand')
+    expect(html(<InlineRichText as="p" data={state('Read More')} />)).toContain('<p')
+  })
+
   it('renders nothing for an empty field, in both shapes', () => {
     // An empty rich text is a truthy object; a component that rendered it would
     // paint an empty heading band on every page with a blank header.

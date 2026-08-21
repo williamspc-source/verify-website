@@ -6,6 +6,7 @@ import {
   displayFields,
   elementClassesField,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 export const StatsBand: Block = {
@@ -31,19 +32,11 @@ export const StatsBand: Block = {
               required: true,
               admin: { width: '33%', description: 'The number to count up to.' },
             },
-            {
-              name: 'prefix',
-              type: 'text',
-              admin: { width: '33%', description: 'e.g. "$" (optional).' },
-            },
-            {
-              name: 'suffix',
-              type: 'text',
-              admin: { width: '33%', description: 'e.g. "+" or "%" (optional).' },
-            },
+            inlineRichTextField('prefix', { admin: { width: '33%', description: 'e.g. "$" (optional).' } }),
+            inlineRichTextField('suffix', { admin: { width: '33%', description: 'e.g. "+" or "%" (optional).' } }),
           ],
         },
-        { name: 'label', type: 'text', required: true },
+        inlineRichTextField('label', { required: true }),
       ],
     },
     cssClassField,

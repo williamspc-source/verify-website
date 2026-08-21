@@ -1,5 +1,7 @@
 'use client'
 
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { Icon } from '@/components/Icon'
@@ -21,7 +23,7 @@ export type FeaturedSlide = {
 // wrap-around at both ends.
 export const FeaturedArticlesClient: React.FC<{
   slides: FeaturedSlide[]
-  ctaLabel?: string
+  ctaLabel?: RichTextValue
   autoplay?: boolean | null
   interval?: number | null
   showArrows?: boolean | null
@@ -116,7 +118,7 @@ export const FeaturedArticlesClient: React.FC<{
               {slide.excerpt ? <p>{slide.excerpt}</p> : null}
               {slide.byline ? <div className="ni-featured-byline">{slide.byline}</div> : null}
               <a className="ni-read-more" href={slide.href}>
-                {ctaLabel}
+                <InlineRichText data={ctaLabel} />
               </a>
               </div>
             </div>

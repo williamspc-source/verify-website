@@ -1,5 +1,5 @@
 'use client'
-import { richTextToPlain } from '@/utilities/lexicalText'
+import { hasRichText, richTextToPlain } from '@/utilities/lexicalText'
 import { InlineRichText } from '@/components/RichText/Inline'
 import { mediaSrc } from '@/utilities/mediaSrc'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -21,7 +21,7 @@ const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean; className?
   className,
 }) => {
   const img = mediaSrc(slide.image, 367 * 2) // .events-offer-visual, measured 367px
-  const pills = (slide.pills || []).filter((p) => p.text)
+  const pills = (slide.pills || []).filter((p) => hasRichText(p.text))
   return (
     <article
       className={cn('events-offer-card', `offer-${slide.accent || 'seminars'}`, className)}
@@ -34,7 +34,7 @@ const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean; className?
         {pills.length > 0 ? (
           <div className="events-offer-pills">
             {pills.map((p, j) => (
-              <span key={j}>{p.text}</span>
+              <InlineRichText as="span" key={j} data={p.text} />
             ))}
           </div>
         ) : null}

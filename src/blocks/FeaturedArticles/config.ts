@@ -5,6 +5,8 @@ import {
   backgroundField,
   cssClassField,
   hideWhenEmptyField,
+  inlineRichTextField,
+  richTextDefault,
 } from '@/fields/blockFields'
 
 // Featured-article carousel (design ref: .ni-featured / .ni-carousel on the
@@ -17,12 +19,8 @@ export const FeaturedArticles: Block = {
   interfaceName: 'FeaturedArticlesBlock',
   labels: { singular: 'Featured Articles Carousel', plural: 'Featured Articles Carousels' },
   fields: [
-    {
-      name: 'eyebrow',
-      type: 'text',
-      defaultValue: 'Featured',
-      admin: { description: 'Small uppercase label above the carousel (optional).' },
-    },
+    inlineRichTextField('eyebrow', { defaultValue: richTextDefault('Featured'),
+      admin: { description: 'Small uppercase label above the carousel (optional).' } }),
     // Motion + controls, mirroring SlideCarousel. Defaults are exactly what was
     // hardcoded before, so adding them changes nothing until an editor touches
     // one. Deliberately NOT copying SlideCarousel's `(interval ?? d) || d`
@@ -103,32 +101,20 @@ export const FeaturedArticles: Block = {
         description: 'Max number of posts to show (automatic mode).',
       },
     },
-    {
-      name: 'badgeLabel',
-      type: 'text',
-      defaultValue: 'Featured',
+    inlineRichTextField('badgeLabel', { defaultValue: richTextDefault('Featured'),
       admin: {
         description: 'Text of the small badge shown on each slide (defaults to "Featured").',
-      },
-    },
-    {
-      name: 'bylinePrefix',
-      type: 'text',
-      defaultValue: 'By:',
+      } }),
+    inlineRichTextField('bylinePrefix', { defaultValue: richTextDefault('By:'),
       admin: {
         description:
           'Prefix shown before the author/date byline on each slide (defaults to "By:").',
-      },
-    },
-    {
-      name: 'ctaLabel',
-      type: 'text',
-      defaultValue: 'Read Full Article →',
+      } }),
+    inlineRichTextField('ctaLabel', { defaultValue: richTextDefault('Read Full Article →'),
       admin: {
         description:
           'Text of the "read more" call-to-action link on each slide (defaults to "Read Full Article →").',
-      },
-    },
+      } }),
     anchorIdField,
     backgroundField,
     cssClassField,

@@ -1,3 +1,5 @@
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import type {
   Post,
   Event,
@@ -110,7 +112,10 @@ const postTagLabel = (post: Post, stream: Stream | null): string | null => {
 }
 
 // ── Staff-narrative card (In-the-Loop → Staff Narratives) ───
-const NarrativeCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, readMoreLabel }) => {
+const NarrativeCard: React.FC<{ post: Post; readMoreLabel: RichTextValue }> = ({
+  post,
+  readMoreLabel,
+}) => {
   if (!post) return null
 
   const stream = typeof post.stream === 'object' && post.stream ? (post.stream as Stream) : null
@@ -148,7 +153,7 @@ const NarrativeCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, 
           {dateLabel && <span className="ni-narrative-date">{dateLabel}</span>}
         </div>
         <a className="ni-narrative-link" href={href}>
-          {readMoreLabel}
+          <InlineRichText data={readMoreLabel} />
         </a>
       </div>
     </div>
@@ -156,7 +161,10 @@ const NarrativeCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, 
 }
 
 // ── Post card (In-the-Loop hub) ─────────────────────────────
-const PostCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, readMoreLabel }) => {
+const PostCard: React.FC<{ post: Post; readMoreLabel: RichTextValue }> = ({
+  post,
+  readMoreLabel,
+}) => {
   if (!post) return null
 
   const stream = typeof post.stream === 'object' && post.stream ? (post.stream as Stream) : null
@@ -188,7 +196,9 @@ const PostCard: React.FC<{ post: Post; readMoreLabel: string }> = ({ post, readM
         </div>
         <div className="ni-card-title">{post.title}</div>
         {post.excerpt && <p className="ni-card-excerpt">{post.excerpt}</p>}
-        <span className="ni-card-link">{readMoreLabel}</span>
+        <span className="ni-card-link">
+                    <InlineRichText data={readMoreLabel} />
+                  </span>
       </div>
     </a>
   )
@@ -344,7 +354,13 @@ export const ArchiveBlock: React.FC<
     hideWhenEmpty?: boolean | null
   }
   const readMoreLabel =
-    (props as { readMoreLabel?: string | null }).readMoreLabel || 'Read More →'
+    // `hasRichText`, not `||`: an empty rich text is a truthy object, so `||`
+    // would stop falling back the day this field was converted and the card link
+    // would render with no words in it.
+    (() => {
+      const label = (props as { readMoreLabel?: RichTextValue }).readMoreLabel
+      return hasRichText(label) ? label : 'Read More →'
+    })()
 
   const limit = limitFromProps || 3
   const now = new Date()

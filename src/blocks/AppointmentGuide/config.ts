@@ -7,6 +7,7 @@ import {
   iconField,
   sectionHeaderFields,
   richBodyField,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 const richBody = richBodyField('body')
@@ -24,15 +25,11 @@ export const AppointmentGuide: Block = {
   labels: { singular: 'Appointment Guide', plural: 'Appointment Guides' },
   fields: [
     ...sectionHeaderFields,
-    {
-      name: 'selectLabel',
-      type: 'text',
-      label: 'Type selector label',
+    inlineRichTextField('selectLabel', { label: 'Type selector label',
       admin: {
         description:
           'Small uppercase label shown above the appointment-type toggle. Defaults to "Select your appointment type".',
-      },
-    },
+      } }),
     {
       name: 'types',
       type: 'array',
@@ -45,8 +42,8 @@ export const AppointmentGuide: Block = {
           type: 'row',
           fields: [
             iconField({ admin: { width: '20%' } }),
-            { name: 'label', type: 'text', required: true, admin: { width: '40%' } },
-            { name: 'sublabel', type: 'text', admin: { width: '40%' } },
+            inlineRichTextField('label', { required: true, admin: { width: '40%' } }),
+            inlineRichTextField('sublabel', { admin: { width: '40%' } }),
           ],
         },
         // Rendered as the id on this type's toggle button, so a link ending
@@ -66,14 +63,14 @@ export const AppointmentGuide: Block = {
               type: 'row',
               fields: [
                 iconField({ admin: { width: '30%' } }),
-                { name: 'label', type: 'text', required: true, admin: { width: '70%' } },
+                inlineRichTextField('label', { required: true, admin: { width: '70%' } }),
               ],
             },
             {
               name: 'items',
               type: 'array',
               label: 'Items',
-              fields: [iconField(), { name: 'heading', type: 'text', required: true }, richBody],
+              fields: [iconField(), inlineRichTextField('heading', { required: true }), richBody],
             },
             {
               name: 'highlightCards',
@@ -82,7 +79,7 @@ export const AppointmentGuide: Block = {
               dbName: 'hcards',
               fields: [
                 iconField(),
-                { name: 'title', type: 'text', required: true },
+                inlineRichTextField('title', { required: true }),
                 {
                   name: 'bullets',
                   type: 'array',
@@ -105,7 +102,7 @@ export const AppointmentGuide: Block = {
                     { label: 'Warning', value: 'warning' },
                   ],
                 },
-                { name: 'text', type: 'textarea' },
+                inlineRichTextField('text'),
               ],
             },
           ],

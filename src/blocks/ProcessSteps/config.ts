@@ -9,6 +9,7 @@ import {
   iconField,
   richBodyField,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 type ClaimantSiblings = { variant?: string | null; imagePlaceholder?: boolean | null }
@@ -100,15 +101,13 @@ export const ProcessSteps: Block = {
           'Draws the pale-blue placeholder tile until a photo is uploaded. Uploading one replaces it outright — caption and glyph with it — so you can leave this ticked.',
       },
     },
-    {
-      name: 'placeholderLabel',
-      type: 'text',
+    inlineRichTextField('placeholderLabel', {
       admin: {
         condition: (_: unknown, sibling: ClaimantSiblings = {}) =>
           isClaimant(_, sibling) && Boolean(sibling?.imagePlaceholder),
         description: 'Optional caption inside the placeholder (e.g. "IMAGE PLACEHOLDER").',
       },
-    },
+    }),
     iconField({
       name: 'placeholderIcon',
       admin: {
@@ -144,11 +143,7 @@ export const ProcessSteps: Block = {
           type: 'row',
           fields: [
             iconField({ admin: { width: '50%' } }),
-            {
-              name: 'badge',
-              type: 'text',
-              admin: { width: '50%', description: 'Optional pill label, e.g. "Free to Join".' },
-            },
+            inlineRichTextField('badge', { admin: { width: '50%', description: 'Optional pill label, e.g. "Free to Join".' } }),
           ],
         },
         {
@@ -165,11 +160,7 @@ export const ProcessSteps: Block = {
             { label: 'Highlight', value: 'accent' },
           ],
         },
-        {
-          name: 'title',
-          type: 'text',
-          admin: { description: 'Optional — leave empty for a number-only step.' },
-        },
+        inlineRichTextField('title', { admin: { description: 'Optional — leave empty for a number-only step.' } }),
         richBodyField('description', {
           admin: {
             description:

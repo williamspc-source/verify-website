@@ -26,8 +26,15 @@ run_case () {
 }
 
 echo "--- A(blocks): a block field nothing reads ---"
-run_case "A-blocks" "src/blocks/IconList/Component.tsx" "every field name is read" \
-  "perl -0pi -e 's/\{item\.text\}/{null}/' src/blocks/IconList/Component.tsx"
+# Was `IconList.text`. The rich-text conversion made `.text` a read in a dozen
+# consumer files (`data={slide.text}`, `data={badge.text}`, …), and the orphan
+# guard joins every consumer into ONE haystack — so breaking one file's read left
+# the field still "read" and the guard stayed green. That is the common-name hole
+# CLAUDE.md records for `icon` and `title`, arriving at a new name.
+# `slide.visualLabel` has exactly one reader in the whole repo, which is what the
+# rule in CLAUDE.md asks for.
+run_case "A-blocks" "src/blocks/SlideCarousel/Component.tsx" "every field name is read" \
+  "perl -0pi -e 's/\{slide\.visualLabel\}/{null}/' src/blocks/SlideCarousel/Component.tsx"
 
 echo "--- B: an option value with no matching CSS rule ---"
 run_case "B-options" "src/fields/blockFields.ts" "every vf-\* modifier class" \

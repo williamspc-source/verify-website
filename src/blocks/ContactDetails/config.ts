@@ -5,6 +5,7 @@ import {
   displayFields,
   iconField,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Renders business contact details (phone / email / address / hours) on a page.
@@ -37,15 +38,15 @@ export const ContactDetails: Block = {
           type: 'row',
           fields: [
             iconField({ admin: { width: '30%' } }),
-            { name: 'label', type: 'text', required: true, admin: { width: '30%' } },
-            { name: 'value', type: 'text', required: true, admin: { width: '40%' } },
+            inlineRichTextField('label', { required: true, admin: { width: '30%' } }),
+            inlineRichTextField('value', { required: true, admin: { width: '40%' } }),
           ],
         },
         {
           type: 'row',
           fields: [
             { name: 'href', type: 'text', admin: { width: '50%', description: 'Optional (tel:/mailto:/URL).' } },
-            { name: 'note', type: 'text', admin: { width: '50%' } },
+            inlineRichTextField('note', { admin: { width: '50%' } }),
           ],
         },
       ],

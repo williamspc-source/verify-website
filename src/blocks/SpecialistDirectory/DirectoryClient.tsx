@@ -60,8 +60,8 @@ type Props = {
   specialtyLabel: string
   locationLabel: string
   accreditationLabel: string
-  emptyHeading: string
-  emptyBody: string
+  emptyHeading: RichTextValue
+  emptyBody: RichTextValue
   cardCtaLabel: string
   secondaryCtaLabel: string
   secondaryCtaHref: string
@@ -362,8 +362,8 @@ export const DirectoryClient: React.FC<Props> = ({
         </div>
       ) : (
         <div className="specialist-filter-empty">
-          <h3>{emptyHeading}</h3>
-          <p>{emptyBody}</p>
+          <InlineRichText as="h3" data={emptyHeading} />
+          <InlineRichText as="p" data={emptyBody} />
         </div>
       )}
     </div>

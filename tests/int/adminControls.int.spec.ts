@@ -52,6 +52,27 @@ const walkFiles = (dir: string, out: string[] = []): string[] => {
   return out
 }
 
+/**
+ * Every field name a config declares — including the ones a helper names.
+ *
+ * `name: 'heading'` is the obvious form. It is no longer the only one: the
+ * rich-text conversion moved ~300 fields to `inlineRichTextField('heading', …)`,
+ * where the name is an argument rather than a property. A matcher that looks
+ * only for `name:` therefore stopped seeing them — silently, and in the
+ * direction that matters: the orphan-field guard simply had nothing to check,
+ * so it went green on a config it was no longer reading. Found because a
+ * deliberate break stopped going red.
+ *
+ * Keep this in step with the field factories in `src/fields/blockFields.ts`.
+ */
+const FIELD_NAME_PATTERNS = [
+  /\bname:\s*'([a-zA-Z][\w]*)'/g,
+  /\b(?:inlineRichTextField|richBodyField|spacingField|presetClassField|textColorField)\(\s*'([a-zA-Z][\w]*)'/g,
+]
+
+const declaredFieldNames = (source: string): string[] =>
+  FIELD_NAME_PATTERNS.flatMap((re) => [...source.matchAll(re)].map((m) => m[1]!))
+
 const blockDirs = readdirSync(BLOCKS, { withFileTypes: true })
   .filter((d) => d.isDirectory() && existsSync(join(BLOCKS, d.name, 'config.ts')))
   .map((d) => d.name)
@@ -137,7 +158,7 @@ describe('admin controls are wired', () => {
     const src = blockSources(name)
     if (!src.trim()) return // config-only block (e.g. re-exported elsewhere)
 
-    const declared = [...config.matchAll(/\bname:\s*'([a-zA-Z][\w]*)'/g)].map((m) => m[1])
+    const declared = declaredFieldNames(config)
     const allowed = ALLOWED_UNREAD['*']
 
     const unread = [...new Set(declared)].filter(
@@ -229,7 +250,7 @@ describe('admin controls are wired', () => {
    */
   it('every class the CSS-class picker offers from code exists in globals.css', () => {
     const src = readFileSync(join(SRC, 'fields/codeDefinedClasses.ts'), 'utf8')
-    const names = [...src.matchAll(/name:\s*'([a-zA-Z][\w-]*)'/g)].map((m) => m[1])
+    const names = [...src.matchAll(/name:\s*'([a-zA-Z][\w-]*)'/g)].map((m) => m[1]!)
     expect(names.length, 'could not parse CODE_DEFINED_CLASSES').toBeGreaterThan(0)
 
     const missing = names.filter((n) => !new RegExp(`\\.${n}\\b`).test(GLOBALS_CSS))
@@ -719,7 +740,7 @@ describe('globals and collections have no orphan fields', () => {
    */
   it.each([...GLOBAL_CONFIGS, ...collectionConfigs()])('%s', (file) => {
     const config = readFileSync(file, 'utf8')
-    const declared = [...config.matchAll(/\bname:\s*'([a-zA-Z][\w]*)'/g)].map((m) => m[1])
+    const declared = declaredFieldNames(config)
 
     const unread = [...new Set(declared)].filter(
       (field) => !ALLOWED_UNREAD_CONFIG[field] && !readsField(CONSUMER_HAYSTACK, field),

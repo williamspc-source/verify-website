@@ -73,8 +73,16 @@ const inlineConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters 
 
 type Props = {
   /**
-   * The element to render. Defaults to `span` — the safe choice inside a button
-   * or a label, where a block element would break the layout.
+   * The element to render.
+   *
+   * Omit it — along with `className`, `id` and `colour` — and nothing is
+   * wrapped: the words go straight into whatever element the caller already
+   * has. That case is common (`<a class="card-link"><InlineRichText data={x} /></a>`)
+   * and a default wrapper there is not free. Measured: defaulting to `<span>`
+   * added 48 elements across the site and produced
+   * `<span class="ni-card-link"><span>Read More →</span></span>`, which is the
+   * kind of nesting that quietly changes what `.parent span` selectors match —
+   * exactly how the Heading block lost its accent colour earlier in this pass.
    */
   as?: React.ElementType
   /** A converted field, or a plain string from one not converted yet. */
@@ -85,24 +93,17 @@ type Props = {
   id?: string
 }
 
-export const InlineRichText: React.FC<Props> = ({
-  as: Tag = 'span',
-  data,
-  className,
-  colour,
-  id,
-}) => {
+export const InlineRichText: React.FC<Props> = ({ as, data, className, colour, id }) => {
   const classes = cn(className, colorClass(colour))
+  // No element asked for and nothing to hang on one → add no element.
+  const Tag = as ?? (classes || id ? 'span' : React.Fragment)
+  const tagProps = Tag === React.Fragment ? {} : { className: classes || undefined, id }
 
   // A string still goes through `accentText`, so `[[brackets]]` behave the same
   // either side of a conversion.
   if (typeof data === 'string') {
     if (!hasRichText(data)) return null
-    return (
-      <Tag className={classes || undefined} id={id}>
-        {accentText(data)}
-      </Tag>
-    )
+    return <Tag {...tagProps}>{accentText(data)}</Tag>
   }
 
   // `hasRichText` rather than a truthiness check, and the `!data` half is what
@@ -112,7 +113,7 @@ export const InlineRichText: React.FC<Props> = ({
   if (!data || !hasRichText(data)) return null
 
   return (
-    <Tag className={classes || undefined} id={id}>
+    <Tag {...tagProps}>
       <ConvertRichText
         converters={inlineConverters}
         data={data as never}

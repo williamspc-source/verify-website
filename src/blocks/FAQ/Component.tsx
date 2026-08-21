@@ -1,3 +1,5 @@
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { FAQBlock as FAQBlockProps } from '@/payload-types'
@@ -37,7 +39,12 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
   if (!items || items.length === 0) return null
   const groupName = exclusive ? `faq-${id || 'group'}` : undefined
   const help = helpCard as
-    | { heading?: string | null; body?: string | null; email?: string | null; phone?: string | null }
+    | {
+        heading?: RichTextValue
+        body?: RichTextValue
+        email?: string | null
+        phone?: string | null
+      }
     | undefined
 
   // "Side by side" ports the design reference's two-panel FAQ
@@ -83,9 +90,9 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
                   anonymous text node. Card mode keeps the bare text node, which
                   is what makes the unset default byte-identical to before. */}
               {divided ? (
-                <span className="vf-faq__question-text">{item.question}</span>
+                <InlineRichText as="span" className="vf-faq__question-text" data={item.question} />
               ) : (
-                item.question
+                <InlineRichText data={item.question} />
               )}
             </summary>
             <div className="faq-a vf-faq__answer">
@@ -138,7 +145,7 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
         </>
       )}
 
-      {help && (help.heading || help.body) ? (
+      {help && (hasRichText(help.heading) || hasRichText(help.body)) ? (
         <div className="vf-faq__help vf-callout vf-callout--info">
           {/* The reference runs the heading and body together as one weighted
               paragraph beside an info icon. The two fields stay separate so an
@@ -146,7 +153,14 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
           <div className="vf-faq__help-message">
             <Icon name="info" className="vf-faq__help-icon" />
             <p className="vf-faq__help-text">
-              {[help.heading, help.body].filter(Boolean).join(' ')}
+              {/* Joined for display, never with `.join(' ')`: these are rich text
+                  now, and joining objects produced a literal
+                  "[object Object] [object Object]" on the page — no error, no
+                  warning, just wrong words. The space between them is a real
+                  text node instead. */}
+              <InlineRichText data={help.heading} />
+              {hasRichText(help.heading) && hasRichText(help.body) ? ' ' : null}
+              <InlineRichText data={help.body} />
             </p>
           </div>
           {help.email || help.phone ? (

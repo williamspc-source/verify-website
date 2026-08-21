@@ -4,6 +4,7 @@ import type { Block } from 'payload'
 import { linkGroup } from '@/fields/linkGroup'
 import { cssClassField, iconField,
   richBodyField,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // A standalone info/note callout usable directly in a page or Row column (unlike
@@ -34,8 +35,8 @@ export const Callout: Block = {
         iconField({ admin: { width: '50%' } }),
       ],
     },
-    { name: 'tag', type: 'text', admin: { description: 'Optional pill label, e.g. "Good to know".' } },
-    { name: 'heading', type: 'text' },
+    inlineRichTextField('tag', { admin: { description: 'Optional pill label, e.g. "Good to know".' } }),
+    inlineRichTextField('heading'),
     richBodyField('body'),
     // Appearance is left in place deliberately. A callout link renders as
     // `.process-note-link`, a single treatment, so the choice has no effect —

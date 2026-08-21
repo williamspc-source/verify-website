@@ -55,10 +55,10 @@ export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
               <div key={i} className={cn('ime-pathway-card', variantClass)}>
                 <div className="ime-pathway-card-top">
                   {card.eyebrow ? (
-                    <div className="ime-pathway-audience">{card.eyebrow}</div>
+                    <InlineRichText as="div" className="ime-pathway-audience" data={card.eyebrow} />
                   ) : null}
-                  {card.title ? <h3>{card.title}</h3> : null}
-                  {card.description ? <p>{card.description}</p> : null}
+                  <InlineRichText as="h3" data={card.title} />
+                  <InlineRichText as="p" data={card.description} />
                 </div>
 
                 <div className="ime-pathway-card-body">
@@ -68,8 +68,8 @@ export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
                         <div key={j} className="ime-pathway-step">
                           <div className="ime-pathway-step-num">{j + 1}</div>
                           <div className="ime-pathway-step-text">
-                            {step.title ? <strong>{step.title}</strong> : null}
-                            {step.description ? <span>{step.description}</span> : null}
+                            <InlineRichText as="strong" data={step.title} />
+                            <InlineRichText as="span" data={step.description} />
                           </div>
                         </div>
                       ))}

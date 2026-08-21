@@ -106,7 +106,7 @@ export const AamleEducationBlock: React.FC<Props & { bare?: boolean }> = ({
                       <Icon name={it.icon} />
                     </div>
                   ) : null}
-                  <strong>{it.label}</strong>
+                  <InlineRichText as="strong" data={it.label} />
                 </div>
               ))}
             </div>

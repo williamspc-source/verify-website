@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { AppointmentGuideBlock as Props } from '@/payload-types'
@@ -41,7 +42,7 @@ const TabPanel: React.FC<{ tab: ApptTab }> = ({ tab }) => {
                 </div>
               ) : null}
               <div className="vf-ag-item-body">
-                <h3 className="vf-ag-item-heading">{item.heading}</h3>
+                <InlineRichText as="h3" className="vf-ag-item-heading" data={item.heading} />
                 {item.body ? (
                   <RichText
                     data={item.body}
@@ -61,11 +62,13 @@ const TabPanel: React.FC<{ tab: ApptTab }> = ({ tab }) => {
           {cards.map((card, i) => (
             <div key={card.id || i} className="vf-ag-highlight-card">
               {card.icon ? <Icon name={card.icon} className="vf-ag-highlight-card-icon" /> : null}
-              <h4>{card.title}</h4>
+              <InlineRichText as="h4" data={card.title} />
               {card.bullets && card.bullets.length > 0 ? (
                 <ul>
                   {card.bullets.map((b, j) => (
-                    <li key={b.id || j}>{b.text}</li>
+                    <li key={b.id || j}>
+                      <InlineRichText data={b.text} />
+                    </li>
                   ))}
                 </ul>
               ) : null}
@@ -80,7 +83,7 @@ const TabPanel: React.FC<{ tab: ApptTab }> = ({ tab }) => {
             name={calloutIcon[callout.style || 'info'] || 'info'}
             className="vf-ag-note-icon"
           />
-          <p>{callout.text}</p>
+          <InlineRichText as="p" data={callout.text} />
         </div>
       ) : null}
     </>

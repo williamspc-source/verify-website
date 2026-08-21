@@ -7,6 +7,8 @@ import {
   iconField,
   motionField,
   sectionHeaderFieldsWithDefaults,
+  inlineRichTextField,
+  richTextDefault,
 } from '@/fields/blockFields'
 
 // Sensible starter copy for the section header. Applied by cloning the shared
@@ -81,12 +83,8 @@ export const WhyVerify: Block = {
               'Optional icon for this reason (kept in markup for structure; hidden in the current light design).',
           },
         }),
-        { name: 'title', type: 'text', required: true },
-        {
-          name: 'body',
-          type: 'textarea',
-          admin: { description: 'Shown when the row is expanded.' },
-        },
+        inlineRichTextField('title', { required: true }),
+        inlineRichTextField('body', { admin: { description: 'Shown when the row is expanded.' } }),
       ],
     },
     {
@@ -98,14 +96,10 @@ export const WhyVerify: Block = {
           'Company image shown beside the reasons. Falls back to a gradient placeholder when empty.',
       },
     },
-    {
-      name: 'placeholderLabel',
-      type: 'text',
-      defaultValue: '[ Company Image Placeholder ]',
+    inlineRichTextField('placeholderLabel', { defaultValue: richTextDefault('[ Company Image Placeholder ]'),
       admin: {
         description: 'Text shown inside the image placeholder when no image is set.',
-      },
-    },
+      } }),
     anchorIdField,
     containerWidthField,
     motionField,

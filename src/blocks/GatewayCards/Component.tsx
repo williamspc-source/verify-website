@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { GatewayCardsBlock as Props } from '@/payload-types'
@@ -74,13 +75,13 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
                   </div>
                 ) : null}
                 {card.eyebrow ? (
-                  <div className="audience-card-eyebrow section-label">{card.eyebrow}</div>
+                  <InlineRichText as="div" className="audience-card-eyebrow section-label" data={card.eyebrow} />
                 ) : null}
-                <div className="audience-card-label vf-card__title">{card.title}</div>
+                <InlineRichText as="div" className="audience-card-label vf-card__title" data={card.title} />
                 {card.subtitle ? (
-                  <div className="audience-card-subtitle">{card.subtitle}</div>
+                  <InlineRichText as="div" className="audience-card-subtitle" data={card.subtitle} />
                 ) : null}
-                {card.description ? <div className="audience-card-hook">{card.description}</div> : null}
+                <InlineRichText as="div" className="audience-card-hook" data={card.description} />
               </div>
               {hasBottom ? (
                 <div className="audience-card-bottom">

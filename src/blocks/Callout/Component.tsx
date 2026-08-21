@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { CalloutBlock as Props } from '@/payload-types'
@@ -46,7 +47,7 @@ export const CalloutBlock: React.FC<Props & { bare?: boolean }> = ({
     return (
       <Section bare={bare} className={cn('vf-callout-block', toClassName(cssClass))}>
         <div className="process-note">
-          {tag ? <span className="process-note-tag">{tag}</span> : null}
+          <InlineRichText as="span" className="process-note-tag" data={tag} />
           {body ? <RichText className="process-note-body" data={body} enableGutter={false} enableProse={false} /> : null}
           {hasLinks
             ? links!.map(({ link }, i) => (
@@ -69,7 +70,7 @@ export const CalloutBlock: React.FC<Props & { bare?: boolean }> = ({
             <Icon name={icon || 'info'} />
           </div>
           <div className="join-form-note-body">
-            {heading ? <strong>{heading}</strong> : null}
+            <InlineRichText as="strong" data={heading} />
             {body ? <RichText data={body} enableGutter={false} enableProse={false} /> : null}
           </div>
         </div>
@@ -95,16 +96,14 @@ export const CalloutBlock: React.FC<Props & { bare?: boolean }> = ({
         ) : null}
 
         <div className="vf-callout__content min-w-0 flex-1">
-          {tag ? (
-            <span
-              className="vf-callout__tag mb-2 inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
-            >
-              {tag}
-            </span>
-          ) : null}
+          <InlineRichText
+            as="span"
+            className="vf-callout__tag mb-2 inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+            data={tag}
+          />
 
           {heading ? (
-            <h3 className="vf-callout__heading text-lg font-semibold leading-snug">{heading}</h3>
+            <InlineRichText as="h3" className="vf-callout__heading text-lg font-semibold leading-snug" data={heading} />
           ) : null}
 
           {body ? (

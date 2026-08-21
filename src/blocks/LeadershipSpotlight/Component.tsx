@@ -73,9 +73,9 @@ export const LeadershipSpotlightBlock: React.FC<Props & { bare?: boolean }> = ({
 
           {hasBadge ? (
             <div className="leader-badge">
-              {badge ? <em className="leader-badge-tag">{badge}</em> : null}
-              {name}
-              {role ? <span>{role}</span> : null}
+              <InlineRichText as="em" className="leader-badge-tag" data={badge} />
+              <InlineRichText data={name} />
+              <InlineRichText as="span" data={role} />
             </div>
           ) : null}
         </div>
@@ -88,7 +88,7 @@ export const LeadershipSpotlightBlock: React.FC<Props & { bare?: boolean }> = ({
             data={heading}
           />
           <InlineRichText as="p" className="leadership-subheading" data={subheading} />
-          {tagline ? <div className="leadership-tagline">{tagline}</div> : null}
+          <InlineRichText as="div" className="leadership-tagline" data={tagline} />
           {body ? <RichText data={body} enableGutter={false} enableProse={false} /> : null}
           {creds.length > 0 ? (
             <div className="leader-credentials">

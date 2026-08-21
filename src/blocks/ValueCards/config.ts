@@ -6,6 +6,7 @@ import {
   cssClassField,
   displayFields,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // The "Our Values" band from the About page — a dark section with a centred
@@ -59,8 +60,8 @@ export const ValueCards: Block = {
         },
       ],
       fields: [
-        { name: 'title', type: 'text', required: true },
-        { name: 'description', type: 'textarea' },
+        inlineRichTextField('title', { required: true }),
+        inlineRichTextField('description'),
       ],
     },
     cssClassField,

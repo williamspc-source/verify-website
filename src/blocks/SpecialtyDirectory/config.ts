@@ -4,6 +4,8 @@ import {
   backgroundField,
   cssClassField,
   sectionHeaderFields,
+  inlineRichTextField,
+  richTextDefault,
 } from '@/fields/blockFields'
 
 // The Specialty List page: specialties grouped by Specialty Category into a
@@ -44,18 +46,10 @@ export const SpecialtyDirectory: Block = {
     {
       type: 'row',
       fields: [
-        {
-          name: 'allTabLabel',
-          type: 'text',
-          defaultValue: 'All Specialties',
-          admin: { width: '50%', description: 'Label for the “all categories” filter tab.' },
-        },
-        {
-          name: 'emptyLabel',
-          type: 'text',
-          defaultValue: 'No specialties in this category yet.',
-          admin: { width: '50%', description: 'Message shown when a category has no specialties.' },
-        },
+        inlineRichTextField('allTabLabel', { defaultValue: richTextDefault('All Specialties'),
+          admin: { width: '50%', description: 'Label for the “all categories” filter tab.' } }),
+        inlineRichTextField('emptyLabel', { defaultValue: richTextDefault('No specialties in this category yet.'),
+          admin: { width: '50%', description: 'Message shown when a category has no specialties.' } }),
       ],
     },
     cssClassField,

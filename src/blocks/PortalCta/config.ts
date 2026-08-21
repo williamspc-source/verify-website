@@ -41,7 +41,7 @@ export const PortalCta: Block = {
       ],
       fields: [
         iconField(),
-        { name: 'label', type: 'text', required: true },
+        inlineRichTextField('label', { required: true }),
       ],
     },
     linkGroup({

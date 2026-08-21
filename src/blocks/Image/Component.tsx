@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { ImageBlock as Props } from '@/payload-types'
@@ -28,7 +29,7 @@ export const ImageBlock: React.FC<Props> = ({
       )}
     >
       <Media resource={media} imgClassName="vf-image__img" />
-      {caption ? <figcaption className="vf-image__caption">{caption}</figcaption> : null}
+      <InlineRichText as="figcaption" className="vf-image__caption" data={caption} />
     </figure>
   )
 }

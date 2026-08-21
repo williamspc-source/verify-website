@@ -1,5 +1,7 @@
 'use client'
 
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useState } from 'react'
 
 import { Icon } from '@/components/Icon'
@@ -7,8 +9,8 @@ import { cn } from '@/utilities/ui'
 
 export type WhyVerifyItem = {
   icon?: string | null
-  title?: string | null
-  body?: string | null
+  title?: RichTextValue
+  body?: RichTextValue
   id?: string | null
 }
 
@@ -53,8 +55,8 @@ export const WhyVerifyClient: React.FC<{ items: WhyVerifyItem[] }> = ({ items })
                 <Icon name={item.icon} />
               </div>
             ) : null}
-            {item.title ? <h3>{item.title}</h3> : null}
-            {item.body ? <p>{item.body}</p> : null}
+            <InlineRichText as="h3" data={item.title} />
+            <InlineRichText as="p" data={item.body} />
           </div>
         )
       })}

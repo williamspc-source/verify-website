@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -179,7 +180,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
             <Icon name="clock" />
           </div>
           <div className="ct-info-item-content">
-            <div className="ct-info-item-title">{officeHoursHeading}</div>
+            <InlineRichText as="div" className="ct-info-item-title" data={officeHoursHeading} />
             {office.hours.map((h, i) => (
               <React.Fragment key={h.id || i}>
                 {h.days ? <div className="ct-info-item-line">{h.days}</div> : null}
@@ -198,7 +199,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
             <Icon name="bus" />
           </div>
           <div className="ct-info-item-content">
-            <div className="ct-info-item-title">{transportHeading}</div>
+            <InlineRichText as="div" className="ct-info-item-title" data={transportHeading} />
             {office.transport.map((t, i) => (
               <div key={t.id || i} className="ct-info-item-line">
                 {t.href ? <ExtLink href={t.href}>{t.label}</ExtLink> : t.label}
@@ -216,7 +217,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
             <Icon name="car" />
           </div>
           <div className="ct-info-item-content">
-            <div className="ct-info-item-title">{parkingHeading}</div>
+            <InlineRichText as="div" className="ct-info-item-title" data={parkingHeading} />
             {parking.map((p, i) => (
               <React.Fragment key={p.id || i}>
                 <div className="ct-info-item-line" style={i > 0 ? { marginTop: 6 } : undefined}>

@@ -6,6 +6,7 @@ import {
   cssClassField,
   displayFields,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Responsive video embed (ported from the "Video Guide" section of the
@@ -72,11 +73,7 @@ export const VideoEmbed: Block = {
         description: 'Describes the video for screen readers (iframe title). Falls back to the heading.',
       },
     },
-    {
-      name: 'caption',
-      type: 'text',
-      admin: { description: 'Optional caption shown beneath the video.' },
-    },
+    inlineRichTextField('caption', { admin: { description: 'Optional caption shown beneath the video.' } }),
     backgroundField,
     anchorIdField,
     cssClassField,

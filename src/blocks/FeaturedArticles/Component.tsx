@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import { mediaSrc } from '@/utilities/mediaSrc'
 import type { Post, Category, Stream } from '@/payload-types'
 
@@ -160,7 +161,7 @@ export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
       id={anchorId || `block-${id}`}
       className={cn('ni-featured', toClassName(cssClass))}
     >
-      {eyebrow ? <div className="ni-featured-label">{eyebrow}</div> : null}
+      <InlineRichText as="div" className="ni-featured-label" data={eyebrow} />
       {/* An empty carousel is not a preview of anything — the arrows would draw
           and do nothing, and there are no dots to draw. With the box unticked
           and no featured posts, the band and its label are what an editor sees. */}

@@ -4,6 +4,8 @@ import {
   backgroundField,
   cssClassField,
   sectionHeaderFields,
+  inlineRichTextField,
+  richTextDefault,
 } from '@/fields/blockFields'
 
 // The interactive Specialist Panel directory: a searchable, filterable listing of
@@ -84,8 +86,8 @@ export const SpecialistDirectory: Block = {
         {
           type: 'row',
           fields: [
-            { name: 'emptyHeading', type: 'text', defaultValue: 'No specialists found', admin: { width: '50%' } },
-            { name: 'emptyBody', type: 'text', defaultValue: 'Try adjusting your filters.', admin: { width: '50%' } },
+            inlineRichTextField('emptyHeading', { defaultValue: richTextDefault('No specialists found'), admin: { width: '50%' } }),
+            inlineRichTextField('emptyBody', { defaultValue: richTextDefault('Try adjusting your filters.'), admin: { width: '50%' } }),
           ],
         },
         {

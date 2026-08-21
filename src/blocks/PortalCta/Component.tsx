@@ -53,7 +53,7 @@ export const PortalCtaBlock: React.FC<Props & { bare?: boolean }> = ({
                   <Icon name={tile.icon} className="portal-opt4-tile-icon" />
                 ) : null}
                 {tile.label ? (
-                  <div className="portal-opt4-tile-label">{tile.label}</div>
+                  <InlineRichText as="div" className="portal-opt4-tile-label" data={tile.label} />
                 ) : null}
               </div>
             ))}

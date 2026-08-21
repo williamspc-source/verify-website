@@ -8,6 +8,7 @@ import {
   gridDisplayFields,
   iconField,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 export const GatewayCards: Block = {
@@ -41,12 +42,12 @@ export const GatewayCards: Block = {
         {
           type: 'row',
           fields: [
-            { name: 'eyebrow', type: 'text', admin: { width: '50%', description: 'Small label above the title.' } },
-            { name: 'subtitle', type: 'text', admin: { width: '50%', description: 'Secondary line under the title (e.g. audience).' } },
+            inlineRichTextField('eyebrow', { admin: { width: '50%', description: 'Small label above the title.' } }),
+            inlineRichTextField('subtitle', { admin: { width: '50%', description: 'Secondary line under the title (e.g. audience).' } }),
           ],
         },
-        { name: 'title', type: 'text', required: true },
-        { name: 'description', type: 'textarea' },
+        inlineRichTextField('title', { required: true }),
+        inlineRichTextField('description'),
         {
           type: 'row',
           fields: [

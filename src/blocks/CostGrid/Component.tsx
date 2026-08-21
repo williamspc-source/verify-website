@@ -52,8 +52,8 @@ export const CostGridBlock: React.FC<Props & { bare?: boolean }> = ({
                   <Icon name={card.icon} />
                 </div>
               ) : null}
-              {card.title ? <h3>{card.title}</h3> : null}
-              {card.description ? <p>{card.description}</p> : null}
+              <InlineRichText as="h3" data={card.title} />
+              <InlineRichText as="p" data={card.description} />
             </article>
           ))}
         </div>

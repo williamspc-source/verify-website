@@ -1,4 +1,5 @@
 'use client'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useEffect, useRef, useState } from 'react'
 
 import type { StatsBandBlock as Props } from '@/payload-types'
@@ -83,11 +84,11 @@ export const StatsBandBlock: React.FC<Props & { bare?: boolean }> = ({
         {stats.map((stat, i) => (
           <div key={i} className={cn('vf-stat vf-card vf-stats-band__stat', toClassName(elementClasses?.card))}>
             <div className="vf-stat-num vf-stats-band__number">
-              {stat.prefix}
+              <InlineRichText data={stat.prefix} />
               <CountUp value={stat.value} play={play} />
-              {stat.suffix}
+              <InlineRichText data={stat.suffix} />
             </div>
-            <div className="vf-stat-label vf-stats-band__label">{stat.label}</div>
+            <InlineRichText as="div" className="vf-stat-label vf-stats-band__label" data={stat.label} />
           </div>
         ))}
       </div>

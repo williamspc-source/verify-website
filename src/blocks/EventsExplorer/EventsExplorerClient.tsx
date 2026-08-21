@@ -280,22 +280,28 @@ const EventCard: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, ct
 const SectionHeader: React.FC<{
   eyebrow?: RichTextValue
   heading?: RichTextValue
-  intro?: string
-  linkLabel?: string
+  intro?: RichTextValue
+  linkLabel?: RichTextValue
   linkUrl?: string
 }> = ({ eyebrow, heading, intro, linkLabel, linkUrl }) => {
   // `hasRichText`, not truthiness: an empty rich-text value is a truthy object.
-  if (!hasRichText(eyebrow) && !hasRichText(heading) && !intro && !linkLabel) return null
+  if (
+    !hasRichText(eyebrow) &&
+    !hasRichText(heading) &&
+    !hasRichText(intro) &&
+    !hasRichText(linkLabel)
+  )
+    return null
   return (
     <div className="events-section-header">
       <div>
         <InlineRichText as="div" className="section-label" data={eyebrow} />
         <InlineRichText as="h2" data={heading} />
-        {intro ? <p>{intro}</p> : null}
+        <InlineRichText as="p" data={intro} />
       </div>
-      {linkLabel && linkUrl ? (
+      {hasRichText(linkLabel) && linkUrl ? (
         <a className="events-view-link" href={linkUrl}>
-          {linkLabel}
+          <InlineRichText data={linkLabel} />
         </a>
       ) : null}
     </div>

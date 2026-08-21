@@ -1,3 +1,5 @@
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import configPromise from '@payload-config'
 import Link from 'next/link'
 import { getPayload } from 'payload'
@@ -12,16 +14,32 @@ import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 
-type TileData = { id: string; icon?: string | null; label: string; href?: string | null; className?: string }
+type TileData = {
+  id: string
+  icon?: string | null
+  label: RichTextValue
+  href?: string | null
+  className?: string
+}
 
-const Tile: React.FC<TileData & { ctaLabel?: string | null }> = ({ icon, label, href, className, ctaLabel }) => {
+const Tile: React.FC<TileData & { ctaLabel?: RichTextValue }> = ({
+  icon,
+  label,
+  href,
+  className,
+  ctaLabel,
+}) => {
   const inner = (
     <>
       <div className="specialty-card-icon vf-card__icon">
         <Icon name={icon} className="size-6" />
       </div>
-      <span className="specialty-card-name vf-card__title">{label}</span>
-      {href ? <span className="specialty-card-link">{ctaLabel || 'View experts →'}</span> : null}
+      <InlineRichText as="span" className="specialty-card-name vf-card__title" data={label} />
+      {href ? (
+        <span className="specialty-card-link">
+          {hasRichText(ctaLabel) ? <InlineRichText data={ctaLabel} /> : 'View experts →'}
+        </span>
+      ) : null}
     </>
   )
   return href ? (
@@ -58,7 +76,7 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
 
   // Newer config field — read defensively so a not-yet-regenerated
   // `payload-types` doesn't fail typecheck.
-  const { ctaLabel } = props as Props & { ctaLabel?: string | null }
+  const { ctaLabel } = props as Props & { ctaLabel?: RichTextValue }
 
   let tiles: TileData[] = []
   if (source === 'manual') {
@@ -132,7 +150,7 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
                   <polyline points="12 5 19 12 12 19" />
                 </svg>
               </span>
-              <span className="claim-name">{t.label}</span>
+              <InlineRichText as="span" className="claim-name" data={t.label} />
             </li>
           ))}
         </ul>

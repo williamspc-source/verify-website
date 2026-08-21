@@ -11,6 +11,8 @@ import {
   iconField,
   sectionHeaderFields,
   richBodyField,
+  inlineRichTextField,
+  richTextDefault,
 } from '@/fields/blockFields'
 
 // Founder / leadership spotlight — a two-column band pairing a portrait (with a
@@ -43,34 +45,19 @@ export const LeadershipSpotlight: Block = {
     {
       type: 'row',
       fields: [
-        {
-          name: 'name',
-          type: 'text',
-          defaultValue: 'Wes Lerch',
-          admin: { width: '50%', description: 'Name shown on the floating badge.' },
-        },
-        {
-          name: 'role',
-          type: 'text',
-          defaultValue: 'Founder & Managing Director',
-          admin: { width: '50%', description: 'Role line beneath the name on the badge.' },
-        },
+        inlineRichTextField('name', { defaultValue: richTextDefault('Wes Lerch'),
+          admin: { width: '50%', description: 'Name shown on the floating badge.' } }),
+        inlineRichTextField('role', { defaultValue: richTextDefault('Founder & Managing Director'),
+          admin: { width: '50%', description: 'Role line beneath the name on the badge.' } }),
       ],
     },
-    {
-      name: 'badge',
-      type: 'text',
-      admin: {
+    inlineRichTextField('badge', { admin: {
         description: 'Optional small kicker above the name on the floating badge, e.g. "Founder".',
-      },
-    },
-    {
-      name: 'tagline',
-      type: 'text',
-      defaultValue:
-        '"I built VERIFY because I knew what the industry needed — and I knew it wasn\'t being delivered."',
+      } }),
+    inlineRichTextField('tagline', {
+      defaultValue: richTextDefault('"I built VERIFY because I knew what the industry needed — and I knew it wasn\'t being delivered."'),
       admin: { description: 'Short italic pull-quote shown above the body copy.' },
-    },
+    }),
     richBodyField('body'),
     {
       name: 'credentials',

@@ -5,6 +5,7 @@ import {
   cssClassField,
   displayFields,
   sectionHeaderFields,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Embeds a map (or any iframe embed, incl. a YouTube video) with optional action
@@ -67,34 +68,22 @@ export const MapEmbed: Block = {
       label: 'Show office info panel (address/hours/transport/parking)',
       admin: { condition: (_, s) => s?.kind === 'map' },
     },
-    {
-      name: 'officeHoursHeading',
-      type: 'text',
-      label: 'Office hours heading',
+    inlineRichTextField('officeHoursHeading', { label: 'Office hours heading',
       admin: {
         condition: (_, s) => s?.kind === 'map',
         description: 'Info-panel heading above the office hours. Defaults to "Office Hours".',
-      },
-    },
-    {
-      name: 'transportHeading',
-      type: 'text',
-      label: 'Public transport heading',
+      } }),
+    inlineRichTextField('transportHeading', { label: 'Public transport heading',
       admin: {
         condition: (_, s) => s?.kind === 'map',
         description:
           'Info-panel heading above the transport list. Defaults to "Recommended Public Transport".',
-      },
-    },
-    {
-      name: 'parkingHeading',
-      type: 'text',
-      label: 'Car parks heading',
+      } }),
+    inlineRichTextField('parkingHeading', { label: 'Car parks heading',
       admin: {
         condition: (_, s) => s?.kind === 'map',
         description: 'Info-panel heading above the parking list. Defaults to "Nearby Car Parks".',
-      },
-    },
+      } }),
     // Appearance is deliberately offered: the generic map variant renders these
     // as btn / btn-outline and honours the choice. The contact variant renders
     // them as `.ct-map-action`, a single treatment, and ignores it — noted in

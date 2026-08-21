@@ -1,3 +1,4 @@
+import { type RichTextValue } from '@/utilities/lexicalText'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -32,8 +33,8 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
   // Newer config fields — read defensively so a not-yet-regenerated
   // `payload-types` doesn't fail typecheck.
   const { allTabLabel, emptyLabel } = props as Props & {
-    allTabLabel?: string | null
-    emptyLabel?: string | null
+    allTabLabel?: RichTextValue
+    emptyLabel?: RichTextValue
   }
 
   const payload = await getPayload({ config: configPromise })
