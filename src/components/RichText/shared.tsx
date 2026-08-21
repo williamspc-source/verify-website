@@ -14,6 +14,7 @@ import type {
 } from '@/payload-types'
 import type { CodeBlockProps } from '@/blocks/Code/Component'
 import { accentText } from '@/utilities/accentText'
+import { colorClass } from '@/fields/richTextColors'
 import { referencePath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 
 /**
@@ -68,6 +69,26 @@ export const TEXT_FORMAT = {
   SUPERSCRIPT: 64,
 } as const
 
+/**
+ * The colour an editor picked from the toolbar, if any.
+ *
+ * `TextStateFeature` stores it as Lexical NodeState, which serialises under `$`
+ * (`NODE_STATE_KEY` in lexical 0.41) — `{ type: 'text', text: '…', $: { color:
+ * 'brand' } }`. The serialised node types do not describe that key, hence the
+ * cast; the shape is validated by `colorClass`, which returns `undefined` for
+ * anything that is not a live palette key, so a hand-edited or retired value
+ * degrades to uncoloured text rather than to a class nothing paints.
+ *
+ * ── This function is the reason the control works at all ────────────────────
+ * Payload's bundled `TextJSXConverter` reads `node.format` and nothing else —
+ * there is no reference to node state anywhere in its converters. Enabling the
+ * toolbar feature without this branch would give an editor a swatch that colours
+ * the text in the admin, saves cleanly, and renders no colour on the page: the
+ * exact "looks editable, silently does nothing" failure the feature was added to
+ * fix. Guarded by `tests/int/inlineRichText.int.spec.tsx`.
+ */
+const nodeColorClass = (node: unknown): string | undefined =>
+  colorClass((node as { $?: { color?: unknown } })?.$?.color as string | undefined)
 
 /**
  * Honour the VERIFY [[accent]] convention inside rich text, and reproduce the
@@ -86,6 +107,13 @@ export const textConverter: JSXConverters<NodeTypes> = {
     if (format & TEXT_FORMAT.CODE) content = <code>{content}</code>
     if (format & TEXT_FORMAT.SUBSCRIPT) content = <sub>{content}</sub>
     if (format & TEXT_FORMAT.SUPERSCRIPT) content = <sup>{content}</sup>
+
+    // Outermost, and after the format wrappers, so `.vf-tc-* .vf-accent` still
+    // matches a [[bracketed]] phrase inside a coloured run — `vf-tc--inline` is
+    // what then lets the editor's explicit pick win over that accent default.
+    const colour = nodeColorClass(node)
+    if (colour) content = <span className={`${colour} vf-tc--inline`}>{content}</span>
+
     return content
   },
 }

@@ -3229,6 +3229,77 @@ become common.
 
 ### Deferred, with the cost measured
 
-Per-word colour (`OUTSTANDING.md` §20), Enter-as-line-break in the editor (§21),
-and the ~7s Payload boot that silently skipped two specs (§22).
+Per-word colour (`OUTSTANDING.md` §20 — **built in Comparison 50**, so that entry
+now records the API risk instead), Enter-as-line-break in the editor (§21), and
+the ~7s Payload boot that silently skipped two specs (§22).
+
+---
+
+## Comparison 50: the colour control made real, and put where an editor looks (2026-08-21)
+
+Not a design pass. Comparison 49 reported a brand-palette **Text colour** control
+on 26 blocks. The editor opened a GatewayCards card, found no colour anywhere in
+the toolbar, and added: *"besides the colour dropdown didn't seem to actually
+change the text colour!"* Both halves were true.
+
+### What was actually wrong
+
+**The dropdown was a dead control on all 26 blocks.** `textColour` was declared in
+`sectionHeaderFields`, rendered in the admin, and written to Postgres.
+`SectionHeader` accepts a `colour` prop and applies it correctly. **No block
+passed it.** A grep for `colour=` across `src/blocks`, `src/heros` and
+`src/components` returned exactly one file — `SectionHeader` itself, declaring
+the prop. Every one of the guards added in Comparison 49 was green throughout.
+
+**And the guard could not have caught it.** `declaredFieldNames` in
+`adminControls.int.spec.ts` reads each block's own `config.ts`; every field
+arriving through `...sectionHeaderFields` is declared in `blockFields.ts`, so for
+26 blocks the guard was checking a set that contained neither the heading, the
+eyebrow, the subheading nor the colour. It resolves shared bundles now, derived
+from the module so it cannot drift. Turning that on immediately found a **second**
+dead control in the same shape — `SpecialistDirectory.subheading`, whose own
+component comment reads *"there is no subheading"* — now hidden with
+`admin.condition: () => false` rather than dropped, because dropping a field drops
+a column and stops the dev push on the invisible prompt.
+
+### What was added
+
+A colour swatch in the toolbar of **every** rich-text box, beside **B** / *I* / U.
+`TextStateFeature` registered once on `defaultLexical`, which all ten field-level
+editors inherit through `rootFeatures`, built from the same `BRAND_TEXT_COLORS`
+array that feeds the dropdown and the CSS. **No schema change**: the colour is a
+key on the text node (`{"$":{"color":"brand"}}`), inside the existing `jsonb`.
+
+Its rendering half is ours and had to be — Payload's bundled `TextJSXConverter`
+reads `node.format` and ignores node state entirely, so registering the feature
+alone would have produced a swatch that colours the admin and paints nothing on
+the page. That is the same defect being fixed, newly minted.
+
+### Which control wins over `[[brackets]]`
+
+Both, differently, and deliberately. The block dropdown sets a line's *default*, so
+a bracketed phrase inside it keeps the brand accent — unchanged. A toolbar pick is
+an editor selecting exact words and asking for a colour, so it wins: the converter
+marks it `.vf-tc--inline`, and one rule in `globals.css` lets it through.
+
+### Measured
+
+`.vf-tc-brand` computes `rgb(28, 117, 188)` against a `rgb(65, 64, 66)` control on
+the same page; an inline `muted` run reads `rgb(147, 171, 191)` and a bracketed
+phrase given `bright` reads `rgb(45, 143, 232)` while an untouched accent elsewhere
+stays `rgb(28, 117, 188)`. `computedSnapshot` is **empty at 8385 nodes**, unchanged
+from before the pass — the controls move nothing until someone uses one. All 13
+reference families still zero; `prove-guards.sh` 11/11.
+
+### The `!important` justification was wrong, and its guard could not fail
+
+The comment above the `.vf-tc-*` rules named `.vf-client-overview .vf-split__title`
+as the page-scoped rule the flag exists to beat. That selector declares
+`margin-bottom`, `font-size` and `font-weight` and **no colour** — so the e2e
+written against it passed with the `!important` deleted. Dark-band headings are
+the same trap for a different reason: the on-dark re-point carries its own flag.
+The real competitors were found by parsing the served stylesheet for rules setting
+`color` on a header class at two classes or more:
+`.why-verify--light .why-header .section-title` goes brand blue with the flag and
+stays `rgb(65, 64, 66)` without it. The comment and the guard both name it now.
 

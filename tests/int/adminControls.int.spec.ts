@@ -35,6 +35,8 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
+import * as blockFields from '@/fields/blockFields'
+
 const SRC = join(process.cwd(), 'src')
 const BLOCKS = join(SRC, 'blocks')
 const GLOBALS_CSS = readFileSync(join(SRC, 'app/(frontend)/globals.css'), 'utf8')
@@ -70,8 +72,58 @@ const FIELD_NAME_PATTERNS = [
   /\b(?:inlineRichTextField|richBodyField|spacingField|presetClassField|textColorField)\(\s*'([a-zA-Z][\w]*)'/g,
 ]
 
-const declaredFieldNames = (source: string): string[] =>
-  FIELD_NAME_PATTERNS.flatMap((re) => [...source.matchAll(re)].map((m) => m[1]!))
+/**
+ * Every field name a shared bundle contributes, read from the bundle itself.
+ *
+ * ── The hole this closes, measured ──────────────────────────────────────────
+ * The patterns above scan a block's own `config.ts`. A block that writes
+ * `...sectionHeaderFields` declares four fields whose names appear nowhere in
+ * that file — they live in `src/fields/blockFields.ts` — so for all **26**
+ * blocks using it, this guard was checking a set that did not include its
+ * heading, its eyebrow, its subheading or its text colour.
+ *
+ * That is not hypothetical. `textColour` was declared, shown in the admin, saved
+ * to Postgres, and read by **nothing**: `SectionHeader` takes a `colour` prop and
+ * not one of the 26 components passed it. An editor could pick a colour on any
+ * section heading on the site and watch nothing happen — the exact failure this
+ * file exists to prevent — while every test here stayed green.
+ *
+ * Third instance of the same family. CLAUDE.md already records two: a field
+ * whose name is common across configs (`icon`, `title`) can never be reported,
+ * and one name serving two purposes in one component hides both. This one is
+ * different in that the guard was not fooled by a coincidental match — it simply
+ * never knew the field existed.
+ *
+ * Derived from the module rather than a hand-written table, so adding a field to
+ * a bundle enrols it here with no second edit. Note the match is
+ * `source.includes(name)`, which is deliberately loose: it also fires on
+ * `sectionHeaderFieldsWithDefaults(…)` and on the local `const whyHeaderFields =`
+ * aliases in CostGrid, MissionPillars and WhyVerify, all of which really do
+ * contribute those fields. A stray mention in a comment would add a name to the
+ * *declared* set, which makes this stricter rather than laxer — the safe
+ * direction for a guard.
+ */
+const namesIn = (fields: unknown[]): string[] =>
+  fields.flatMap((entry) => {
+    const field = entry as { name?: string; fields?: unknown[] }
+    if (typeof field?.name === 'string') return [field.name]
+    // A `row` or `collapsible` holds its children at the same level as itself —
+    // `spacingFields` is one row wrapping paddingTop/paddingBottom, so skipping
+    // this would silently contribute nothing.
+    return Array.isArray(field?.fields) ? namesIn(field.fields) : []
+  })
+
+const HELPER_BUNDLES: [string, string[]][] = Object.entries(blockFields)
+  .filter(([, value]) => Array.isArray(value))
+  .map(([name, value]) => [name, namesIn(value as unknown[])] as [string, string[]])
+  // Option lists (`BACKGROUND_OPTIONS`, …) are arrays too, and contribute no
+  // names — dropped so they cannot match a config by accident.
+  .filter(([, names]) => names.length > 0)
+
+const declaredFieldNames = (source: string): string[] => [
+  ...FIELD_NAME_PATTERNS.flatMap((re) => [...source.matchAll(re)].map((m) => m[1]!)),
+  ...HELPER_BUNDLES.filter(([name]) => source.includes(name)).flatMap(([, names]) => names),
+]
 
 const blockDirs = readdirSync(BLOCKS, { withFileTypes: true })
   .filter((d) => d.isDirectory() && existsSync(join(BLOCKS, d.name, 'config.ts')))
@@ -144,6 +196,14 @@ const ALLOWED_UNREAD: Record<string, Record<string, string>> = {
     cssClass: 'applied via toClassName()',
     blockName: 'Payload built-in admin label',
   },
+  // Per-block entries. This one was found by the bundle fix above, not by a
+  // person: the block's own comment says "there is no subheading", and the field
+  // arrived anyway because it is spread in with the header bundle. It is now
+  // hidden with `admin.condition: () => false` in that block's config, which is
+  // the other half of the invariant — read it, or do not offer it.
+  SpecialistDirectory: {
+    subheading: 'hidden by admin.condition — the filter panel has no subheading',
+  },
 }
 
 describe('admin controls are wired', () => {
@@ -159,7 +219,7 @@ describe('admin controls are wired', () => {
     if (!src.trim()) return // config-only block (e.g. re-exported elsewhere)
 
     const declared = declaredFieldNames(config)
-    const allowed = ALLOWED_UNREAD['*']
+    const allowed = { ...ALLOWED_UNREAD['*'], ...(ALLOWED_UNREAD[name] ?? {}) }
 
     const unread = [...new Set(declared)].filter(
       (field) => !allowed[field] && !readsField(src, field),
@@ -290,8 +350,7 @@ describe('admin controls are wired', () => {
     const DOCUMENTED_INERT: Record<string, string> = {
       Callout:
         'linkGroup description: "Callout links all render in the same style, so a link’s Appearance … makes no difference here."',
-      MapEmbed:
-        'linkGroup description explains Appearance applies on the standard map layout only',
+      MapEmbed: 'linkGroup description explains Appearance applies on the standard map layout only',
     }
 
     const SPREAD_APPEARANCE = /\{\.\.\.[A-Za-z_.?[\]0-9]+\}\s*(?:\n\s*)?appearance=/
@@ -377,7 +436,9 @@ describe('admin controls are wired', () => {
           i++
         }
         // depth > 0 means an unbalanced call — report it rather than skip it.
-        out.push(depth === 0 ? text.slice(m.index, i) : `UNBALANCED:${text.slice(m.index, m.index + 80)}`)
+        out.push(
+          depth === 0 ? text.slice(m.index, i) : `UNBALANCED:${text.slice(m.index, m.index + 80)}`,
+        )
       }
       return out
     }
@@ -514,8 +575,13 @@ describe('every image is uploadable from the admin', () => {
 
     // Guard the guard: if the prop names are ever renamed this finds nothing and
     // silently passes, which is the failure mode the whole file exists to avoid.
-    const covered = blockDirs.filter((n) => /placeholderLabel|placeholderIcon/.test(blockSources(n)))
-    expect(covered.length, 'no block matched — has the placeholder prop been renamed?').toBeGreaterThanOrEqual(4)
+    const covered = blockDirs.filter((n) =>
+      /placeholderLabel|placeholderIcon/.test(blockSources(n)),
+    )
+    expect(
+      covered.length,
+      'no block matched — has the placeholder prop been renamed?',
+    ).toBeGreaterThanOrEqual(4)
 
     expect(offenders, 'a placeholder with no upload cannot be replaced by an editor').toEqual([])
   })
@@ -538,9 +604,11 @@ describe('cache purges actually purge', () => {
     // 2. Nothing else may import next/cache's revalidateTag and re-introduce it.
     const directImporters = walkFiles(SRC)
       .filter((f) => /\.tsx?$/.test(f) && f !== wrapperPath)
-      .filter((f) => /import\s*\{[^}]*\brevalidateTag\b[^}]*\}\s*from\s*'next\/cache'/.test(
-        readFileSync(f, 'utf8'),
-      ))
+      .filter((f) =>
+        /import\s*\{[^}]*\brevalidateTag\b[^}]*\}\s*from\s*'next\/cache'/.test(
+          readFileSync(f, 'utf8'),
+        ),
+      )
       .map(rel)
     expect(directImporters, 'must go through safeRevalidateTag').toEqual([])
 
@@ -614,9 +682,19 @@ describe('documented style hooks exist', () => {
 // ---------------------------------------------------------------------------
 
 const GLOBAL_CONFIGS = [
-  'Header', 'Footer', 'SiteSettings', 'ArticleSettings', 'EventsSettings',
-  'TeamSettings', 'SpecialistProfile', 'SpecialistAvailability', 'DesignSystem', 'Styles',
-].map((d) => join(SRC, d, 'config.ts')).filter((f) => existsSync(f))
+  'Header',
+  'Footer',
+  'SiteSettings',
+  'ArticleSettings',
+  'EventsSettings',
+  'TeamSettings',
+  'SpecialistProfile',
+  'SpecialistAvailability',
+  'DesignSystem',
+  'Styles',
+]
+  .map((d) => join(SRC, d, 'config.ts'))
+  .filter((f) => existsSync(f))
 
 const collectionConfigs = (): string[] => {
   const dir = join(SRC, 'collections')
@@ -647,8 +725,17 @@ const collectionConfigs = (): string[] => {
 const CONFIG_FILE_PATHS = new Set<string>()
 
 const CONSUMER_FILES: { path: string; text: string }[] = [
-  'app', 'components', 'blocks', 'heros', 'utilities', 'search',
-  'Footer', 'Header', 'plugins', 'collections', 'hooks',
+  'app',
+  'components',
+  'blocks',
+  'heros',
+  'utilities',
+  'search',
+  'Footer',
+  'Header',
+  'plugins',
+  'collections',
+  'hooks',
 ]
   .flatMap((d) => walkFiles(join(SRC, d)))
   .filter((f) => !f.endsWith('payload-types.ts'))
@@ -716,12 +803,14 @@ const ALLOWED_UNREAD_CONFIG: Record<string, string> = {
   // what renders today; these are captured for future use and are NOT offered
   // as if they changed the page.
   locationRef: 'Events: structured location; the rendered value is the `location` text field',
-  relatedSpecialist: 'Posts: captured for spotlight attribution; the byline renders from `author.source`',
+  relatedSpecialist:
+    'Posts: captured for spotlight attribution; the byline renders from `author.source`',
 
   // Admin-only ordering and grouping. These drive the admin list view, not the
   // public site, and their descriptions now say so.
   order: 'admin list ordering (Streams/Offices/Locations); public order is authored per-block',
-  region: 'Locations admin grouping; the directory filter derives from specialist-denormalised titles',
+  region:
+    'Locations admin grouping; the directory filter derives from specialist-denormalised titles',
 
   // Deprecated, hidden from the admin, column retained pending a drop migration.
   availabilityHighlight: 'deprecated, admin.hidden — superseded by `advertise`',

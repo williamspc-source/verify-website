@@ -39,7 +39,7 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 16 | Two self-sectioning blocks are missing from `selfSpaced` | Yes | A stray 64px above and below Events Explorer and Featured Articles | ~5 min + re-baseline | Next spacing pass — it moves pages, so measure |
 | 17 | An article is bylined to someone who is not on the team | Yes | A byline that does not link, where the others do | ~5 min + a reseed | Needs a content decision first |
 | 18 | The reference-diff exceptions rest on measurements older than the stylesheet | No | None — but the tool's exceptions cannot be trusted until re-taken | ~45 min | Before the next port that leans on them |
-| 20 | Per-word text colour is not offered, only per-element | By design | None — [[brackets]] cover the common case | ~10 lines + importmap | Only if someone asks |
+| 20 | The toolbar colour swatch rides an `@experimental` Payload API | Live and working | None today; a Payload upgrade could remove the control, never the content | ~20 lines to rebuild or drop back | Re-check on every Payload upgrade |
 | 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~40 lines **+ two pinned Lexical deps** | Only with the pin guarded |
 | 22 | Payload boots in ~7s, and two specs were silently skipped for it | Dev/test only | A suite can report green while checking nothing | Unknown | Watch the admin, not the boot |
 | 19 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min for an unlisted style-guide page | A decision — doing nothing is defensible |
@@ -576,27 +576,35 @@ oversight to correct. Doing nothing is defensible: these are the five simplest b
 
 ---
 
-## 20. Per-word text colour is not offered, only per-element
+## 20. The toolbar colour swatch rides an `@experimental` Payload API
 
-Editors colour a *line* — a heading, a subheading, a card's copy — through the
-block's **Text colour** control. They cannot colour one word mid-sentence from
-the toolbar.
+This entry used to say per-word colour was *not offered*, on the reasoning that
+it had not been asked for. It was asked for — the first thing the editor said on
+opening a card was "I can't change text colour though" — so it is built, and what
+remains is the risk it carries.
 
-**Live today?** By design, and it is what was asked for: "they don't need to
-change text colour mid paragraph". Recorded because the capability exists and
-someone will eventually ask.
+The swatch is `TextStateFeature`, which Payload 3.85 marks **`@experimental`:
+"There may be breaking changes to this API"**. It is registered once, in
+`src/fields/richTextColorFeature.ts`.
 
-**User impact:** none reported. `[[bracketed]]` text already covers the common
-case — a highlighted phrase in a heading, in the brand accent.
+**Live today?** Yes, and working. Not a defect — a dependency to keep an eye on.
 
-**Cost of adding it:** small but not free. Payload 3.85 ships `TextStateFeature`,
-which puts a colour dropdown in the rich-text toolbar and stores only a key, so
-~3 lines to register it with the brand palette, ~5 lines in the `text` converter
-in `src/components/RichText/shared.tsx` to render the key as a class, and a
-re-run of `generate:importmap`. The reasons it was not done: it is marked
-`@experimental` in that version, and it would give an editor two ways to colour
-one phrase — the bracket and the picker — fighting over the same run, with the
-bracket winning and no way to tell why.
+**User impact if it breaks:** on a Payload upgrade the toolbar could lose the
+swatch, or the feature could refuse to construct and take the admin with it.
+Neither can damage stored content: what is written to the document is the bare
+palette key (`{"$":{"color":"brand"}}`), never CSS. Content coloured today keeps
+rendering even if the editor half disappears entirely, because the *reading* half
+is ours — `nodeColorClass` in `src/components/RichText/shared.tsx` — and depends
+on nothing but the shape of the JSON.
+
+**Cost of containing it:** the exposure is two files and roughly twenty lines. If
+the API moves, the swatch can be rebuilt against whatever replaces it, or dropped
+back to the block-level **Text colour** dropdown, which uses no experimental API
+at all. **What to actually do:** re-read
+`node_modules/@payloadcms/richtext-lexical/dist/features/textState/feature.server.d.ts`
+after any Payload upgrade, and run `tests/int/richTextColors.int.spec.ts`, which
+constructs the feature and reads its props back — so an API change fails a test
+rather than a page.
 
 ---
 

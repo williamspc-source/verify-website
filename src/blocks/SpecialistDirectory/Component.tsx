@@ -33,6 +33,7 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
   const {
     eyebrow,
     heading,
+    textColour,
     background,
     enableSearch,
     enableSpecialty,
@@ -115,6 +116,7 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
       <DirectoryClient
         kicker={eyebrow ?? 'Find a specialist'}
         heading={heading ?? 'Search the directory'}
+        textColour={textColour}
         specialists={specialists}
         enableSearch={enableSearch ?? true}
         enableSpecialty={enableSpecialty ?? true}

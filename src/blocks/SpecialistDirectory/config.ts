@@ -1,4 +1,4 @@
-import type { Block } from 'payload'
+import type { Block, Field } from 'payload'
 
 import {
   backgroundField,
@@ -7,6 +7,18 @@ import {
   inlineRichTextField,
   richTextDefault,
 } from '@/fields/blockFields'
+
+// This block renders its eyebrow and heading inside the filter panel (see
+// Component.tsx) and the reference design has no subheading there — nothing
+// reads it, so offering the box would be a control that silently does nothing.
+// Hidden rather than removed: dropping the field drops a column, and a
+// destructive change stops the dev push on the invisible "Accept warnings?"
+// prompt. The stored value is preserved and simply not shown.
+const directoryHeaderFields: Field[] = sectionHeaderFields.map((field) =>
+  'name' in field && field.name === 'subheading'
+    ? ({ ...field, admin: { ...field.admin, condition: () => false } } as Field)
+    : field,
+)
 
 // The interactive Specialist Panel directory: a searchable, filterable listing of
 // the Specialists collection (by specialty / location / accreditation) with a live
@@ -17,7 +29,7 @@ export const SpecialistDirectory: Block = {
   interfaceName: 'SpecialistDirectoryBlock',
   labels: { singular: 'Specialist Directory', plural: 'Specialist Directories' },
   fields: [
-    ...sectionHeaderFields,
+    ...directoryHeaderFields,
     backgroundField,
     {
       type: 'collapsible',

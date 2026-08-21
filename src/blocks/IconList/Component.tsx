@@ -19,6 +19,7 @@ export const IconListBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   headingAlign,
   columns,
   items,
@@ -41,6 +42,7 @@ export const IconListBlock: React.FC<Props & { bare?: boolean }> = ({
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align={headingAlign === 'left' ? 'left' : 'center'}
       />
 

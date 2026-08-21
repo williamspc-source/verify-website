@@ -27,7 +27,7 @@ const relTitles = (rels: unknown): string[] =>
     : []
 
 export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = async (props) => {
-  const { eyebrow, heading, subheading, background, showFilterBar, showRosters, showKeyAreas, cssClass, bare } =
+  const { eyebrow, heading, subheading, textColour, background, showFilterBar, showRosters, showKeyAreas, cssClass, bare } =
     props
 
   // Newer config fields — read defensively so a not-yet-regenerated
@@ -97,7 +97,7 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
       className={cn('vf-specialty-directory-block', toClassName(cssClass))}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
+      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" colour={textColour} />
       <SpecialtyClient
         categories={categories}
         entries={entries}

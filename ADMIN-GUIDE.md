@@ -428,11 +428,14 @@ Three things follow, and they are the ones worth knowing:
   CSS classes, colour values and a few labels that the page assembles with
   JavaScript stay plain, because formatting there could be typed and would never
   appear — a control that does nothing is worse than one that is absent.
-- **Colour is a block control, not a per-word one.** Blocks carry a **Text
-  colour** picker that colours the whole line from the brand palette. Two of the
-  choices, *Heading text* and *Body text*, flip automatically on a dark band, so
-  a card switched from light to dark stays readable on its own. `HOOKS.md` §6a is
-  the reference.
+- **Colour comes from the brand palette, from either of two controls.** A swatch
+  in the toolbar colours whatever is selected; a **Text colour** dropdown on the
+  block colours a whole heading and its subheading at once. Both store a palette
+  *key* rather than a colour, so **Site Settings → Brand colours** repaints every
+  coloured word on the site. Two of the choices, *Heading text* and *Body text*,
+  flip automatically on a dark band, so a card switched from light to dark stays
+  readable on its own. `HOOKS.md` §6a is the reference for which control to reach
+  for and what happens when one meets a `[[bracketed]]` phrase.
 - **Pasting from Word brings its formatting with it.** That has always been true;
   it is more visible now that the field keeps it. If a pasted line looks wrong,
   select it and clear the formatting rather than retyping around it.

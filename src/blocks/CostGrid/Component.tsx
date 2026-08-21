@@ -18,6 +18,7 @@ export const CostGridBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   cards,
   note,
   anchorId,
@@ -37,9 +38,9 @@ export const CostGridBlock: React.FC<Props & { bare?: boolean }> = ({
     >
       {hasHeader ? (
         <div className="cost-header">
-          <InlineRichText as="div" className="section-label" data={eyebrow} />
-          <InlineRichText as="h2" className="section-title" data={heading} />
-          <InlineRichText as="p" className="section-subtitle" data={subheading} />
+          <InlineRichText as="div" className="section-label" data={eyebrow} colour={textColour} />
+          <InlineRichText as="h2" className="section-title" data={heading} colour={textColour} />
+          <InlineRichText as="p" className="section-subtitle" data={subheading} colour={textColour} />
         </div>
       ) : null}
 

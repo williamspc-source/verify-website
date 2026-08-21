@@ -20,6 +20,12 @@ import { InlineRichText } from '@/components/RichText/Inline'
  *  · Delete `inlineParagraphConverter` → "a second paragraph becomes a line
  *    break" fails with `<p>` in the output. This is the one that would otherwise
  *    ship: it needs no code change to appear, only the converter being left out.
+ *  · Delete the `nodeColorClass` branch at the end of `textConverter`
+ *    (src/components/RichText/shared.tsx) → the two toolbar-colour cases below
+ *    fail. That branch is the entire rendering half of the toolbar swatch:
+ *    Payload's own text converter reads `node.format` and ignores node state, so
+ *    without it an editor picks a colour, sees it in the admin, saves it, and the
+ *    page shows nothing.
  */
 
 const state = (...paragraphs: string[]) =>
@@ -41,6 +47,44 @@ const state = (...paragraphs: string[]) =>
           { type: 'text', text, format: 0, detail: 0, mode: 'normal', style: '', version: 1 },
         ],
       })),
+    },
+  }) as never
+
+/**
+ * One paragraph whose single text node carries the NodeState that
+ * `TextStateFeature` writes — `$` is lexical's `NODE_STATE_KEY`, and this is the
+ * literal shape that comes back out of the `jsonb` column.
+ */
+const coloured = (text: string, colour?: string) =>
+  ({
+    root: {
+      type: 'root',
+      format: '',
+      indent: 0,
+      version: 1,
+      direction: 'ltr',
+      children: [
+        {
+          type: 'paragraph',
+          format: '',
+          indent: 0,
+          version: 1,
+          direction: 'ltr',
+          textFormat: 0,
+          children: [
+            {
+              type: 'text',
+              text,
+              format: 0,
+              detail: 0,
+              mode: 'normal',
+              style: '',
+              version: 1,
+              ...(colour ? { $: { color: colour } } : {}),
+            },
+          ],
+        },
+      ],
     },
   }) as never
 
@@ -66,7 +110,9 @@ describe('InlineRichText', () => {
   it('a second paragraph becomes a line break, not a second block', () => {
     // The two-line lockups depend on this: "Ensuring Accuracy," / "Empowering
     // Justice" is one heading on two lines, and was a textarea newline before.
-    const out = html(<InlineRichText as="h1" data={state('Ensuring Accuracy,', 'Empowering Justice')} />)
+    const out = html(
+      <InlineRichText as="h1" data={state('Ensuring Accuracy,', 'Empowering Justice')} />,
+    )
     expect(out).toContain('<br/>')
     expect(out).not.toContain('<p')
     expect(out.indexOf('Ensuring Accuracy,')).toBeLessThan(out.indexOf('Empowering Justice'))
@@ -111,8 +157,32 @@ describe('InlineRichText', () => {
 
   it('still wraps when there is something to hang on the element', () => {
     expect(html(<InlineRichText className="x" data={state('Read More')} />)).toContain('<span')
-    expect(html(<InlineRichText colour="brand" data={state('Read More')} />)).toContain('vf-tc-brand')
+    expect(html(<InlineRichText colour="brand" data={state('Read More')} />)).toContain(
+      'vf-tc-brand',
+    )
     expect(html(<InlineRichText as="p" data={state('Read More')} />)).toContain('<p')
+  })
+
+  it('paints a colour the editor picked from the toolbar', () => {
+    const out = html(<InlineRichText as="h2" data={coloured('Expert Panel', 'brand')} />)
+    expect(out).toContain('vf-tc-brand')
+    // The marker that lets a toolbar pick beat the [[bracket]] accent. Without
+    // it, colouring a bracketed phrase is a click that changes nothing.
+    expect(out).toContain('vf-tc--inline')
+  })
+
+  it('adds no span when no colour was picked', () => {
+    // The other half of the two-state rule: a guard that only checks the
+    // coloured case would pass on a converter that wrapped everything.
+    expect(html(<InlineRichText as="h2" data={coloured('Expert Panel')} />)).not.toContain('span')
+  })
+
+  it('ignores a colour key that is not in the palette', () => {
+    // Content coloured with a key that is later retired keeps rendering, just
+    // uncoloured. Emitting `vf-tc-galaxy` would leave a class nothing paints.
+    expect(
+      html(<InlineRichText as="h2" data={coloured('Expert Panel', 'galaxy')} />),
+    ).not.toContain('vf-tc-')
   })
 
   it('renders nothing for an empty field, in both shapes', () => {

@@ -3,16 +3,28 @@ import type { Field } from 'payload'
 /**
  * The colours an editor can paint text with, and the single place they are defined.
  *
- * ## Why this is a field rather than a toolbar button
+ * ## Two controls, one palette
  *
- * Payload 3.85 ships `TextStateFeature`, which would put a colour dropdown inside
- * the rich-text toolbar and let an editor colour one word mid-sentence. It is
- * deliberately not used. Colour here is a property of an *element* — this
- * heading, this card's body — not of a run of words, and there is already a
- * mechanism for the one-word case: `[[double brackets]]` paint a phrase in the
- * brand accent (see `accentText`). Adding a second, overlapping way to colour a
- * word would leave two controls fighting over the same text, with the bracket
- * winning, and no way for an editor to tell why.
+ * This array feeds both of them:
+ *
+ *  · the block-level **Text colour** select (`textColorField`, below), which sets
+ *    the colour of a whole heading, subheading or card line; and
+ *  · the **toolbar swatch** in every rich-text box, registered by
+ *    `./richTextColorFeature.ts`, which colours whatever the editor selected.
+ *
+ * Both emit `.vf-tc-<key>`, so `globals.css` paints them identically and
+ * `richTextColors.int.spec.ts` keeps all three in step.
+ *
+ * The toolbar half was originally left out on the reasoning that two ways to
+ * colour a phrase would fight — the bracket against the picker — with the bracket
+ * winning and no way for an editor to tell why. That was a real problem and it is
+ * now decided rather than avoided: the converter marks a toolbar pick
+ * `vf-tc--inline`, and `globals.css` lets it beat the `[[bracket]]` accent, while
+ * the block-level select still loses to it. A default yields to the bracket; a
+ * selection an editor made by hand does not.
+ *
+ * What was not reconsidered is where colours come from. Mid-paragraph colour is
+ * still drawn from this seven-entry brand palette and never from a colour wheel.
  *
  * ## Why keys and tokens rather than stored colour values
  *

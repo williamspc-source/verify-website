@@ -50,6 +50,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
     eyebrow,
     heading,
     subheading,
+    textColour,
     background,
     columns,
     numberStyle,
@@ -90,9 +91,9 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
       >
         {hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading) ? (
           <div className="process-header">
-            <InlineRichText as="div" className="section-label" data={eyebrow} />
-            <InlineRichText as="h2" className="section-title" data={heading} />
-            <InlineRichText as="p" className="section-subtitle" data={subheading} />
+            <InlineRichText as="div" className="section-label" data={eyebrow} colour={textColour} />
+            <InlineRichText as="h2" className="section-title" data={heading} colour={textColour} />
+            <InlineRichText as="p" className="section-subtitle" data={subheading} colour={textColour} />
           </div>
         ) : null}
         {rows.map((row, r) => (
@@ -136,9 +137,9 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
       >
         <div className="claimant-process-inner">
           <div className="claimant-process-left">
-            <InlineRichText as="div" className="section-label" data={eyebrow} />
-            <InlineRichText as="h2" className="section-title" data={heading} />
-            <InlineRichText as="p" data={subheading} />
+            <InlineRichText as="div" className="section-label" data={eyebrow} colour={textColour} />
+            <InlineRichText as="h2" className="section-title" data={heading} colour={textColour} />
+            <InlineRichText as="p" data={subheading} colour={textColour} />
             {/* An uploaded photo replaces the placeholder outright — caption and
                 glyph with it — which is what lets an editor leave the checkbox
                 ticked forever. Same precedence as SplitFeature's media column. */}
@@ -191,8 +192,8 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
         {hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading) || introRich ? (
           <div className="aamle-edu-intro">
             <div className="aamle-edu-intro-left">
-              <InlineRichText as="span" className="aamle-edu-intro-label" data={eyebrow} />
-              <InlineRichText as="h3" className="aamle-edu-intro-heading" data={heading} />
+              <InlineRichText as="span" className="aamle-edu-intro-label" data={eyebrow} colour={textColour} />
+              <InlineRichText as="h3" className="aamle-edu-intro-heading" data={heading} colour={textColour} />
             </div>
             {/* The rich intro wins when set; `subheading` stays as the fallback so
                 existing content keeps rendering and the plain field is still usable. */}
@@ -207,7 +208,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
               </div>
             ) : subheading ? (
               <div className="aamle-edu-intro-right">
-                <InlineRichText as="p" className="aamle-edu-intro-desc" data={subheading} />
+                <InlineRichText as="p" className="aamle-edu-intro-desc" data={subheading} colour={textColour} />
               </div>
             ) : null}
           </div>
@@ -268,6 +269,7 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align="center"
         titleClassName={toClassName(elementClasses?.heading)}
       />

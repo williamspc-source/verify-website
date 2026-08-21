@@ -16,6 +16,7 @@ export const WhyVerifyBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   items,
   image,
   placeholderLabel,
@@ -46,6 +47,7 @@ export const WhyVerifyBlock: React.FC<Props & { bare?: boolean }> = ({
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align="center"
       />
 

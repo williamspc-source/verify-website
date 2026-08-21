@@ -14,6 +14,7 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   background,
   columns,
   cards,
@@ -42,6 +43,7 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align="center"
         titleClassName={toClassName(elementClasses?.heading)}
       />

@@ -255,11 +255,20 @@ anchor id, a CSS class, a colour value, and a handful of labels that the page
 builds into a button or a filter with JavaScript. If a box has no toolbar, that
 is why.
 
-### Colouring a line
+### Colouring text
 
-Blocks have a **Text colour** control, usually beside the heading fields. It
-colours that whole piece of copy — the heading and its subheading, a card's text
-— from the brand palette:
+There are two ways, and they are for different jobs.
+
+**To colour some words** — a phrase, a line, or everything in one box — select
+them and use the **colour swatch in the toolbar**, next to **B** / *I* / U. It is
+in every box that has a toolbar. Pick **Default style** at the top of that menu to
+take a colour back off.
+
+**To colour a whole heading** — the heading and its subheading together, without
+selecting anything — use the block's **Text colour** dropdown, usually just below
+the heading fields.
+
+Both offer the same brand palette:
 
 | Choice | What it is |
 | --- | --- |
@@ -275,12 +284,25 @@ every coloured line on the site changes with it. That is the reason to pick from
 this list rather than to reach for CSS: a hex typed into a style sheet would be
 left behind.
 
+**One thing to know about White.** In the editor it is drawn with a faint dark
+outline so you can see it on the white background of the box. That outline is
+only in the admin — on the page the text is plain white.
+
 ### `[[Brackets]]` still work, and are not the same thing
 
 Wrapping a phrase in `[[double brackets]]` paints *that phrase* in the brand
-accent — a heading's highlighted words. **Text colour** paints the *whole line*.
-They compose: bracketed words keep the accent colour inside a coloured heading.
-Use brackets for a phrase, Text colour for a line.
+accent — a heading's highlighted words. It is the older way of doing it, and it
+still works everywhere.
+
+When two of these meet, the more specific instruction wins:
+
+| Situation | What you see |
+| --- | --- |
+| Brackets inside a heading you coloured with the **Text colour dropdown** | The bracketed words keep the brand accent. The dropdown sets the line's default, and the brackets are more specific than a default. |
+| Brackets you selected and coloured with the **toolbar swatch** | Your chosen colour wins. You highlighted those exact words and asked for a colour, so the brackets give way. |
+
+If you want a phrase in the accent blue, brackets are the quickest way. If you
+want it in any other colour, select it and use the swatch.
 
 ### Pressing Enter in a heading
 
@@ -292,8 +314,8 @@ not start a new heading or a new paragraph on the page.
 
 ## 7. Built-in options (no CSS needed)
 
-**Formatting is not in this list** — bold, italic, links and Text colour are on
-the field itself; see §6a. What follows is the block-level layout options.
+**Formatting is not in this list** — bold, italic, links and both ways of
+colouring text are on the field itself; see §6a. What follows is the block-level layout options.
 
 **Not every block has all of these** — that sentence used to say "every block exposes…" and sent
 people hunting for a Background field on Heading, Text and Spacer, which have never had one.

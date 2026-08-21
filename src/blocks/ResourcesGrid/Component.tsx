@@ -125,6 +125,7 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     eyebrow,
     heading,
     subheading,
+    textColour,
     background,
     source = 'auto',
     audience,
@@ -178,7 +179,7 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
       shadow={shadow}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
+      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" colour={textColour} />
       {variant === 'ni-resource' ? (
         <div className={`ni-grid-${cols}`}>
           {cards.map((c) => (

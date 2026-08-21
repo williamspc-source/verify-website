@@ -50,6 +50,8 @@ export type DirectorySpecialist = {
 type Props = {
   specialists: DirectorySpecialist[]
   kicker: RichTextValue
+  /** The block's `textColour`, applied to the kicker and heading. */
+  textColour?: string | null
   heading: RichTextValue
   enableSearch: boolean
   enableSpecialty: boolean
@@ -139,6 +141,7 @@ const Card: React.FC<{
 export const DirectoryClient: React.FC<Props> = ({
   specialists,
   kicker,
+  textColour,
   heading,
   enableSearch,
   enableSpecialty,
@@ -247,8 +250,13 @@ export const DirectoryClient: React.FC<Props> = ({
       <div className="specialist-filter-panel" aria-label="Specialist directory filters">
         <div className="specialist-filter-head">
           <div>
-            <InlineRichText as="div" className="specialist-filter-kicker" data={kicker} />
-            <InlineRichText as="h2" data={heading} />
+            <InlineRichText
+              as="div"
+              className="specialist-filter-kicker"
+              colour={textColour}
+              data={kicker}
+            />
+            <InlineRichText as="h2" colour={textColour} data={heading} />
           </div>
           {isFiltering ? (
             <div className="specialist-filter-count" aria-live="polite">

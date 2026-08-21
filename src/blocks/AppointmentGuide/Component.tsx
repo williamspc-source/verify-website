@@ -94,6 +94,7 @@ export const AppointmentGuideBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   selectLabel,
   types,
   cssClass,
@@ -119,7 +120,7 @@ export const AppointmentGuideBlock: React.FC<Props & { bare?: boolean }> = ({
       className={cn('vf-appointment-guide', toClassName(cssClass))}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
+      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" colour={textColour} />
       <GuideClient types={clientTypes} selectLabel={selectLabel} />
     </Section>
   )

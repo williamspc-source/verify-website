@@ -12375,14 +12375,25 @@
    ── Why `!important`, deliberately ──
    This is an editor's explicit choice, and it has to beat rules it cannot see.
    Section headings are painted by `.section-title { color: var(--text-dark) }`
-   (0,1,0), but a dozen page-scoped ports are more specific than that —
-   `.vf-client-overview .vf-split__title` is 0,2,0, `.ct-page .ct-portal-card …`
-   is 0,3,0 — and every one of them would silently win over a plain `.vf-tc-*`.
-   The editor would pick a colour, save, and see nothing change, which is exactly
-   the failure this repo's first invariant forbids. Specificity cannot be won
-   here without guessing how deep the deepest scoped rule is, so the flag states
-   the intent instead: an explicit choice outranks a default.
-   The scope is narrow — `color` only, and only on an element an editor coloured. */
+   (0,1,0), and several page-scoped ports set a colour on the same elements at
+   higher specificity — `.why-verify--light .why-header .section-title` (0,3,0),
+   `.ct-page .ct-portal-card__features .vf-section-header__title` (0,3,0),
+   `.svc-admin-split .vf-section-header__title` and `.our-values .section-title`
+   (0,2,0) — every one of which would silently win over a plain `.vf-tc-*`. The
+   editor would pick a colour, save, and see nothing change, which is exactly the
+   failure this repo's first invariant forbids. Specificity cannot be won here
+   without guessing how deep the deepest scoped rule is, so the flag states the
+   intent instead: an explicit choice outranks a default.
+   The scope is narrow — `color` only, and only on an element an editor coloured.
+
+   Those selectors were MEASURED — parsed out of the served stylesheet as rules
+   setting `color` on a header class at two classes or more, then read in the
+   browser with the flag removed. The list this comment used to carry was not: it
+   named `.vf-client-overview .vf-split__title`, which declares margin, font-size
+   and font-weight and no colour at all, so it was never a competitor. The e2e
+   guard was written against it first and could not be made to fail. A heading on
+   a dark band proves nothing here either — the on-dark re-point below carries its
+   own flag, so it wins whichever way the bare class is written. */
 .vf-tc-heading {
   color: var(--text-dark) !important;
 }
@@ -12443,4 +12454,21 @@
 .vf-on-dark .vf-tc-muted .vf-accent,
 .vf-on-dark .vf-tc-white .vf-accent {
   color: var(--accent-on-dark);
+}
+
+/* ...unless the editor coloured that phrase from the TOOLBAR, in which case the
+   pick wins. The two controls are not equals: the block's Text colour dropdown
+   sets the default for a whole line, and against a default the bracket should
+   win — that is the rule above. Selecting a bracketed phrase and choosing a
+   colour is a deliberate, local instruction, and letting the rules above repaint
+   it would leave an editor clicking a swatch that visibly does nothing on
+   exactly the words they highlighted.
+
+   `vf-tc--inline` is emitted only by the `text` converter in
+   src/components/RichText/shared.tsx, never by the block-level control, so this
+   cannot reach a heading coloured through the dropdown. `inherit` rather than a
+   literal, so the accent takes the `.vf-tc-*` colour on the same element — which
+   is what the editor picked — and keeps following the dark-band re-points. */
+.vf-tc--inline .vf-accent {
+  color: inherit !important;
 }

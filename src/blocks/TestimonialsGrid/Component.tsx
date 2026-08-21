@@ -36,6 +36,7 @@ export const TestimonialsGridBlock: React.FC<Props & { bare?: boolean }> = async
     eyebrow,
     heading,
     subheading,
+    textColour,
     background,
     source = 'auto',
     featuredOnly,
@@ -88,6 +89,7 @@ export const TestimonialsGridBlock: React.FC<Props & { bare?: boolean }> = async
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align="center"
         titleClassName={toClassName(elementClasses?.heading)}
       />

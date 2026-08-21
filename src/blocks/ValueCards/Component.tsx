@@ -16,6 +16,7 @@ export const ValueCardsBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   background,
   cards,
   cssClass,
@@ -42,6 +43,7 @@ export const ValueCardsBlock: React.FC<Props & { bare?: boolean }> = ({
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align="center"
       />
 

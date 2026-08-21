@@ -33,6 +33,7 @@ export const VideoEmbedBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   provider,
   videoId,
   url,
@@ -63,7 +64,7 @@ export const VideoEmbedBlock: React.FC<Props & { bare?: boolean }> = ({
       motion={motion}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
+      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" colour={textColour} />
 
       <figure
         className={cn(

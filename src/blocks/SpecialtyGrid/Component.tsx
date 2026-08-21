@@ -56,6 +56,7 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     eyebrow,
     heading,
     subheading,
+    textColour,
     background,
     source = 'auto',
     taxonomy,
@@ -125,6 +126,7 @@ export const SpecialtyGridBlock: React.FC<Props & { bare?: boolean }> = async (p
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align="center"
         titleClassName={toClassName(elementClasses?.heading)}
       />

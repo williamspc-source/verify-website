@@ -16,6 +16,7 @@ export const LeadershipSpotlightBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   background,
   photo,
   placeholderIcon,
@@ -81,13 +82,12 @@ export const LeadershipSpotlightBlock: React.FC<Props & { bare?: boolean }> = ({
         </div>
 
         <div className="leadership-content">
-          <InlineRichText as="div" className="section-label" data={eyebrow} />
+          <InlineRichText as="div" className="section-label" data={eyebrow} colour={textColour} />
           <InlineRichText
             as="h2"
             className={cn('section-title', toClassName(elementClasses?.heading))}
-            data={heading}
-          />
-          <InlineRichText as="p" className="leadership-subheading" data={subheading} />
+            data={heading} colour={textColour} />
+          <InlineRichText as="p" className="leadership-subheading" data={subheading} colour={textColour} />
           <InlineRichText as="div" className="leadership-tagline" data={tagline} />
           {body ? <RichText data={body} enableGutter={false} enableProse={false} /> : null}
           {creds.length > 0 ? (

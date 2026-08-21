@@ -74,6 +74,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     eyebrow,
     heading,
     subheading,
+    textColour,
     background,
     headerBackground,
     source = 'specialists',
@@ -190,6 +191,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
       eyebrow={eyebrow}
       title={heading}
       subtitle={subheading}
+      colour={textColour}
       align="center"
       titleClassName={toClassName(elementClasses?.heading)}
     />

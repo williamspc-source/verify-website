@@ -65,6 +65,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
     eyebrow,
     heading,
     subheading,
+    textColour,
     anchorId,
     background,
     source = 'auto',
@@ -127,6 +128,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
       eyebrow={eyebrow}
       title={heading}
       subtitle={subheading}
+      colour={textColour}
       align="center"
       titleClassName={toClassName(elementClasses?.heading)}
     />

@@ -55,11 +55,19 @@ page-by-page list:
       formatting toolbar, not a plain input
 - [ ] Bold a word in a heading, save, and confirm it renders bold on the page
 - [ ] Set **Text colour** on a block to *Brand blue* — the heading and subheading
-      both take the colour
+      both take the colour. **Check this on more than one block**: the control was
+      shipped once reading nothing at all, on all 26 blocks that carry it, and
+      looked entirely normal in the admin the whole time
+- [ ] Select two words inside a card's *Description* and colour them from the
+      **toolbar swatch** — only those words change on the page
+- [ ] Pick **Default style** in that swatch menu and confirm the colour comes off
 - [ ] Set the same block's band to a dark background: text set to *Heading text*
       or *Body text* stays readable; *Brand blue* lightens rather than vanishing
 - [ ] A heading containing `[[brackets]]` still shows the accent colour on the
-      bracketed words, inside a coloured heading
+      bracketed words, inside a heading coloured by the **dropdown**
+- [ ] Select a `[[bracketed]]` phrase and colour it from the **toolbar**: here the
+      colour you picked wins over the accent — the opposite of the line above, and
+      deliberately so
 - [ ] Press Enter in a heading: it makes a second line of the same heading, not a
       second heading
 - [ ] Nothing anywhere on the page reads `[object Object]`

@@ -37,6 +37,18 @@ run_case "A-blocks" "src/blocks/SlideCarousel/Component.tsx" "every field name i
   "perl -0pi -e 's/\{slide\.visualLabel\}/{null}/' src/blocks/SlideCarousel/Component.tsx"
 
 echo "--- B: an option value with no matching CSS rule ---"
+# The bundle hole. Before `declaredFieldNames` learned to read shared field
+# arrays, every field a block gets from `...sectionHeaderFields` was invisible to
+# the guard — which is how `textColour` shipped set-able and read by nothing on 26
+# blocks. Breaking a component that forwards it must now be caught.
+# Note it removes the destructure too, not only the JSX use. `readsField` counts
+# `{ textColour,` as a read — deliberately, since that is how most block
+# components reach a field — so deleting the usage alone leaves the guard green.
+# That is the documented weakness, not a hole this break should paper over: the
+# defect being reproduced is a component that never mentions the field at all.
+run_case "A-bundle" "src/blocks/GatewayCards/Component.tsx" "every field name is read" \
+  "perl -0pi -e 's/^\\s*(colour=\\{textColour\\}|textColour,)\\n//gm' src/blocks/GatewayCards/Component.tsx"
+
 run_case "B-options" "src/fields/blockFields.ts" "every vf-\* modifier class" \
   "perl -0pi -e \"s/\\{ label: 'Accent bar', value: 'accent-bar' \\}/{ label: 'Accent bar', value: 'accent-bar' }, { label: 'Tilt', value: 'tilt' }/\" src/fields/blockFields.ts"
 

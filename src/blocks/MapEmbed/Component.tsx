@@ -35,6 +35,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
     eyebrow,
     heading,
     subheading,
+    textColour,
     kind = 'map',
     office: officeRef,
     embedUrl,
@@ -278,7 +279,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
       containerWidth={containerWidth}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} />
+      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} colour={textColour} />
 
       {showSplit ? (
         <div className="ct-location-module">

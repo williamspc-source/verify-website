@@ -37,6 +37,7 @@ type Props = {
   eyebrow?: RichTextValue
   heading?: RichTextValue
   subheading?: RichTextValue
+  textColour?: string | null
   mode?: 'all' | 'upcoming-only' | 'past-only' | null
   pageSize?: number | null
   showSearch?: boolean | null
@@ -80,7 +81,7 @@ const serialise = (e: Event, photoWidth: number): EventItem => ({
 // serialisable objects to the client, which decides upcoming vs past from the
 // live browser date.
 export const EventsExplorerBlock: React.FC<Props> = async (props) => {
-  const { eyebrow, heading, subheading, anchorId, background, cssClass, bare } = props
+  const { eyebrow, heading, subheading, textColour, anchorId, background, cssClass, bare } = props
   const mode = (props as { mode?: Props['mode'] }).mode || 'all'
   const pageSize = (props as { pageSize?: number | null }).pageSize || 8
   const showSearch = (props as { showSearch?: boolean | null }).showSearch ?? true
@@ -131,9 +132,9 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
       {hasHeader ? (
         <div className="events-section-header events-explorer-header">
           <div>
-            <InlineRichText as="div" className="section-label" data={eyebrow} />
-            <InlineRichText as="h2" data={heading} />
-            <InlineRichText as="p" data={subheading} />
+            <InlineRichText as="div" className="section-label" data={eyebrow} colour={textColour} />
+            <InlineRichText as="h2" data={heading} colour={textColour} />
+            <InlineRichText as="p" data={subheading} colour={textColour} />
           </div>
         </div>
       ) : null}

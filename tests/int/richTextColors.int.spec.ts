@@ -8,6 +8,7 @@ import {
   colorClass,
   textColorField,
 } from '@/fields/richTextColors'
+import { brandTextColorFeature } from '@/fields/richTextColorFeature'
 
 /**
  * The editor's colour palette has two halves that can drift apart.
@@ -110,6 +111,50 @@ describe('the brand text-colour palette', () => {
     const match = CSS.match(new RegExp(`\\.vf-on-dark \\.vf-tc-${key}[^{]*\\{([^}]*)\\}`))
     expect(match?.[1], `no \`.vf-on-dark .vf-tc-${key}\` rule`).toBeTruthy()
     expect(match![1]).toContain(`var(${onDarkToken})`)
+  })
+})
+
+/**
+ * The toolbar swatch and the block-level select are two controls over one
+ * palette, and they fail in different directions. The select is guarded above by
+ * its CSS. The swatch has a second way to go wrong that no CSS check can see:
+ * its colours are literal hexes, because the admin has no `--primary` token to
+ * resolve — `brandColorStyle()` puts the brand tokens on `<html>` in the
+ * front-end layout only. So the editor's preview can drift from the page while
+ * every rule in globals.css stays correct, and an editor picks "Brand blue",
+ * sees one blue in the box and a different one on the site.
+ *
+ * The break, run: change `--primary` in globals.css to `#1c75bd` → the palette's
+ * own token assertion above goes red first, which is what stops the swatch and
+ * the page separating. Change `colour.fallback` to `colour.token` in
+ * `richTextColorFeature.ts` → "every swatch paints the palette's colour" fails,
+ * naming `brand`, because `var(--primary)` is not a colour the admin can resolve.
+ */
+describe('the toolbar colour swatches', () => {
+  const swatches = brandTextColorFeature().serverFeatureProps.state.color
+
+  it('offers exactly the palette — no more, no fewer', () => {
+    // Both directions matter. A key here with no CSS rule is a swatch that does
+    // nothing on the page; a palette entry missing here is a colour the select
+    // offers and the toolbar does not, for no reason an editor could guess.
+    expect(Object.keys(swatches).sort()).toEqual(BRAND_TEXT_COLORS.map((c) => c.key).sort())
+  })
+
+  it.each(BRAND_TEXT_COLORS.map((c) => [c.key, c] as const))(
+    'every swatch paints the palette’s colour: %s',
+    (key, colour) => {
+      expect(swatches[key]?.css?.color, `swatch ${key} should preview ${colour.fallback}`).toBe(
+        colour.fallback,
+      )
+      expect(swatches[key]?.label).toBe(colour.label)
+    },
+  )
+
+  it('keeps White legible in the editor', () => {
+    // White on the admin's white background is an invisible swatch and, once
+    // applied, text that looks deleted. The outline is admin-only — the page
+    // renders `.vf-tc-white` with no shadow.
+    expect(swatches.white?.css?.['text-shadow']).toBeTruthy()
   })
 })
 

@@ -32,6 +32,7 @@ export const ContactDetailsBlock: React.FC<Props & { bare?: boolean }> = async (
   eyebrow,
   heading,
   subheading,
+  textColour,
   useGlobal,
   items,
   cssClass,
@@ -117,7 +118,7 @@ export const ContactDetailsBlock: React.FC<Props & { bare?: boolean }> = async (
       containerWidth={containerWidth}
       bare={bare}
     >
-      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
+      <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" colour={textColour} />
 
       <div className="contact-details" style={{ maxWidth: 'var(--vf-measure-narrow, 560px)', marginInline: 'auto' }}>
         {contactItems.map(({ key, icon, label, value, href, note }) => (

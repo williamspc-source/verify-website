@@ -19,6 +19,7 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
     eyebrow,
     heading,
     subheading,
+    textColour,
     columns,
     items,
     cssClass,
@@ -131,7 +132,7 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
       {split ? (
         <div className="vf-faq__split">
           <div className="vf-faq__aside">
-            <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="left" />
+            <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="left" colour={textColour} />
             {splitImage ? (
               <Media resource={splitImage} className="vf-faq__image" imgClassName="vf-faq__image-img" />
             ) : null}
@@ -140,7 +141,7 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
         </div>
       ) : (
         <>
-          <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" />
+          <SectionHeader eyebrow={eyebrow} title={heading} subtitle={subheading} align="center" colour={textColour} />
           {list}
         </>
       )}

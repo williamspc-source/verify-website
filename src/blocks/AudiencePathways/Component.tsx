@@ -13,6 +13,7 @@ export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   background,
   pathways,
   anchorId,
@@ -36,9 +37,9 @@ export const AudiencePathwaysBlock: React.FC<Props & { bare?: boolean }> = ({
     >
       {hasHeader ? (
         <div className="ime-pathways-header">
-          <InlineRichText as="div" className="section-label" data={eyebrow} />
-          <InlineRichText as="h2" data={heading} />
-          <InlineRichText as="p" data={subheading} />
+          <InlineRichText as="div" className="section-label" data={eyebrow} colour={textColour} />
+          <InlineRichText as="h2" data={heading} colour={textColour} />
+          <InlineRichText as="p" data={subheading} colour={textColour} />
         </div>
       ) : null}
 

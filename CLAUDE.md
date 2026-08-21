@@ -101,6 +101,10 @@ Every rule below is here because that failure already happened once in this repo
 | **An empty rich text is a TRUTHY object.** Every `if (!heading)` and `x \|\| 'Default'` guarding a converted field has to become `hasRichText(x)`. | Nine block components guarded their header with `Boolean(eyebrow \|\| heading \|\| subheading)`. Converted, that is permanently true — every blank header would have started painting an empty band, on every page. |
 | **A `defaultValue` on a rich-text field must be a FUNCTION.** `richTextDefault('…')` returns one. | Payload writes a literal default into the DDL. A string default produced `"heading" jsonb DEFAULT 'What Sets Us [[Apart]]'`, which Postgres rejects as invalid JSON; the correct Lexical object produced an *unescaped* JSON literal, so the apostrophe in "Minimising Your Client's Report Costs" closed the SQL string and killed the `CREATE TABLE` with a bare syntax error naming the table, not the field. |
 | **The compiler cannot see a component that declares its own `string` props.** `RenderBlocks` spreads a block loosely, so the lie stays inside the file and surfaces as a failed production build naming a *page*, or as React error #31 during hydration. Sweep for raw renders instead of trusting `tsc`. | `/events` returned HTTP 200 with complete, correct server HTML and then died hydrating, leaving 11 rendered nodes where there had been 425. `/specialists/specialty-list` and three profile pages each failed a build the same way, one at a time. |
+| **A field a SHARED HELPER supplies is invisible to the orphan guard unless the guard reads the helper.** `declaredFieldNames` scans a block's own `config.ts`; anything arriving through `...sectionHeaderFields` is declared in `blockFields.ts` and was never in the set being checked. It resolves the bundles now (`HELPER_BUNDLES`, derived from the module so it cannot drift), guarded by the `A-bundle` case in `prove-guards.sh`. | `textColour` was added to `sectionHeaderFields`, appeared on **26 blocks**, saved to Postgres — and **not one component passed it on**. `SectionHeader` declares a `colour` prop and a grep for `colour=` across `src/blocks`, `src/heros` and `src/components` returned exactly one file: `SectionHeader` itself, defining it. Every editor on every section heading could pick a colour and watch nothing happen, for as long as the suite reported green. Fixing the guard immediately found a **second** case in the same shape — `SpecialistDirectory.subheading`, whose own component comment says "there is no subheading" — now hidden with `admin.condition: () => false`, which is the other half of the invariant. Third instance of this family, after the common-name hole (`icon`, `title`) and one name serving two purposes in one file. |
+| **Payload's own JSX converters read `node.format` and ignore node state entirely.** Anything stored as Lexical NodeState — which serialises under `$` — renders only if *our* converter reads it (`nodeColorClass` in `src/components/RichText/shared.tsx`). | `TextStateFeature` puts a colour swatch in the toolbar and writes `{"$":{"color":"brand"}}` onto the text node. Registering it alone gives an editor a control that colours the text in the admin, saves cleanly, and paints nothing on the page — a brand-new instance of the failure it was added to fix. The two halves must ship together. |
+| **A guard aimed at a rule that declares nothing passes forever.** Before asserting that rule X beats rule Y, check that Y declares the property at all. | The `!important` on `.vf-tc-*` was justified in a comment naming `.vf-client-overview .vf-split__title` as a 0,2,0 competitor. It sets `margin-bottom`, `font-size` and `font-weight` and **no colour** — so the e2e written against it stayed green with the flag deleted, and read as a guard that could not fail. Dark-band headings are the same trap for a different reason: `.vf-on-dark .vf-tc-*` carries its own flag, so those pass either way. The real competitors were found by parsing the *served* stylesheet for rules setting `color` on a header class at ≥2 classes, then measuring each with the flag removed: `.why-verify--light .why-header .section-title` goes brand blue with it and stays `rgb(65,64,66)` without. |
+
 | **Never join or interpolate a copy value.** `.join(' ')` and `` `${x}` `` over rich text print `[object Object]` — no error, no warning, just the wrong words. Guarded by `tests/e2e/richTextRender.e2e.spec.ts`. | FAQ joined its help card's heading and body; `/information-centre/for-clients` shipped "[object Object] [object Object]" beside an info icon. `computedSnapshot` found it only because the paragraph had become one line instead of two. `/contact` printed it four more times, from `` ` \| ${t.note}` `` separators. |
 | **`InlineRichText` adds no wrapper unless you ask for one**, and a heading must render `as={Tag}` rather than wrapping its text in a span. | Defaulting to `<span>` added 48 elements sitewide and nested `<span class="ni-card-link"><span>…</span></span>`. Worse, the Heading block's `<Tag><span>text</span></Tag>` handed the brand colour to the wrapper — `.section-title span` is the *accent* rule — and the heading itself went grey. |
 | **Booting Payload runs a dev schema push, so a deliberately-broken config is applied to the local database.** `pnpm test:e2e` boots it through `tests/helpers/seedUser.ts`; so does any `payload run` script. Repair with `src/migrations/REFERENCE-inline-richtext.sql`, which is idempotent for this reason. | Proving one guard red converted **156 columns** back to varchar, keeping the Lexical JSON as text. Nothing said so; the next build simply failed. |
@@ -140,7 +144,7 @@ and the specs read as deletable. Counts are deliberately **not** recorded here �
 
 | File | What it guards |
 |---|---|
-| `tests/int/adminControls.int.spec.ts` | The control guards: orphan fields, option values with no CSS rule, the class picker, hardcoded brand assets, placeholders with no upload, `cacheLife` on a tag purge, discarded `appearance`, unguarded draft queries. Proved by `zsh tests/int/prove-guards.sh` — **ten** cases, all must report PASS. |
+| `tests/int/adminControls.int.spec.ts` | The control guards: orphan fields, option values with no CSS rule, the class picker, hardcoded brand assets, placeholders with no upload, `cacheLife` on a tag purge, discarded `appearance`, unguarded draft queries. Proved by `zsh tests/int/prove-guards.sh` — **eleven** cases, all must report PASS. |
 | `tests/int/seedAuthored.int.spec.ts` | `isUnauthored`/`isPlaceholderLayout`, and that every `authorPage` copy uses them rather than counting blocks. Also asserts how many files define `authorPage`, which is the number to trust. |
 | `tests/int/cssTokens.int.spec.ts` | `buildTokenCss`/`safeTokenValue` sanitisation — editor-supplied values land inside a `<style>` tag. |
 | `tests/int/eventTiming.int.spec.ts` | `isPast` at start-of-day, `registrationOpen` and its fallback, and that the two are allowed to disagree. The unit half of **Event timing** below. |
@@ -151,11 +155,11 @@ and the specs read as deletable. Counts are deliberately **not** recorded here �
 | `tests/e2e/links.e2e.spec.ts` | Every `#fragment` link has a target, plus the behavioural Videolink assertion — the "an anchor link is two halves" invariant. |
 | `tests/e2e/images.e2e.spec.ts` | Images are served at the size they render, per route. **The guard for the four image invariants below** (`sizes`, width-only derivatives, the no-derivative majority case, `object-fit` without `fill`). |
 | `tests/int/proseFields.int.spec.ts` | Every field an editor types words into is rich text, or is named with a reason. Walks the sanitised config, so it sees fields nested in arrays, groups, tabs and rows. |
-| `tests/int/richTextColors.int.spec.ts` | The brand text-colour palette and its CSS agree — every key has a rule, every rule resolves through the token it claims, every token is in `:root`. |
+| `tests/int/richTextColors.int.spec.ts` | The brand text-colour palette and its CSS agree — every key has a rule, every rule resolves through the token it claims, every token is in `:root` — **and** the toolbar swatches offer exactly that palette, previewing each colour as the literal the admin can resolve. It constructs `TextStateFeature` and reads its props back, so a Payload API change fails here rather than on a page. |
 | `tests/int/lexicalText.int.spec.ts` | `richTextToPlain` / `hasRichText` — reading a copy value's words whether it holds a string or a tree. |
-| `tests/int/inlineRichText.int.spec.tsx` | `InlineRichText` renders no `<p>`, no wrapper `<div>`, a `<br>` between paragraphs, and no element at all when none was asked for. |
+| `tests/int/inlineRichText.int.spec.tsx` | `InlineRichText` renders no `<p>`, no wrapper `<div>`, a `<br>` between paragraphs, and no element at all when none was asked for — plus the toolbar colour: a text node carrying `$: {color}` emits `.vf-tc-* .vf-tc--inline`, one without emits no span, and a retired key emits nothing. |
 | `tests/int/seedWrites.int.spec.ts` | No seed file calls `payload.create`/`update` directly, bypassing the rich-text lift. |
-| `tests/e2e/richTextRender.e2e.spec.ts` | No route renders `[object Object]` or throws while hydrating. |
+| `tests/e2e/richTextRender.e2e.spec.ts` | No route renders `[object Object]` or throws while hydrating, **and** an editor's colour beats the page-scoped rule it has to beat — the browser half of the `!important` on `.vf-tc-*`, which no file check can see. |
 | `tests/e2e/carousel.e2e.spec.ts` | `SlideCarousel` bounds: rapid next/prev, arrow keys, dot recovery, autoplay wrap. **The guard for the carousel invariant below** — and note it clicks with `{ force: true }`, without which the burst is not rapid. |
 | `tests/e2e/admin.e2e.spec.ts` | The admin loads and the Pages create form renders. Seeds its own user, and deletes the autosave draft it creates. |
 | `tests/helpers/` | `seedUser.ts` (deletes and recreates `dev@payloadcms.com`) and `login.ts`. |
@@ -298,10 +302,24 @@ the *default* tick, because a bullet the editor gave an icon still has to keep i
 **Copy fields are rich text.** `inlineRichTextField(name, overrides)` is the one-line
 form (headings, card titles, button labels — compact editor, no headings or lists) and
 `richBodyField` the multi-paragraph one. Render both through
-`src/components/RichText/Inline.tsx`, never by interpolating the value. `textColorField`
-(`src/fields/richTextColors.ts`) gives the block a brand-palette `textColour`, emitted as
-`.vf-tc-*`; the palette is one array feeding both the field's options and the CSS, kept in
-step by `tests/int/richTextColors.int.spec.ts`.
+`src/components/RichText/Inline.tsx`, never by interpolating the value.
+
+**Colour has two controls over one palette** (`BRAND_TEXT_COLORS`, `src/fields/richTextColors.ts`),
+both emitting `.vf-tc-*` and both storing a *key* so Site Settings repaints every coloured word:
+
+- `textColorField` gives a block a `textColour` select covering a whole heading and subheading. A
+  block that spreads `sectionHeaderFields` **must forward it** — `<SectionHeader colour={textColour}>`,
+  or `colour=` on each `InlineRichText` if it renders its own header. It is not compile-forced;
+  `adminControls.int.spec.ts` is what proves it, and the field shipped read by nothing until that
+  guard learned to see bundle-supplied fields.
+- `brandTextColorFeature()` (`src/fields/richTextColorFeature.ts`) puts the same palette in every
+  rich-text toolbar, registered once on `defaultLexical` so all ten field-level editors inherit it.
+  It writes Lexical NodeState (`$`), which **only our converter renders** — see the Invariants table.
+  Separate file from the palette because it imports the server export, and `colorClass` is client code.
+
+Inside a coloured element a `[[bracketed]]` phrase keeps the brand accent; inside a *toolbar* pick it
+does not, because that pick is `.vf-tc--inline` and an explicit selection outranks a bracket. All of
+this is kept in step by `tests/int/richTextColors.int.spec.ts`.
 
 Shared field helpers live in `src/fields/blockFields.ts` (`backgroundField`, `containerWidthField`,
 `spacingFields`, `motionField`, `sectionHeaderFields`, `anchorIdField`, `iconField`,
@@ -420,6 +438,30 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   rule you know works (`nav.site-nav` → `position: sticky`). Do not try to read `document.styleSheets`
   — cross-sheet access throws, and a `try/catch` around it reports zero matches for *every* selector,
   including ones that are plainly applied.
+- **`referenceCssDiff.mjs` prints TWO numbers with the word "differences" in them, and the one that
+  looks like the answer is not.** Its footer reads *"Reference selectors: 32 · build: 48 ·
+  deliberately not ported: 3 · explained differences: 32"*, then a separate `✓`/`✗` verdict line.
+  A `grep -Eo 'differences: [0-9]+'` matches the **explained** count — the tally of documented,
+  deliberate exceptions — so a family with 32 recorded exceptions and zero real differences reads as
+  "32 differences". Measured: that grep reported 11 of 13 families non-zero, including a family
+  whose own next line said *"no desktop differences"*, and the false alarm survived a git-bisect
+  across four commits before the output was read properly. Key on the verdict line, never on a
+  number in the summary.
+- **A `prettier --write` glob reaches every file it matches, not the files you edited.** Running it
+  over `src/blocks/**/Component.tsx` to tidy a two-line change reformatted **24 unrelated
+  components** plus all 12k lines of `globals.css` — 8,715 insertions in one file — because the repo
+  is not prettier-clean and nothing enforces it (`pnpm lint` passes either way; the raw edits passed
+  it before the formatter ran). The churn buries the actual change and makes the diff unreviewable.
+  Same family as the `perl -0pi` bulk-edit trap already recorded, and the fix is the same: read
+  `git diff --stat` before believing the edit was confined. Formatting is not exempt from that.
+- **A comment is just more text to a regex, in CSS as well as in TypeScript.** Writing the literal
+  selector `.vf-on-dark .vf-tc-brand` inside the explanatory comment above the palette rules made
+  `richTextColors.int.spec.ts` — which finds that rule with
+  `\.vf-on-dark \.vf-tc-<key>[^{]*\{` — match the comment and then run on to the next real rule,
+  reading the wrong declarations. One test went red on a change that touched no CSS. Second instance
+  of this hazard; the first is the orphan guard's `object.property` form in a JSX comment, already
+  in the Invariants table. Re-run the affected guard after editing any comment near one.
+
 - **Never run `pnpm build` while `pnpm dev` is running.** They share `.next`, and the production
   build overwrites what the dev server is serving from. Measured: a hover rule that had just been
   confirmed working (`.audience-card:hover` → `translateY(-6px)`) started computing to `none` on

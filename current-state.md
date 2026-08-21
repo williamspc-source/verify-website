@@ -35,25 +35,28 @@ One application serves both the public site and `/admin`.
 
 ## What is working well
 
-**The build is green on every gate.** Measured 2026-08-21, not carried over from an earlier pass:
+**The build is green on every gate.** Re-measured 2026-08-21 after the text-colour pass, not carried
+over from an earlier one:
 
 | Gate | Result |
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **190/190**, 12 files |
-| `pnpm test:e2e` | **50/50** in 56s against the production server; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
-| `zsh tests/int/prove-guards.sh` | **10/10** — every guard proven to go red on its deliberate break |
+| `pnpm test:int` | **202/202**, 12 files |
+| `pnpm test:e2e` | **52/52**; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
+| `zsh tests/int/prove-guards.sh` | **11/11** — every guard proven to go red on its deliberate break |
 | `referenceCssDiff.mjs`, all 13 families | zero differences |
 
 > **This file owns the test counts.** They were in four documents and no two agreed; `CLAUDE.md` and
-> `README.md` now carry the commands instead. Note the e2e number cannot be counted from source: 22
-> `test(` declarations expand to 31, because `images.e2e.spec.ts` parameterises one per route. Run it.
+> `README.md` now carry the commands instead. Note the e2e number cannot be counted from source: **25**
+> `test(` declarations expand to **52**, because `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
+> both parameterise one per route. Run it.
 
-> The e2e run was against the **production** server on `:3000`, and the admin spec that
-> `OUTSTANDING.md` §2 reports as intermittent did not flake. That is consistent with §2's diagnosis
-> — the failure is a 5s timeout against a cold Turbopack compile — and suggests the flake is
-> confined to dev-server runs. One clean run is not proof; do not close §2 on it.
+> This run was against a **dev** server on `:3000` — a clean one, restarted with `.next` removed —
+> and `admin.e2e.spec.ts` did not flake in it. The previous reading in this table was taken against
+> the production server and is no longer what the numbers describe. `OUTSTANDING.md` §2 diagnoses the
+> flake as a 5s timeout against a cold Turbopack compile, which a warmed dev server would not hit;
+> one clean run is not proof either way, so do not close §2 on it.
 
 **The content model is complete and populated.** 22 collections, 10 globals, and **89** live URLs
 across five sitemaps, counted 2026-08-20 — 27 pages, 4 posts, 26 specialists, 19 team, 13 events.
@@ -237,13 +240,25 @@ narrative above stops at 38 on purpose.
 **Comparison 49 (2026-08-21) is a capability pass, not a design one.** Every field
 an editor types words into is rich text — 585 columns, up from ~50 — with bold,
 italic, underline and links on the field and a brand-palette **Text colour** on
-the block. Colour is per element rather than per word, and `[[brackets]]` still
-paint a phrase in the accent. `computedSnapshot` reads 8385 nodes before and
-after with an empty diff, so it moved no pixels; six new guards keep it that way.
-What stays plain — URLs, mailto bodies, alt text, CSS classes, tokens, `<option>`
-labels — is listed with a reason in `tests/int/proseFields.int.spec.ts`.
+the block. `[[brackets]]` still paint a phrase in the accent. `computedSnapshot`
+reads 8385 nodes before and after with an empty diff, so it moved no pixels; six
+new guards keep it that way. What stays plain — URLs, mailto bodies, alt text,
+CSS classes, tokens, `<option>` labels — is listed with a reason in
+`tests/int/proseFields.int.spec.ts`.
 
-The next input is your pass through `REVIEW-CHECKLIST.md`.
+**Comparison 50 (2026-08-21) made that colour control real, and it had not been.**
+The **Text colour** dropdown Comparison 49 added was declared on 26 blocks, saved
+to Postgres and **read by nothing** — no component forwarded it — so an editor
+could set it on any section heading and see no change. The orphan-field guard was
+blind to it because the field arrives through a shared bundle it never read. Both
+are fixed, and a colour swatch now sits in the toolbar of every rich-text box, so
+colour is available per *selection* as well as per element. Measured: `.vf-tc-brand`
+computes `rgb(28,117,188)` against a `rgb(65,64,66)` control, and `computedSnapshot`
+is empty at the same 8385 nodes because nothing is coloured until someone colours it.
+
+The next input is your pass through `REVIEW-CHECKLIST.md` — and the two colour
+lines in it are worth doing carefully, since one of them passed by eye for a
+whole pass while the control underneath it did nothing.
 
 ### 3. Smaller known items
 
@@ -268,9 +283,11 @@ Each is measured and justified in `OUTSTANDING.md` — do not re-derive them:
   stylesheet they excuse. All 13 families read zero today; the exceptions are what needs re-taking.
 - **§19** Stats Band, Spacer, Divider, Icon and Image are on no page since `/style-guide` was removed,
   so nothing reviews them.
-- **§20 / §21** Deliberate limits of the rich-text pass: colour is per element rather than per
-  word, and Enter in a heading makes a paragraph in the editor (the page renders it as a line
-  break either way). Both have their cost measured.
+- **§20** The toolbar colour swatch is `TextStateFeature`, which Payload 3.85 marks
+  `@experimental`. Live and working; re-check it on any Payload upgrade. Stored content is a bare
+  palette key, so a broken API could cost the control but never the words.
+- **§21** Enter in a heading makes a paragraph in the editor (the page renders it as a line break
+  either way). Cost measured by writing it.
 - **§22** Payload now boots in ~7s, which silently *skipped* two integration specs until their
   timeouts were raised — a suite reporting green while checking nothing.
 

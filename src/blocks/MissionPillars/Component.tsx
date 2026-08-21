@@ -14,6 +14,7 @@ export const MissionPillarsBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
   heading,
   subheading,
+  textColour,
   background,
   pillars,
   containerWidth,
@@ -36,9 +37,9 @@ export const MissionPillarsBlock: React.FC<Props & { bare?: boolean }> = ({
     >
       {hasRichText(eyebrow) || hasRichText(heading) || hasRichText(subheading) ? (
         <div className="mv-mission-header">
-          <InlineRichText as="div" className="section-label" data={eyebrow} />
-          <InlineRichText as="h2" className="section-title" data={heading} />
-          <InlineRichText as="p" className="mv-mission-statement" data={subheading} />
+          <InlineRichText as="div" className="section-label" data={eyebrow} colour={textColour} />
+          <InlineRichText as="h2" className="section-title" data={heading} colour={textColour} />
+          <InlineRichText as="p" className="mv-mission-statement" data={subheading} colour={textColour} />
         </div>
       ) : null}
 

@@ -13,6 +13,7 @@ export const TabsBlock: React.FC<Props & { bare?: boolean; anchorId?: string | n
   eyebrow,
   heading,
   subheading,
+  textColour,
   background,
   tabs,
   cssClass,
@@ -47,6 +48,7 @@ export const TabsBlock: React.FC<Props & { bare?: boolean; anchorId?: string | n
         eyebrow={eyebrow}
         title={heading}
         subtitle={subheading}
+        colour={textColour}
         align="center"
         titleClassName={toClassName(elementClasses?.heading)}
       />
