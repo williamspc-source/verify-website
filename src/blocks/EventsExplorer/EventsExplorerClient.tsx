@@ -6,6 +6,10 @@ import { EventCalendar } from '@/components/EventCalendar'
 import { eventPath } from '@/utilities/routes'
 import { isEventPast, startOfDay } from '@/utilities/eventTiming'
 import { accentText } from '@/utilities/accentText'
+import { cn } from '@/utilities/ui'
+import { pastBandClass, type EventsExplorerSeparator } from './separator'
+
+export type { EventsExplorerSeparator }
 
 // Plain, serialisable event shape passed from the server component.
 export type EventItem = {
@@ -63,6 +67,7 @@ type Props = {
   labels?: EventsExplorerLabels | null
   cardStyle?: 'list' | 'card' | null
   groups?: EventsExplorerGroups | null
+  separator?: EventsExplorerSeparator | null
 }
 
 const eventUrl = (e: EventItem): string => eventPath(e.slug) ?? '/events'
@@ -309,7 +314,8 @@ const EventGroup: React.FC<{
   emptyText: string
   cardStyle?: 'list' | 'card'
   header?: React.ReactNode
-}> = ({ label, list, ctaLabel, pageSize, emptyText, cardStyle = 'list', header }) => {
+  className?: string
+}> = ({ label, list, ctaLabel, pageSize, emptyText, cardStyle = 'list', header, className }) => {
   const [page, setPage] = useState(1)
   const boxRef = useRef<HTMLDivElement | null>(null)
 
@@ -328,7 +334,7 @@ const EventGroup: React.FC<{
   }
 
   return (
-    <div className="events-explorer-group">
+    <div className={cn('events-explorer-group', className)}>
       {/* Card mode carries a full section header; list mode keeps the bare
           label, which is what the reference's dedicated listing pages use. */}
       {header ?? (label ? <div className="section-label">{label}</div> : null)}
@@ -369,6 +375,7 @@ export const EventsExplorerClient: React.FC<Props> = ({
   labels,
   cardStyle,
   groups,
+  separator,
 }) => {
   const style: 'list' | 'card' = cardStyle === 'card' ? 'card' : 'list'
   const now = useSyncExternalStore(subscribeToNothing, getToday, getTodayServer)
@@ -423,6 +430,14 @@ export const EventsExplorerClient: React.FC<Props> = ({
   const showUpcoming = mode !== 'past-only'
   const showPast = mode !== 'upcoming-only'
   const showBothLabels = mode === 'all'
+
+  // A separator only means anything with a group on each side of it, so both
+  // are gated on that rather than on `mode` — the admin condition already hides
+  // the fields outside "Upcoming & Past", and this makes the render agree with
+  // it instead of trusting that it does.
+  const bothGroups = showUpcoming && showPast
+  const dividerStyle = separator?.divider && separator.divider !== 'none' ? separator.divider : null
+  const pastBand = pastBandClass(mode, separator)
 
   return (
     <div className="events-explorer-body" aria-busy={now === null || undefined}>
@@ -484,8 +499,19 @@ export const EventsExplorerClient: React.FC<Props> = ({
               emptyText={q ? L.emptyUpcomingSearch : L.emptyUpcoming}
             />
           ) : null}
+          {bothGroups && dividerStyle ? (
+            <hr
+              className={cn(
+                'events-explorer-divider',
+                'vf-divider',
+                `vf-divider--${dividerStyle}`,
+                `vf-divider--${separator?.dividerWidth || 'full'}`,
+              )}
+            />
+          ) : null}
           {showPast ? (
             <EventGroup
+              className={pastBand}
               label={showBothLabels ? L.pastHeading : undefined}
               cardStyle={style}
               header={

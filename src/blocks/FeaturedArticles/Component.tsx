@@ -1,6 +1,5 @@
 import { mediaSrc } from '@/utilities/mediaSrc'
 import type { Post, Category, Stream } from '@/payload-types'
-import type { Where } from 'payload'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -11,6 +10,7 @@ import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { postPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 import { FeaturedArticlesClient, type FeaturedSlide } from './FeaturedArticlesClient'
+import { featuredPostsWhere, featuredSelectedPosts } from './query'
 
 const MONTHS_SHORT = [
   'Jan',
@@ -107,6 +107,7 @@ type Props = {
   interval?: number | null
   showArrows?: boolean | null
   showDots?: boolean | null
+  hideWhenEmpty?: boolean | null
 }
 
 export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
@@ -117,30 +118,16 @@ export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
   const badgeLabel = (props as { badgeLabel?: string | null }).badgeLabel || 'Featured'
   const bylinePrefix = (props as { bylinePrefix?: string | null }).bylinePrefix || 'By:'
   const ctaLabel = (props as { ctaLabel?: string | null }).ctaLabel || 'Read Full Article →'
-  const { autoplay, interval, showArrows, showDots } = props
+  const { autoplay, interval, showArrows, showDots, hideWhenEmpty } = props
 
   const limit = limitFromProps || 6
   let posts: Post[] = []
 
   if (source === 'manual') {
     // Manual selection — use the populated relationship docs, preserving order.
-    posts = ((props.posts as (Post | number | string)[] | null) || []).filter(
-      (p): p is Post => !!p && typeof p === 'object',
-    )
+    posts = featuredSelectedPosts(props)
   } else {
     const payload = await getPayload({ config: configPromise })
-
-    // A post is "featured" if its checkbox is set OR it belongs to the
-    // Featured stream (slug: "featured").
-    const or: Where[] = [{ featured: { equals: true } }]
-    const featuredStream = await payload.find({
-      collection: 'streams',
-      depth: 0,
-      limit: 1,
-      where: { slug: { equals: 'featured' } },
-    })
-    const featuredStreamId = featuredStream.docs[0]?.id
-    if (featuredStreamId) or.push({ stream: { equals: featuredStreamId } })
 
     const fetched = await payload.find({
       collection: 'posts',
@@ -151,13 +138,20 @@ export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
       depth: 2,
       limit,
       sort: '-publishedAt',
-      where: { or },
+      // Same filter the Section Nav counts against (./query.ts).
+      where: await featuredPostsWhere(payload),
     })
     posts = fetched.docs
   }
 
   const slides = posts.map((p) => toSlide(p, badgeLabel, bylinePrefix))
-  if (slides.length === 0) return null
+
+  // With nothing to show, an unticked box keeps the (empty) section as it was —
+  // ticked, the section goes, and the sticky nav on /in-the-loop drops its
+  // `#featured` tab in the same pass. This replaces a bare `<div id>` fallback
+  // that existed only to stop links.e2e.spec.ts flagging a tab pointing at a
+  // missing id; with the tab gone there is no link left to satisfy.
+  if (slides.length === 0 && hideWhenEmpty) return null
 
   return (
     <Section
@@ -167,14 +161,19 @@ export const FeaturedArticlesBlock: React.FC<Props> = async (props) => {
       className={cn('ni-featured', toClassName(cssClass))}
     >
       {eyebrow ? <div className="ni-featured-label">{eyebrow}</div> : null}
-      <FeaturedArticlesClient
-        slides={slides}
-        ctaLabel={ctaLabel}
-        autoplay={autoplay}
-        interval={interval}
-        showArrows={showArrows}
-        showDots={showDots}
-      />
+      {/* An empty carousel is not a preview of anything — the arrows would draw
+          and do nothing, and there are no dots to draw. With the box unticked
+          and no featured posts, the band and its label are what an editor sees. */}
+      {slides.length > 0 ? (
+        <FeaturedArticlesClient
+          slides={slides}
+          ctaLabel={ctaLabel}
+          autoplay={autoplay}
+          interval={interval}
+          showArrows={showArrows}
+          showDots={showDots}
+        />
+      ) : null}
     </Section>
   )
 }

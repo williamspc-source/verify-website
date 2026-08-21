@@ -87,6 +87,12 @@ const ROUTES = [
   '/',
   '/about',
   '/about/meet-the-team',
+  // The Meet the Team LIST was covered while an individual team profile was not —
+  // a different template entirely (`.staff-hero`, `.staff-body-grid`, the sidebar),
+  // and the one changed by the profile-photo pass. Added before that pass captured
+  // its baseline; a route added afterwards has nothing to compare against and
+  // reads as clean.
+  '/about/team/wes-lerch',
   '/services',
   '/specialists',
   '/in-the-loop',
@@ -98,7 +104,9 @@ const ROUTES = [
   '/contact',
   '/search',
   '/privacy-policy',
-  // Restyled in the banded-card and FAQ passes; the harness covers 18 of 29 pages.
+  // Restyled in the banded-card and FAQ passes. Coverage, counted 2026-08-21: the 21
+  // routes below against the 27 URLs in the pages sitemap. Re-count both before quoting
+  // them — this line said 18 of 28 while the list held 21.
   '/services/medico-legal/ime',
   '/services/medico-legal/jme',
   '/services/medico-legal/reporting-services',
@@ -107,7 +115,6 @@ const ROUTES = [
   '/information-centre/for-clients',
   '/information-centre/for-claimants',
   '/make-a-booking',
-  '/style-guide',
 ]
 
 /**

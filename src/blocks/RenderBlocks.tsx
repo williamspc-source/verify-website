@@ -182,9 +182,15 @@ export const RenderBlocks: React.FC<{
         const Block = blockComponents[blockType as keyof typeof blockComponents]
         if (!Block) return null
 
+        // The sticky Section Nav hides a tab whose section will render nothing,
+        // so it needs to see the blocks around it. Passed to that block alone —
+        // handing every block the whole layout would be a prop 40-odd components
+        // ignore, and an invitation for one of them to start reading it.
+        const siblings = blockType === 'sectionNav' ? { siblings: blocks } : {}
+
         const node = (
           // @ts-expect-error there may be some mismatch between the expected types here
-          <Block {...block} bare={isNested} disableInnerContainer />
+          <Block {...block} {...siblings} bare={isNested} disableInnerContainer />
         )
 
         // Nested children never get the legacy margin wrapper (parent owns spacing).

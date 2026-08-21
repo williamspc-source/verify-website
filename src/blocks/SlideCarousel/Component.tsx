@@ -1,6 +1,6 @@
 'use client'
 import { mediaSrc } from '@/utilities/mediaSrc'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Icon } from '@/components/Icon'
 
@@ -79,50 +79,103 @@ export const SlideCarouselBlock: React.FC<Props> = ({
   const count = slides?.length || 0
   const looped = count > 1
   const base = looped ? 1 : 0 // track position of the first real slide
-  const [pos, setPos] = useState(base) // current track position
-  const [animate, setAnimate] = useState(true)
+  // `pos` and `animate` move together — a snap is "this position, without a
+  // transition", and splitting them let a re-render apply one before the other.
+  const [track, setTrack] = useState({ pos: base, animate: true })
+  const { pos, animate } = track
   const [hovering, setHovering] = useState(false) // hover/focus pause
   const tick = (interval ?? 5800) || 5800
+  // A step that had to wait for a snap to happen first (see `advance`).
+  const pendingStep = useRef<1 | -1 | null>(null)
 
-  const active = looped ? (pos - 1 + count) % count : pos // real slide index (for dots)
+  /**
+   * The track position of the REAL slide at `p`, mapping each clone onto its
+   * twin: 0 (clone of last) → count, count + 1 (clone of first) → 1. Defined over
+   * every integer, so it also recovers a position that has left the track.
+   */
+  const realPos = useCallback(
+    (p: number): number => (looped ? ((((p - 1) % count) + count) % count) + 1 : p),
+    [looped, count],
+  )
 
-  const step = useCallback((dir: 1 | -1) => {
-    setAnimate(true)
-    setPos((p) => p + dir)
-  }, [])
+  const active = looped ? realPos(pos) - 1 : pos // real slide index (for dots)
 
-  const goTo = useCallback((realIndex: number) => {
-    setAnimate(true)
-    setPos(realIndex + (count > 1 ? 1 : 0))
-  }, [count])
+  /**
+   * Move one slide, keeping `pos` inside 0…count+1.
+   *
+   * ── The bug this exists to prevent ──
+   * This used to be `setPos((p) => p + dir)` with no bound at all, and the only
+   * thing that ever pulled `pos` back was `onTransitionEnd` matching exactly
+   * `count + 1` or `0`. Clicking faster than the 0.55s transform transition keeps
+   * restarting it, so `transitionend` does not fire until the last click settles —
+   * by which point `pos` is past the end and matches neither branch, and nothing
+   * snaps it back. Measured: 8 fast clicks left the track at translateX(-9702px),
+   * position 9 of a 6-card track, with no slide in the viewport. The dots kept
+   * highlighting (the active dot is computed with modulo), so it read as a blank
+   * panel on a working carousel rather than a counter that had run away.
+   *
+   * Stepping from a clone is the case that used to leak. The clone is pixel
+   * identical to its twin, so snapping there WITHOUT a transition is invisible;
+   * the queued step then animates from the twin on the next frame and still reads
+   * as forward. Clamping instead would animate backwards across the whole track.
+   */
+  const advance = useCallback(
+    (dir: 1 | -1) => {
+      setTrack(({ pos: p }) => {
+        if (!looped) return { pos: Math.min(Math.max(p + dir, 0), count - 1), animate: true }
+        const next = p + dir
+        if (next >= 0 && next <= count + 1) return { pos: next, animate: true }
+        pendingStep.current = dir
+        return { pos: realPos(p), animate: false }
+      })
+    },
+    [looped, count, realPos],
+  )
+
+  const goTo = useCallback(
+    (realIndex: number) => {
+      pendingStep.current = null
+      setTrack({ pos: realIndex + (count > 1 ? 1 : 0), animate: true })
+    },
+    [count],
+  )
 
   // After a no-transition snap, re-enable the transition on the next frame so the
-  // following slide animates again.
+  // following slide animates again — and apply any step that was queued because
+  // the snap had to happen first.
   useEffect(() => {
     if (animate) return
-    const raf = requestAnimationFrame(() => requestAnimationFrame(() => setAnimate(true)))
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        const dir = pendingStep.current
+        pendingStep.current = null
+        setTrack(({ pos: p }) => ({ pos: dir ? p + dir : p, animate: true }))
+      }),
+    )
     return () => cancelAnimationFrame(raf)
   }, [animate])
 
   useEffect(() => {
     if (!autoplay || hovering || count <= 1) return
-    const id = window.setInterval(() => {
-      setAnimate(true)
-      setPos((p) => p + 1)
-    }, tick)
+    // Through `advance`, not its own `p + 1`: the unbounded increment was here a
+    // second time, and a timer that fires while a click burst is mid-flight would
+    // have walked off the track exactly the same way.
+    const id = window.setInterval(() => advance(1), tick)
     return () => window.clearInterval(id)
-  }, [autoplay, hovering, count, tick])
+  }, [autoplay, hovering, count, tick, advance])
 
   // When we land on a clone, jump (without animation) to the matching real slide.
-  const onTransitionEnd = () => {
+  // Written as "anything outside 1…count", not as two exact values, so this is a
+  // total recovery rather than two special cases.
+  const onTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
     if (!looped) return
-    if (pos === count + 1) {
-      setAnimate(false)
-      setPos(1)
-    } else if (pos === 0) {
-      setAnimate(false)
-      setPos(count)
-    }
+    // `transitionend` bubbles. No card carries a transition today, but the block's
+    // Element-styles presets can put one on `.events-offer-card`, and a bubbled
+    // event would fire a spurious snap mid-glide.
+    if (e.target !== e.currentTarget) return
+    setTrack((prev) =>
+      prev.pos >= 1 && prev.pos <= count ? prev : { pos: realPos(prev.pos), animate: false },
+    )
   }
 
   if (!slides || count === 0) return null
@@ -167,11 +220,11 @@ export const SlideCarouselBlock: React.FC<Props> = ({
           onKeyDown={(e) => {
             if (e.key === 'ArrowLeft') {
               e.preventDefault()
-              step(-1)
+              advance(-1)
             }
             if (e.key === 'ArrowRight') {
               e.preventDefault()
-              step(1)
+              advance(1)
             }
           }}
         >
@@ -200,7 +253,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
                 type="button"
                 className={cn('events-offer-arrow events-offer-arrow-prev vf-slide-carousel__arrow', buttonClass)}
                 aria-label="Previous slide"
-                onClick={() => step(-1)}
+                onClick={() => advance(-1)}
               >
                 <Icon name="caret-left" className="size-5" />
               </button>
@@ -208,7 +261,7 @@ export const SlideCarouselBlock: React.FC<Props> = ({
                 type="button"
                 className={cn('events-offer-arrow events-offer-arrow-next vf-slide-carousel__arrow', buttonClass)}
                 aria-label="Next slide"
-                onClick={() => step(1)}
+                onClick={() => advance(1)}
               >
                 <Icon name="caret-right" className="size-5" />
               </button>

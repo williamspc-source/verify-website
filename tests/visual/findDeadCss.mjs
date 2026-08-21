@@ -105,11 +105,14 @@ const ROUTES = [
   '/events',
   '/contact',
   '/search',
-  '/legal/privacy-policy',
+  // `/legal/privacy-policy` was listed here and 404s — the page is at
+  // `/privacy-policy`. Same dead-route bug already fixed in computedSnapshot.mjs,
+  // and it matters more here: an unreachable page contributes no classes, so every
+  // selector unique to it reads as dead. Measured 2026-08-20.
+  '/privacy-policy',
   '/information-centre/for-clients',
   '/information-centre/for-claimants',
   '/make-a-booking',
-  '/style-guide',
   // One URL per collection detail template — these use classes that appear
   // nowhere else, so omitting them manufactures false positives.
   '/specialists/profiles/dr-bill-donnelly',

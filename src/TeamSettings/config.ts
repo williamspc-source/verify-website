@@ -28,28 +28,17 @@ export const TeamSettings: GlobalConfig = {
               'Second breadcrumb link (the team index). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.',
           },
         },
+        // `roleLabel` was here, above the sidebar's ROLE pin. The pin was removed
+        // (it repeated the role already under the name in the hero), so the label
+        // had nothing left to label — a setting an editor can change that does
+        // nothing is the failure `tests/int/adminControls.int.spec.ts` guards.
         {
-          type: 'row',
-          fields: [
-            {
-              name: 'roleLabel',
-              type: 'text',
-              defaultValue: 'Role',
-              admin: {
-                width: '50%',
-                description: 'Sidebar label above the member’s role.',
-              },
-            },
-            {
-              name: 'qualificationLabel',
-              type: 'text',
-              defaultValue: 'Qualification',
-              admin: {
-                width: '50%',
-                description: 'Sidebar label above each qualification.',
-              },
-            },
-          ],
+          name: 'qualificationLabel',
+          type: 'text',
+          defaultValue: 'Qualification',
+          admin: {
+            description: 'Sidebar label above each qualification.',
+          },
         },
         {
           name: 'aboutPrefix',

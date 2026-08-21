@@ -25,7 +25,7 @@ wording you edit.
 |---|---|---|
 | **Publishing** | Pages, Articles, Events | Constantly — this is the site's content |
 | **Reference** | Services, Resources, Offices, Testimonials | Occasionally — records that feed sections of pages |
-| **Taxonomy** | Nine lists that classify specialists and articles | Rarely — set up once, extended now and then |
+| **Taxonomy** | Ten lists that classify specialists, articles and staff | Rarely — set up once, extended now and then |
 | **People** | Specialists, Team Members | When someone joins, leaves or changes role |
 | **Availability** | Availability Sessions | Regularly, if you advertise appointment slots |
 | **Media** | Every uploaded image and file | Whenever you add a photo |
@@ -118,6 +118,14 @@ most common way to lose an article.
 the whole of the day it is held, not until its start time. Registration is controlled separately by
 **Registration closes at**, so an event can be running and still taking expressions of interest.
 
+**Event type** is the badge on the card and the filter visitors sort by, so it decides where an
+event turns up as much as how it reads. The list is Networking, Industry Briefing, Workshop, Webinar,
+Breakfast Seminar, Masterclass, Specialist Seminar, and — added 2026-08-20 — **Conference**,
+**Sponsorship** and **Social Event**. Those last three exist because everything that was not a
+seminar was landing on *Networking*, which put a Christmas party and an industry briefing in the same
+filter. Pick the one a visitor would expect; a conference VERIFY exhibits at is a Conference, an
+event it puts its name to is a Sponsorship.
+
 **Event photo** is worth setting. It is shown on the two listing pages and on the `/events` hub
 cards. Leave it empty and the event falls back to a date calendar showing the day and month — so a
 missing photo never leaves an empty panel, and you can add photos gradually rather than all at once.
@@ -158,8 +166,10 @@ resource changes that section and nothing else.
 
 ### Offices
 
-**What it is:** your physical offices — address, phone, email, opening hours, map, parking and
-public transport.
+**What it is:** your physical offices — address, phone, email, opening hours, map, parking, public
+transport, and a free-text **Note**. The note reads as the last line of *Nearby Car Parks*, or at the
+foot of the card when that office lists no car parks — so a caveat about parking sits with the
+parking rather than drifting away from it.
 
 **Where it appears:** the **footer of every page**, and the "Where to Find Us" section on Contact
 and on Information for Claimants.
@@ -182,7 +192,7 @@ this — if you change the number here and the footer still shows the old one, c
 
 ## 5. Taxonomy
 
-Nine lists that classify things. You will rarely add to them, and you should think before deleting
+Ten lists that classify things. You will rarely add to them, and you should think before deleting
 from them — other records point at these.
 
 | List | What it classifies | Where a visitor sees it |
@@ -196,6 +206,28 @@ from them — other records point at these.
 | **Locations** | Specialists | A profile's location line, and a directory filter |
 | **Streams** | Articles | **Nothing** — it is the folder in the web address |
 | **Topics** | Articles | The coloured chips on article cards, and "Topics" on an article |
+| **Departments** | Team members | The group headings on Meet the Team, in the order you set |
+
+### Adding a new team
+
+**Taxonomy → Departments → Create new.** Give it a name and an **Order** (lower shows first on Meet
+the Team), and it is immediately selectable on every team member. Assign someone to it and a new
+labelled group appears on Meet the Team — no developer, no deploy.
+
+Renaming one renames its heading. Reordering them reorders the groups. Both were fixed in code until
+2026-08-20 and could only be changed by a developer.
+
+**Two things point at a department**, and both follow a rename automatically:
+
+- **Team members** — each person's Department, which is what groups them on Meet the Team.
+- **People Grid blocks** — a People Grid placed on any page can be limited to one department, and can
+  be told to group by department. Since 2026-08-20 the block chooses from this same list rather than
+  a fixed one, so the two can no longer offer different teams. If you retire a department, check any
+  People Grid that was pinned to it: it will have nothing left to show.
+
+> **Deleting a department that still has members is refused**, and the message says how many. Move
+> them to another department first. Without that guard they would keep their profiles but vanish from
+> Meet the Team, which is the sort of thing nobody notices for months.
 
 **Two of these are named differently from what a visitor reads.** *Assessment Areas* used to be
 called "Areas of Expertise" in the admin, and *Topics* used to be called "Categories" — both were
@@ -222,6 +254,14 @@ renamed so the admin matches the site.
 assessment types, claim types, assessment areas, accreditations and locations, and the profile
 assembles itself. The free-text parts are the biography, qualifications and position line.
 
+**Qualifications and accreditations are two different things**, and the difference decides how far a
+change reaches. **Qualifications** are typed on the specialist and belong to that one person; each row
+carries its own icon, chosen from the wording if you leave it empty. **Accreditations** are *shared
+records* (Reference → Accreditations) — a profile picks from the list, so editing one accreditation
+changes it on every specialist who holds it, and it doubles as a filter on the specialist directory.
+Leave the **Position line** empty and the specialty is used instead, so the line under a name is never
+blank. `HOOKS.md` §9 covers changing the icons themselves.
+
 **You can drag to reorder** this list; the order is used on the panel page.
 
 **Draft or instant:** has a Draft/Published toggle — saving as a draft removes them from the site.
@@ -234,6 +274,19 @@ assembles itself. The free-text parts are the biography, qualifications and posi
 
 > Note the two addresses differ — the list is at `/about/meet-the-team` while an individual is at
 > `/about/team/…`. That is intentional and long-standing; nothing needs doing about it.
+
+**Two photos, and which page each feeds.** A person can show one photo in the team grid and a
+different one on their own profile:
+
+| field | where it shows |
+|---|---|
+| **Team photo** | Meet the Team, and the byline photo wherever they are credited on an article. Also their profile page, unless the next field is set. |
+| **Profile photo** | Their profile page **only**. Leave it empty to use the Team photo in both places. |
+| **Show no photo on the profile page** | No photo on the profile; they still appear with their Team photo on Meet the Team. This wins over both uploads, so you can hide a photo without deleting it. |
+
+With no photo *and* no qualifications, the profile's bio widens to the full page rather than leaving
+a gap where the photo was. For a bad crop, see **Media** below — it is fixed there, once, for every
+page the picture appears on.
 
 **Draft or instant:** has a Draft/Published toggle.
 
@@ -274,7 +327,32 @@ photos beside it. Fixed on 2026-08-19.
 
 **One thing still worth knowing:** save photographs as **JPEG**, not PNG. PNG is lossless and is the
 right choice for a logo, but a PNG photograph is roughly ten times the file size of the identical
-JPEG, and the site cannot convert between formats. See OUTSTANDING.md §11.
+JPEG, and the site cannot convert between formats. See OUTSTANDING.md §11. The exception is the
+**specialist** headshots: those are cut-outs with a transparent background, and JPEG cannot store
+transparency, so they stay PNG.
+
+**The social preview image is already set, site-wide.** Every page, article, event, specialist and
+team member has its own optional *Meta Image* for link previews, and all of them fall back to
+**Site Settings → Social image**, which holds a 1200×630 VERIFY share card. Only override it on a
+document that deserves its own picture. If you do, use a **1200×630** image on an opaque background:
+anything else gets centre-cropped to that shape, and a transparent PNG picks up whatever background
+LinkedIn or Teams happens to use. The logo itself is the wrong choice here — it is too wide, and
+crops to "VERI".
+
+**Some page photographs are seeded too.** The larger pictures on About, the homepage, Information for
+Clients and Claimants, and Administrative Services come from files in the repository, not from an
+upload here — so they survive a rebuild. You can still replace one by uploading over it; it will hold
+until someone rebuilds the database from scratch, at which point the repository file returns. If a
+picture should change permanently, ask whoever maintains the site to swap the file.
+
+**Team and specialist photos have a second source, and it overrides you.** Those two sets of
+headshots are also kept as files in the repository, so that a rebuilt site still has them — an admin
+upload lives only on the server it was uploaded to. If someone has a file there, the next seed run
+replaces their photo with it, keeping your alt text, focal point and zoom. So if you upload a new
+headshot here and it reverts, that is why: the repository file has to be replaced too, or deleted to
+hand the photo over to the admin permanently. Ask whoever maintains the site; the folders and naming
+are in README.md under *Photos that have to survive a rebuild*. Everyone else's images — page
+blocks, events, articles — are yours alone and are never touched.
 
 ### Forms, and Form Submissions
 
@@ -307,7 +385,7 @@ on *every* article, event, team profile or specialist profile, rather than on on
 |---|---|
 | **Article Settings** | The sidebar cards and fixed labels on every article ("In This Article", "Topics") |
 | **Events Settings** | Boilerplate on event pages, per host (AAMLE / VERIFY) |
-| **Team Settings** | Breadcrumb and labels on every team profile |
+| **Team Settings** | Breadcrumb, the “About …” bio heading and the Qualification label on every team profile |
 | **Specialist Profile** | The section headings on every specialist profile, and the booking-portal band |
 | **Specialist Availability** | Wording on the availability grid, and the enquiry email its Send button opens |
 
@@ -316,6 +394,18 @@ on *every* article, event, team profile or specialist profile, rather than on on
 **Header** is the main menu and its dropdowns. **Footer** is the link columns, contact details and
 opening hours. **Site Settings** holds the logo, favicon, brand colours, the enquiry-drawer form, and
 the wording of the booking-portal registration email.
+
+Two groups inside Site Settings are easy to miss, and both change wording that appears on **every**
+page:
+
+- **Breadcrumbs** — the trail under the title on interior pages. **Home label** is the first crumb
+  ("Home"), shared site-wide; **Separator** is the character between crumbs (default `›`); and
+  **Screen-reader label** names the trail for screen readers, which is the only way someone using one
+  can tell it apart from the main menu. The middle crumb — "About", "Events" — comes from the content
+  type rather than from here, and an individual page can hide its trail from its own Hero tab.
+- **Accessibility** — **Skip-link text** is the wording of the link that appears when a keyboard user
+  presses Tab on a fresh page, letting them jump past the menu. The link itself is always there; only
+  its wording is editable.
 
 ### Design
 
@@ -366,7 +456,8 @@ to those, so make them when you are ready.
 - **Only the active tab of a Tabs block is in the page for search engines.** Do not hide anything
   important in a second tab.
 - **Clearing "Send to" on the registration email disables those buttons on purpose** — they render
-  as plain text rather than opening an email with no recipient.
+  as plain text rather than opening an email with no recipient. The wording of that email, and what
+  each field does, is in `HOOKS.md` §9.
 
 ---
 

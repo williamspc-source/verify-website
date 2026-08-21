@@ -23,7 +23,6 @@ import type { Team } from '@/payload-types'
 type TeamSettingsShape = {
   labels?: {
     breadcrumbSectionLabel?: string | null
-    roleLabel?: string | null
     qualificationLabel?: string | null
     aboutPrefix?: string | null
   } | null
@@ -61,7 +60,17 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
   const crumbSettings = await getCrumbSettings()
 
   const m = member as Team & Record<string, unknown>
-  const photo = typeof m.photo === 'object' ? m.photo : null
+  // Which photo this page shows, in one place:
+  //   hidden          → none, whatever is uploaded
+  //   profilePhoto    → that one (Meet the Team and bylines keep the team photo)
+  //   otherwise       → the team photo
+  const hidePhoto = Boolean((m as { hidePhotoOnProfile?: boolean }).hidePhotoOnProfile)
+  const teamPhoto = typeof m.photo === 'object' ? m.photo : null
+  const overridePhoto =
+    typeof (m as { profilePhoto?: unknown }).profilePhoto === 'object'
+      ? ((m as { profilePhoto?: unknown }).profilePhoto as typeof teamPhoto)
+      : null
+  const photo = hidePhoto ? null : (overridePhoto ?? teamPhoto)
   const sections = Array.isArray(m.sections)
     ? (m.sections as { heading?: string; body?: unknown }[])
     : []
@@ -70,6 +79,14 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
     : []
   // Accent word for the bio heading — the member's first name ("About Wes").
   const firstName = (m.title ?? '').split(/\s+/)[0]
+
+  // The sidebar holds the photo AND any qualification pills, so it survives a
+  // hidden photo whenever there is a qualification to show — dropping it on
+  // `hidePhoto` alone would silently take a member's qualifications with it.
+  // Only when it would render nothing does the grid collapse to one column, so
+  // the bio spans the full width instead of leaving a void beside it.
+  const hasQualification = qualifications.some((q) => q.qualification)
+  const showSidebar = Boolean(photo) || hasQualification
 
   return (
     <article>
@@ -94,7 +111,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
       {/* Body */}
       <section className="staff-body">
         <div className="container">
-          <div className="staff-body-grid">
+          <div className={`staff-body-grid${showSidebar ? '' : ' staff-body-grid--no-media'}`}>
             {/* Bio column */}
             <div>
               {m.bio ? (
@@ -121,43 +138,57 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
               ))}
             </div>
 
-            {/* Sidebar */}
-            <div>
-              <div className="staff-photo">
-                {photo ? (
-                  <Media resource={photo} imgClassName="staff-photo-img" size="320px" />
-                ) : null}
-              </div>
+            {/* Sidebar — omitted entirely when there is neither a photo nor a
+                qualification, so the grid above collapses to one column rather
+                than reserving 320px for nothing.
 
-              <div className="staff-sidebar-info">
-                {m.role ? (
-                  <div className="staff-sidebar-item">
-                    <div className="staff-sidebar-item-icon">
-                      <Icon name="briefcase" />
-                    </div>
-                    <div>
-                      <div className="staff-sidebar-item-label">{labels?.roleLabel || 'Role'}</div>
-                      <div className="staff-sidebar-item-text">{m.role}</div>
-                    </div>
+                The ROLE pin that used to head this list is gone. It is in every
+                reference profile, so this is a deliberate departure: it repeated
+                the role already printed under the name in the hero. See
+                verify-website-design-diff.md, Comparison 46. The Role label in
+                Team Settings went with it — a label for something nothing renders
+                is a control that silently does nothing.
+
+                NB: that sentence deliberately avoids writing the removed field in
+                `object.property` form. `readsField` in adminControls treats a
+                member access as a read even inside a comment, so naming it that
+                way here re-arms the very blind spot the guard warns about — it
+                silently made the orphan check pass on a deliberate break. */}
+            {showSidebar ? (
+              <div>
+                {photo ? (
+                  <div className="staff-photo">
+                    <Media
+                      resource={photo}
+                      fill
+                      pictureClassName="absolute inset-0"
+                      imgClassName="staff-photo-img"
+                      size="320px"
+                    />
                   </div>
                 ) : null}
-                {qualifications.map((q, i) =>
-                  q.qualification ? (
-                    <div className="staff-sidebar-item" key={i}>
-                      <div className="staff-sidebar-item-icon">
-                        <Icon name="graduation-cap" />
-                      </div>
-                      <div>
-                        <div className="staff-sidebar-item-label">
-                          {labels?.qualificationLabel || 'Qualification'}
+
+                {hasQualification ? (
+                  <div className="staff-sidebar-info">
+                    {qualifications.map((q, i) =>
+                      q.qualification ? (
+                        <div className="staff-sidebar-item" key={i}>
+                          <div className="staff-sidebar-item-icon">
+                            <Icon name="graduation-cap" />
+                          </div>
+                          <div>
+                            <div className="staff-sidebar-item-label">
+                              {labels?.qualificationLabel || 'Qualification'}
+                            </div>
+                            <div className="staff-sidebar-item-text">{q.qualification}</div>
+                          </div>
                         </div>
-                        <div className="staff-sidebar-item-text">{q.qualification}</div>
-                      </div>
-                    </div>
-                  ) : null,
-                )}
+                      ) : null,
+                    )}
+                  </div>
+                ) : null}
               </div>
-            </div>
+            ) : null}
           </div>
         </div>
       </section>

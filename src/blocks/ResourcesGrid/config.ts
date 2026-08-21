@@ -5,6 +5,7 @@ import {
   backgroundField,
   cssClassField,
   gridDisplayFields,
+  hideWhenEmptyField,
   sectionHeaderFields,
 } from '@/fields/blockFields'
 
@@ -102,6 +103,7 @@ export const ResourcesGrid: Block = {
     },
     anchorIdField,
     cssClassField,
+    hideWhenEmptyField,
     ...gridDisplayFields,
   ],
 }

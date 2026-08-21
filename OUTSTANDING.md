@@ -21,7 +21,7 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 
 | # | Issue | Live today? | User impact | Effort | Recommendation |
 |---|---|---|---|---|---|
-| 1 | Migration not yet created on the box | — | **Blocks deploy** | ~20 min + a careful read | **Required, immediately before the push** |
+| 1 | The catch-up migration, abandoned — a **fresh baseline** replaces it | — | **Blocks deploy** until the baseline is generated | ~20 min | Superseded; the live procedure is `current-state.md` §1 |
 | 2 | Two e2e specs are flaky under a loaded dev server, and can 500 an unrelated route | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine, sometimes reporting a page as broken when it is not | ~10 min | Worth doing before handover |
 | 3 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** | After the deploy, not before |
 | 4 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min | Only if someone confirms which is intended |
@@ -29,6 +29,17 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 6 | Three dead CSS rules on a `.ct-portal-card` class that never reaches the DOM | No | None — a live rule covers it | ~5 min | Fold into the next dead-CSS sweep |
 | 7 | A Service with no `linkOverride` would render a link to a page that does not exist | Latent — 0 broken links today | Only if someone adds one of the 6 override-less services to the one grid with linking on; `links.e2e.spec.ts` catches it | ~20 min + a schema change | Before anyone builds a new services grid |
 | 8 | The availability button says "Send enquiry"; form submits say "Send Enquiry" | Cosmetic | One word, one button | ~10 min + a repair | With the next copy sweep |
+| 9 | The Join the Expert Panel intro is 2–4px off, on selectors ~29 pages share | Cosmetic, 1 page | Sub-pixel to 4px on one intro band | ~15 min + re-baseline | Only with a wider type pass — the selectors are shared |
+| 10 | Two deliberate departures from the reference on the events listings | By design | None — both are improvements on the reference | — | Recorded so nobody "fixes" them back |
+| 11 | Photo derivatives are PNG, which costs ~1.5 MB across two pages | Yes | `/` and `/specialists` carry ~1.5 MB more than they need | 2 lines + regenerating every derivative | Its own pass — the regeneration is migration-shaped |
+| 12 | The bundled homepage shield is a 1166px PNG in a 50px box | Yes | 73 KB for a 50px logo, on every page | ~10 min | With the next asset sweep |
+| 13 | Twelve of the twenty image placeholders have no photograph | Yes | Twelve pale-blue placeholders where a photo belongs | Per photo: drop the file in and map it | As the photographs arrive |
+| 14 | `public/media/` accumulates orphaned uploads across reseeds | Local only | None — disk on the dev machine | ~5 min | Whenever it bothers you |
+| 15 | `.events-summary-section` is a faithful port that nothing can reach | No | None — dead CSS | ~5 min | Fold into the next dead-CSS sweep |
+| 16 | Two self-sectioning blocks are missing from `selfSpaced` | Yes | A stray 64px above and below Events Explorer and Featured Articles | ~5 min + re-baseline | Next spacing pass — it moves pages, so measure |
+| 17 | An article is bylined to someone who is not on the team | Yes | A byline that does not link, where the others do | ~5 min + a reseed | Needs a content decision first |
+| 18 | The reference-diff exceptions rest on measurements older than the stylesheet | No | None — but the tool's exceptions cannot be trusted until re-taken | ~45 min | Before the next port that leans on them |
+| 19 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min for an unlisted style-guide page | A decision — doing nothing is defensible |
 
 ---
 
@@ -61,6 +72,18 @@ and seven times and 500 once**. A genuinely broken route does not do that. The t
 the log immediately before each failure — `Pulling schema from database…`, i.e. `seedUser.ts` building
 its own Payload instance for the admin spec while the crawl that follows is already running. So the
 admin spec does not merely fail on its own timeout; it can take the *next* spec down with it.
+
+**Widened again 2026-08-20: the `beforeAll` hook now exceeds its own 30s budget.** Two of three full
+`pnpm test` runs failed with *"beforeAll hook timeout of 30000ms exceeded"* at
+`admin.e2e.spec.ts:12`, followed by *"browser.newContext: Target page, context or browser has been
+closed"* — so the hook, not an assertion, is where the clock runs out, and all three admin tests are
+lost with it. The same spec passed **3/3 in isolation in 16s** immediately afterwards, and the count
+has grown — 17 tests when this was written, 31 on 2026-08-21 — which is more crawl traffic ahead
+of it. (The suite counts live in `current-state.md`, dated; they were in four documents and no two
+agreed.) Same cause, one layer up:
+`seedTestUser()` builds its own Payload instance (*"Pulling schema from database…"*) while the rest of
+the suite is still hitting the dev server. The fix in this section covers it — warm `/admin` once
+before starting the clock — but the timeout to raise is `beforeAll`'s, not just the two assertions'.
 
 Two things follow. A 500 in this suite is not evidence of a broken page until it reproduces — check
 the ratio of 200s to 500s for that route in `.dev.log` first. And the `Ecmascript file had an error`
@@ -167,7 +190,8 @@ Measured on `/specialists/profiles/dr-adam-parr` at 1440px:
 `#414042` appear **49, 23 and 46 times** across its pages — so ours is darker on *every* interior page
 with a breadcrumb, not just this one.
 
-**Cost of fixing:** three token values in the light `--bc-*` context (`globals.css:4025-4070`), plus
+**Cost of fixing:** three token values in the light `--bc-*` context (`globals.css:4189-4191`; the
+dark override is at `:4235-4237`, and must move with it or the two go out of step), plus
 the separator's `font-size: 0.85em`. Not a page-scoped override — scoping it would make this page
 disagree with the rest of the site, which is the opposite of the point. It is one small edit and a
 snapshot re-baseline, but it changes ~25 pages at once, which is why it is a decision and not a
@@ -184,14 +208,14 @@ legitimate only because the entries say what the difference is rather than asser
 Found while verifying Comparison 37, by splitting `/contact`'s class attributes into a set rather than
 grepping for a substring.
 
-`globals.css` scopes three rules to `.ct-page .ct-portal-card` — lines **9182**, **9201** and
-**9202**. The bare class **is not in the served HTML**. Only the children are (`__head`, `__label`,
+`globals.css` scopes three rules to `.ct-page .ct-portal-card` — lines **9192**, **9211** and
+**9212**. The bare class **is not in the served HTML**. Only the children are (`__head`, `__label`,
 `__text`, `__btn`, `__features`), and `ct-page` itself is present, so the scoping is fine and only the
 parent hook is missing. A substring grep for `ct-portal-card` reports it present, because every child
 class contains that string — which is why it went unnoticed.
 
 Nothing is visibly wrong, because a **separate live rule** supplies the same treatment:
-`.ct-page .ct-enquiry-grid .ct-portal-card__btn` (line 10737) already sets the button margin and
+`.ct-page .ct-enquiry-grid .ct-portal-card__btn` (line 10809) already sets the button margin and
 full-width sizing.
 
 **Why it is not simply "add the missing class":** the dead rule sets `margin: 12px 0 4px` where the
@@ -282,7 +306,8 @@ them to satisfy one page changes ~29 pages — the shape of the `.page-hero h1` 
 59 pages and was written up as a *correction*.
 
 **The cost of fixing it properly is one variant, not five edits.** `.vf-client-overview`
-(`globals.css:9231`) **already encodes exactly this treatment** — `font-size: clamp(1.7rem,3vw,2.4rem)`,
+(`globals.css:9240-9241`, where the selector this entry calls `.section-title` is in fact
+`.vf-split__title`) **already encodes exactly this treatment** — `font-size: clamp(1.7rem,3vw,2.4rem)`,
 `font-weight: 800`, `margin-bottom: 20px`, plus `.vf-client-overview .vf-split__body p { line-height:
 1.85 }` — as a page scope for `/for-clients`, whose reference intro is the same editorial pattern.
 So the honest fix is a single shared "editorial intro" density on SplitFeature serving both pages,
@@ -382,220 +407,217 @@ This is why the image guard scopes its ratio check to CMS-served URLs — includ
 would have meant either failing on day one or setting the threshold to 24×, which would excuse every
 real regression.
 
+## 13. Twelve of the twenty image placeholders still have no photograph
+
+**Re-measured 2026-08-20.** The *mechanism* gap this entry used to describe is closed: page
+photographs are now seeded from `public/assets/images/content/` by
+`src/endpoints/seed/repairContentImages.ts`, so a filled placeholder survives a database rebuild.
+Eight are done. **Twelve are still empty**, waiting on photography:
+
+| page | placeholder |
+|---|---|
+| `/services` | Independent Medical Examinations · Joint Medical Examinations |
+| `/services/medico-legal` | Everything a Matter Needs, Under One Roof |
+| `/services/medico-legal/ime` | An Expert Medical Opinion, Independent of All Parties |
+| `/services/medico-legal/jme` | One Specialist. Jointly Instructed by Both Parties. |
+| `/services/medico-legal/reporting-services` | Supplementary Report · Expert Evidence · Teleconference · File Review |
+| `/specialists/join-expert-panel` | A Specialist Partnership Built on Quality & Integrity |
+| `/services` and `/services/educational-services` | the two AAMLE Education panels |
+
+Nothing renders wrong — the pale-blue tile is the designed empty state, and each says "Image
+Placeholder".
+
+**Cost of closing one:** drop the file in `public/assets/images/content/` and add one entry to
+`TARGETS` in the repair. Minutes each.
+
+**The trap to avoid:** filling one through the admin instead. That works immediately and is lost the
+next time the database is rebuilt — which is how the box is being deployed. The repair route is the
+one that survives.
+
+## 14. `public/media/` accumulates orphaned uploads across reseeds
+
+**Measured 2026-08-19.** Seventeen copies of one headshot — `wes-lerch.png` through
+`wes-lerch-16.png`, each with its own `-300x300` derivative — sit in `public/media/`, and exactly one
+(`-15`) is referenced by a Media doc. Every reseed against a fresh database uploads again while the
+previous files stay on disk.
+
+Impact is disk only, and local only: ~35 KB per orphan, and a fresh install on the box uploads each
+photo once. Nothing renders wrong, because the unreferenced files are unreachable.
+
+Cost of fixing: a cleanup script that lists `public/media/`, subtracts every `filename` and every
+`sizes.*.filename` recorded in the Media collection, and deletes the remainder. The risk is the
+obvious one — it must enumerate from the database and not from a filename pattern, or it will delete
+a file that is in use.
+
+## 15. `.events-summary-section` is a faithful port that nothing can reach
+
+**Measured 2026-08-20.** `globals.css:5104-5105` carries the reference's
+
+```css
+.events-summary-section { padding: 78px 0; }
+.events-summary-section.bg-soft { background: #f6fbff; }
+```
+
+and **neither can ever match**. The reference gives its Upcoming and Past groups a `<section>` each;
+we render both inside one `<Section>`, so the class never reaches the DOM — 0 occurrences in the
+browser, with `.events-section-header` ×3 and `.events-card-grid` ×2 as positive controls that the
+check could see the region at all. (`curl | grep` is useless here: those groups are client-rendered,
+and it reports 0 `.events-card-grid` on a page showing eight.)
+
+It is **deliberately left dead** rather than wired up. Adding `.events-summary-section` to our group
+divs would apply `padding: 78px 0` to every group on all three events pages — 156px per group,
+including the two single-mode child listings that have no second group and no reason to move. The
+separator work (Comparison 45) therefore uses its own `.events-explorer-group--band` modifier, which
+takes the same job with the padding we want.
+
+**Cost of closing it:** delete the two rules. Held back because the `events` diff family compares
+declarations and would then report them missing from the build, so it needs a `NOT_PORTED` entry with
+this reason in the same pass — and because this repo has twice nearly deleted live CSS on a dead-code
+verdict.
+
+Checked rather than assumed, because the first draft of this entry got it wrong: `.bg-soft` is **not**
+a live class used elsewhere. It appears exactly once in `globals.css`, inside the compound selector
+above, and is emitted by no component. So both rules are dead together and neither has an
+independent consumer — which makes the deletion simpler than the caveat originally claimed, not
+riskier.
+
+## 16. Two self-sectioning blocks are missing from `selfSpaced`, so they carry a stray 64px
+
+**Measured 2026-08-20.** `CLAUDE.md`'s own rule for adding a block says: *"add to `selfSpaced` if the
+component wraps itself in `<Section>` (otherwise it gets the legacy `my-16` wrapper at top level)"*.
+Two do not follow it —
+
+| block | slug | renders `<Section>` | in `selfSpaced` |
+|---|---|---|---|
+| EventsExplorer | `eventsExplorer` | `Component.tsx:104` | **no** |
+| FeaturedArticles | `featuredArticles` | `Component.tsx:157` | **no** |
+
+— so each is wrapped in `.my-16` and carries **64px of margin above and below its own Section
+padding**. That is what supplied half of the 152px white strip between the /events band and the
+footer (Comparison 45); the band case is handled by `.my-16:has(> .events-explorer--band-to-edge)`,
+which is the same collapse `.my-16:has(> .ni-section)` already does for Archive bands, but the stray
+margin is still there in every other case.
+
+Checked, not assumed: an audit of all 36 block components for a `<Section>` render initially reported
+**three**, including `ArchiveBlock` — a false positive, because its match was a *comment* saying
+"the same band classes `<Section>` uses". It renders a plain `<div>` and is correctly excluded, as the
+`.ni-section` collapse rule above implies.
+
+**Cost of closing it:** two lines in `RenderBlocks.tsx`. Held back because it removes 64px top and
+bottom from `/events`, `/events/upcoming-events`, `/events/past-events` and `/in-the-loop` — four
+pages moving, none of which anyone has complained about, on a change nobody asked for. Do it behind a
+`computedSnapshot` capture and expect a diff, rather than as a tidy-up.
+
+---
+## 17. An article is bylined to someone who is not on the team
+
+`src/endpoints/seed/data/posts.ts` names **Evie Le** as an author. She is not among the 19 team
+members the seed creates, and her photograph is staged for deletion in the same working tree — so the
+byline names a person with no profile to link to.
+
+**Live today?** Yes, on the seeded articles that carry that byline.
+
+**User impact:** small and cosmetic — a name renders as plain text where the other authors' names
+resolve to a team profile. Nothing 404s, because `teamPath` returns nothing to link to rather than
+fabricating an href.
+
+**Why it was not fixed here:** it is a content decision, not a defect. Either the article is
+re-attributed to a current team member, or Evie Le is restored to the team data with a photograph.
+Both are one-line changes to the fixture **plus a seed run**, and the seed only writes into an
+absence, so an article whose author an editor has already changed will not be touched.
+
+**Cost of fixing:** ~5 minutes plus a reseed, once someone says which way.
+
+**How it was nearly lost:** this was tracked in `current-state.md`, and that section was deleted in
+the same pass that deleted the photograph — leaving the inconsistency live and recorded nowhere.
+Which is what this register is for.
+
 ---
 
-## 1. The outstanding migration
+## 18. The reference-diff exceptions rest on measurements older than the stylesheet
 
-Not a code fix, and not a defect. The local database has been kept in step by the Postgres adapter's
-dev push, which runs automatically and writes no migration file. Production does not push — it runs
-migrations — so the box cannot serve the new code until a migration exists that takes the **live**
-database from the checked-in baseline to the current shape.
+`tests/visual/referenceCssDiff.mjs` keeps three lists of deliberate exceptions — `NOT_PORTED`,
+`IMPLEMENTED_AS` and `EXPLAINED`. Seven `EXPLAINED`/`NOT_PORTED` reasons cite a browser measurement
+taken at 1440px on **2026-08-18** or **2026-08-19**. `globals.css` has changed by 164 lines since.
 
-### Status: deliberately held until the end
+**Live today?** No — all 13 families read zero on 2026-08-21, before and after that day's edits. This
+is a trap for a future reading, not a current fault.
 
-Polishing is still in progress and every further pass may add fields. Generating the migration now
-would mean regenerating it later, and a superseded migration file in `src/migrations/` is a trap:
-someone will run it.
+**User impact:** none directly. The risk is to the tool's credibility: the file's own rule is that an
+aged exception needs its measurement **re-run, not re-read**, and a skip justified by "verified equal
+in the browser" was once false and hid **11 real spacing gaps** on `/services`.
 
-**So the sequence is: finish the work, then do this once, then push.** Everything below describes
-what the migration will contain *as of the last measurement*; the shape of the additions and the
-identity of the five drops are settled, but **the counts will move** if more fields land. Re-measure
-before you generate — the commands are in the next section.
+**Cost of fixing:** ~45 minutes. Re-take the seven readings at 1440px with JavaScript disabled on
+both sides, and either confirm the reason or close the difference. That is a design pass, so it was
+not folded into a documentation one; a dated age warning now sits above `EXPLAINED` so nobody reads
+those reasons as fresh.
 
-### Measured drift — and how to re-measure it
+---
 
-Two passes have landed since the table below was measured:
+## 19. Five blocks are on no page, so nothing reviews them
 
-- the **article heading-id** pass added no columns — it changes how rich text is rendered, not what
-  is stored;
-- the **Meet the Team header band** pass added **2**: `header_background` on
-  `pages_blocks_people_grid` and `_pages_v_blocks_people_grid`. Additive, nullable, defaulted to an
-  inert sentinel. It changes no enum and drops nothing, so the drop list in §B is untouched.
+**Stats Band**, **Spacer**, **Divider**, **Icon** and **Image** are selectable in the page builder and
+appear on no page of the site. They were only ever displayed together on `/style-guide`, removed on
+2026-08-20 — correctly, since it was a developer page a visitor could reach.
 
-So the additions are now **+184**, not +182. Re-measure anyway rather than trusting this sentence —
-the commands are below.
+**Live today?** Not a fault. The blocks work; they are simply unobserved.
 
-Measured **2026-08-14** (re-measured after the link pass), checked-in baseline
-(`src/migrations/20260705_105320_baseline.json`) against the local `verify_cms` schema:
+**User impact:** none now, and a regression in any of them would reach production unnoticed —
+`REVIEW-CHECKLIST.md` cannot list what no page renders, and `computedSnapshot.mjs` cannot measure it.
 
-| | Baseline | Now | Change |
-|---|---|---|---|
-| Columns | 3207 | 3386 | **+184, −5** |
-| Tables | 301 | 303 | **+2** |
-| Indexes | 946 | 1266 | +320 |
+**Cost of fixing:** ~30 minutes for an unlisted, `noindex` style-guide page that is not in the nav or
+the sitemap — which is close to what was just deleted, so it is a real decision rather than an
+oversight to correct. Doing nothing is defensible: these are the five simplest blocks in the builder.
 
-The link pass added **49** columns to the previous 3335: an optional `anchor` on every stored link
-(one column per table that uses the `link()` helper, live + version), plus `anchor_id` on
-`appt_guide_types`, `pages_blocks_services_grid` and their version twins. All additive. The header
-band pass added the last **2** (`header_background`, live + version). Re-measured 2026-08-14:
-3386 current against 3207 baseline is a net 179, which with the five drops is **+184**.
+**Do not** put them on a real page to make the checklist tidy.
 
-> **Correction.** An earlier revision of this table said "+131, −3" alongside a list of five dropped
-> columns — the two disagreed, and the column breakdown was the wrong one. 3207 + 133 − 5 = 3335.
-> A revision before that gave 3329 columns / 1267 indexes, which reconciled with neither source.
-> These figures are re-derived, not adjusted.
+---
 
-Re-derive both sides with these. Run from the repo root, against the machine's own database:
+## 1. The catch-up migration, abandoned
 
-```bash
-PSQL=/opt/homebrew/opt/postgresql@15/bin/psql
+**Superseded on 2026-08-20 and kept only as a record.** This entry used to be a 215-line procedure
+for taking the **live** database from the checked-in baseline to the current shape with one generated
+catch-up migration. That is no longer the plan: the box is being wiped and rebuilt, so the move is a
+**fresh baseline** — delete `src/migrations/`'s baseline, empty its index, and generate one
+`CREATE TABLE` migration against an empty database. **The live procedure is `current-state.md` §1.**
 
-# Current
-$PSQL -d verify_cms -tAc "select count(*) from information_schema.columns where table_schema='public';"
-$PSQL -d verify_cms -tAc "select count(*) from information_schema.tables where table_schema='public' and table_type='BASE TABLE';"
-$PSQL -d verify_cms -tAc "select count(*) from pg_indexes where schemaname='public';"
-
-# Baseline
-node -e 'const t=Object.values(require("./src/migrations/20260705_105320_baseline.json").tables||{});
-console.log("tables",t.length,"columns",t.reduce((n,x)=>n+Object.keys(x.columns||{}).length,0),
-"indexes",t.reduce((n,x)=>n+Object.keys(x.indexes||{}).length,0));'
-```
-
-Counts alone will not tell you whether a **sixth** column has joined the drop list, and that is the
-only part of this migration that destroys data. Diff at column level:
-
-```bash
-$PSQL -d verify_cms -tAF'|' \
-  -c "select table_name||'.'||column_name from information_schema.columns
-      where table_schema='public' order by 1;" > /tmp/cols_now.txt
-
-node -e '
-const fs = require("fs")
-const base = new Set()
-for (const t of Object.values(require("./src/migrations/20260705_105320_baseline.json").tables || {}))
-  for (const c of Object.values(t.columns || {})) base.add(t.name + "." + c.name)
-const now = new Set(fs.readFileSync("/tmp/cols_now.txt", "utf8").trim().split("\n"))
-const added   = [...now].filter((k) => !base.has(k)).sort()
-const removed = [...base].filter((k) => !now.has(k)).sort()
-console.log("ADDED", added.length, "\nREMOVED", removed.length)
-console.log(removed.map((r) => "  " + r).join("\n"))
-'
-```
-
-**If `REMOVED` is anything other than the five columns in §B, stop and find out why.** That is how
-the five below were identified, and re-running it is cheaper than discovering a sixth drop on the
-live database.
-
-### A. The additions — 133 columns, 2 tables. Ordinary, and safe.
-
-Additive DDL is reversible in practice and carries no data loss. Grouped by what introduced them:
-
-| Area | Count | What |
-|---|---|---|
-| `site_settings` | 36 | The brand palette (30 `colors_*`), `breadcrumbs_home_label` / `_nav_label` / `_separator`, `accessibility_skip_link_label`, `enquiry_form_id`, `shield_id` |
-| `design_system` | 28 | Shadow/glow `effects_*` (15), `radius_*` (8), `gradients_*` (4), `typography_text_scale` |
-| Events guest presenters | 13 | `events_guest_presenters` + `_events_v_version_guest_presenters` — **these are the 2 new tables** |
-| Card shadow preset | 18 | `shadow` on 9 block tables, ×2 for their version twins |
-| Page hero | 10 | `hero_hero_background`, `hero_hero_padding_top` / `_bottom`, `hero_container_width`, `hero_definition_interaction`, ×2 for the version table |
-| Nav/footer/article link targets | 9 | 3 FK columns each on `header_rels`, `footer_rels`, `article_settings_rels` (`events_id`, `specialists_id`, `team_id`) |
-| Rich text + step controls | 4 | `process_steps.intro_rich` and `process_steps_steps.badge_style`, ×2 |
-| Everything else | 15 | `events.registration_closes_at` ×2, `services_grid.card_align` ×2, `newsletter.form_id` ×2, 3 × `specialist_profile.portal_cta_*_label`, 2 label fields each on `article_settings` and `events_settings`, `offices.is_primary`, `search.uri` |
-
-36 + 28 + 13 + 18 + 10 + 9 + 4 + 15 = **133**.
-
-### B. The removals — 5 columns. **This is the irreversible part.**
+Deleting it rather than leaving it was the point. Its pre-flight told the operator to confirm
+*"exactly five `DROP COLUMN` statements … anything else dropping is a mistake — stop and
+investigate"*. Re-measured 2026-08-21, the working tree drops **twelve** columns, every one of them
+deliberate:
 
 ```
+_pages_v.version_hero_scroll_hint          pages.hero_scroll_hint
+_pages_v_blocks_people_grid.department     pages_blocks_people_grid.department
+_team_v.version_department                 team.department
 article_settings.labels_breadcrumb_home_label
-team_settings.labels_breadcrumb_home_label
+team_settings.labels_breadcrumb_home_label team_settings.labels_role_label
 specialist_profile.breadcrumb_breadcrumb_current_label
-testimonials.author_name          ← added by the homepage redesign
-testimonials.avatar_id            ← added by the homepage redesign
+testimonials.author_name                   testimonials.avatar_id
 ```
 
-**The three breadcrumb labels** were consolidated into `site_settings.breadcrumbs_home_label` /
-`_separator` / `_nav_label`. Nothing reads the old columns — verified by grep over `src/`, excluding
-the generated `payload-types.ts`, with a live field (`Offices.hoursNote`, 3 hits) as a positive
-control so a zero result means absent rather than a broken search.
+Six of those are the department columns moving from a hardcoded select to the Departments taxonomy —
+a *change of shape*, not a loss. An operator following the old instruction would have stopped a
+correct deploy on the strength of a number that went stale under it. That is the failure mode this
+register exists to prevent, which is why the whole procedure went rather than being annotated.
 
-**The migration will not copy the values across.** If an editor customised a breadcrumb label on the
-box, it is lost. That was accepted for *this* deploy because the box's content is being replaced
-wholesale. **It will not be acceptable next time**: once the box holds real edits, a consolidation
-like this needs an `UPDATE … SET new = old` in the migration *before* the `DROP`.
+**Two things in it survive the change of plan**, because they are about how Payload generates SQL and
+not about which migration you generate:
 
-**The two testimonial columns** came out with the homepage redesign. The card now matches the design
-reference, which attributes quotes by position and organisation only — no personal name, no
-portrait. Leaving the fields in place would have left two admin controls that render nothing, which
-the orphan-field guard fails on. Locally all six seeded testimonials had neither set, so nothing was
-lost here.
+- **`migrate:create` will not warn you.** The *"Accept warnings and push schema to database? (y/N)"*
+  prompt exists only in the **dev-push** path (`pushDevSchema.js`), which runs during local
+  development. `migrate:create` writes the SQL silently, `DROP COLUMN`s included. **Read the
+  generated file**, every time.
+- **A `varchar → jsonb` conversion needs its `USING` clause**, and a generated migration does not
+  carry one. `ProcessSteps.description` was converted locally with a paragraph-splitting expression
+  checked in verbatim at **`src/migrations/REFERENCE-processSteps-richtext.sql`** — inert, because
+  `src/migrations/index.ts` registers migrations explicitly rather than scanning the directory. A
+  bare `ALTER COLUMN … TYPE jsonb` fails outright on a non-empty table, and `USING description::jsonb`
+  is worse: it errors on the first row, because the values are prose, not JSON. A fresh baseline on an
+  empty database sidesteps this — but the moment there is data, it applies again.
 
-**Pre-flight check on the box, before you migrate.** Locally these columns are already gone, so this
-can only be answered there:
-
-```sql
-SELECT id, author_name, avatar_id FROM testimonials
-WHERE author_name IS NOT NULL OR avatar_id IS NOT NULL;
-
-SELECT labels_breadcrumb_home_label FROM article_settings;
-SELECT labels_breadcrumb_home_label FROM team_settings;
-SELECT breadcrumb_breadcrumb_current_label FROM specialist_profile;
-```
-
-Anything non-null is about to be deleted. Copy it somewhere first, or add the `UPDATE` to the
-migration.
-
-### C. Two type changes — the part a generated migration gets **wrong**
-
-| Column | Baseline | Now |
-|---|---|---|
-| `pages_blocks_process_steps_steps.description` | `varchar` | `jsonb` |
-| `_pages_v_blocks_process_steps_steps.description` | `varchar` | `jsonb` |
-
-(`intro_rich` on the same two block tables is an ordinary additive `jsonb` column — no conversion.)
-
-Both tables hold data: **26 live rows** and **150 draft-history rows** locally as of 2026-08-14.
-That matters because:
-
-- a generated `ALTER COLUMN … TYPE jsonb` with **no** `USING` clause fails outright on a non-empty
-  table;
-- one with a bare `USING description::jsonb` is worse — it errors on the first row, because the
-  existing values are plain prose, not JSON.
-
-The migration must carry the paragraph-splitting `USING` expression used locally. It is checked in
-verbatim at **`src/migrations/REFERENCE-processSteps-richtext.sql`** — inert, because
-`src/migrations/index.ts` registers migrations explicitly rather than scanning the directory. It
-defines a `pg_temp.to_lexical(text)` helper that splits on `\n{2,}` and wraps each paragraph as a
-Lexical node, matching `plainTextToLexical` exactly, then applies it to both tables. Paste it into
-the generated migration. **Do not trust the default.**
-
-Inline `**bold**` / `*italic*` is deliberately not parsed by that function; no existing row contains
-a marker (checked), and the seed is the path that introduces them.
-
-### `migrate:create` will not warn you
-
-The *"Accept warnings and push schema to database? (y/N)"* prompt exists only in the **dev-push**
-path (`pushDevSchema.js`), which is what runs during local development. `migrate:create` writes the
-SQL silently, `DROP COLUMN`s included. **Read the generated file.**
-
-### The procedure, on the box
-
-1. Run the **pre-flight check** in §B. Deal with anything non-null before going further.
-2. `pnpm payload generate:types`
-3. `pnpm payload migrate:create <name>`
-4. **Open the generated SQL and read all of it.** Confirm:
-   - exactly **five** `DROP COLUMN` statements, and they are the five in §B. Anything else dropping
-     is a mistake — stop and investigate;
-   - the two `description` columns change type **with** the `USING` clause pasted from
-     `REFERENCE-processSteps-richtext.sql`;
-   - `intro_rich` is a plain additive column with no conversion.
-5. `pnpm payload migrate`
-6. `pnpm build`
-
-### After it runs
-
-- **Admin → Site Settings → Breadcrumbs.** The three consolidated labels start empty on the box; set
-  them (locally they are `Home` / `›` / `Breadcrumb`).
-- **Open a page with a Process Steps block** and confirm the step descriptions render as paragraphs
-  rather than as raw JSON or as nothing. That is the conversion's only visible proof.
-- **Admin → System → Search → Reindex**, per `README.md` → *Before you deploy*.
-- Check a testimonial card, the header/footer nav, and one interior page hero — those cover the
-  three largest groups of added columns.
-
-### If it goes wrong
-
-Payload migrations run in a transaction, so a failure inside step 5 rolls back and the database is
-untouched — the usual failure is the missing `USING` clause, which surfaces as an error on the first
-`process_steps` row and changes nothing.
-
-What is **not** recoverable is a successful migration that dropped a column you had not checked.
-Take a `pg_dump` before step 5. That is the whole safety net for §B.
+**Cost of the fresh baseline:** ~20 minutes, and it is the deploy's critical path. The measured drift
+against the old baseline — 3518 columns against 3207, 308 tables against 301, 1295 indexes against
+946, with 323 columns added and the 12 above removed (2026-08-21) — is now only useful as a sense of
+how far the two had diverged. `current-state.md` §1 carries the live numbers and the commands that
+re-take them.

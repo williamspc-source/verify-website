@@ -25,7 +25,8 @@
  *     zsh tests/int/prove-guards.sh
  *
  * applies each break in turn, checks the matching test goes red, and restores
- * every file it touched. All five must report PASS.
+ * every file it touched. All ten must report PASS (ten `run_case` invocations,
+ * counted 2026-08-21 — it said five while running ten).
  *
  * When one of these fails, the fix is almost always to wire the control up. If it
  * genuinely should not be wired, add it to the allowlist WITH a reason.

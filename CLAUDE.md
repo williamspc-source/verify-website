@@ -90,9 +90,12 @@ Every rule below is here because that failure already happened once in this repo
 | **A "read this field" check must not count code that *writes* it.** | The orphan-field guard's haystack included `src/endpoints`, where the seed writes `{ hoursNote: '…' }`. That looks identical to a read, so every seeded field appeared consumed — measured: deleting the only renderer of `Offices.hoursNote` still passed. |
 | **An in-page anchor link is two halves: the link *and* the target.** Fixing one without the other is invisible. Guarded by `tests/e2e/links.e2e.spec.ts`. | The homepage's Videolink link was corrected to `#videolink-appointment` and the guide still opened on In-Person — the anchor ids had never reached the database, because `seedInfoBooking` early-returns on an authored page. The href looked right in every check that read hrefs. |
 | **Content links live in the database, so a seed edit alone fixes nothing.** Pair every link correction with an unconditional repair (`src/endpoints/seed/seedLinkRepairs.ts`, run from `seedVerify`). | The seed had *already* been corrected to canonical paths. Every existing install, the box included, still served the old ones: 30 links across 9 pages on flat legacy paths that only resolved through a 308. |
-| **"Has this been written yet?" is answered by `isUnauthored` (`src/endpoints/seed/authored.ts`) — never by counting blocks.** A repair writes only into an *absence*: a missing block, a superseded string, an empty field. Guarded by `tests/int/seedAuthored.int.spec.ts`. | All seven `authorPage` guards asked `layout.length > 2`, which is a proxy for "looks substantial", not "someone wrote this" — so **13 of 27 pages** were rewritten from the fixture on every seed run, discarding editor changes. Proven: the events hero was reworded to `EDITOR WORDING TEST`, the seed re-run, and the fixture wording came back. The correct predicate already existed as `isPlaceholderLayout`, used only by the two pages built outside `authorPage`. |
+| **"Has this been written yet?" is answered by `isUnauthored` (`src/endpoints/seed/authored.ts`) — never by counting blocks.** A repair writes only into an *absence*: a missing block, a superseded string, an empty field. Guarded by `tests/int/seedAuthored.int.spec.ts`. | All the `authorPage` guards asked `layout.length > 2`, which is a proxy for "looks substantial", not "someone wrote this" — so **13 of 27 pages** were rewritten from the fixture on every seed run, discarding editor changes. Proven: the events hero was reworded to `EDITOR WORDING TEST`, the seed re-run, and the fixture wording came back. The correct predicate already existed as `isPlaceholderLayout`; today it has one direct call site (`src/endpoints/seedVerify.ts:798`) plus its use inside `isUnauthored` itself. `tests/int/seedAuthored.int.spec.ts` asserts **six** files define `authorPage` — the seventh copy is inlined in `seedHomepage` — and its comment records that this control is what caught a guessed number, so trust the spec over any count written here. |
+| **For a file, "absence" means the stored bytes differ from the source — not that the field is empty.** Media is deduped by `alt`, and Payload suffixes the stored filename on collision (`wes-lerch.png` → `wes-lerch-15.png`), so `filesize` is the only reliable disk↔database link. | The photo backfill guarded on `if (rec.photo) continue`, the team lookup hardcoded `${slug}.png` so a JPEG never matched, and `getOrCreateMedia` matched on `alt` and handed back the *old* doc. Three independent reasons a replacement photo committed to `public/assets/images/` changed nothing, none of which logged anything, on a seed run that reported success — covering all 26 specialists and 14 of 19 team members. Replace the file **in place** on the existing doc (`payload.update({ filePath })`): the id, alt, focal point and zoom survive, every reference updates at once, derivatives regenerate, and PNG alpha is preserved. |
 | **A field with a `defaultValue` cannot be used as a migration signal.** To detect "this document predates the change", key on a *new* field that declares no default. | A repair meant to fire once keyed on all four new fields being unset. A new column does not arrive null when its field has a default: the adapter emits `ADD COLUMN … DEFAULT`, which Postgres backfills into every existing row. Measured before the repair had ever run, the block already read `spaced/default/check` — indistinguishable from an editor's choice, so the repair would never have fired at all. `placeholderIcon` (no default) was the only genuine absence available. |
 | **An id a link can target must be in the server HTML, and the id and the link must come from one function** (`src/utilities/headingId.ts`; opt in per `RichText` with `headingIds`). Assigning ids in a `useEffect` is too late for the browser and too late to be worth doing. | Article heading ids were assigned by `ArticleToc` on mount, so a *pasted* `…/article#section` URL found nothing and stayed at the top — the browser resolves a fragment while parsing. Restoring that mount loop as a test break confirmed it: `scrollY 0`, heading still resting at y=972. The two slugify copies (one for the contents hrefs, one for the ids) were also free to drift, and a drifted pair renders perfectly and does nothing. |
+| **A nav that hides an item for a sibling section decides emptiness through the SAME query the section runs.** Extract the block's filter to a `query.ts` beside it (`src/blocks/*/query.ts`), consumed by the block to fetch and by `src/blocks/sectionEmptiness.ts` to count. | The sticky Section Nav on `/in-the-loop` drops the tab of any section that renders nothing. Two copies of "which posts does this list" are free to disagree, and the failure is silent in both directions — a tab pointing at a section that is not there, or a live section with no way to reach it. Exactly how the five copies of the collection→prefix map in `routes.ts` drifted, and how three byte-identical event-type label maps nearly shipped a blank badge. The alternative — the client dropping pills whose `#id` is missing — cannot drift either, but costs a visible flash of tabs that then vanish and does nothing with JavaScript off. |
+| **A walk over a block tree guards `Array.isArray` on EVERY child key.** Block field names are not unique across configs, so a key that holds children on one block holds a scalar on another. | `columns` is the Row block's array of columns *and* Archive's/ResourcesGrid's "how many per row" select, where it is the string `'3'`. `flattenBlocks` read it without the guard and threw `flatMap is not a function`, 500-ing `/in-the-loop` — the runtime form of the shared-field-name hole already recorded for the orphan-field guard. The neighbouring repairs in `src/endpoints/seed/` had the guard; the new helper was written from the same shape and lost it. |
 | **Don't cache a value that is already stable.** For a `useSyncExternalStore` snapshot, prefer a naturally-stable computation over a module-level memo. | `startOfDay(Date.now())` already returns the same number all day. Memoising it in a module variable froze "today" for the life of the JS bundle — which outlives a page, since client-side navigation doesn't re-evaluate modules — so a tab open overnight never re-bucketed events. |
 
 ## Commands
@@ -108,10 +111,39 @@ pnpm test:int             # vitest, tests/int/**/*.int.spec.ts
 pnpm test:e2e             # playwright, tests/e2e/ — starts/reuses a dev server on :3000
 pnpm generate:types       # → src/payload-types.ts   (after ANY collection/global/block field change)
 pnpm generate:importmap   # → src/app/(payload)/admin/importMap.js (after adding a custom admin component)
+
+pnpm payload run scripts/inventory.ts   # → photo-inventory.csv + content-inventory.csv (review docs)
 ```
+
+`scripts/inventory.ts` enumerates every image slot on the site and every page/article/event. Both
+CSVs are gitignored working documents and go stale as soon as content changes — a deleted-and-
+reseeded document returns with a **new id**, so `admin_url` starts pointing at a record that no
+longer exists. Re-run it rather than editing a stale copy.
 
 Single test: `pnpm test:int tests/int/api.int.spec.ts -t "name"` ·
 `pnpm test:e2e tests/e2e/frontend.e2e.spec.ts -g "name"`.
+
+### What each suite guards
+
+Six of these were never named anywhere in this file, so the invariants they cover read as unguarded
+and the specs read as deletable. Counts are deliberately **not** recorded here — they live in
+`current-state.md`, dated, because four documents once carried four disagreeing numbers.
+
+| File | What it guards |
+|---|---|
+| `tests/int/adminControls.int.spec.ts` | The control guards: orphan fields, option values with no CSS rule, the class picker, hardcoded brand assets, placeholders with no upload, `cacheLife` on a tag purge, discarded `appearance`, unguarded draft queries. Proved by `zsh tests/int/prove-guards.sh` — **ten** cases, all must report PASS. |
+| `tests/int/seedAuthored.int.spec.ts` | `isUnauthored`/`isPlaceholderLayout`, and that every `authorPage` copy uses them rather than counting blocks. Also asserts how many files define `authorPage`, which is the number to trust. |
+| `tests/int/cssTokens.int.spec.ts` | `buildTokenCss`/`safeTokenValue` sanitisation — editor-supplied values land inside a `<style>` tag. |
+| `tests/int/eventTiming.int.spec.ts` | `isPast` at start-of-day, `registrationOpen` and its fallback, and that the two are allowed to disagree. The unit half of **Event timing** below. |
+| `tests/int/headingId.int.spec.ts` | `headingId`/`slugify` — stable slugs, `[[accent]]` stripping, collision disambiguation. The unit half of the anchor-id invariant. |
+| `tests/int/qualificationIcon.int.spec.ts` | Re-derives every qualification→icon pair from the design reference and asserts `qualificationIcon()` reproduces it, returns only icons in `iconMap`, and falls back. |
+| `tests/int/api.int.spec.ts` | **One boot smoke test** (`fetches users`). The name promises a suite; it is not one. |
+| `tests/e2e/frontend.e2e.spec.ts` | The largest e2e file: skip link (both states), centred-heading wrap, hero weight, testimonial hover. Most of the browser traps below are its assertions. |
+| `tests/e2e/links.e2e.spec.ts` | Every `#fragment` link has a target, plus the behavioural Videolink assertion — the "an anchor link is two halves" invariant. |
+| `tests/e2e/images.e2e.spec.ts` | Images are served at the size they render, per route. **The guard for the four image invariants below** (`sizes`, width-only derivatives, the no-derivative majority case, `object-fit` without `fill`). |
+| `tests/e2e/carousel.e2e.spec.ts` | `SlideCarousel` bounds: rapid next/prev, arrow keys, dot recovery, autoplay wrap. **The guard for the carousel invariant below** — and note it clicks with `{ force: true }`, without which the burst is not rapid. |
+| `tests/e2e/admin.e2e.spec.ts` | The admin loads and the Pages create form renders. Seeds its own user, and deletes the autosave draft it creates. |
+| `tests/helpers/` | `seedUser.ts` (deletes and recreates `dev@payloadcms.com`) and `login.ts`. |
 
 There is no typecheck script — use `pnpm exec tsc --noEmit`. ESLint ignores `src/payload-types.ts`.
 Imports resolve through `@/*` → `src/*` and `@payload-config` → `src/payload.config.ts`.
@@ -323,6 +355,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   *excludes* `/login`, and assert something only an authenticated page has.
 - **A write script that exits 0 may have written nothing.** `pnpm payload run` produced no output,
   made no changes, and succeeded. Assert the write in the store afterwards; never trust the exit code.
+  One specific cause: `payload run` **imports** the module, it does not call a default export — a
+  script written as `export default async function ({ payload })` runs zero lines, prints nothing and
+  exits 0. Do the work at the top level with `getPayload({ config })`.
 - **Verify at the layer the visitor sees.** Two Custom Styles presets were in the database and the
   REST API returned all 27, while the served page still had 25. The database being right proves
   nothing about the page — that gap was the caching bug in the Invariants table.
@@ -334,6 +369,11 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   that DDL by hand (`psql`) and restart, so the push finds no drift — that is how
   `ProcessSteps.description` was converted `varchar → jsonb`, prompt-free, in one
   `ALTER COLUMN … USING`.
+  **Seen again 2026-08-20, from removing a field added ten minutes earlier.** "I only just added it"
+  does not make a removal non-destructive: dropping `Departments.description` hung the push the same
+  way. The symptom that time was `curl` returning **000** and a single admin request sitting at
+  *"200 in 10.0min"* in the log, with the prompt several lines above it. Check `.dev.log` for
+  *"Accept warnings"* before assuming the server is merely slow.
 - **Content inside an inactive Tabs pane is not in the HTML.** `curl | grep` for the AAMLE panel
   found nothing on the homepage and the block was rendering perfectly — only the active tab is
   server-rendered. Drive a browser and click the tab.
@@ -453,7 +493,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   ships wrong.** `/events` was rebuilt, verified, and reported as matching the reference. The check
   compared the `h1` string and the list of `h2` headings — it found four slide titles out of four and
   stopped. Never measured: hero alignment, type scale (60.8px/800 against the reference's 52.8/700),
-  section background, card design, and every slide *body*, which were paraphrases from `seedShowcase`.
+  section background, card design, and every slide *body*, which were paraphrases from the showcase fixture
+  (`seedShowcase.ts`, since deleted — that authoring now lives in the per-page modules under
+  `src/endpoints/seed/`).
   Three rounds of "you missed something" followed, each finding another by eye. Spotting differences
   does not converge; enumerating them does. `node tests/visual/referenceCssDiff.mjs <family>` parses
   every declaration on both sides and prints a count that has to reach zero — and it caught two things
@@ -531,7 +573,9 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   variant was first verified on `/services`: the modifier appeared, and "the default ticks are gone"
   passed. Both were true and worthless — only `reporting-services` and `/style-guide` have any
   bullets at all, so the tick count was zero before the change too. Re-pointed at `/style-guide`,
-  where it goes **5 → 0 → 5**, the assertion has content. This is the positive-control rule again in
+  where it goes **5 → 0 → 5**, the assertion has content. (**`/style-guide` was removed on
+  2026-08-20**, so `reporting-services` is now the only page with bullets and the only place this
+  can be proven; the lesson stands, the second control does not.) This is the positive-control rule again in
   its most seductive form: the check *did* find the page, *did* find the section, and still measured
   an empty set. Assert a non-zero count in the "before" state, or the "after" state means nothing.
 - **The reference's `:first-child` is rarely our `:first-child`.** Its rows sit in a dedicated
@@ -707,6 +751,53 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   computed snapshot, and the only layout movement from an image-sizing pass. Harmless here, but it
   means "sizes preserve the aspect ratio" is *approximately* true, and a comment claiming it exactly
   is wrong.
+- **`object-fit: cover` on a Next `<Image>` does nothing unless the image is in `fill` mode.** Eight
+  photographs sat in their tiles with a band of background showing beneath — box 530×398, image
+  530×354 — while `getComputedStyle` reported `object-fit: cover` on the element the entire time.
+  Without `fill`, Next emits width/height attributes and the browser sizes by the image's own aspect
+  ratio; a `h-full` utility class never gets to apply. And `fill` positions absolutely, so the
+  container needs `position: relative` — `.vf-split__media` was `static`, and adding `fill` alone
+  would have anchored the photo to an ancestor further up and appeared to change nothing. Two blocks
+  already had it right (`WhyVerify`, `LeadershipSpotlight`), which is the fastest way to tell the two
+  states apart: compare against a call site that works rather than reading the CSS again.
+- **A seed step that writes a page's layout BEFORE that page's authoring module runs silently
+  disables the fixture — and only on a fresh install.** `seedVerify` used to place the contact form
+  itself, guarded on `isPlaceholderLayout`. It ran ~12 seconds before `seedInfoBooking`, replaced the
+  scaffold placeholder with a lone `formBlock`, and so made `isUnauthored` false: the real fixture
+  logged *"contact already authored, skipping"* against a database ninety seconds old. Measured on a
+  clean reseed — **/contact ended with 1 block instead of 13**, no portal card, no contact details,
+  no map, **zero `cssClass` rows**, which in turn left `repairPortalEnquiry` with no
+  `ct-portal-card__btn` anchor and made *it* a silent no-op too. An incrementally-grown database hides
+  all of this, because the page was authored before the ordering existed; `links.e2e.spec.ts` caught
+  it only after a wipe. **The box is a fresh install, so this would have shipped.** The pattern occurs
+  three times and only one was a bug: `for-claimants` already worked around it with
+  `authorPageReplace`, and `specialist-availability` is benign because the early build and the fixture
+  are the same single block — so check whether the two layouts actually differ before "fixing" the
+  next one.
+- **A dev schema push that has already SUCCEEDED can retry and fail forever, and the symptom is a
+  hanging page, not an error.** Adding an `iconField` creates a Postgres enum; the push created it,
+  then a later push retried `CREATE TYPE … AS ENUM(…)` and died on *"type already exists"*, so
+  `getPayload()` never settled and every request hung — `curl` returned nothing, and the only visible
+  message in `.dev.log` was the unrelated pre-existing `instrumentation.ts` Edge Runtime warning. It
+  reads exactly like a component you have just broken. **Check the database before believing drift**:
+  here all four columns and both enums (live *and* `_pages_v`) were already present and correctly
+  typed, so there was nothing to repair — `./stop.sh && rm -rf .next && ./start.sh` cleared it,
+  source unchanged. Distinct from the destructive-DDL prompt already recorded: that one waits on
+  input, this one loops on a redundant statement.
+- **An OG image is served through the `og` derivative, which CROPS — so a wide logo cannot be the
+  social image.** `generateMeta` reads `media.sizes.og.url`, and that size is `1200×630, crop:
+  'center'`. Pointing the field at the 4267×1359 logo scaled it to 1978px wide and centre-cropped to
+  1200, **losing 39% of the width**: the rendered derivative reads "VERI" over "MEDICO-LEGAL SOL"
+  with the shield sliced in half. Nothing warns, and the field reads as set. Supply a source already
+  at 1200×630 — the crop is then a no-op — and check the *derivative*, not the upload. Transparency
+  is the second half: a PNG with alpha is composited by each platform onto its own, usually dark,
+  background, which would have hidden the grey strapline entirely.
+- **`sharp`'s `flatten()` is applied to the INPUT, before `composite()`, whatever order you call them
+  in.** Building the share card as `sharp({create}).composite([logo]).flatten({background}).png()`
+  produced a file that looked perfect and was still RGBA — `channels: 3` on the canvas does not help
+  either, because compositing an RGBA overlay promotes it back to 4. The fix is a second pass:
+  composite `.toBuffer()`, then `sharp(buffer).flatten(...)`. Read the colour type out of the PNG
+  header (byte 25; 4 or 6 means alpha) rather than trusting that a white-looking image is opaque.
 - **A regex bulk edit across a fixture file reaches further than the page you are editing.** Adding
   one field to five rows via `perl -0pi -e` matched **13** — every row in `seedServices.ts` with the
   same two-line preamble, including `/services`, which must not have it. It was caught by reading
@@ -714,19 +805,72 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   the line numbers before accepting a bulk edit to seeded content; the fixtures for several pages
   live in one file and look alike by design.
 
+- **`computedSnapshot.mjs` reports one differing node on two routes with the code unchanged.** Measured
+  2026-08-20: three captures of the same tree, and `.vf-section__inner.container` on
+  `/information-centre/for-clients` and `/for-claimants` flips `marginLeft`/`marginRight` between
+  `0px` and the used `130px` — same node count, same `width`, direction reversing between runs. Probed
+  directly at rest it is never `0px` (6 containers, 3 loads, both pages), so it is transient during the
+  harness's own scroll-and-settle. Different signature from the `matrix(…)`/`opacity` reveal frames
+  already recorded, and worth knowing before chasing it: **a one-node diff of that shape is noise**.
+  Establish it the same way — capture twice without changing anything and diff the two; doing exactly
+  that during the /contact note move reproduced the `/for-clients` node flipping back on identical
+  code. **`/about` shows it too** — seen once, same node shape and the same `130px`↔`0px` pair — so
+  the route list here is the set observed, not a closed one.
+
+- **A comment that names a removed field in `object.property` form re-arms the orphan guard's blind
+  spot.** `readsField` (`adminControls.int.spec.ts`) deliberately matches member access rather than a
+  bare word, and it does not know what a comment is — so writing *"`labels.roleLabel` went with it"* in
+  the very JSX comment explaining the removal made the field look consumed. Measured: re-adding
+  `roleLabel` to `TeamSettings` with nothing rendering it **passed**. Reworded to avoid the dot form,
+  the same break fails and names the field. The guard's own header warns that a comment can satisfy a
+  bare-word match; this is the same hazard surviving the fix that was supposed to close it. Write
+  removed fields as prose ("the Role label in Team Settings"), and re-run the break after editing any
+  comment near a guard.
+
+- **One field name serving two purposes in one component makes the orphan guard blind to both.**
+  `PeopleGrid` reads `department` twice: the block's own filter (which documents it) and each team
+  member's `department` (which groups them). Deleting the filter read entirely still **passed** —
+  `readsField` only asks whether *something* in that file reads a property of that name. Measured; it
+  is the common-name hole CLAUDE.md already records for `icon` and `title`, now in a form where both
+  reads live in the same file. The filter was proven by hand instead, which is the only way: setting
+  it to Client Support took Meet the Team from four groups to one of four cards, and unsetting it
+  restored all four. When a block field shares a name with the record field it filters on, check it in
+  the browser and do not trust the suite.
+
+- **A carousel that recovers only in `transitionend` has no recovery once clicks outrun the
+  transition.** `SlideCarousel` tracked an unbounded `pos` and snapped the clone back only when
+  `onTransitionEnd` saw exactly `count + 1` or `0`. Rapid clicks keep restarting the 0.55s transform,
+  so the event does not fire until the LAST click settles — by then `pos` is past the end and matches
+  neither branch. Measured on `/events`: 8 fast clicks left the track at `translateX(-9702px)`,
+  position 9 of a 6-card track, with **no slide in the viewport**. The tell is that it reads as a
+  rendering bug: the dots kept highlighting, because the active dot is computed with modulo, so it
+  looked like a working carousel that had lost its content. Bound the position at the point of
+  *change*; a recovery keyed on exact values is not a bound. `FeaturedArticles` was unaffected — it
+  advances with `(c + 1) % count`.
+- **Playwright's `click()` waits for the element to be stable, so a "rapid click" test is not rapid.**
+  The regression spec for the carousel above was written first and **passed against the broken
+  component** — inside a track under a 0.55s transform transition, actionability checks made each
+  click wait out the animation, so the burst arrived slower than the bug needs. `{ force: true }`
+  skips those checks and it went red immediately, naming the exact position. Same family as the
+  probes already recorded here: a check that quietly does something gentler than the thing you meant
+  to test reads exactly like a check that found nothing wrong.
+
 ### CSS token tooling
 
-`tests/visual/` holds four Node scripts that `pnpm test` does **not** run:
+`tests/visual/` holds five Node scripts that `pnpm test` does **not** run (the two codemods share
+a bullet):
 
 - `node tests/visual/computedSnapshot.mjs capture|compare baseline` — computed-style snapshot
   gate against a running `:3000`, keyed by structural index path rather than class name (class
   names are what the migrations change). Token replacements are value-preserving by
   construction, so the expected diff is empty; any diff is a real bug, not a tolerance.
-  It measures **40** properties over **19** routes — `width`/`height`/`gridTemplateColumns`/
+  It measures **39** properties over **21** routes — `width`/`height`/`gridTemplateColumns`/
   `transform` are in that set, which is what makes it catch a reflow and not just a repaint, but
-  19 routes is 19 of the site's 29 pages and it never triggers `:hover`. Capture immediately
-  before a change and compare immediately after; baselines are gitignored because any content
-  change invalidates them. `capture` refuses a non-200 — it used to bank the 404 page as a
+  that is still a subset of the **27** URLs in the pages sitemap, and it never triggers `:hover`.
+  All three numbers re-counted 2026-08-21 (`grep -c '<loc>' ` over `/pages-sitemap.xml`, and the
+  arrays themselves); they had drifted to "40 over 18" here and "18 of 28" in the file's own
+  comment, while the list held 21 — so re-count rather than quoting these. Capture immediately before a change and compare immediately after;
+  baselines are gitignored because any content change invalidates them. `capture` refuses a non-200 — it used to bank the 404 page as a
   baseline for two routes that do not exist.
 - `node tests/visual/tokenise.mjs <4a|4b|4c|4d> [--dry]` and
   `node tests/visual/tokeniseShape.mjs <radius|gradient> [--dry]` — one-shot codemods over
@@ -761,7 +905,8 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
 
 `payload.config.ts` registers taxonomy lookups before the content that references them. The
 specialist data layer is a 4-axis taxonomy — `specialties` (+ `specialty-categories`),
-`claim-types`, `assessment-types`, `areas-of-expertise` — with `accreditations`, `locations` and
+`claim-types`, `assessment-types`, `areas-of-expertise` — with `accreditations`, `locations`,
+`departments` (the teams staff are grouped into, replacing a four-value select) and
 `streams` alongside. Content collections: Pages, Posts, Media, Categories, Users, Specialists,
 Team, Events, AvailabilitySessions, Services, Resources, Offices, Testimonials. Directory blocks
 (`SpecialistDirectory`, `SpecialtyDirectory`, `EventsExplorer`) filter on those taxonomies, so new
@@ -799,7 +944,7 @@ Collections with a detail page (Pages, Posts, Specialists, Team, Events, Availab
 have their own `hooks/revalidate<Name>.ts` targeting the path built by `routes.ts` — these also
 purge the old path when a published doc moves, and the relevant `<name>-sitemap` tag. Pages
 additionally purge `global_header`/`global_footer` on structural changes, because the nav is read
-through `unstable_cache` and `revalidatePath` alone won't refresh it. On top of that, most content
+through `unstable_cache` and `revalidatePath` alone won't refresh it.
 **All of these go through `src/utilities/safeRevalidate.ts`, never `next/cache` directly** — see the
 Invariants table for what an unguarded call did to the admin's Create view. On top of that, most content
 collections also run the shared `revalidateSiteOnChange`/`revalidateSiteOnDelete`

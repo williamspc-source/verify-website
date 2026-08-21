@@ -11,6 +11,12 @@ import {
   sectionHeaderFields,
 } from '@/fields/blockFields'
 
+type ClaimantSiblings = { variant?: string | null; imagePlaceholder?: boolean | null }
+
+/** The photo fields exist only on the one variant that has a column to hold them. */
+const isClaimant = (_: unknown, sibling: ClaimantSiblings = {}): boolean =>
+  sibling?.variant === 'claimant'
+
 export const ProcessSteps: Block = {
   slug: 'processSteps',
   interfaceName: 'ProcessStepsBlock',
@@ -57,6 +63,59 @@ export const ProcessSteps: Block = {
         condition: (_, sibling) => sibling?.variant === 'edu-panels',
         description:
           'Replaces the plain Subheading for this variant, adding bold and italic. Leave empty to keep using Subheading.',
+      },
+    }),
+    // ── Claimant left-column photo ──────────────────────────────────────────
+    // The design reference has NO image in this column — `.claimant-process-left`
+    // is label + title + paragraph and nothing else. This was added at the
+    // client's request; see verify-website-design-diff.md, Comparison 42, so it
+    // does not get "corrected" back out later.
+    //
+    // Only the `claimant` variant has a left column to hold a photo; the other
+    // three centre their section header and have nowhere to put one. Offering the
+    // fields there would be a control an editor can set that silently does
+    // nothing — the invariant guarded by tests/int/adminControls.int.spec.ts.
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Left-column photo',
+      admin: {
+        condition: isClaimant,
+        description:
+          'Optional photo below the intro copy. It fills a fixed 4:3 frame, cropped around the focal point set on the image in Media — so fix a bad crop there rather than re-exporting the file.',
+      },
+    },
+    {
+      name: 'imagePlaceholder',
+      type: 'checkbox',
+      // Defaults to off so that adding these fields moves nothing on any page
+      // that already exists. This one block is switched on by data instead, in
+      // src/endpoints/seed/repairClaimantProcessImage.ts.
+      defaultValue: false,
+      label: 'Show an image placeholder when no photo is set',
+      admin: {
+        condition: isClaimant,
+        description:
+          'Draws the pale-blue placeholder tile until a photo is uploaded. Uploading one replaces it outright — caption and glyph with it — so you can leave this ticked.',
+      },
+    },
+    {
+      name: 'placeholderLabel',
+      type: 'text',
+      admin: {
+        condition: (_: unknown, sibling: ClaimantSiblings = {}) =>
+          isClaimant(_, sibling) && Boolean(sibling?.imagePlaceholder),
+        description: 'Optional caption inside the placeholder (e.g. "IMAGE PLACEHOLDER").',
+      },
+    },
+    iconField({
+      name: 'placeholderIcon',
+      admin: {
+        condition: (_: unknown, sibling: ClaimantSiblings = {}) =>
+          isClaimant(_, sibling) && Boolean(sibling?.imagePlaceholder),
+        description:
+          'Optional glyph above the placeholder caption. Left unset the tile is the caption alone, which is how the reference draws its empty-photo boxes on /services.',
       },
     }),
     {

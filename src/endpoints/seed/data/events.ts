@@ -1,11 +1,19 @@
-// Events & seminars, transcribed from the design reference (events-data.js).
-// `date` is ISO (YYYY-MM-DD); the seed converts it to a Date. Upcoming vs past is
-// derived from the date at view time, so the same list drives both dedicated
-// pages (/upcoming-events, /past-events) and the In-the-Loop AAMLE hub.
+// VERIFY's real events, as published on vmls.com.au/events-seminars/.
 //
-// `cpdEligible`: the reference marks only AAMLE-hosted events "CPD Eligible · Free"
-// on the compact In-the-Loop cards (events.js formatLine: host === 'aamle'). We
-// mirror that here so the ArchiveBlock compact card renders the same status line.
+// This replaced 16 invented scaffold events on 2026-08-20. Deleting a fixture
+// entry does NOT remove the document from an existing install — `createIfNew`
+// only ever adds — so the old set was cleared by a full reseed, which is also
+// how the box is built.
+//
+// `date` is ISO (YYYY-MM-DD) and drives sorting, the calendar glyph, and the
+// upcoming/past split (compared start-of-day; see src/utilities/eventTiming.ts).
+// Several of these run over several days and the collection has a single date
+// field, so `date` holds the FIRST day and `timeLabel` carries the visible span
+// ("13 – 15 February 2025"). Same for the one event with no exact date: the
+// Gold Coast dinner is dated mid-month and labelled "Mid-October 2024".
+//
+// `cpdEligible`: the reference marks only AAMLE-hosted events "CPD Eligible ·
+// Free" on the compact In-the-Loop cards (events.js formatLine: host === 'aamle').
 
 export type EventSeed = {
   slug: string
@@ -19,6 +27,9 @@ export type EventSeed = {
     | 'breakfast-seminar'
     | 'masterclass'
     | 'specialist-seminar'
+    | 'conference'
+    | 'sponsorship'
+    | 'social'
   date: string
   timeLabel: string
   location: string
@@ -30,191 +41,162 @@ export type EventSeed = {
 
 export const EVENTS: EventSeed[] = [
   {
-    slug: 'end-of-year-medico-legal-case-review',
-    title: 'End-of-Year Medico-Legal Case Review',
-    eventType: 'networking',
-    date: '2025-12-15',
-    timeLabel: '4:00 pm - 6:00 pm',
-    location: 'Brisbane CBD',
-    host: 'verify',
-    registrationUrl: '',
-    excerpt: 'A professional networking event and case review exploring recurring medico-legal issues from the year and practical lessons for future referrals.',
-  },
-  {
-    slug: 'ime-scheduling-and-claimant-readiness',
-    title: 'IME Scheduling and Claimant Readiness',
-    eventType: 'client-training',
-    date: '2026-01-23',
-    timeLabel: '10:00 am - 11:00 am',
-    location: 'Online webinar',
-    host: 'verify',
-    registrationUrl: '',
-    excerpt: 'A process-focused session on appointment preparation, claimant communications, documentation expectations, and reducing delays in IME workflows.',
-  },
-  {
-    slug: 'workcover-queensland-claims-update',
-    title: 'WorkCover Queensland Claims Update',
-    eventType: 'industry-briefing',
-    date: '2026-02-07',
-    timeLabel: '12:30 pm - 1:30 pm',
-    location: 'Online briefing',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/past-events/',
-    excerpt: 'A concise industry briefing covering current WorkCover claim trends, medical evidence considerations, and practical updates for legal and insurance teams.',
-  },
-  {
-    slug: 'psychiatric-injury-claims-workshop',
-    title: 'Psychiatric Injury Claims Workshop',
-    eventType: 'workshop',
-    date: '2026-02-21',
-    timeLabel: '9:30 am - 11:30 am',
-    location: 'Brisbane CBD',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
-    excerpt: 'A workshop for practitioners managing psychiatric injury claims, focused on diagnosis, causation, pre-existing history, and practical IME preparation.',
-  },
-  {
-    slug: 'common-brief-preparation-errors',
-    title: 'Common Brief Preparation Errors',
-    eventType: 'webinar',
-    date: '2026-03-13',
-    timeLabel: '1:00 pm - 2:00 pm',
-    location: 'Online webinar',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
-    excerpt: 'A client training session unpacking the brief preparation issues that most often delay appointments, create report gaps, or trigger avoidable supplementary questions.',
-  },
-  {
-    slug: 'pain-medicine-in-personal-injury-claims',
-    title: 'Pain Medicine in Personal Injury Claims',
+    slug: 'breakfast-seminar-with-orthopaedic-surgeons',
+    title: 'Breakfast Seminar with Orthopaedic Surgeons',
     eventType: 'breakfast-seminar',
-    date: '2026-03-27',
-    timeLabel: '7:30 am - 9:30 am',
-    location: 'The Grove Rooftop',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/past-events/',
-    excerpt: 'A specialist breakfast seminar covering chronic pain assessment, causation questions, treatment histories, and the role of functional reporting in personal injury matters.',
-  },
-  {
-    slug: 'quality-assurance-in-expert-evidence',
-    title: 'Quality Assurance in Expert Evidence',
-    eventType: 'webinar',
-    date: '2026-04-18',
-    timeLabel: '12:00 pm - 1:00 pm',
-    location: 'Online webinar',
+    date: '2024-08-26',
+    timeLabel: '8:00 am – 9:00 am',
+    location: 'The Inchcolm',
     host: 'verify',
     registrationUrl: '',
-    excerpt: 'A behind-the-scenes session explaining how quality assurance improves report accuracy, consistency, and responsiveness to referral questions.',
+    excerpt:
+      'VERIFY was pleased to host another breakfast seminar for our valued clients, featuring Orthopaedic Surgeons Dr Jason Beer and Dr Simon Perkins. This seminar provided an opportunity for Dr Beer and Dr Perkins to share some valuable IME insights from their own personal experience and answer client questions about their specialist perspective on the IME process.',
   },
   {
-    slug: 'medico-legal-report-writing-masterclass',
-    title: 'Medico-Legal Report Writing Masterclass',
-    eventType: 'masterclass',
-    date: '2026-04-24',
-    timeLabel: '9:00 am - 12:00 pm',
-    location: 'Brisbane CBD',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
-    excerpt: 'A practical masterclass for specialists and legal teams focused on clear reasoning, defensible conclusions, report structure, and common medico-legal drafting pitfalls.',
+    slug: 'aila-national-conference-2024',
+    title: 'AILA National Conference 2024',
+    eventType: 'conference',
+    date: '2024-09-11',
+    timeLabel: '11 September – 13 September | 2024',
+    location: 'Gold Coast Conference & Exhibition Centre',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'VERIFY was delighted to support the 2024 Australian Insurance Law Associations (AILA) National Conference as an Exhibitor Sponsor and our team enjoyed engaging with a diverse range of practitioners within the insurance law industry throughout.',
+  },
+  {
+    slug: 'travis-schultz-law-and-wine-dinner-lifeflight-2024',
+    title: 'Travis Schultz & Partners Law & Wine Dinner for LifeFlight Sponsorship',
+    eventType: 'sponsorship',
+    date: '2024-09-12',
+    timeLabel: '',
+    location: 'The W Hotel',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      "VERIFY was proud to be a supporting partner of the Travis Schultz & Partners Law & Wine Dinner for LifeFlight 2024, through the donation of a Luxury Fiji Travel Package to the Law & Wine Dinner's iconic charity auction. This vital fundraising event supports the critical work of RACQ LifeFlight Rescue, which has for decades saved the lives of countless critically injured Queenslanders.",
+  },
+  {
+    slug: 'gold-coast-client-dinner',
+    title: 'Gold Coast Client Dinner',
+    eventType: 'social',
+    // No exact date published; dated mid-month so it sorts correctly, with the
+    // vague wording preserved in the label.
+    date: '2024-10-15',
+    timeLabel: 'Mid-October 2024',
+    location: 'Gold Coast',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'To show our appreciation of our Gold Coast-based clientele, VERIFY hosted a dinner with some of our esteemed specialists and Gold Coast-based clients. The team looks forward to hosting further events on the Gold Coast in future.',
+  },
+  {
+    slug: 'breakfast-seminar-with-psychiatrists',
+    title: 'Breakfast Seminar with Psychiatrists',
+    eventType: 'breakfast-seminar',
+    date: '2024-11-06',
+    timeLabel: '8:00 am – 9:00 am',
+    location: 'The Inchcolm',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      "VERIFY was pleased to host our third Breakfast Seminar of 2024, which featured Consultant Forensic Psychiatrist Dr Lucas Murphy, who provided insights for VERIFY's valued clients into psychiatric matters within a medico-legal context.",
+  },
+  {
+    slug: 'verify-end-of-year-holiday-party-2024',
+    title: 'VERIFY End-of-Year Holiday Party 2024',
+    eventType: 'social',
+    date: '2024-12-13',
+    timeLabel: '',
+    location: 'The Lodge Bar & Dining',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'VERIFY was delighted to host our End-of-Year Holiday Party in 2024 at The Lodge Bar & Dining, and hopes all who attended enjoyed the festivities throughout. We’re now looking ahead to 2025 with excitement and anticipation!',
+  },
+  {
+    slug: 'ala-queensland-conference-2025',
+    title: 'ALA Queensland Conference 2025',
+    eventType: 'conference',
+    date: '2025-02-13',
+    timeLabel: '13 February – 15 February | 2025',
+    location: 'Sheraton Grand Mirage Resort, Gold Coast',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'VERIFY was elated to return to the Australian Lawyers Alliance (ALA) Queensland Conference in 2025 as an Exhibitor Sponsor, and greatly enjoyed gaining further insight into current and developing issues in the personal injuries space, whilst connecting with personal injury law professionals practising throughout QLD.',
+  },
+  {
+    slug: 'aila-qld-insurance-intensive-2025-risky-business',
+    title: '2025 AILA QLD Insurance Intensive ‘Risky Business’',
+    eventType: 'conference',
+    date: '2025-06-05',
+    timeLabel: '',
+    location: 'The Calile Hotel, Brisbane',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'VERIFY was delighted to support the Australian Insurance Law Association (AILA) as Session Sponsor for their 2025 QLD Insurance Intensive, ‘Risky Business’. VERIFY’s Managing Director, Wes Lerch, delivered the Welcome to Session Three.',
+  },
+  {
+    slug: 'travis-schultz-law-and-wine-dinner-lifeflight-2025',
+    title: 'Travis Schultz & Partners Law & Wine Dinner for LifeFlight 2025',
+    eventType: 'sponsorship',
+    date: '2025-10-09',
+    timeLabel: '',
+    location: 'The W Hotel',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'VERIFY was honoured to return to the Travis Schultz & Partners Law & Wine Dinner for LifeFlight in 2025 as an auction sponsor. A memorable evening of inspiring discussion, expertly-paired wine, and above all, continued support and fundraising for the critical, life-saving care provided by LifeFlight across Queensland.',
+  },
+  {
+    slug: 'holiday-party-2025-blue-christmas',
+    title: 'Holiday Party 2025: VERIFY’s ‘Blue Christmas’',
+    eventType: 'social',
+    date: '2025-12-18',
+    timeLabel: '',
+    location: 'The Lodge Bar & Dining',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'We wrapped up 2025 in colour at VERIFY’s annual Holiday Party with clients & specialists – thank you to who attended and toasted the end of another fantastic year! We’re excited for what 2026 will bring… Dress Code: Hues of BLUE | Cocktail.',
+  },
+  {
+    slug: 'ala-queensland-conference-2026',
+    title: 'ALA Queensland Conference 2026',
+    eventType: 'conference',
+    date: '2026-02-12',
+    timeLabel: '12 February – 14 February | 2026',
+    location: 'Sheraton Grand Mirage Resort, Gold Coast',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'VERIFY is excited to return to the Australian Lawyers Alliance (ALA) Queensland Conference in 2026 – this time alongside our education division, the Australian Academy of Medico-Legal Education (AAMLE). Exciting surprises are in the works! We’re hugely looking forward to connecting and reconnecting with familiar and new faces alike, alongside delving into emerging issues in the Queensland personal injury law space.',
+  },
+  {
+    slug: 'the-future-is-female-leading-ladies-in-medicine-and-law',
+    title: 'The Future is Female: Leading Ladies in Medicine & Law',
+    eventType: 'social',
+    date: '2026-03-06',
+    timeLabel: 'Friday, 6 March 2026 | 11:00 am – 3:00 pm',
+    location: 'Bougainvillea House, Howard Smith Wharves',
+    host: 'verify',
+    registrationUrl: '',
+    excerpt:
+      'In celebration of International Women’s Day 2026, VERIFY is thrilled to host The Future is Female: Leading Ladies in Medicine & Law – an exclusive event honouring and connecting the women working at the forefront of medicine and law in Australia. Dress Code: Business Casual | Fun & Floral.',
   },
   {
     slug: 'breakfast-seminar-with-dr-ashwani-garg',
     title: 'Breakfast Seminar with Dr Ashwani Garg',
     eventType: 'breakfast-seminar',
     date: '2026-05-27',
-    timeLabel: '7:30 am - 9:30 am',
+    timeLabel: '7:30 am – 9:30 am',
     location: 'The Grove Rooftop',
     host: 'aamle',
     cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/events/breakfast-seminar-with-dr-ashwani-garg/',
-    excerpt: "A psychiatrist's practical guide to mediation preparation, presented by Dr Ashwani Garg, Consultant Psychiatrist. This breakfast seminar will focus on report interpretation, preparation strategy, and the questions legal teams should clarify before mediation.",
-  },
-  {
-    slug: 'ama-guides-6th-edition-practical-refresher',
-    title: 'AMA Guides 6th Edition Practical Refresher',
-    eventType: 'webinar',
-    date: '2026-06-12',
-    timeLabel: '12:00 pm - 1:00 pm',
-    location: 'Online webinar',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
-    excerpt: 'A focused refresher covering how the AMA Guides are applied in Queensland medico-legal practice, with worked examples from recent impairment assessment scenarios.',
-  },
-  {
-    slug: 'navigating-queensland-ctp-reforms',
-    title: 'Navigating Queensland CTP Reforms',
-    eventType: 'workshop',
-    date: '2026-06-28',
-    timeLabel: '8:30 am - 10:30 am',
-    location: 'VERIFY Brisbane Boardroom',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/events/',
-    excerpt: 'An expert-led workshop examining practical implications of the July 2026 CTP reforms for solicitors, case managers, and insurers operating in Queensland.',
-  },
-  {
-    slug: 'reading-a-medico-legal-report',
-    title: 'Reading a Medico-Legal Report',
-    eventType: 'webinar',
-    date: '2026-07-15',
-    timeLabel: '1:00 pm - 2:00 pm',
-    location: 'Online webinar',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
-    excerpt: 'A practical guide for solicitors and claims teams on what to look for when reviewing an IME report, identifying gaps, and preparing targeted supplementary questions.',
-  },
-  {
-    slug: 'psychiatric-imes-what-practitioners-need-to-know',
-    title: 'Psychiatric IMEs: What Practitioners Need to Know',
-    eventType: 'specialist-seminar',
-    date: '2026-07-22',
-    timeLabel: '12:30 pm - 1:30 pm',
-    location: 'Online webinar',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
-    excerpt: 'A specialist-led session covering psychiatric independent medical examinations, including referral questions, contested diagnoses, secondary gain, and report limitations.',
-  },
-  {
-    slug: 'expert-evidence-essentials-for-litigation-teams',
-    title: 'Expert Evidence Essentials for Litigation Teams',
-    eventType: 'networking',
-    date: '2026-08-06',
-    timeLabel: '4:00 pm - 6:00 pm',
-    location: 'Brisbane CBD',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/events/',
-    excerpt: 'A networking and education event for litigation teams covering expert engagement, report defensibility, conference preparation, and evidence readiness.',
-  },
-  {
-    slug: 'orthopaedic-impairment-assessment-update',
-    title: 'Orthopaedic Impairment Assessment Update',
-    eventType: 'webinar',
-    date: '2026-08-20',
-    timeLabel: '12:00 pm - 1:00 pm',
-    location: 'Online webinar',
-    host: 'aamle',
-    cpdEligible: true,
-    registrationUrl: 'https://aamle.com.au/2026-seminar-menu/',
-    excerpt: 'A concise orthopaedic update for legal and insurance teams, covering common impairment assessment issues and how to brief specialists more effectively.',
-  },
-  {
-    slug: 'claimant-communication-and-examination-preparation',
-    title: 'Claimant Communication and Examination Preparation',
-    eventType: 'client-training',
-    date: '2026-09-04',
-    timeLabel: '9:00 am - 10:30 am',
-    location: 'VERIFY Brisbane Boardroom',
-    host: 'verify',
     registrationUrl: '',
-    excerpt: 'A client-focused session on helping claimants understand the IME process, reducing avoidable delays, and improving appointment readiness.',
+    excerpt:
+      'VERIFY and AAMLE were delighted to host our 2026 Breakfast Seminar, featuring Consultant Psychiatrist Dr Ashwani Garg. The session offered valuable insights into psychiatric considerations within a medico-legal framework, providing meaningful guidance for VERIFY’s valued clients.',
   },
 ]

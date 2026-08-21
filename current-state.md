@@ -1,6 +1,6 @@
 # Current state
 
-**Snapshot: 2026-08-17.** Where the project actually stands — what is working, what is not, and what
+**Snapshot: 2026-08-21.** Where the project actually stands — what is working, what is not, and what
 has to happen to get it onto the box. Written for the person driving the work, not as a handover.
 
 This file is a **status snapshot**, not a reference. It deliberately does not restate architecture,
@@ -21,7 +21,7 @@ section below points at the document that owns the detail.
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
 | `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 38 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 48 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -35,22 +35,31 @@ One application serves both the public site and `/admin`.
 
 ## What is working well
 
-**The build is green on every gate.** Measured 2026-08-17, not carried over from an earlier pass:
+**The build is green on every gate.** Measured 2026-08-21, not carried over from an earlier pass:
 
 | Gate | Result |
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **134/134**, 7 files |
-| `pnpm test:e2e` | **20/20**, 2.6m |
+| `pnpm test:int` | **135/135**, 7 files |
+| `pnpm test:e2e` | **31/31** in 56s against the production server; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
+| `zsh tests/int/prove-guards.sh` | **10/10** — every guard proven to go red on its deliberate break |
+| `referenceCssDiff.mjs`, all 13 families | zero differences |
+
+> **This file owns the test counts.** They were in four documents and no two agreed; `CLAUDE.md` and
+> `README.md` now carry the commands instead. Note the e2e number cannot be counted from source: 22
+> `test(` declarations expand to 31, because `images.e2e.spec.ts` parameterises one per route. Run it.
 
 > The e2e run was against the **production** server on `:3000`, and the admin spec that
 > `OUTSTANDING.md` §2 reports as intermittent did not flake. That is consistent with §2's diagnosis
 > — the failure is a 5s timeout against a cold Turbopack compile — and suggests the flake is
 > confined to dev-server runs. One clean run is not proof; do not close §2 on it.
 
-**The content model is complete and populated.** 21 collections, 10 globals, and 113 live URLs
-across five sitemaps — 28 pages, 24 posts, 26 specialists, 19 team, 16 events. Nothing is a stub.
+**The content model is complete and populated.** 22 collections, 10 globals, and **89** live URLs
+across five sitemaps, counted 2026-08-20 — 27 pages, 4 posts, 26 specialists, 19 team, 13 events.
+Nothing is a stub. It was 113 (28/24/26/19/16): the 2026-08-20 content cull replaced 24 scaffold
+articles with 4 real ones and 16 scaffold events with 13 real ones, and the Style Guide page was
+removed the same day. Re-count from the sitemaps rather than editing this line.
 
 **The design gap is much smaller than the log suggested.** Re-audited 2026-08-17 against the
 reference served over HTTP: of the twelve recurring cross-page issues still marked open, **ten are
@@ -87,13 +96,19 @@ That produces a single `CREATE TABLE` migration: no drops, no type conversions, 
 nothing to hand-review for data loss. **Do it last**, once the polishing work has stopped changing
 fields — a superseded migration file in `src/migrations/` is a trap, because someone will run it.
 
-Current drift, re-measured 2026-08-17 (`verify_cms` against the checked-in baseline):
+Current drift, re-measured 2026-08-21 (`verify_cms` against the checked-in baseline):
 
 | | Baseline | Now |
 |---|---|---|
-| Columns | 3207 | 3386 |
-| Tables | 301 | 303 |
-| Indexes | 946 | 1266 |
+| Columns | 3207 | 3518 |
+| Tables | 301 | 308 |
+| Indexes | 946 | 1295 |
+
+At column level that is **323 added and 12 removed** — six of the twelve are the department columns
+moving to the Departments taxonomy, which is a change of shape rather than a loss. The commands that
+re-take all of this (psql counts, then a column-level ADDED/REMOVED diff against the baseline JSON)
+are in `OUTSTANDING.md` §1, which is otherwise a superseded record: the twelve drops are exactly why
+its old "expect exactly five" pre-flight had to go. **Re-measure rather than editing these numbers.**
 
 ### 2. Design gaps — none open
 
@@ -200,7 +215,7 @@ client components import it), so the new `portalEnquiry` link type is resolved b
 offered only on the two blocks that resolve it — enforced by the resolver's return type, so
 forwarding a raw link is a compile error rather than a dead button.
 
-**The admin was audited and made legible.** Nothing anywhere explained the 21 collections and 10
+**The admin was audited and made legible.** Nothing anywhere explained the 22 collections and 10
 globals, and the admin used different words from the site in four places. `Posts` is now **Articles**,
 `Categories` **Topics**, `Areas of Expertise` **Assessment Areas**; the settings globals moved out of
 the content groups into **Page settings**; every collection and global gained a one-line description;
@@ -208,6 +223,16 @@ and the dashboard stopped telling editors to visit a *Globals* heading that does
 `ADMIN-GUIDE.md` is the new editor-facing guide. One real defect fell out of it: Claim Types were
 concatenated into the Assessment Types list on 23 of 26 specialist profiles, so a claim type never
 appeared under its own name — now its own section, a deliberate departure from the reference.
+
+**Comparisons 39-48**, all since that audit, in a line each: the join-panel benefit cards styled —
+and their CSS found to have been unreachable, hung off a page-scoped class that never reached the
+database (39); every event given one date fallback (40); images served at the size they render, six
+routes falling from 19.5 MB to 4.5 MB (41); the claimant process photo and the founder portrait
+(42-43); `/in-the-loop`'s empty sections and their nav tabs removed together (44); a rule between
+Upcoming and Past on `/events` (45); team profiles given a second photo, with a double crop fixed
+(46); `/contact`'s parking caveat moved to sit with the car parks (47); and this documentation audit
+(48). The detail is in `verify-website-design-diff.md`; this list exists so a reader can see that the
+narrative above stops at 38 on purpose.
 
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
@@ -224,20 +249,46 @@ Each is measured and justified in `OUTSTANDING.md` — do not re-derive them:
   but the dropdown offers them. Removing them needs a data migration over `_pages_v` history.
 - **§4** `.contact-form` padding follows the reference's superseded rule. Needs someone who knows
   the design to say which value is intended.
+- **§11 / §12** Format, not size: specialist headshots are PNG, so their derivatives are too (~1.5 MB
+  across `/` and `/specialists`), and the bundled shield is a 1166px PNG in a 50px box.
+- **§15 / §16** A faithful port nothing can reach, and two self-sectioning blocks missing from
+  `selfSpaced` — Events Explorer and Featured Articles carry a stray 64px.
+- **§17** An article is bylined to **Evie Le**, who is not on the team and whose photograph has been
+  removed. A content decision: re-attribute the article, or put her back with a photograph.
+- **§18** Seven of `referenceCssDiff.mjs`'s exceptions rest on browser measurements older than the
+  stylesheet they excuse. All 13 families read zero today; the exceptions are what needs re-taking.
+- **§19** Stats Band, Spacer, Divider, Icon and Image are on no page since `/style-guide` was removed,
+  so nothing reviews them.
 
-### 4. Uncommitted in the working tree
+### 4. /in-the-loop shows one section, because one stream has articles
 
-Six team photographs are deleted on disk but still tracked:
+The 2026-08-20 content cull left four real articles, all in the **QA Insights** stream. Seven of the
+hub's eight sections therefore have nothing to list, and each is now set to hide itself when empty —
+**and its tab in the sticky category nav goes with it**. Measured on the served page: 1 tab, 1
+anchor, 0 dead fragments, identical with JavaScript disabled.
 
-```
-public/assets/images/team/{evie-le,jaynalyn-malijan,jefferson-cortez,
-                           kimberly-patente,ricaliza-perlas,zenuel-bermundo}.png
-```
+Nothing needs changing. Publish an article into any stream and that section and its tab both come
+back on their own. To *see* an empty section — to check its wording before the content exists —
+untick "Hide this section when it has nothing to show" on that block; the tab returns with it.
+See `src/Styles/HOOKS.md` and `verify-website-design-diff.md` Comparison 44.
 
-Nothing in `src/` references those paths (checked with a positive control), and none of the six
-appear in the reference's team roster — so this looks like a deliberate roster change. **But
-`Evie Le` is still an author in `src/endpoints/seed/data/posts.ts`.** Resolve the two together:
-either commit the deletions and drop the seed reference, or restore the files.
+The three scaffold resources were deleted with the articles: each was only a link to one of them, and
+`links.e2e.spec.ts` caught all three 404ing. `ensureResource` in `seedHubs.ts` is retained for the
+first genuine resource.
+
+**Every one of the 13 events is in the past.** So `/events/upcoming-events` renders its empty state
+("No upcoming events are listed right now — please check back soon"), and the hub's *AAMLE Events*
+section — which lists upcoming events only — counts as empty and is hidden with the rest. Both are
+the source data, not a fault; a future-dated event brings them back.
+
+### 4b. Photographs — the team is done, twelve placeholders remain
+
+All 27 supplied photographs are in (2026-08-20): **19 of 19 team members** and **26 of 26
+specialists** have a headshot, sourced from the tracked folders and reproducible on a fresh install.
+Eight page photographs are placed through `repairContentImages.ts`.
+
+What is left is **12 of the 20 image placeholders**, listed in `OUTSTANDING.md` §13 with what
+closing each one costs. They render the designed pale-blue tile; nothing looks broken.
 
 ---
 

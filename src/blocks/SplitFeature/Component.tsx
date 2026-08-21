@@ -80,7 +80,12 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
           >
             {hasImage ? (
               <div className="vf-split__media">
-                <Media resource={row.image} imgClassName="w-full h-full object-cover" />
+                <Media
+                  resource={row.image}
+                  fill
+                  pictureClassName="absolute inset-0"
+                  imgClassName="object-cover"
+                />
               </div>
             ) : placeholder ? (
               /* This branch runs only when there is no image, which is what makes

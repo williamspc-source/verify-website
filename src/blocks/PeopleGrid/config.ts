@@ -71,15 +71,19 @@ export const PeopleGrid: Block = {
     },
     // Team filter
     {
+      // Was one of four hardcoded copies of the department list; it is now a
+      // relationship to the Departments taxonomy, the same one each team member
+      // is assigned through, so the two lists cannot offer different teams.
+      // Written without member-access syntax on purpose: the orphan-field guard's
+      // readsField matches that form and does not know what a comment is.
       name: 'department',
-      type: 'select',
-      admin: { condition: sourceIs('team'), description: 'Optional — limit to one department.' },
-      options: [
-        { label: 'Operations', value: 'operations' },
-        { label: 'Business Development', value: 'business-development' },
-        { label: 'Client Support', value: 'client-support' },
-        { label: 'Quality Assurance', value: 'quality-assurance' },
-      ],
+      type: 'relationship',
+      relationTo: 'departments',
+      hasMany: false,
+      admin: {
+        condition: sourceIs('team'),
+        description: 'Optional — limit to one department.',
+      },
     },
     {
       name: 'groupByDepartment',

@@ -12,20 +12,15 @@ import { toClassName } from '@/utilities/cssClass'
 import { accentText } from '@/utilities/accentText'
 
 import { EventsExplorerClient } from './EventsExplorerClient'
-import type { EventItem, EventsExplorerLabels, EventsExplorerGroups } from './EventsExplorerClient'
+import type {
+  EventItem,
+  EventsExplorerLabels,
+  EventsExplorerGroups,
+} from './EventsExplorerClient'
+import type { EventsExplorerSeparator } from './separator'
+import { pastBandClass } from './separator'
+import { EVENT_TYPE_LABELS } from '@/utilities/eventTypeLabels'
 
-// Human-readable event-type labels — kept in sync with the Events collection
-// options (mirrors EVENT_TYPE_LABELS in ArchiveBlock / the event detail page).
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  networking: 'Networking Event',
-  'client-training': 'Client Training',
-  'industry-briefing': 'Industry Briefing',
-  workshop: 'Workshop',
-  webinar: 'Webinar',
-  'breakfast-seminar': 'Breakfast Seminar',
-  masterclass: 'Masterclass',
-  'specialist-seminar': 'Specialist Seminar',
-}
 
 
 // Field reads are typed defensively because payload-types have not been
@@ -40,6 +35,7 @@ type Props = {
   labels?: EventsExplorerLabels | null
   cardStyle?: 'list' | 'card' | null
   groups?: EventsExplorerGroups | null
+  separator?: EventsExplorerSeparator | null
   anchorId?: string | null
   background?: SectionBackground | null
   cssClass?: string | string[] | null
@@ -81,6 +77,14 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
   // untouched; only a block explicitly set to `card` takes the hub treatment.
   const cardStyle = (props as { cardStyle?: 'list' | 'card' | null }).cardStyle || 'list'
   const groups = (props as { groups?: EventsExplorerGroups | null }).groups ?? undefined
+  const separator =
+    (props as { separator?: EventsExplorerSeparator | null }).separator ?? undefined
+
+  // A banded Past group is the last thing in the block and runs to its bottom
+  // edge, so the Section's own bottom padding has to come off — otherwise the
+  // band stops and a strip of the page background shows beneath it. Decided from
+  // the same helper the client renders with, so the two cannot disagree.
+  const bandRunsToEdge = Boolean(pastBandClass(mode, separator))
 
   const payload = await getPayload({ config: configPromise })
   const res = await payload.find({
@@ -101,7 +105,11 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
       bare={bare}
       background={background || 'white'}
       id={anchorId || undefined}
-      className={cn('events-explorer', toClassName(cssClass))}
+      className={cn(
+        'events-explorer',
+        bandRunsToEdge && 'events-explorer--band-to-edge',
+        toClassName(cssClass),
+      )}
     >
       {/* The same `.events-section-header` the upcoming/past groups use, so this
           heading matches them by construction rather than by two rules kept in
@@ -126,6 +134,7 @@ export const EventsExplorerBlock: React.FC<Props> = async (props) => {
         labels={labels}
         cardStyle={cardStyle}
         groups={groups}
+        separator={separator}
       />
     </Section>
   )

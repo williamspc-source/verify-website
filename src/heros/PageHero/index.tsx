@@ -44,7 +44,6 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
   const imagePanel = Boolean((props as { imagePanel?: boolean | null }).imagePanel)
   const imagePanelLabel =
     (props as { imagePanelLabel?: string | null }).imagePanelLabel || 'Company Image Placeholder'
-  const scrollHint = (props as { scrollHint?: string | null }).scrollHint
 
   // The trail and the eyebrow compete for one slot directly above the heading,
   // and they are near-identical in texture (uppercase, letter-spaced, ~13px), so
@@ -144,12 +143,6 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
                   <span className="ph-card-img-label">{imagePanelLabel}</span>
                 )}
               </div>
-              {scrollHint ? (
-                <div className="ph-scroll-hint">
-                  <Icon name="arrow-down" />
-                  <span>{scrollHint}</span>
-                </div>
-              ) : null}
             </div>
           </div>
         ) : (

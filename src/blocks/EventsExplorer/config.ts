@@ -3,9 +3,20 @@ import type { Block } from 'payload'
 import {
   anchorIdField,
   backgroundField,
+  BACKGROUND_OPTIONS,
   cssClassField,
+  DIVIDER_STYLE_OPTIONS,
+  DIVIDER_WIDTH_OPTIONS,
   sectionHeaderFields,
 } from '@/fields/blockFields'
+
+// The separator controls exist only to tell the Upcoming group from the Past
+// one, so they are offered only when both are on the page. In "Upcoming only" /
+// "Past only" there is a single group and nothing to separate — offering them
+// there would be a control an editor can set that silently does nothing, which
+// `tests/int/adminControls.int.spec.ts` exists to stop.
+const isBothGroups = (_: unknown, sibling: { mode?: string | null } = {}): boolean =>
+  (sibling?.mode ?? 'all') === 'all'
 
 // Events Explorer — faithful port of the design reference's events listing pages
 // (upcoming-events.html / past-events.html). Renders ALL events from the Events
@@ -113,6 +124,72 @@ export const EventsExplorer: Block = {
           fields: [
             { name: 'pastLinkLabel', type: 'text', label: 'Past · link label', admin: { width: '50%' } },
             { name: 'pastLinkUrl', type: 'text', label: 'Past · link URL', admin: { width: '50%' } },
+          ],
+        },
+      ],
+    },
+    {
+      // ── Separating Upcoming from Past ──────────────────────────────────
+      // The design reference gives each group its own <section> and tints the
+      // past one `bg-soft` (#f6fbff). We render both inside a single <Section>,
+      // so neither its band nor any rule was reaching the page and the two ran
+      // together — see verify-website-design-diff.md, Comparison 45.
+      //
+      // Two independent controls rather than one combined "separator style":
+      // a rule and a band are different devices, an editor may reasonably want
+      // either or both, and folding them together would make one unreachable.
+      name: 'separator',
+      type: 'group',
+      label: 'Separating Upcoming from Past',
+      admin: {
+        condition: isBothGroups,
+        description:
+          'How the two groups are told apart. Both are off by default, which is exactly how this block rendered before they existed. Only shown in “Upcoming & Past” mode — with one group there is nothing to separate.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'divider',
+              type: 'select',
+              defaultValue: 'none',
+              label: 'Divider line',
+              admin: {
+                width: '50%',
+                description: 'A rule drawn between the two groups, aligned with the content.',
+              },
+              // Prefixed with the off state; the three styles themselves are the
+              // Divider block's, shared so the two cannot drift apart and emit a
+              // `.vf-divider--<slug>` class that has no rule behind it.
+              options: [{ label: 'None', value: 'none' }, ...DIVIDER_STYLE_OPTIONS],
+            },
+            {
+              name: 'dividerWidth',
+              type: 'select',
+              defaultValue: 'full',
+              label: 'Divider width',
+              admin: {
+                width: '50%',
+                condition: (_: unknown, sibling: { divider?: string | null } = {}) =>
+                  Boolean(sibling?.divider) && sibling.divider !== 'none',
+              },
+              options: DIVIDER_WIDTH_OPTIONS,
+            },
+          ],
+        },
+        {
+          name: 'pastBackground',
+          type: 'select',
+          defaultValue: 'default',
+          label: 'Band behind the Past group',
+          admin: {
+            description:
+              'Give the Past group its own full-width coloured band, which is how the design reference separates the two. “Pale blue” is its treatment. The colours come from Design System → Section bands.',
+          },
+          options: [
+            { label: 'Same as the section (no band)', value: 'default' },
+            ...BACKGROUND_OPTIONS,
           ],
         },
       ],

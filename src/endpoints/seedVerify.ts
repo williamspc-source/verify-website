@@ -8,7 +8,6 @@ import {
 
 import { seedDataLayer } from './seed/seedDataLayer'
 import { seedAvailability } from './seed/seedAvailability'
-import { seedShowcase } from './seed/seedShowcase'
 import { seedHomepage } from './seed/seedHomepage'
 import { seedContentGlobals } from './seed/seedContentGlobals'
 import { seedAbout } from './seed/seedAbout'
@@ -36,6 +35,12 @@ import { repairEnquiryLayout } from './seed/repairEnquiryLayout'
 import { repairPortalEnquiry } from './seed/repairPortalEnquiry'
 import { repairJoinBenefits } from './seed/repairJoinBenefits'
 import { repairEventTimeDash } from './seed/repairEventTimeDash'
+import { repairSocialImage } from './seed/repairSocialImage'
+import { repairClaimantProcessImage } from './seed/repairClaimantProcessImage'
+import { repairContentImages } from './seed/repairContentImages'
+import { repairHubEmptySections } from './seed/repairHubEmptySections'
+import { repairEventsSeparator } from './seed/repairEventsSeparator'
+import { repairTeamDepartments } from './seed/repairTeamDepartments'
 import { repairEventsHub, repairFeaturedCategories } from './seed/seedEventsHub'
 import { isPlaceholderLayout } from './seed/authored'
 import { CONTACT_SERVICE_OPTIONS } from './seed/data/services'
@@ -871,46 +876,18 @@ export const seedVerify = async ({
       payload.logger.info('— Contact form already exists, skipping')
     }
 
-    // Place the form on the Contact page (only while still the placeholder).
-    const contact = await payload.find({
-      collection: 'pages',
-      where: { slug: { equals: 'contact' } },
-      limit: 1,
-      depth: 0,
-      req,
-    })
-    const contactPage = contact.docs[0]
-    if (contactPage && formId && isPlaceholderLayout(contactPage.layout)) {
-      await payload.update({
-        collection: 'pages',
-        id: contactPage.id,
-        depth: 0,
-        req,
-        context: { disableRevalidate: true },
-        data: {
-          hero: pageHero(
-            'Contact',
-            'Get in Touch',
-            'Refer a matter, book a service, or ask us anything — our team responds promptly.',
-          ),
-          layout: [
-            {
-              blockType: 'formBlock',
-              form: formId,
-              enableIntro: true,
-              introContent: richText([
-                heading('Send an Enquiry', 'h2'),
-                paragraph('Complete the form below and our team will respond promptly.'),
-              ]),
-            },
-          ],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
-      })
-      payload.logger.info('— Placed Contact form on the Contact page')
-    } else {
-      payload.logger.info('— Contact page already built, skipping')
-    }
+    // The Contact page's form is NOT placed here. It used to be, and that broke
+    // the fresh-install path: this ran ~12 seconds before `seedInfoBooking`
+    // authors the page, replaced the scaffold placeholder with a lone formBlock,
+    // and so made `isUnauthored` false — the real fixture then logged
+    // "contact already authored, skipping" on a database ninety seconds old.
+    // Measured on a clean reseed: /contact ended with **1 block instead of 13**,
+    // no portal card, no contact details, no map, and zero `cssClass` rows, which
+    // in turn left `repairPortalEnquiry` with no `ct-portal-card__btn` anchor to
+    // find. It failed silently on every fresh install — and the box is a fresh
+    // install. `seedInfoBooking` places the same form itself (with the card
+    // styling `repairEnquiryLayout` exists to retrofit), looking the id up by
+    // query, so nothing is lost by leaving it to the fixture.
   }
 
   // ── Enquiry drawer form + Join-panel EOI form (per-form recipient email) ──
@@ -1165,9 +1142,6 @@ export const seedVerify = async ({
   // ── Specialist availability demo data (advertised specialists + sessions) ──
   await seedAvailability({ payload, req })
 
-  // ── Style Guide showcase page (every block, for review/handoff) ──
-  await seedShowcase({ payload, req })
-
   // ── Homepage layout (matches .design-reference/index.html) ──
   await seedHomepage({ payload, req })
 
@@ -1208,6 +1182,12 @@ export const seedVerify = async ({
   await repairPortalEnquiry({ payload, req })
   await repairJoinBenefits({ payload, req })
   await repairEventTimeDash({ payload, req })
+  await repairSocialImage({ payload, req })
+  await repairClaimantProcessImage({ payload, req })
+  await repairContentImages({ payload, req })
+  await repairHubEmptySections({ payload, req })
+  await repairEventsSeparator({ payload, req })
+  await repairTeamDepartments({ payload, req })
   await repairLinkTargets({ payload, req })
   await repairBlockBands({ payload, req })
   // Both write only into an absence — a missing carousel block, a superseded

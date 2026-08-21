@@ -223,7 +223,7 @@ everything listed here as live, and they should not be renamed without updating 
 > **Three shipped presets were written against those names and did nothing:**
 > *Carousel · Overlay arrows*, *Avatars · Gradient initials* and *Divider · Bold*.
 > They are corrected in the seed, but **presets are database rows** — an existing
-> site keeps the old CSS until someone opens Globals → Custom Styles and edits
+> site keeps the old CSS until someone opens Design → Custom Styles and edits
 > those three presets by hand. Re-running the seed will not fix them.
 
 **Layout primitives and atoms**
@@ -244,9 +244,47 @@ everything listed here as live, and they should not be renamed without updating 
 
 ## 7. Built-in options (no CSS needed)
 
-Every block exposes **Background**, **Container width**, **Motion**, and grid blocks add
-**Hover effect** and **Card shadow**. Layout primitives add padding, gap, columns/span and
-alignment. The home hero adds background, width and padding. Reach for CSS only after these.
+**Not every block has all of these** — that sentence used to say "every block exposes…" and sent
+people hunting for a Background field on Heading, Text and Spacer, which have never had one.
+Measured 2026-08-21 across the 52 blocks: **Background** on 24, **Container width** on 25,
+**Motion** on 24, **Extra CSS classes** on 15, **Hover effect** on 11, **Card shadow** on 12, and a
+**Style preset** on 49. Broadly: a block that draws a band across the page has the section controls;
+the atoms you drop *inside* one (Heading, Text, Button, Image, Spacer, Divider, Icon) do not, because
+they take their background from the Section around them.
+
+**The block's own edit panel is the authority, not this page.** If the control is not there, that
+block does not have it. Layout primitives add padding, gap, columns/span and alignment. The home hero
+adds background, width and padding. Reach for CSS only after these.
+
+**The controls on the pieces inside a Section.** §6 above lists the CSS classes these produce, which
+is no help if you are looking for the setting. Each of these is a normal field on the block:
+
+| On this block | The control | What it does |
+| --- | --- | --- |
+| Heading | **Heading level** | H1–H4. Changes what the page announces to a screen reader, not just the size |
+| Heading | **Size** | Small → Display, independent of the level |
+| Text | **Text size** | Small / Base / Large |
+| Button | **Size** | Small / Default / Large |
+| Image | **Width** | Full, Wide, Normal, Narrow |
+| Image | **Corner rounding** | None → Fully round. **Not the same control as Design System → Corner rounding**, which sets the site-wide default; this one overrides it for one image |
+| Image | **Shadow** | None → Extra large |
+| Spacer | **Height** | XS → XL — for adding space without an empty paragraph |
+| Divider | **Style** and **Width** | Line, dots or gradient; how far across the column it runs |
+| Icon | **Size** and **Colour** | Small/Medium/Large; brand blue, accent, muted or inherit |
+| Any of them | **Alignment** | Left / Centre / Right |
+| Row | **Vertical alignment** | Top, centre, bottom or stretch — how columns of different heights line up |
+| Column | **Column span** | How many of the row's columns this one occupies |
+| Anywhere an icon appears | **the icon picker** | A fixed set of icons. Type to filter; only icons in the set can be chosen, so an icon can never fail to draw |
+
+**Blocks this guide had never mentioned.** They are in the *Add block* list and they work; there was
+simply nowhere describing them, and the one page that displayed them was deleted on 2026-08-20:
+
+- **Stats Band** — a row of big numbers with labels, on a band.
+- **Call to Action** — a heading, a line of text and a button.
+- **Spacer**, **Divider**, **Icon** — the atoms in the table above, droppable inside a Section or Row.
+- **Banner** and **Code** — available *inside a rich-text field* rather than the block list; a
+  coloured callout, and a code sample.
+
 
 > **Linking to a section of another page.** Every link now has a **Jump to section** box under the
 > document picker. Type the section's Anchor ID there — without the `#` — and the link lands on that
@@ -308,12 +346,9 @@ then pick **quiet-cards** in that block's *Custom CSS class(es)*.
 ### A form or signup box is missing from the page — it is not CSS
 
 If the **"Make an Enquiry"** drawer opens but its Send button is greyed out and it says
-*"This form is temporarily unavailable"*, nothing is hidden and no styling is at fault. The drawer
-does not know which form to put the enquiry in, so it refuses to take one rather than accept an
-enquiry it would then discard.
-
-Fix it in **Globals → Site Settings → Enquiry drawer form**: choose the form named **Enquiry**.
-The most common cause is that someone renamed that form.
+*"This form is temporarily unavailable"*, nothing is hidden and no styling is at fault — so there is
+nothing to fix on this page. **`ADMIN-GUIDE.md` → Forms explains what has happened and how to fix
+it.**
 
 Same for a **newsletter band** that shows a heading and *"Signups are temporarily unavailable"*
 instead of an email box: open that block on the page and set its **Form** field. If it shows the
@@ -483,7 +518,7 @@ and no choice you made gets thrown away.
 Each Split Feature row can show a pale blue box in place of a photo, so a page can be laid out before
 the photography exists. Per row:
 
-- **Show a grey image placeholder** — the tickbox that turns it on.
+- **Show an image placeholder** — the tickbox that turns it on.
 - **Placeholder label** — the caption inside it, e.g. "Image Placeholder".
 - **Placeholder icon** — an optional glyph above the caption. Reporting Services uses the `image`
   one; the /services rows deliberately have none.
@@ -491,6 +526,19 @@ the photography exists. Per row:
 **To replace it, just upload an image to that row.** The whole placeholder disappears — box, caption
 and glyph together — and the photo takes its place. You do **not** need to untick anything, and
 removing the image later brings the placeholder back exactly as it was.
+
+### The photo in "Your Examination Step by Step"
+
+**Pages → Information for Claimants → the Process Steps block.** The same four controls, in the
+left-hand column beneath the intro copy — a **Left-column photo**, plus the placeholder tickbox,
+caption and glyph. They appear only on the *Claimant step list* layout, because it is the only one
+of the four with a column to put a photo in; on Cards, Two-row and AAMLE panels they are hidden
+rather than offered and ignored.
+
+The frame is a fixed 4:3 whatever you upload, so the column keeps the same height and the page never
+reflows around a tall or panoramic photo. If the crop cuts through the wrong part of the picture,
+that is a Media setting rather than a styling one — **`ADMIN-GUIDE.md` → Media** explains the focal
+point. The tile shows the pale blue placeholder with "IMAGE PLACEHOLDER" until a photo is added.
 
 
 ### A specialist's job title, qualification icons and accreditations
@@ -503,9 +551,9 @@ removing the image later brings the placeholder back exactly as it was.
   graduation cap for a degree, a medal for a fellowship, a certificate for a certificate or diploma.
   Add a row and leave the icon empty and it picks the right one from the wording — set one and your
   choice always wins.
-- **Accreditations** are records shared between specialists (Specialists → Accreditations), and each
-  one carries its own icon too. They all use the seal-check tick by default, which is what the design
-  calls for; change it on the accreditation and it changes everywhere that accreditation appears.
+- **Accreditations** carry their own icon too, and default to the seal-check tick, which is what the
+  design calls for. They are *shared records*, so changing one changes every specialist who holds it
+  — **`ADMIN-GUIDE.md` → Specialists** covers what they are and what else reads them.
 
 
 ### Card styles on a Feature Grid, and what makes service cards centre
@@ -550,8 +598,9 @@ looks exactly as it always has.
 
 Where each is used: **Information for Clients** and **Information for Claimants** are Divided +
 Chevron; the **IME** page's claim-types list is Divided + Pill + Tile + Compact on brand-tinted rules;
-the **JME** FAQ is Divided + Pill + Compact. The **Style Guide** is deliberately left on Card, so the
-default look stays visible somewhere.
+the **JME** FAQ is Divided + Pill + Compact. Those four are the only FAQ blocks on the site — the
+Style Guide page that used to hold a fifth on the plain **Card** style was removed on 2026-08-20, so
+there is nowhere left to see the Card look without adding an FAQ block to a page yourself.
 
 > **"Only one open at a time" is a separate tickbox, and it is worth a thought.** Untick it and a
 > reader can leave several answers open to compare them — which is what the reference does on both
@@ -630,3 +679,54 @@ that sits in a column beside something else, as the Join Expert Panel contact de
 > **An icon list whose items are links styles itself as a contact list** — brand-blue links, a larger
 > icon and tighter spacing. There is no setting for it: adding links is the signal, because that is
 > what distinguishes contact details from a row of feature chips.
+
+### A section that hides itself — and its tab — when it has nothing to show
+
+**Pages → the page → an Archive, Featured Articles Carousel or Resources Grid block → "Hide this
+section when it has nothing to show".**
+
+These three blocks list whatever is in the CMS — articles in a stream, featured articles, resources.
+When there is nothing to list they used to leave a heading over an empty band. Tick this and the
+whole section stands down instead: heading, intro and all.
+
+**The tab goes with it.** On a page with a sticky Section Nav — /in-the-loop's *Latest · News &
+Updates · AAMLE Events · …* bar — the pill pointing at a hidden section is removed too, so the bar
+never offers a tab that leads nowhere. There is nothing to set for that; the nav reads the section's
+own tickbox.
+
+All eight sections on **In the Loop** have it ticked. Today that leaves one tab, *QA Insights*,
+because that is the only stream with published articles. Publish a News & Updates article and its
+section and its tab both come back on their own — nothing needs re-ticking.
+
+> **Untick it to see an empty section.** With the box off, the section renders as it always did —
+> heading, intro and no cards — which is how you check the wording and the band colour before the
+> content exists. The tab stays too, so you can click through to it.
+
+Note *AAMLE Events* on that page lists **upcoming** events only. Every event currently in the CMS is
+in the past, so that section counts as empty and is hidden. Adding a future-dated event brings it back.
+
+### Telling Upcoming Events from Past Events apart
+
+**Pages → Events & Seminars → the Events Explorer block → "Separating Upcoming from Past".**
+
+The two groups sit in one section, so by default nothing but whitespace divides them. Two controls,
+which work independently — use either, both, or neither:
+
+- **Divider line** — None (the default) · Line · Dots · Gradient. Draws a rule between the two
+  groups, aligned with the text. **Divider width** appears once you pick one: Full spans the content,
+  Narrow is a short centred rule.
+- **Band behind the Past group** — leave it on *Same as the section* for no band, or pick any section
+  colour to put the Past group on its own full-width stripe. **Pale blue** is the treatment the design
+  reference uses. The colours themselves come from Design System → Section bands.
+
+`/events` uses the **band** (Light blue accent) with no divider line — the reference's own treatment.
+The divider is there if you would rather have a rule, and the two are independent, so you can use
+either without touching the other.
+
+> **A band runs to the bottom of the section**, flush into the footer, and takes its breathing room
+> from its own padding rather than leaving a gap underneath. That is automatic: pick a colour and the
+> block handles it.
+
+> **These only appear on a block set to "Upcoming & Past".** The two dedicated listing pages show one
+> group each, so there is nothing to separate — the controls are hidden there rather than offered and
+> quietly ignored.

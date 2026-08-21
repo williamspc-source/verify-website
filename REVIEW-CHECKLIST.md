@@ -3,9 +3,14 @@
 Every page and every block on it, in the order they render. Tick as you go.
 
 **Generated 2026-08-17** from the live `/api/pages` on the local production server — this is the
-actual block list from the database, not a reading of the rendered HTML. 27 CMS pages, 215 blocks.
-`/search` is the 28th URL in the pages sitemap but is a dedicated route rather than a Pages
-document, so it appears under *Site-wide* below instead.
+actual block list from the database, not a reading of the rendered HTML. `/search` is a dedicated
+route rather than a Pages document, so it appears under *Site-wide* below instead.
+
+**Counts re-measured 2026-08-20: 26 CMS pages, 136 blocks** (was 27 pages / 215 blocks at
+generation). The Style Guide page was removed, and the 2026-08-20 content cull took the rest. **The
+per-page block lists below have NOT been regenerated**, so treat a block that is listed and is not on
+the page as a stale line rather than a missing block — /in-the-loop is the one where that is
+expected, and its section explains why.
 
 ## How to use it
 
@@ -102,6 +107,8 @@ drops its stylesheet and makes everything read as an unstyled default:
 
 - [ ] **Hero** (pageHero) — "The People Behind VERIFY" — subtitle, shield, breadcrumb
 - [ ] **People Grid** — "Experienced, Dedicated & Client-Focused" (team, grid)
+  - [ ] Department headings read correctly and sit in the order set in Taxonomy → Departments
+  - [ ] Nobody is missing — a member with no department does not silently drop out of the grid
 - [ ] **CTA Band** — "Ready to Refer Your Next Matter to VERIFY?" (2 links)
 
 ### Contact Us  
@@ -130,6 +137,7 @@ drops its stylesheet and makes everything read as an unstyled default:
 - [ ] **Slide Carousel** — "Four ways VERIFY brings medico-legal learning to life" (4 slides, eyebrow *Programs & partnerships*)
 - [ ] **Events Explorer** — "Explore VERIFY & AAMLE Events" (all, with search, **card presentation**)
   - [ ] Upcoming section — "Latest Medico-Legal Education Events" + intro + *View more upcoming events*
+  - [ ] **Band behind the Past section** — pale blue, full width, running flush into the footer with no white strip beneath it (Separating Upcoming from Past → Band behind the Past group)
   - [ ] Past section — "Recent VERIFY & AAMLE Programs" + intro + *View more past events*
   - [ ] Cards show the event image, or its **date** when no image is uploaded
 
@@ -148,16 +156,21 @@ drops its stylesheet and makes everything read as an unstyled default:
 ### In the Loop  
 `/in-the-loop`
 
+All eight sections below are set to **hide themselves when they have nothing to list**, and the
+Section Nav drops the matching tab with them. With today's content only `#qa-insights` has articles,
+so the nav shows **one** tab and the seven others render nothing — that is correct, not a fault. To
+review a hidden section's wording, untick "Hide this section when it has nothing to show" on it.
+
 - [ ] **Hero** (pageHero) — "Your Source for Medico-Legal Intelligence" — subtitle, breadcrumb, image panel
-- [ ] **Section Nav** (8 items)
-- [ ] **Featured Articles** — "Featured" (auto, #featured)
-- [ ] **Archive** (#news)
-- [ ] **Archive** (#events)
-- [ ] **Archive** (#insights)
-- [ ] **Archive** (#spotlights)
-- [ ] **Resources Grid** — "Guides, Checklists & Templates" (auto, ni-resource, #resources)
-- [ ] **Archive** (#qa-insights)
-- [ ] **Archive** (#staff-narratives)
+- [ ] **Section Nav** (8 items configured; **1 rendered today**)
+- [ ] **Featured Articles** — "Featured" (auto, #featured) — *hidden: no featured articles*
+- [ ] **Archive** (#news) — *hidden: no News & Updates articles*
+- [ ] **Archive** (#events) — *hidden: lists upcoming events, and all 13 events are past*
+- [ ] **Archive** (#insights) — *hidden: no Industry Insights articles*
+- [ ] **Archive** (#spotlights) — *hidden: no Specialist Spotlights articles*
+- [ ] **Resources Grid** — "Guides, Checklists & Templates" (auto, ni-resource, #resources) — *hidden: no resources*
+- [ ] **Archive** (#qa-insights) — the one section with content (4 articles)
+- [ ] **Archive** (#staff-narratives) — *hidden: no Staff Narratives articles*
 - [ ] **Newsletter** — "Be the First to Know About VERIFY & AAMLE Updates"
 
 ### Information Centre  
@@ -172,6 +185,8 @@ drops its stylesheet and makes everything read as an unstyled default:
 
 - [ ] **Hero** (pageHero) — "Information for Claimants" — subtitle, breadcrumb
 - [ ] **Process Steps** — "Your Examination Step by Step" (5 steps, claimant, #process-overview)
+  - [ ] Left-column photo fills its frame with no band of background showing
+  - [ ] With no photo: the pale blue placeholder shows its caption and glyph, not an empty box
 - [ ] **Section** (#appointment-guide)
   - [ ] **Text**
   - [ ] **Heading** — "What to Expect — Every Step of the Process"
@@ -324,55 +339,6 @@ drops its stylesheet and makes everything read as an unstyled default:
   - [ ] **Callout** (1 links)
 - [ ] **Portal CTA** — "Online Booking Portal" (3 tiles, 2 links)
 
-### Style Guide  
-`/style-guide`
-
-- [ ] **Hero** (homeHero) — "VERIFY block library" — eyebrow "Design system", subtitle, breadcrumb
-- [ ] **Gateway Cards** — "Find your pathway" (3 cards)
-- [ ] **Feature Grid** — "Built for accuracy" (3 items)
-- [ ] **Stats Band** — "By the numbers" (4 stats)
-- [ ] **Process Steps** — "Our process" (3 steps, cards)
-- [ ] **Tabs** — "What we offer" (2 tabs)
-  - [ ] Tab: **Medico-Legal**
-    - [ ] **Heading** — "Medico-Legal Services"
-    - [ ] **Text**
-  - [ ] Tab: **Educational**
-    - [ ] **Heading** — "Educational Services"
-    - [ ] **Text**
-- [ ] **Split Feature** (2 rows)
-- [ ] **Specialty Grid** — "Specialties" (auto, cards)
-- [ ] **People Grid** — "Available this month" (specialists, carousel)
-- [ ] **People Grid** — "Meet the team" (team, grid)
-- [ ] **Slide Carousel** — "Four ways VERIFY brings medico-legal learning to life" (4 slides)
-- [ ] **Section**
-  - [ ] **Heading** — "Build anything — no code"
-  - [ ] **Text**
-  - [ ] **Spacer**
-  - [ ] **Row**
-    - [ ] Column 1 of 3
-      - [ ] **Icon**
-      - [ ] **Heading** — "Sections"
-      - [ ] **Text**
-      - [ ] **Button** (1 links)
-    - [ ] Column 2 of 3
-      - [ ] **Icon**
-      - [ ] **Heading** — "Rows & columns"
-      - [ ] **Text**
-      - [ ] **Button** (1 links)
-    - [ ] Column 3 of 3
-      - [ ] **Icon**
-      - [ ] **Heading** — "Atoms"
-      - [ ] **Text**
-      - [ ] **Button** (1 links)
-  - [ ] **Spacer**
-  - [ ] **Divider**
-  - [ ] **Spacer**
-  - [ ] **Image**
-- [ ] **Section**
-  - [ ] **Heading** — "Rich blocks nest too"
-  - [ ] **FAQ** (2 items)
-- [ ] **CTA Band** — "Ready to get started?" (2 links)
-
 ### Terms & Conditions  
 `/terms-conditions`
 
@@ -388,7 +354,16 @@ drops its stylesheet and makes everything read as an unstyled default:
 These render from one template each, so reviewing every document is wasted effort — check two or
 three per collection, picking ones that differ (long vs short, with image vs without).
 
-**Posts — 24 documents**, at `/in-the-loop/<stream>/<slug>`, across 7 streams.
+**Posts — 4 documents** (2026-08-20; was 24 before the content cull), at
+`/in-the-loop/<stream>/<slug>`. All four are in the **QA Insights** stream; the other six streams
+exist and are empty.
+
+There is also a **stream index** at `/in-the-loop/<stream>` — one page per stream, listing that
+stream's articles. Check the populated one and an empty one; they are the same template and only the
+empty case can render as a page with nothing on it.
+
+- [ ] `/in-the-loop/qa-insights` — lists the four articles, header reads as the stream
+- [ ] An empty stream — reads as empty on purpose, not as a broken page
 
 - [ ] Article header — title, stream badge, byline, hero image
 - [ ] Body rich text — headings, lists, emphasis, links
@@ -407,9 +382,12 @@ three per collection, picking ones that differ (long vs short, with image vs wit
 **Team — 19 documents**, at `/about/team/<slug>`.
 
 - [ ] Photo or initials fallback, role, bio
+- [ ] **No ROLE pin under the photo** — the role appears once, under the name in the hero
+- [ ] A member with a **Profile photo** set shows it here and their **Team photo** on Meet the Team
+- [ ] A member with **Show no photo on the profile page** ticked has no photo and a full-width bio
 - [ ] Back-link to Meet the Team
 
-**Events — 16 documents**, at `/events/event/<slug>`. Rebuilt past the reference (approved) —
+**Events — 13 documents** (2026-08-20; all past-dated), at `/events/event/<slug>`. Rebuilt past the reference (approved) —
 see `verify-website-design-diff.md` Comparison 25 and `src/Styles/HOOKS.md` for what an editor can
 put on one.
 
@@ -427,6 +405,14 @@ Empty by design until someone writes them — check the surface, not the absence
 - [ ] **Image** on an event → full-bleed photo hero; no image → the plain hero
 
 ---
+
+## Blocks this checklist cannot reach
+
+**Stats Band, Spacer, Divider, Icon and Image are on no page.** They were only ever displayed on
+`/style-guide`, which was removed on 2026-08-20 — correctly, since it was a developer page a visitor
+could reach. Nothing here reviews them, and nothing on the live site would show a regression in them.
+Recorded in `OUTSTANDING.md`; they are not broken, they are simply unobserved. Do not add them to a
+page to make this list tidy — that is a content change, and it puts a demo on a real page.
 
 ## Notes
 

@@ -14,18 +14,20 @@ import { toClassName } from '@/utilities/cssClass'
 import { mediaFocal } from '@/utilities/focalPoint'
 import { specialistPath, teamPath } from '@/utilities/routes'
 
-const DEPARTMENT_LABELS: Record<string, string> = {
-  operations: 'Operations',
-  'business-development': 'Business Development',
-  'client-support': 'Client Support',
-  'quality-assurance': 'Quality Assurance',
-}
-const DEPARTMENT_ORDER = [
-  'operations',
-  'business-development',
-  'client-support',
-  'quality-assurance',
-]
+/**
+ * A team member's department, as a populated relationship.
+ *
+ * This replaced a `DEPARTMENT_LABELS` slug→name map and a `DEPARTMENT_ORDER`
+ * array, both fixed in code — two of the four copies of that list. The label and
+ * the order are now the department's own `title` and `order`, so adding a team,
+ * renaming one or reordering the groups on Meet the Team is an admin edit.
+ */
+type DepartmentRef = { id: number | string; title?: string | null; order?: number | null }
+
+const asDepartment = (value: unknown): DepartmentRef | null =>
+  value && typeof value === 'object' && 'id' in (value as DepartmentRef)
+    ? (value as DepartmentRef)
+    : null
 
 const firstLocationTitle = (locations: Specialist['locations']): string | null => {
   const first = Array.isArray(locations) ? locations[0] : null
@@ -118,7 +120,11 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     }
   } else if (source === 'team') {
     const where: Where = {}
-    if (department) where.department = { equals: department }
+    if (department) {
+      where.department = {
+        equals: typeof department === 'object' ? (department as { id: number | string }).id : department,
+      }
+    }
     const res = await payload.find({
       collection: 'team',
       // Local API defaults to overrideAccess: true, which bypasses
@@ -130,17 +136,31 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
       where,
     })
     if (groupByDepartment) {
-      const byDept = new Map<string, PersonCardData[]>()
+      // Keyed by department id, with the department kept alongside so the label
+      // and the sort both come from the record rather than from a second lookup.
+      // `department` is required on Team, and Departments refuses deletion while
+      // members remain, so an unassigned member is not a state the data can reach
+      // — one is skipped rather than invented into a default group, which is what
+      // the old `t.department || 'operations'` fallback silently did.
+      const byDept = new Map<string, { dept: DepartmentRef; cards: PersonCardData[] }>()
       res.docs.forEach((t) => {
-        const d = t.department || 'operations'
-        const list = byDept.get(d) ?? []
-        list.push(teamToCard(t, Boolean(linkProfiles)))
-        byDept.set(d, list)
+        const dept = asDepartment(t.department)
+        if (!dept) return
+        const key = String(dept.id)
+        const entry = byDept.get(key) ?? { dept, cards: [] }
+        entry.cards.push(teamToCard(t, Boolean(linkProfiles)))
+        byDept.set(key, entry)
       })
-      groups = DEPARTMENT_ORDER.filter((d) => byDept.has(d)).map((d) => ({
-        label: DEPARTMENT_LABELS[d] || d,
-        cards: byDept.get(d) as PersonCardData[],
-      }))
+      groups = [...byDept.values()]
+        .sort(
+          (a, b) =>
+            (a.dept.order ?? 0) - (b.dept.order ?? 0) ||
+            (a.dept.title ?? '').localeCompare(b.dept.title ?? ''),
+        )
+        .map(({ dept, cards: groupCards }) => ({
+          label: dept.title || '',
+          cards: groupCards,
+        }))
       groups.forEach((g) => cards.push(...g.cards))
     } else {
       res.docs.forEach((t) => cards.push(teamToCard(t, Boolean(linkProfiles))))

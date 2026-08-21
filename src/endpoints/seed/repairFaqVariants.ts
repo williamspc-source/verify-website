@@ -27,8 +27,14 @@ type Ctx = { payload: Payload; req: PayloadRequest }
  */
 
 // Page slug → the settings that page's FAQ takes. Each of these four pages has
-// exactly one FAQ block; the Style Guide's is deliberately left on Card so the
-// default treatment stays visible somewhere.
+// exactly one FAQ block, and they are now the ONLY FAQ blocks on the site.
+//
+// This used to add "the Style Guide's is deliberately left on Card so the default
+// treatment stays visible somewhere". That page was removed on 2026-08-20, so
+// `itemStyle: 'card'` — the field's default — renders on no page at all. That is
+// not a fault; a default needs no live instance. It is recorded because the next
+// person to change the Card treatment has nowhere on the site to see the effect,
+// and must add an FAQ block to a scratch page to check it.
 const FAQ_VARIANTS: Record<string, Record<string, unknown>> = {
   'for-clients': {
     itemStyle: 'divided',

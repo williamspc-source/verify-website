@@ -62,6 +62,43 @@ export const Team: CollectionConfig<'team'> = {
               name: 'photo',
               type: 'upload',
               relationTo: 'media',
+              label: 'Team photo',
+              admin: {
+                description:
+                  'Used on Meet the Team, and as the byline photo wherever this person is credited on an article. Also used on their own profile page unless a Profile photo is set below. Fix a bad crop by moving the focal point on the image in Media.',
+              },
+            },
+            // ── Profile-page photo ───────────────────────────────────────
+            // Staff asked for the grid card and the profile page to be able to
+            // differ. Both default to empty/false, which is exactly how this
+            // rendered before they existed — so no member moves and no seed
+            // repair is needed. Deliberately NOT in `defaultPopulate`: that
+            // governs how Team is populated as a *relationship* (cards,
+            // bylines), and none of those render the profile photo. The profile
+            // page's own `find` returns it regardless.
+            {
+              name: 'profilePhoto',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Profile photo',
+              admin: {
+                // Offering an upload that cannot render is the "control that
+                // silently does nothing" case tests/int/adminControls guards.
+                condition: (_, sibling: { hidePhotoOnProfile?: boolean } = {}) =>
+                  !sibling?.hidePhotoOnProfile,
+                description:
+                  'Optional. Shown instead of the Team photo on this person’s own profile page only — Meet the Team and article bylines keep using the Team photo. Leave empty to use the Team photo in both places.',
+              },
+            },
+            {
+              name: 'hidePhotoOnProfile',
+              type: 'checkbox',
+              defaultValue: false,
+              label: 'Show no photo on the profile page',
+              admin: {
+                description:
+                  'Hides the photo on this person’s profile page; they still appear with their Team photo on Meet the Team. This wins over both uploads, so you can hide the photo without deleting it.',
+              },
             },
             {
               name: 'bio',
@@ -110,17 +147,18 @@ export const Team: CollectionConfig<'team'> = {
       ],
     },
     {
+      // Was a select with four options fixed in code, which meant a new team
+      // needed a developer, a deploy and a Postgres enum change. The list lives
+      // in Taxonomy → Departments now; see src/collections/Departments.ts.
       name: 'department',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'departments',
+      hasMany: false,
       required: true,
-      defaultValue: 'operations',
-      admin: { position: 'sidebar' },
-      options: [
-        { label: 'Operations', value: 'operations' },
-        { label: 'Business Development', value: 'business-development' },
-        { label: 'Client Support', value: 'client-support' },
-        { label: 'Quality Assurance', value: 'quality-assurance' },
-      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Which team this person is in. Add a new one under Taxonomy → Departments.',
+      },
     },
     {
       name: 'order',

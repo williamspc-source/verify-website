@@ -149,7 +149,8 @@ that reports every enquiry notification and password-reset email as sent. See `.
    Appearance choice, so the editor's stored value is discarded,
 4. a query against a draft-enabled collection has no `overrideAccess` and no `_status` filter,
    leaking unpublished documents onto the public site,
-5. `HOOKS.md` documents a style hook class that nothing emits,
+5. `HOOKS.md` documents a style hook class that nothing emits, or a `cssClass` picker offers a
+   preset class no rule defines,
 6. a cache purge passes a named `cacheLife` profile, which marks the tag stale instead of expiring
    it — the editor's first reload after saving then serves the *previous* value,
 7. a brand asset is referenced straight from a CSS rule instead of through a Site Settings token, or
@@ -173,17 +174,21 @@ goes red, and `zsh tests/int/prove-guards.sh` applies each in turn and restores 
 
 ### The browser guards
 
-Four things across `tests/e2e/frontend.e2e.spec.ts` and `tests/e2e/links.e2e.spec.ts` cannot be
-checked by reading source, because each is about what the page *computes* or what the browser
-*does*, not what the CSS says. Each carries the deliberate break that proves it red;
-`prove-guards.sh` drives `pnpm test:int` only, so these are re-proved by hand.
+Six things across four e2e specs — `frontend.e2e.spec.ts`, `links.e2e.spec.ts`,
+`images.e2e.spec.ts` and `carousel.e2e.spec.ts` — cannot be checked by reading source, because each
+is about what the page *computes* or what the browser *does*, not what the CSS says. Each carries the
+deliberate break that proves it red; `prove-guards.sh` drives `pnpm test:int` only, so these are
+re-proved by hand. The last two are the newest and the easiest to mistake for optional: deleting
+them removes the only net under the image-sizing and carousel work.
 
 | Guard | Catches |
 |---|---|
 | The `<main>` landmark and its skip link | The link rendering unstyled — asserted **offscreen before focus** as well as on-screen after, because the on-screen half alone is trivially true of an unstyled element |
 | Centred section headers do not narrow themselves into a wrap | A width cap on a heading box breaking a title that its container had room for. Ten headings across eight pages were wrapping this way |
 | A testimonial card highlights on hover without moving | A card motion preset firing inside a viewport with no room for it, clipping the card |
-| A pasted article deep link lands on its heading | An anchor target that only exists after JavaScript runs. Checked three ways: the id is in the **raw server HTML** of all 24 articles; the heading lands exactly on the computed `scroll-padding-top` line on a fresh load; and the same holds with **JavaScript disabled**, which no client-side workaround can fake |
+| Every image is served at the size it renders (`images.e2e.spec.ts`) | An oversized derivative — a 1440px file in a 320px box. An invalid `sizes` attribute makes the browser fetch the *largest* candidate, silently and with no console warning |
+| The carousel cannot be clicked past its own end (`carousel.e2e.spec.ts`) | A position that outruns the transition and leaves no slide in view. Note it clicks with `{ force: true }`: Playwright's normal click waits for stability, so a "rapid" burst is not rapid and the test passes against the broken component |
+| A pasted article deep link lands on its heading | An anchor target that only exists after JavaScript runs. Checked three ways: the id is in the **raw server HTML** of every article the posts sitemap lists; the heading lands exactly on the computed `scroll-padding-top` line on a fresh load; and the same holds with **JavaScript disabled**, which no client-side workaround can fake. The bound is deliberately "more than zero", not a headcount — it was `> 5`, calibrated to 24 scaffold articles, and the 2026-08-20 cull to 4 made it fail on its own precondition |
 
 Three habits make the difference between these and the guards that rotted:
 
@@ -222,10 +227,11 @@ before claiming a port is done, then confirm in the browser: a zero proves a rul
 that it reached the page.
 
 `tests/visual/computedSnapshot.mjs` captures computed styles across the site so a CSS change can be
-diffed. It measures 34 properties, including `width`, `height`, `grid-template-columns` and
+diffed. It measures 39 properties, including `width`, `height`, `grid-template-columns` and
 `transform` — which is what lets it catch a layout change and not just a repaint. Two real limits
-remain: it never triggers `:hover`, and it visits 14 routes, not all 29 pages, so a clean run says
-nothing about the rest.
+remain: it never triggers `:hover`, and it visits 21 routes, not all 27 page URLs, so a clean run says
+nothing about the rest. (Counted 2026-08-21. Both numbers had drifted here and in the harness's own
+comment — count the arrays rather than quoting this line.)
 
 > This paragraph used to claim those four layout properties were **absent**. They had been added
 > after the harness returned a falsely clean diff on exactly the changes most likely to break a page
@@ -237,22 +243,28 @@ nothing about the rest.
 
 ## Images and where to upload them
 
-**The site ships before its photography does.** Every image slot is empty and showing a placeholder,
-and every one of them is fillable from `/admin` — no code change, no deploy. This is the map.
+**The photography arrives in stages, and the site works at every stage.** The people are in: all 19
+team headshots and all 26 specialist portraits. Of the twenty in-page image slots, eight are filled
+and **twelve are still showing a placeholder** — listed one by one in `OUTSTANDING.md`. Every slot,
+filled or not, is fillable from `/admin` — no code change, no deploy. This is the map.
+
+> An earlier version of this line said *every* slot was empty, and was contradicted ninety lines
+> further down by this same section. If you are checking whether a photograph has landed, look at the
+> page, not at this paragraph.
 
 Nothing here is hardcoded: where a bundled file appears (the logo, the shield), it is a *fallback*
 that only shows while the corresponding field is empty. Two guards in
 `tests/int/adminControls.int.spec.ts` keep it that way — one fails the build if a brand asset is
 referenced straight from CSS, the other if a block draws a placeholder without offering an upload.
 
-### Site-wide — **Admin → Globals → Site Settings**
+### Site-wide — **Admin → Site → Site Settings**
 
 | Field | Where it appears | If left empty |
 | --- | --- | --- |
 | Logo | Header, and the footer if no footer logo is set | Bundled VERIFY wordmark |
 | Footer logo | Footer only | Falls back to Logo, then the bundled wordmark |
 | Favicon | Browser tab | `public/favicon.png` |
-| Social image | Link previews when a page is shared | No preview image |
+| Social image | Link previews when a page is shared | The generated 1200×630 share card (`public/assets/images/social-share.png`), set by the seed |
 | Shield / seal mark | Home hero watermark, the mark behind **every** interior page hero, and the Contact page's portal cards | Bundled VERIFY shield |
 
 ### People and content — **Admin → Collections**
@@ -272,7 +284,8 @@ Add or open the block, then use its upload field.
 
 | Block | Field | If left empty |
 | --- | --- | --- |
-| Split Feature | Row → Image | Grey placeholder box, if that row's "Show a grey image placeholder" is ticked; otherwise the row goes full width |
+| Split Feature | Row → Image | Pale-blue placeholder tile, if that row's "Show an image placeholder" is ticked; otherwise the row goes full width |
+| Process Steps (Claimant step list) | Left-column photo | Pale-blue placeholder tile, if "Show an image placeholder" is ticked; otherwise nothing renders |
 | Why VERIFY | Image | Labelled gradient box |
 | AAMLE Education | Image | Labelled gradient box, if the row's placeholder is ticked |
 | Leadership Spotlight | Photo | Labelled box with a person icon |
@@ -289,6 +302,50 @@ Add or open the block, then use its upload field.
   which stores alt text plus a focal point and zoom. If a portrait crops through someone's face,
   open the image in Media and move the focal point — every place that image is used re-crops around
   it.
+- **Upload a JPEG unless the picture needs transparency.** What you upload is what visitors
+  download, in the same format: Payload's derivatives inherit the source's format, so a PNG
+  photograph stays a PNG at every size. A photograph saved as PNG costs several times what the same
+  picture costs as a JPEG, and nothing in the admin warns you — `OUTSTANDING.md` §11 measures what
+  this is costing today. Cut-outs that need a transparent background (the specialist portraits) are
+  the exception, and are PNG on purpose.
+- **You do not need to resize before uploading.** The site picks the smallest generated size that
+  still covers the box at 2× — `src/utilities/mediaSrc.ts` — and re-encodes at quality 82. A big
+  upload is not served at its full size; it just gives the site more sizes to choose from.
+
+### Photos that have to survive a rebuild
+
+An upload made in the admin lands in `public/media/`, which is **gitignored** — it exists only on
+the machine it was uploaded from, and a fresh install has nothing. For the team and specialist
+headshots, which have to be reproducible, the source is a tracked folder instead:
+
+| | Path | Filename | Format |
+| --- | --- | --- | --- |
+| Team | `public/assets/images/team/` | the person's **slug** — `wes-lerch.jpg` | JPEG (these are opaque) |
+| Specialists | `public/assets/images/specialist/` | the person's **display name** — `Dr Adam Parr.png` | **PNG** — they are cut-outs with a transparent background |
+| Page photos | `public/assets/images/content/` | anything — the filename is mapped explicitly | JPEG |
+
+Drop the file in, commit, and run the seed (`POST /next/seed-verify`). The rules:
+
+- **The folder wins.** If a person has a file there, the seed keeps their stored photo in step with
+  it — replacing the file *in place*, so the alt text, focal point and zoom you set in the admin are
+  all preserved and every page using that image updates at once.
+- **To manage a photo from the admin instead, delete the folder file.** With no file, the seed
+  leaves that person alone forever.
+- **Delete the file you are replacing, in the same commit.** A `wes-lerch.png` left beside a new
+  `wes-lerch.jpg` is two files for one person; the seed names both in a warning and skips them
+  rather than guessing which you meant.
+- **The seed log says what it did** — added / replaced / unchanged, each replaced person by name,
+  and any file that matched nobody. A misspelled filename shows up there rather than silently doing
+  nothing.
+
+Specialist matching ignores honorifics, so `Dr Adam Parr.png`, `Adam Parr.png` and `Prof Adam
+Parr.png` all reach the same person.
+
+**Page photographs work differently**, because a filename cannot say which section it belongs to.
+Drop the file in `content/`, then add an entry to `TARGETS` in
+`src/endpoints/seed/repairContentImages.ts` naming the page and the block. Twelve placeholders are
+still waiting on photographs — `OUTSTANDING.md` §13 lists them. Filling one through the admin instead
+works immediately but is lost whenever the database is rebuilt.
 
 ## Architecture
 

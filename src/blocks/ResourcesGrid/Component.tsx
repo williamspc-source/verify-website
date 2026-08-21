@@ -1,5 +1,5 @@
 import configPromise from '@payload-config'
-import { getPayload, type Where } from 'payload'
+import { getPayload } from 'payload'
 import React from 'react'
 
 import type { ResourcesGridBlock as Props, Resource } from '@/payload-types'
@@ -9,6 +9,7 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { resourcesSelected, resourcesWhere } from './query'
 
 type CardData = {
   id: string
@@ -126,7 +127,6 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     source = 'auto',
     audience,
     resourceType,
-    resources,
     columns,
     limit,
     cssClass,
@@ -138,20 +138,17 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
   } = props
   const anchorId = (props as { anchorId?: string | null }).anchorId || undefined
   const variant = (props as { variant?: string | null }).variant || 'card'
+  const hideWhenEmpty = (props as { hideWhenEmpty?: boolean | null }).hideWhenEmpty
 
   const cols = Number(columns) || 3
 
   let cards: CardData[] = []
   if (source === 'manual') {
-    cards = (resources || [])
-      .filter((r): r is Resource => typeof r === 'object' && r !== null)
-      .map(cardFromResource)
+    cards = resourcesSelected(props).map(cardFromResource)
   } else {
     const payload = await getPayload({ config: configPromise })
-    const where: Where = {}
-    // 'all' means "Everyone" → no audience restriction.
-    if (audience && audience !== 'all') where.audience = { equals: audience }
-    if (resourceType) where.resourceType = { equals: resourceType }
+    // Same filter the Section Nav counts against (./query.ts).
+    const where = resourcesWhere({ audience, resourceType })
     const res = await payload.find({
       collection: 'resources',
       depth: 1,
@@ -162,7 +159,11 @@ export const ResourcesGridBlock: React.FC<Props & { bare?: boolean }> = async (p
     cards = res.docs.map(cardFromResource)
   }
 
-  if (cards.length === 0) return null
+  // Nothing to list, and the editor has asked for the section to stand down.
+  // Replaces a bare `<div id>` fallback that kept /in-the-loop's `#resources`
+  // nav item from pointing at a missing id — the nav now drops that tab itself,
+  // deciding it through the same query.
+  if (cards.length === 0 && hideWhenEmpty) return null
 
   return (
     <Section

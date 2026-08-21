@@ -1096,7 +1096,8 @@ past and lists everything, so keeping the previews would print the same events t
 search bar is a deliberate improvement — the reference hub has none.
 
 No code was written for either fix, and no schema changed. The carousel already existed, complete,
-in `seedShowcase`; `postTagLabel` already preferred a post's own category.
+in `seedShowcase` (since deleted — see Comparison 48); `postTagLabel` already preferred a post's own
+category.
 
 ### What was open before that pass
 
@@ -1192,7 +1193,8 @@ headings. A structural match was reported as a visual one.
 What that check never looked at, all measured afterwards: hero alignment (`start` against the
 reference's `center`), type scale (60.8px/800 against 52.8px/700), copy width (1132px against 860px),
 the subtitle (different copy, 18.4px/560px against 16px/650px), the section background, the card
-design, and every slide *body* — which were paraphrases carried over from `seedShowcase`, where only
+design, and every slide *body* — which were paraphrases carried over from `seedShowcase` (since
+deleted — see Comparison 48), where only
 the four **titles** matched. Four titles out of four is exactly what a heading comparison finds
 before it stops.
 
@@ -1549,7 +1551,7 @@ implementations. Five already matched the reference; two did not.**
 | SlideCarousel | `/events` | 5800ms, arrows, dots, hover-pause | 5800ms intended | ✓ |
 | FeaturedArticles | `/in-the-loop` | 5000ms, arrows, 3 dots | 5000ms, arrows, 3 dots | ✓ |
 | TestimonialsGrid | `/` | no autoplay, arrows only | no autoplay, arrows only | ✓ |
-| PeopleGrid marquee | `/style-guide` | 30s, arrows on | *no counterpart* | left as a controls demo |
+| PeopleGrid marquee | `/style-guide` | 30s, arrows on | *no counterpart* | left as a controls demo — **that page was removed 2026-08-20, so this instance no longer exists** |
 
 Measured after: **every marquee reads `animation-duration: 60s`**, matching the reference on all four
 of its own instances. `/in-the-loop` still advances at ~5s with 2 arrows and 3 dots; `/events` still
@@ -2604,3 +2606,527 @@ Duplicate fetches: 1 per route → **0**. Worst CMS oversize ratio: 23.4× → *
 `OUTSTANDING.md` §11 (derivatives are PNG — ~1.5 MB still recoverable, but closing it means
 regenerating every existing upload) and §12 (the bundled shield, a static asset outside the
 optimiser's reach at 23.4×). Both measured, neither blocking.
+
+---
+
+## Comparison 42: a photo added to the claimant process column, which the reference does not have (2026-08-20)
+
+**This one is a deliberate departure, not a gap being closed.** Recorded so nobody later "corrects"
+it back out by diffing against the reference.
+
+### What the reference does
+
+`.design-reference/information-centre/for-claimants.html:577-580` — `.claimant-process-left` holds a
+section label, an `h2`, and one paragraph. **No image.** The right-hand column carries the numbered
+steps 01–05 and that is the whole section.
+
+### What was asked for
+
+A photograph beneath the intro paragraph, editable from the admin. Supplied as a mockup.
+
+### What was built
+
+Four fields on the **Process Steps** block, all conditioned on `variant === 'claimant'` — the only
+one of the four layouts with a left column to hold a photo. Measured before starting: that variant
+is used on exactly one page (`for-claimants`); `cards` covers admin-services, jme and style-guide,
+`two-row` covers for-clients, `edu-panels` the homepage.
+
+| field | behaviour |
+|---|---|
+| `image` | Fills a fixed 4:3 frame, cropped around the focal point set in Media |
+| `imagePlaceholder` | Pale-blue tile until a photo exists. **Defaults to `false`** |
+| `placeholderLabel` | Caption inside the tile — "IMAGE PLACEHOLDER" |
+| `placeholderIcon` | Optional glyph, left unset |
+
+The checkbox defaults to off so that adding the fields moves nothing, and the one block that should
+show the tile is switched on as **data**, by `src/endpoints/seed/repairClaimantProcessImage.ts` —
+because `authorPage` early-returns on an authored page, so a fixture edit would reach a virgin
+install and nothing else.
+
+### Measured
+
+Adding the fields moved **nothing**: `computedSnapshot.mjs` captured before the change and compared
+after read **9292 nodes on both sides, one node differing** — an `/in-the-loop` scroll-reveal frame
+(`matrix(1,0,0,1,0,4.974)` → `4.932`), which is the recorded signature of an animation frame rather
+than a regression.
+
+The tile itself, in the browser:
+
+| | |
+|---|---|
+| `background-image` | `linear-gradient(145deg, rgb(203,229,250), rgb(147,208,247))` |
+| `aspect-ratio` | `4 / 3`, measured 1.333 |
+| `border-radius` | 16px, equal to `--vf-radius-md` |
+| gap below the intro | 28px |
+
+That gap has to come from the tile's own `margin-top`: `.claimant-process-left p` sets `margin: 0`,
+so there is no paragraph margin below the intro to inherit.
+
+All three states were driven, each with content in it — placeholder (`label: "IMAGE PLACEHOLDER"`),
+then an uploaded image (placeholder gone, caption `null`, `object-fit: cover`, 1132px natural into a
+488px box), then cleared again (placeholder and caption both back).
+
+### A correction found along the way
+
+The client asked whether this placeholder is blue rather than grey. It is, and **three places said
+grey** — including `SplitFeature`'s checkbox label, *"Show a grey image placeholder…"*, which is the
+text an editor reads while deciding whether to tick it. `--accent` is `#cbe5fa` and `--accent-light`
+is `#93d0f7`; both `.vf-split__media` and `--vf-grad-image-tint` are pale-blue gradients. Corrected
+in the config, in `README.md`, and in the regenerated inventory CSV.
+
+### Not affected
+
+`referenceCssDiff.mjs`'s `faq-claimants` family matches only that page's FAQ selectors
+(`/^\.(claimant-faqs|faq-item|faq-a|faq-header|ic-faq-)/`), so it neither sees `.claimant-process-media`
+nor is disturbed by it — and equally, its zero says nothing about this section. That is the
+match-regex trap already recorded twice; noted here rather than re-derived.
+
+---
+
+## Comparison 43: the founder photograph made portrait (2026-08-20)
+
+A deliberate departure, recorded so it is not diffed back out.
+
+### What changed
+
+`.leader-img-main` was `aspect-ratio: 4/4` — a square. The supplied photograph of Wes Lerch is
+**934×1400 (2:3)**, so a square box cropped away the top and bottom of the frame. Changed to `2/3`.
+
+### Why it moves nothing else
+
+Exactly **one** Leadership Spotlight block exists site-wide, on `/about`. Measured after the change:
+box 405×607, computed `aspect-ratio: 2 / 3`, rendered ratio **0.667**, the image served at 881×1320
+with `object-fit: cover` — the same ratio as the box, so nothing is distorted.
+
+`.leader-badge` is absolutely positioned against that box (`bottom: -20px`), so it was re-measured
+rather than assumed: it still straddles the bottom edge, its top sitting 55px above it, and it is
+visible at a non-zero size.
+
+### The rest of the photographs — and the gap that `object-fit: cover` was not closing
+
+Seven other supplied photographs are **3:2** against tiles that are **4:3**, so each crops by roughly
+11%. That is the designed behaviour — `object-fit: cover`, framed by the focal point set on the image
+in Media — and is deliberately *not* a reason to change the tile ratio, which came from the reference
+and is shared by fifteen placeholders across the site.
+
+**Except cover was not being applied.** Every one of those photographs sat in its box with a band of
+the blue gradient showing underneath. Measured: box **530×398**, image **530×354** — a 44px gap, with
+`object-fit: cover` correctly computed on the element the whole time.
+
+The cause is that `Media` renders through Next's `<Image>`, and `fill` mode is what makes it stretch
+to its container; without it Next emits width/height attributes and the browser sizes the image by
+its own aspect ratio, so a `h-full` class never gets to win. `WhyVerify` and `LeadershipSpotlight`
+already passed `fill` and were correct; `SplitFeature` and `ProcessSteps` did not.
+
+`fill` also positions absolutely, so it needs a positioned ancestor — `.vf-split__media` and
+`.claimant-process-media` were both `position: static` and have been given `position: relative`.
+Without that the photo anchors to some ancestor further up the tree and the fix does nothing.
+
+Measured after: all **8 of 8** photographs fill their boxes exactly, `object-fit: cover`, no gap.
+
+## Comparison 44: /in-the-loop — empty sections and their tabs removed, and the scroll hint deleted (2026-08-20)
+
+Two deliberate departures on one page, recorded so neither is diffed back in.
+
+### The reference never faced this
+
+`in-the-loop/in-the-loop.html` has content in all eight of its sections, so its sticky
+`.ni-section-nav` bar can afford eight pills. Ours does not. Measured on the served page before this
+pass — 8 tabs, 8 anchors, and exactly **four** rendered cards on the whole page, all of them in QA
+Insights:
+
+| tab | anchor | cards rendered |
+|---|---|---|
+| QA Insights | `#qa-insights` | 4 |
+| everything else — Latest, News & Updates, AAMLE Events, Industry Insights, Specialist Spotlights, Resources, Staff Narratives | 7 anchors | **0** |
+
+Note **AAMLE Events among them.** That section lists `view: upcoming`, and all 13 events in the CMS
+are past-dated, so it had nothing to draw — it was never "13 events" as an earlier note of mine
+claimed, which conflated the collection's total with what that section lists.
+
+### What changed
+
+A `hideWhenEmpty` field on `ArchiveBlock`, `FeaturedArticles` and `ResourcesGrid`. Set, and with
+nothing to list, the block renders `null` — and the Section Nav drops the pill pointing at it.
+
+**The nav decides that through the section's own query**, not a second copy of it: each block's
+filter was extracted to a `query.ts` beside it, which the block uses to fetch and
+`src/blocks/sectionEmptiness.ts` uses to count. That is what stops the two disagreeing — the failure
+mode being a bar of pills that lead to sections that are not there, which is worse than the empty
+bands it replaces. It is decided on the server, so there is no flash of tabs that then vanish;
+measured identical with `javaScriptEnabled: false`.
+
+It also **replaces the bare `<div id>` fallback** added on 2026-08-19. That existed only so
+`links.e2e.spec.ts` would not flag `#featured` and `#resources` as tabs pointing at missing ids. With
+the tabs gone there is no link left to satisfy, and an invisible anchor with nothing in it was a wart.
+
+Measured after: **1 tab, 1 anchor** (`qa-insights`), 0 dead fragments with JavaScript on and off.
+Untick one and both the section and its tab return — `events` goes 1 tab → 2, 2 h2s → 3 — which is
+the assertion the tickbox exists for, and the before-state count of 8 is what makes it mean anything.
+
+### The scroll hint is deleted, and the reference has one
+
+The hero's bobbing "Scroll to explore" caption is **in** `in-the-loop.html`. It is gone here at the
+client's request: the field (`heros/config.ts`), the render (`PageHero`), both CSS rules
+(`.ph-scroll-hint` and the `@keyframes ph-bob` nothing else used) and the seeded value. The two
+Postgres columns were dropped by hand in `psql` before restarting, because a destructive dev push
+hangs on a prompt inside a backgrounded log.
+
+Confirmed absent from the **served** stylesheet, not just the source — 425 KB across two sheets,
+neither string present, with `.ph-card-img-label` from the same block as a positive control that the
+search would have found them.
+
+## Comparison 45: /events — a rule between Upcoming and Past, where the reference uses a band (2026-08-20)
+
+A deliberate departure, and a porting gap closed beside it.
+
+### What the reference does, and why ours could not
+
+`events-seminars.html` puts each group in its own `<section class="events-summary-section">` and
+tints the past one `bg-soft` (`#f6fbff`). We render both groups inside a **single** `<Section>`, so
+neither `.events-summary-section` nor its band could ever reach the page. Measured in the browser
+before this pass — these groups are client-rendered, so `curl | grep` reports nothing either way:
+
+| | measured |
+|---|---|
+| `.events-summary-section` in the DOM | **0** (positive controls: `.events-section-header` ×3, `.events-card-grid` ×2) |
+| background of each group | `rgba(0, 0, 0, 0)` — both transparent |
+| gap between them | 52px, from `.events-explorer-group + .events-explorer-group` |
+
+So the two ran together, which is what prompted the request — and with Upcoming currently empty
+("No upcoming events are listed right now") the two headings read as one list.
+
+### What changed
+
+Two independent controls on the Events Explorer block, under *Separating Upcoming from Past*, both
+off by default: a **divider line** (None / Line / Dots / Gradient, plus Full / Narrow width) and a
+**band behind the Past group** (the seven standard section backgrounds, plus a "no band" sentinel).
+They are offered only in *Upcoming & Past* mode — with one group there is nothing to separate, and a
+control that can be set and does nothing is the thing `adminControls.int.spec.ts` guards against.
+
+The divider is a departure: **the reference draws no rule here.** It is what was asked for, and it is
+recorded so it is not diffed back out. The band is the reference's own treatment, now reachable.
+
+**`/events` ended on the band, not the rule.** The divider was built and switched on first, because a
+rule is what was asked for; the band was then chosen in the admin. `repairEventsSeparator` was
+re-pointed to match, which is not cosmetic — the box is a fresh install, so the repair is what ships,
+and one still drawing the rule would hand it a look that had been turned off while the chosen one
+lived only in the local database.
+
+### The one value that cannot match
+
+Our nearest preset to the reference's `#f6fbff` is **Pale blue**, `--band-light: #eef6fc`, measured
+as `rgb(238, 246, 252)`. Four hex digits apart, and not closed by adding a token: a new global preset
+to satisfy one page is the `.page-hero h1` mistake, which moved 59 pages and was written up as a
+*correction*.
+
+### Measured after
+
+Divider on `/events`: **1**, class `events-explorer-divider vf-divider vf-divider--line
+vf-divider--full`, 1132px wide, `1px rgb(198, 198, 198)`, sitting between the two groups —
+`upcoming.bottom=1757 · hr=1797..1798 · past.top=1838`, 40px of air each side. Off again: **0**.
+
+`/events/upcoming-events` and `/events/past-events`: **0** dividers *with the field deliberately set
+to Line*, which is the only way the `mode` guard proves anything — 0 on a page that never had the
+field set would be true whether the guard worked or not.
+
+Band, checked in both of its forms because `background: inherit` on the full-bleed `::before` could
+have failed on a gradient: `light` → `rgb(238, 246, 252)`, `accent` → the 135° gradient, and the
+`::before` painting **1280px against a 1280px viewport** in both.
+
+The field defaults move nothing: `computedSnapshot` over 18 routes, **0** changed nodes, `/events`
+and both child listings included. `referenceCssDiff.mjs events` still reads zero across 119 selectors.
+
+### The band's two spacing faults, and what caused each
+
+Switching the band on exposed both ends of it, and they had different causes.
+
+**Above: no breathing room.** The first version zeroed the band's `margin-top`, reasoning that its own
+56px padding was separation enough. Measured, the gap between the last line of the Upcoming group and
+the band's top edge was **0px** — the padding separates the band's edge from its *heading*, and does
+nothing for the content above that edge. The rule was removed; the band keeps the 52px it inherits
+from `.events-explorer-group + .events-explorer-group`.
+
+**Below: 152px of white before the footer**, in two parts that had to be found separately — the
+Section's own `padding-bottom: 88px` *plus* **64px** of `.my-16` wrapper margin. The wrapper is there
+because `eventsExplorer` is missing from RenderBlocks' `selfSpaced` set even though it wraps itself in
+`<Section>` (`OUTSTANDING.md` §16). A banded Past group now takes an `events-explorer--band-to-edge`
+class on the Section that zeroes both — unlayered, so it beats `.vf-section` inside
+`@layer components` without `!important`, the same escape `.booking-section.vf-section` uses.
+
+Measured after: gap above the band **52px**, band-to-footer **0px**. And with the band off, all three
+events pages read `88px` / `64px` / **152px** again — unchanged, which is the half that proves the
+class is doing the work rather than something global having moved.
+
+### Two things that went wrong on the way, both worth knowing
+
+**A `'use client'` module cannot export a helper the server calls.** The band predicate is needed in
+two places — the client renders the group, the server zeroes the Section padding — so it was exported
+from `EventsExplorerClient.tsx` and imported by the server component. Every export of a client module
+becomes a client reference: *"Attempted to call pastBandClass() from the server but pastBandClass is on
+the client"*, and `/events` 500'd. It lives in `src/blocks/EventsExplorer/separator.ts` now, a plain
+module with no directive, which is the same shape as the `query.ts` files beside the other blocks.
+
+**And the fix then appeared not to work.** The class was on the element and every measurement read the
+old numbers — `padding-bottom: 88px`, wrapper margin `64px`, gap `0px`. Not a specificity problem:
+`events-explorer--band-to-edge` was **absent from the served stylesheet** while sitting in the source,
+with `events-explorer-group--band` from the previous compile present as a positive control. A stale
+Turbopack build, for the fifth recorded time. `rm -rf .next` and a restart, source unchanged, and all
+three numbers were correct.
+
+## Comparison 46: team profiles — a second photo, the ROLE pin removed, and a double crop fixed (2026-08-20)
+
+A departure, a new capability and a defect found on the way.
+
+### The ROLE pin is gone, and the reference draws it
+
+Every `.design-reference/about/team/*.html` renders a `.staff-sidebar-item` with a `ph-briefcase`
+glyph, the label **Role** and the member's role — directly beneath the photo. It is a faithful port,
+and it comes out at the client's request: the same role is already printed under the name in the
+hero two hundred pixels above it, so the pin repeated it with more emphasis than the original.
+
+`TeamSettings.labels.roleLabel` went with it. A label for something nothing renders is a control an
+editor can change that does nothing, which `adminControls.int.spec.ts` exists to fail on.
+
+**Qualifications stay.** They render in the same blue pill, and unlike the pin they are *ours* — no
+reference profile has one, and **0 of 19** members use it. Keeping an unused capability costs nothing;
+deleting it would have meant dropping a table.
+
+### Three photo states
+
+`Team.photo` is now labelled **Team photo** (Meet the Team, and article bylines). Two fields join it:
+
+| field | effect |
+|---|---|
+| `profilePhoto` | shown instead, **on the profile page only** |
+| `hidePhotoOnProfile` | no photo on the profile page; wins over both uploads |
+
+Empty and unticked is exactly the old rendering, so no member moved and no seed repair was needed.
+`profilePhoto` is hidden in the admin while the box is ticked, rather than offered and ignored.
+
+Measured on `/about/team/wes-lerch`, each state read on **both** pages, because asserting only the
+profile would not show the override was scoped:
+
+| state | profile | Meet the Team card | grid |
+|---|---|---|---|
+| default | `wes-lerch.jpg` | `wes-lerch-600x899.jpg` | `756px 320px` |
+| `profilePhoto` = a different image | `mel-smith.jpg` | **`wes-lerch-600x899.jpg`** — unchanged | `756px 320px` |
+| hidden (override still set) | **no `.staff-photo` at all** | unchanged | `1132px` — one column |
+| hidden **+ a qualification** | no photo, **1 pill labelled "Qualification"** | unchanged | `756px 320px` |
+
+That last row is the case a naive fix breaks: dropping the sidebar whenever the photo is hidden would
+take a member's qualifications with it. And the pill count is what proves the pin is gone in both
+directions — 1 (Role) → 0 → 1 (Qualification), a different label and a different glyph.
+
+`/about/meet-the-team` measured **0 changed nodes** through all of it.
+
+### The double crop — found, not asked for
+
+`.staff-photo` is `320×320` with `overflow: hidden`, and the `<img>` inside it measured **320×480**:
+`height: 100%` was not resolving against the aspect-ratio-derived height, so the image kept its own
+934×1400 ratio and the container clipped the overflow. `ImageMedia` had already applied the editor's
+focal point — `object-position: 50% 1%` — but inside a 480px-tall frame that was then cut to 320.
+**Two crops**, so a focal point set low in the frame was clipped away *after* being honoured. It
+looked right for Wes only because his point is near the top.
+
+Fixed with the pattern this repo already uses (`.vf-split__media`, Comparison 43): `position:
+relative` on the container, `fill` on the `<Media>`. Measured after: image box **320×320**, equal to
+the container, `object-fit: cover`, focal point still applied.
+
+### Two notes on the harness
+
+`computedSnapshot`'s `ROUTES` covered `/about/meet-the-team` but **no individual profile** — a
+different template entirely, and the one being changed. `/about/team/wes-lerch` was added *before*
+the baseline was captured; added afterwards it would have had nothing to compare against and read as
+clean. The profile went 213 → 204 nodes, 19 differing, all of it the pin and the photo wrapper.
+
+And the served stylesheet lagged the source again — sixth recorded time. The symptom was specific:
+`fill` positions absolutely, and without the not-yet-served `position: relative` the photo anchored
+to the viewport and measured **1440×900**. `rm -rf .next` and a restart, source unchanged.
+
+## Comparison 47: /contact — the parking caveat rejoins the car parks it is about (2026-08-20)
+
+A one-element move that closes a gap with the reference, reported by the client.
+
+### What was wrong
+
+The italic sentence *"During peak hours, CBD parking options may be limited…"* rendered as a
+**detached footer note** at the bottom of the white location card — visually a fifth item, sitting
+under the icon column with nothing to attach it to.
+
+There was no separator to delete. Neither `globals.css:7863` nor the reference declares any
+`border-top` or `padding-top` on `.ct-info-item-note`; the entire break was `.ct-info-panel`'s
+`gap: 28px`, doing to that paragraph exactly what it does between the four real items.
+
+The reference has it **inside** the Nearby Car Parks item — `.design-reference/contact.html:735`,
+the last child of that item's `.ct-info-item-content`, after both car parks and their height limits.
+Ours (`MapEmbed/Component.tsx:230`) made it a direct child of the panel instead.
+
+### The move, and the branch that had to come with it
+
+The note is now one element with two possible homes:
+
+| when | where it renders |
+|---|---|
+| the office lists car parks | last line of the Nearby Car Parks item, as the reference has it |
+| it lists none | at the foot of the card, exactly as before |
+
+The fallback is the point. `Offices.note` is a general "additional guidance" field, and this is its
+**only renderer in the repo** — putting it unconditionally inside a conditional item would have made
+an editor's text vanish for any office without a car park, with nothing to catch it. Proven both
+ways by forcing the parking array empty: the item disappears (three titles, not four) and the note
+reappears at panel level. The field's admin description now says where it lands.
+
+One TypeScript note worth keeping: hoisting `Array.isArray(office?.parking) && …length > 0` into a
+`const hasParking` **lost the narrowing** the inline ternary was providing, and `office.parking`
+started reading as possibly-null at the `.map()` below. Deriving the array (`const parking = …`)
+answers both questions from one narrowing.
+
+### The card gets shorter, and stays level
+
+`.ct-location-module` is `align-items: stretch` with `.ct-info-panel { height: 100% }`
+(globals.css 11169/11173) and `.ct-map-wrap` at `flex: 1 1 auto`, so the map already follows
+whatever the card dictates. Measured on `/contact`, before and after:
+
+| | card | map column | both end at |
+|---|---|---|---|
+| before | 644px | 644px | 2594px |
+| after | **633px** | **633px** | **2584px** |
+
+Only 11px, because the note rewraps from three lines to four once it sits in the indented content
+column — **56.48px @ 342px wide → 75.31px @ 284px wide** — which absorbs most of the 28px gap it
+gives up. So the spacing change that was anticipated to hold the alignment was not needed, and was
+deliberately not made: the columns were never at risk of parting.
+
+`/information-centre/for-claimants` renders the same block against the same office and moved
+identically (644 → 633, both columns ending at 6272).
+
+### The snapshot, and one node that is not ours
+
+`computedSnapshot` reported **30 changed nodes**. 29 are the two map pages: the note leaving panel
+position `>4:P` and arriving at `>3:DIV>1:DIV>5:P`, plus a chain of heights each shrinking by the
+same 10.17px — card, its ancestors, map wrap, iframe. No colour, padding, margin or alignment
+anywhere.
+
+The thirtieth was `.vf-section__inner.container` on `/information-centre/for-clients` flipping
+`marginLeft`/`marginRight` between `0px` and `130px` — the transient already recorded in CLAUDE.md.
+Confirmed rather than assumed: capturing twice with the code untouched reproduced that same single
+node, flipping back. It also appeared on `/about` in one run, which the record did not previously
+name.
+
+---
+
+## Comparison 48: the nine records audited against the tree — the documentation set made true again (2026-08-21)
+
+Not a design pass. This one audits the **documentation** against the repository, because the rule in
+`CLAUDE.md` — *a change lands in all the records it touches, or the set starts lying* — had failed in
+several places at once, and a reader could not tell which document was stale.
+
+### How it was done
+
+Three parallel audits, one per group of documents: `CLAUDE.md` plus the comments inside the tooling it
+describes; the status/handover files (`README.md`, `current-state.md`, `OUTSTANDING.md`, this file);
+and the editor-facing files (`ADMIN-GUIDE.md`, `src/Styles/HOOKS.md`, `REVIEW-CHECKLIST.md`). Every
+finding was then re-checked against the source before being acted on — two of the audits' own numbers
+were wrong (a grep-based block-field census that missed spread-in helpers, and a naive parse that
+counted 43 `PROPS` where the array holds 39).
+
+### The measurements, all taken 2026-08-21 before any edit
+
+| What | Result | How |
+|---|---|---|
+| Integration suite | **135 passed, 7 files** | `pnpm test:int` |
+| End-to-end suite | **31 passed** in 56.1s, 5 files | `pnpm test:e2e`, reusing the running `:3000` |
+| Reference CSS families | **13 of 13 read zero**, before and after the edits | `referenceCssDiff.mjs` per family |
+| Guard proofs | **10 of 10 PASS** | `zsh tests/int/prove-guards.sh` |
+| Pages sitemap | **27** URLs (89 across all five sitemaps) | `grep -c '<loc>'` |
+| `computedSnapshot` coverage | **39** properties over **21** routes | counting the arrays |
+| Block controls | of **52** blocks: Background 24, Container width 25, Motion 24, Extra CSS classes 15, Hover effect 11, Card shadow 12 | a census script importing every block config and flattening nested fields |
+| Schema drift | **3518** columns / **308** tables / **1295** indexes against the baseline's 3207 / 301 / 946 — **323** columns added, **12** removed | the psql snippets from `OUTSTANDING.md` |
+
+The static count of e2e tests is 22 declarations, but Playwright reports **31**, because
+`images.e2e.spec.ts` parameterises one test per route. `current-state.md`'s "31/31" was therefore
+right and would have been "corrected" to 22 by anyone counting `test(` in the source.
+
+### What was wrong, and what changed
+
+**The deploy procedure existed twice, saying opposite things.** `OUTSTANDING.md` §1 walked the
+operator through a catch-up migration whose pre-flight said *"exactly five `DROP COLUMN` … anything
+else is a mistake — stop and investigate"*. The working tree drops **twelve**, all deliberate, six of
+them the department columns moving to the Departments taxonomy. Meanwhile `current-state.md` §1 says
+the box is being wiped and the move is a fresh baseline. §1 is now a short superseded record pointing
+at `current-state.md`, keeping only the two things that survive the change of plan: `migrate:create`
+writes `DROP COLUMN`s silently, and a `varchar → jsonb` conversion needs its `USING` clause.
+
+**Four documents carried the test counts and no two agreed** (31/31, 26, 17, and a static 22). They
+now live in one place — `current-state.md`, dated. `CLAUDE.md` and `README.md` carry the commands.
+
+**Six test files were named nowhere in `CLAUDE.md`**, so the invariants they guard read as unguarded
+and the specs read as deletable — including `images.e2e.spec.ts`, which is the only net under the
+image-sizing work, and `carousel.e2e.spec.ts`, which is untracked and was one `git checkout` from
+being lost. `CLAUDE.md` now has a suite inventory, and `README.md`'s browser-guard table gained the
+two missing rows.
+
+**Editor controls existed with nothing describing them.** Three new Event types (Conference,
+Sponsorship, Social Event) on a field `ADMIN-GUIDE.md` had never mentioned at all; the People Grid
+department filter, now a relationship to the taxonomy; two whole Site Settings groups — Breadcrumbs
+and Accessibility — that an uncommitted field description actively points editors towards; the
+Offices note; and roughly fourteen block controls that `HOOKS.md` documented only as emitted CSS
+classes, which is no help to someone looking for the setting. `HOOKS.md` also claimed *"every block
+exposes Background, Container width, Motion"* — Background is on 24 of 52.
+
+**Two files were restating each other where the rule says cross-link**: the enquiry-drawer fix, the
+registration-email warning, the focal point, and — a cross-link `CLAUDE.md` names as required —
+specialist qualification icons, which had no link in either direction. Each now has one owner and a
+pointer from the other. The two also disagreed on the admin path (*Globals →* against *Site →*); the
+first is stale.
+
+**Comments that function as documentation were wrong or misfiled.** `adminControls.int.spec.ts` said
+*"all five must report PASS"* three lines below its own warning that a guard which has never failed is
+not evidence — `prove-guards.sh` runs ten. Three explanatory blocks in `referenceCssDiff.mjs` each sat
+above the wrong family key, so a reader attributed the reporting-services caveat to `for-clients` and
+the FAQ-accordion caveat to `join-expert-panel`. `computedSnapshot.mjs` said it covered "18 of 28
+pages" while its list held 21. A comment added to `PeopleGrid/config.ts` described "the four hardcoded
+copies of this list" above a field the same diff had converted to a relationship — and was rewritten
+without member-access syntax, because the orphan-field guard matches that form in comments too.
+
+**`CLAUDE.md`'s revalidation section had been shipped garbled** — a botched insertion left the clause
+*"On top of that, most content"* dangling at the end of one line and repeated two lines later. Present
+in `HEAD`, so it has been read that way by everyone who got that far.
+
+### What was deliberately not done
+
+- **The aged `referenceCssDiff` exceptions were not re-measured.** Seven `EXPLAINED`/`NOT_PORTED`
+  reasons cite browser readings from 2026-08-18/19, and `globals.css` has moved 164 lines since.
+  Re-taking them is a design pass; a dated age warning now sits above `EXPLAINED` and the work is
+  recorded as `OUTSTANDING.md` §18.
+- **No Comparison was backfilled for `91bcf77`** (the blue rule between the calendar and the event),
+  which went into `OUTSTANDING.md` §10 rather than getting its own number. Minting 49 for a 2026-08-20
+  change appended after this entry would make the log's chronology lie.
+- **The Evie Le byline was recorded, not fixed** (`OUTSTANDING.md` §17). It is a content decision, and
+  it had been tracked in `current-state.md` in a section the same working tree deleted — live, and
+  recorded nowhere, until now.
+- **Five blocks with no page to render them** (Stats Band, Spacer, Divider, Icon, Image) are recorded
+  as §19 rather than put back on a page. `/style-guide` was deleted for good reasons.
+
+### Checked and clean
+
+`.dev.log` carried one *"file … is missing on the disk"* error for a logo derivative. Checked against
+the database: **all 56 media rows and every generated derivative have their file on disk**, so it was
+transient — not a second instance of the orphaned-uploads entry (§14).
+
+### What this working tree holds
+
+Recorded here because nothing else records it, and because much of it has never been committed: **88
+changed paths**, a new **Departments** collection with its seed data and repair, `seedShowcase.ts`
+deleted (431 lines), the team photographs replaced, `eventTypeLabels.ts` consolidating three
+duplicated label maps, an untracked `carousel.e2e.spec.ts`, and **Comparisons 42-47, which existed
+only in this working tree**. All of it is committed with this entry.
+
+### Verification
+
+`pnpm lint`, `pnpm test:int` (135), `pnpm test:e2e` (31), `prove-guards.sh` (10/10) and all 13
+reference families re-run after the edits, with the guard proof run **immediately after** the comment
+changes to `src/` and `tests/int/` — a comment near that guard can re-arm the blind spot it exists to
+close. The seed was **not** run, so no `computedSnapshot` baseline was invalidated, and none was
+captured: no CSS changed in this pass. `HOMEPAGE-CHANGES.md` was not touched — it is closed history.

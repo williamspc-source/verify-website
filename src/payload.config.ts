@@ -17,6 +17,7 @@ import { AreasOfExpertise } from './collections/AreasOfExpertise'
 import { Accreditations } from './collections/Accreditations'
 import { SpecialtyCategories } from './collections/SpecialtyCategories'
 import { Streams } from './collections/Streams'
+import { Departments } from './collections/Departments'
 import { Locations } from './collections/Locations'
 import { Specialists } from './collections/Specialists'
 import { Team } from './collections/Team'
@@ -127,7 +128,9 @@ export default buildConfig({
   //   2. The admin nav derives its GROUP order from first appearance while
   //      scanning this array and then `globals` — there is no way to declare it.
   //      So this order is also the sidebar's order: Publishing, Reference,
-  //      People, Availability, Taxonomy, Media, System.
+  //      Taxonomy, People, Availability, Media, System. (It said "People,
+  //      Availability, Taxonomy" until 2026-08-20 — read off the array, Taxonomy
+  //      has always come first. CLAUDE.md had it right; this comment did not.)
   collections: [
     // Publishing — the things you write and publish
     Pages,
@@ -148,6 +151,10 @@ export default buildConfig({
     Locations,
     Streams,
     Categories,
+    // The teams staff are grouped into. Registered here with the other lookups
+    // AND before `Team`, which references it — this array is both the
+    // taxonomy-before-content order and the only thing deciding sidebar groups.
+    Departments,
     // People
     Specialists,
     Team,

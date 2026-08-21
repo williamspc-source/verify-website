@@ -1,16 +1,17 @@
 import type { CollectionSlug, Payload, PayloadRequest } from 'payload'
 import { ACCREDITATION_ICON, qualificationIcon } from '@/utilities/qualificationIcon'
-import { readdirSync } from 'fs'
 import path from 'path'
 
 import { AREAS_OF_EXPERTISE, ASSESSMENT_TYPES, CLAIM_TYPES, SPECIALTIES, type Term } from './data/taxonomy'
 import { SPECIALISTS } from './data/specialists'
 import { TEAM } from './data/team'
+import { DEPARTMENTS } from './data/departments'
 import { EVENTS } from './data/events'
 import { POSTS } from './data/posts'
 import { SERVICES } from './data/services'
 import { TESTIMONIALS } from './data/testimonials'
 import { plainTextToLexical } from './data/richText'
+import { fileKey, nameKey, syncPeoplePhotos } from './media'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
@@ -274,6 +275,24 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
     })
     if (found.docs[0]) streamMap.set(st.slug, found.docs[0].id)
   }
+  // Departments — the teams staff are grouped into. Seeded here with the other
+  // lookups so they exist before Team members reference them below.
+  const departmentMap = new Map<string, number | string>()
+  for (const d of DEPARTMENTS) {
+    await createIfNew(ctx, 'departments', d.slug, {
+      title: d.title,
+      slug: d.slug,
+      order: d.order,
+    })
+    const found = await payload.find({
+      collection: 'departments',
+      where: { slug: { equals: d.slug } },
+      limit: 1,
+      depth: 0,
+      req,
+    })
+    if (found.docs[0]) departmentMap.set(d.slug, found.docs[0].id)
+  }
   payload.logger.info('— Taxonomy seeded')
 
   // Enrich Specialty docs with category + keyAreas + description (upsertTerms
@@ -384,7 +403,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
       title: m.title,
       slug: m.slug,
       role: m.role,
-      department: m.department,
+      department: departmentMap.get(m.department),
       order: m.order,
       bio: plainTextToLexical(m.bio),
       _status: 'published',
@@ -600,129 +619,31 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   payload.logger.info('Data layer seed complete.')
 }
 
-// Title-prefix tokens stripped when matching a person to their photo filename.
-const NAME_TOKENS = new Set([
-  'dr', 'drs', 'adj', 'adjunct', 'prof', 'professor', 'assoc', 'associate', 'a', 'aprof', 'ms',
-  'mr', 'mrs', 'mx',
-])
-const nameKey = (s: string): string =>
-  s
-    .toLowerCase()
-    .replace(/\.[a-z0-9]+$/i, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim()
-    .split(' ')
-    .filter((t) => t && !NAME_TOKENS.has(t))
-    .join(' ')
-
-// Uploads a Media doc from disk once; reuses an existing doc by matching alt.
-async function getOrCreateMedia(
-  { payload, req }: Ctx,
-  absPath: string,
-  alt: string,
-): Promise<number | string | null> {
-  const existing = await payload.find({
-    collection: 'media',
-    where: { alt: { equals: alt } },
-    limit: 1,
-    depth: 0,
-    req,
-  })
-  if (existing.docs[0]) return existing.docs[0].id
-  try {
-    const created = await payload.create({
-      collection: 'media',
-      // Headshots: seed the focal point at (near) top-centre to match the design
-      // reference's `object-position: top center` on the carousel/avatar images.
-      // NB: Payload coerces a falsy `focalY: 0` back to the 50 default, so we use
-      // 1 (`50% 1%` ≈ top, visually identical). Editors fine-tune per image via
-      // the focal-point picker + zoom in the Media library.
-      data: { alt, focalX: 50, focalY: 1 } as any,
-      filePath: absPath,
-      req,
-      context: { disableRevalidate: true },
-    })
-    return created.id
-  } catch (e) {
-    payload.logger.warn(`  · media upload failed for ${alt}: ${(e as Error).message}`)
-    return null
-  }
-}
-
 async function backfillPhotos(ctx: Ctx): Promise<void> {
-  const { payload, req } = ctx
   const imagesDir = path.join(process.cwd(), 'public', 'assets', 'images')
-  const isImg = (f: string) => /\.(png|jpe?g|webp)$/i.test(f)
 
-  // Specialists — filenames are display names ("Dr Andrew Renaut.png"); match by normalised name.
-  try {
-    const specDir = path.join(imagesDir, 'specialist')
-    const specByKey = new Map(
-      readdirSync(specDir)
-        .filter(isImg)
-        .map((f) => [nameKey(f), f] as const),
-    )
-    let sp = 0
-    for (const s of SPECIALISTS) {
-      const file = specByKey.get(nameKey(s.title))
-      if (!file) continue
-      const found = await payload.find({
-        collection: 'specialists',
-        where: { slug: { equals: s.slug } },
-        limit: 1,
-        depth: 0,
-        req,
-      })
-      const rec = found.docs[0] as { id: number | string; photo?: unknown } | undefined
-      if (!rec || rec.photo) continue
-      const mediaId = await getOrCreateMedia(ctx, path.join(specDir, file), s.title)
-      if (mediaId) {
-        await payload.update({
-          collection: 'specialists',
-          id: rec.id,
-          data: { photo: mediaId } as any,
-          req,
-          context: { disableRevalidate: true },
-        })
-        sp++
-      }
-    }
-    payload.logger.info(`— Specialist photos backfilled (${sp})`)
-  } catch (e) {
-    payload.logger.warn(`— Specialist photo backfill skipped: ${(e as Error).message}`)
-  }
+  // Specialists — filenames are display names ("Dr Andrew Renaut.png"), matched
+  // on a normalised name so the title's honorific and the file's extension are
+  // both irrelevant. These stay PNG: they are cut-outs with a transparent
+  // background (colour type 6), and a JPEG would put a white box behind each.
+  await syncPeoplePhotos(ctx, {
+    label: 'Specialist',
+    dir: path.join(imagesDir, 'specialist'),
+    collection: 'specialists',
+    people: SPECIALISTS,
+    keyOfFile: nameKey,
+    keyOfPerson: (p) => nameKey(p.title),
+  })
 
-  // Team — filenames are slugs ("wes-lerch.png").
-  try {
-    const teamDir = path.join(imagesDir, 'team')
-    const teamFiles = new Set(readdirSync(teamDir).filter(isImg))
-    let tp = 0
-    for (const m of TEAM) {
-      const file = `${m.slug}.png`
-      if (!teamFiles.has(file)) continue
-      const found = await payload.find({
-        collection: 'team',
-        where: { slug: { equals: m.slug } },
-        limit: 1,
-        depth: 0,
-        req,
-      })
-      const rec = found.docs[0] as { id: number | string; photo?: unknown } | undefined
-      if (!rec || rec.photo) continue
-      const mediaId = await getOrCreateMedia(ctx, path.join(teamDir, file), m.title)
-      if (mediaId) {
-        await payload.update({
-          collection: 'team',
-          id: rec.id,
-          data: { photo: mediaId } as any,
-          req,
-          context: { disableRevalidate: true },
-        })
-        tp++
-      }
-    }
-    payload.logger.info(`— Team photos backfilled (${tp})`)
-  } catch (e) {
-    payload.logger.warn(`— Team photo backfill skipped: ${(e as Error).message}`)
-  }
+  // Team — filenames are slugs ("wes-lerch.jpg"). This used to build
+  // `${slug}.png` by hand, so a JPEG replacement matched nothing and said so
+  // nowhere. Team photos are opaque, so JPEG is both allowed and much smaller.
+  await syncPeoplePhotos(ctx, {
+    label: 'Team',
+    dir: path.join(imagesDir, 'team'),
+    collection: 'team',
+    people: TEAM,
+    keyOfFile: fileKey,
+    keyOfPerson: (p) => p.slug,
+  })
 }

@@ -33,3 +33,6 @@ tsconfig.tsbuildinfo
 # Capture one immediately before a change, compare immediately after, discard.
 # Left untracked but un-ignored they reached 29MB, one `git add -A` from the repo.
 tests/visual/__snapshots__/
+
+# Inventory review documents — regenerate with scripts/inventory.ts
+*-inventory.csv

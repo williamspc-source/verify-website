@@ -79,10 +79,10 @@ export const SplitFeature: Block = {
         {
           name: 'imagePlaceholder',
           type: 'checkbox',
-          label: 'Show a grey image placeholder when no image is set',
+          label: 'Show an image placeholder when no image is set',
           admin: {
             description:
-              'Keeps the two-column layout (reference grey box) until a real image is uploaded. Uploading an image above replaces the placeholder entirely — label and icon included — so you can leave this ticked.',
+              'Keeps the two-column layout with a pale-blue placeholder tile until a real image is uploaded. Uploading an image above replaces the placeholder entirely — label and icon included — so you can leave this ticked.',
           },
         },
         {

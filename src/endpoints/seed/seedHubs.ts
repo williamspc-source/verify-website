@@ -128,6 +128,11 @@ type ResourceSeed = {
   externalUrl: string
   order: number
 }
+// Retained deliberately though nothing calls it today: the three scaffold
+// resources it created were links to deleted articles and were removed on
+// 2026-08-20. The next REAL resource (a PDF with a `file`) needs exactly this,
+// and re-deriving it from scratch would be wasted work.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function ensureResource({ payload, req }: Ctx, data: ResourceSeed): Promise<void> {
   try {
     const existing = await payload.find({
@@ -262,44 +267,15 @@ const ensureNewsletterForm = async ({ payload, req }: Ctx): Promise<string | num
 export const seedHubs = async (ctx: Ctx): Promise<void> => {
   const newsletterFormId = await ensureNewsletterForm(ctx)
 
-  // Seed a few scaffold resources so the In-the-Loop resources grid isn't empty
-  // (admins can replace copy / attach real files later).
-  await ensureResource(ctx, {
-    slug: 'brief-preparation-checklist-for-ime-referrals',
-    title: 'Brief Preparation Checklist for IME Referrals',
-    icon: 'check-square',
-    resourceType: 'checklist',
-    audience: 'clients',
-    description:
-      'A step-by-step checklist for solicitors and case managers preparing referral briefs for independent medical examinations — covering documentation, claimant history, and referral-question structure.',
-    ctaLabel: 'Read Guide',
-    externalUrl: '/in-the-loop/resources/brief-preparation-checklist-for-ime-referrals',
-    order: 1,
-  })
-  await ensureResource(ctx, {
-    slug: 'understanding-ime-report-turnaround-times',
-    title: 'Understanding IME Report Turnaround Times',
-    icon: 'file-text',
-    resourceType: 'guide',
-    audience: 'clients',
-    description:
-      'A plain-language guide explaining how IME report timelines work, what affects turnaround, and how to plan your matter around realistic delivery expectations.',
-    ctaLabel: 'Read Guide',
-    externalUrl: '/in-the-loop/resources/understanding-ime-report-turnaround-times',
-    order: 2,
-  })
-  await ensureResource(ctx, {
-    slug: 'what-to-expect-at-your-independent-medical-examination',
-    title: 'What to Expect at Your Independent Medical Examination',
-    icon: 'question',
-    resourceType: 'guide',
-    audience: 'claimants',
-    description:
-      'A clear, reassuring guide for claimants attending an IME — covering what to bring, what happens during the examination, and answers to the most common questions.',
-    ctaLabel: 'Read Guide',
-    externalUrl: '/in-the-loop/resources/what-to-expect-at-your-independent-medical-examination',
-    order: 3,
-  })
+  // No scaffold resources are seeded. There were three, and each was a link to
+  // an In-the-Loop article — `externalUrl: '/in-the-loop/resources/…'`. Those
+  // articles were AI-written scaffold and were deleted on 2026-08-20, which left
+  // three resource cards pointing at 404s; `links.e2e.spec.ts` caught all three.
+  //
+  // The pointers went with the articles rather than being re-aimed at nothing.
+  // `ResourcesGrid` returns null when it has no cards, so the "Guides, Checklists
+  // & Tools" section on /in-the-loop simply does not render — no empty box.
+  // Add real resources here (with `file` for a genuine download) when they exist.
 
   // Resolve the In-the-Loop stream ids up front.
   const [news, insights, spotlights, qa, staff] = await Promise.all([
@@ -322,14 +298,20 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
       showShield: false,
       imagePanel: true,
       imagePanelLabel: 'Company Image Placeholder',
-      scrollHint: 'Scroll to explore',
       heading: 'Your Source for [[Medico-Legal]] Intelligence',
       subtitle:
         'Industry updates, expert perspectives, AAMLE events, and practical resources — everything you need to stay informed and ahead.',
     },
     [
       // Sticky category tab / anchor bar directly below the hero (design ref
-      // `.ni-section-nav`). Order + labels mirror the reference exactly.
+      // `.ni-section-nav`). Order + labels mirror the reference exactly — the
+      // nav drops any item whose section has hidden itself, so a stream with no
+      // articles costs neither a tab nor an empty band.
+      //
+      // None of the sections below set `hideWhenEmpty` here. It is owned by
+      // `repairHubEmptySections`, which runs unconditionally and so reaches a
+      // fresh install and an authored one alike; setting it in both places would
+      // be two copies to keep in step for no gain.
       {
         blockType: 'sectionNav',
         sticky: true,

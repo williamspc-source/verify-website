@@ -22,23 +22,13 @@ import { eventTiming } from '@/utilities/eventTiming'
 import { headingIdAt, headingLabel, type TextishNode } from '@/utilities/headingId'
 
 import type { Event, EventsSetting } from '@/payload-types'
+import { EVENT_TYPE_LABELS } from '@/utilities/eventTypeLabels'
 
 type Args = { params: Promise<{ slug?: string }> }
 
 // Generic event-page UI labels, from the Events Settings global's `labels` group.
 type EventLabels = NonNullable<EventsSetting['labels']>
 
-// Human-readable labels for the event type, matching the Events collection options.
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  networking: 'Networking Event',
-  'client-training': 'Client Training',
-  'industry-briefing': 'Industry Briefing',
-  workshop: 'Workshop',
-  webinar: 'Webinar',
-  'breakfast-seminar': 'Breakfast Seminar',
-  masterclass: 'Masterclass',
-  'specialist-seminar': 'Specialist Seminar',
-}
 
 const formatDate = (value?: string | null): string => {
   if (!value) return ''

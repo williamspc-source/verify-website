@@ -306,7 +306,13 @@ test.describe('Links', () => {
     // ── 1. Cause: the id is in the server HTML, on every article ───────────
     const xml = await (await fetch(`${base}/posts-sitemap.xml`)).text()
     const articles = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname)
-    expect(articles.length, 'the posts sitemap should list articles to check').toBeGreaterThan(5)
+    // The bound is 0, not a headcount. It used to be `> 5`, which was calibrated
+    // to 24 scaffold articles; deleting the AI-written ones on 2026-08-20 left 4
+    // real articles and the test failed on its own precondition rather than on
+    // anything about the site. What this control exists to catch is a regex that
+    // matched NOTHING reading as a pass — `> 0` catches exactly that and does not
+    // go stale as content changes.
+    expect(articles.length, 'the posts sitemap should list articles to check').toBeGreaterThan(0)
 
     type Candidate = { path: string; frag: string }
     const candidates: Candidate[] = []
@@ -332,7 +338,10 @@ test.describe('Links', () => {
     }
 
     // Positive controls: a regex that matched nothing must not read as a pass.
-    expect(fragmentsChecked, 'articles should have contents links to check').toBeGreaterThan(10)
+    // Same recalibration: `> 10` assumed the scaffold's article count. The four
+    // real articles carry 8 contents links between them (2 each), so the bound is
+    // again "the regex found something", not a volume.
+    expect(fragmentsChecked, 'articles should have contents links to check').toBeGreaterThan(0)
     expect(
       missing,
       `contents links whose heading id is absent from the SERVER html — a pasted\nURL with this fragment will not jump:\n  ${missing.join('\n  ')}`,

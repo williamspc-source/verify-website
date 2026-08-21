@@ -210,7 +210,10 @@ export const Offices: CollectionConfig = {
     {
       name: 'note',
       type: 'textarea',
-      admin: { description: 'Any additional guidance shown in the location module.' },
+      admin: {
+        description:
+          'Any additional guidance shown in the location module. It reads as the last line of Nearby Car Parks — or, if this office lists no car parks, at the foot of the card.',
+      },
     },
     {
       name: 'order',

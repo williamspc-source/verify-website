@@ -74,9 +74,9 @@ const EVENTS_PAGE_CLASS = 'events-pages'
 /**
  * The four-ways carousel, copied from `.design-reference/events/events-seminars.html`.
  *
- * The first version of this was lifted from `seedShowcase`, where a paraphrased
- * set of the same four slides had been written for the style-guide page. Only
- * the four *titles* matched, which is exactly why it passed a review: a check
+ * The first version of this was lifted from the style-guide showcase seed (since
+ * removed with the page), where a paraphrased set of the same four slides had been
+ * written. Only the four *titles* matched, which is exactly why it passed a review: a check
  * that compares headings finds four out of four and stops. Every body was
  * shorter and differently worded, three of the four pill sets were wrong, and
  * slide 2 had lost the quotation marks in its title. This is the reference copy,

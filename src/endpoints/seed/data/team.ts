@@ -107,12 +107,12 @@ export const TEAM: TeamSeed[] = [
 
   // ── Quality Assurance ──
   {
-    slug: 'sharla-johnston',
-    title: 'Sharla Johnston',
+    slug: 'sharla-knechtli',
+    title: 'Sharla Knechtli',
     role: 'Quality Assurance Lead',
     department: 'quality-assurance',
     order: 1,
-    bio: 'Sharla Johnston is VERIFY\'s Quality Assurance Lead, overseeing day-to-day QA operations, including proofreading, compliance checks, workflow management, and supervision of junior QA staff. She holds a Bachelor of Psychological Sciences (Honours Class 1) and has extensive prior work experience as a medical receptionist and secretary to a psychiatrist, and in market research. The thoughtfulness that Sharla is known for in the office is also evidenced by her previous volunteering efforts at Brisbane Relief Hub, providing essential services to those most in need.',
+    bio: 'Sharla Knechtli is VERIFY\'s Quality Assurance Lead, overseeing day-to-day QA operations, including proofreading, compliance checks, workflow management, and supervision of junior QA staff. She holds a Bachelor of Psychological Sciences (Honours Class 1) and has extensive prior work experience as a medical receptionist and secretary to a psychiatrist, and in market research. The thoughtfulness that Sharla is known for in the office is also evidenced by her previous volunteering efforts at Brisbane Relief Hub, providing essential services to those most in need.',
   },
   {
     slug: 'mel-smith',

@@ -1,6 +1,11 @@
 import type { Block } from 'payload'
 
-import { anchorIdField, backgroundField, cssClassField } from '@/fields/blockFields'
+import {
+  anchorIdField,
+  backgroundField,
+  cssClassField,
+  hideWhenEmptyField,
+} from '@/fields/blockFields'
 
 // Featured-article carousel (design ref: .ni-featured / .ni-carousel on the
 // "In the Loop" page). One full-width article slide at a time with autoplay,
@@ -127,5 +132,6 @@ export const FeaturedArticles: Block = {
     anchorIdField,
     backgroundField,
     cssClassField,
+    hideWhenEmptyField,
   ],
 }

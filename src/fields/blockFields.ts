@@ -14,7 +14,7 @@ import { iconOptions } from '@/components/Icon'
 // cannot offer different colours. Values map to `.vf-section--*` through
 // `bgClasses` in components/Section, which is what the "every option has a CSS
 // rule" guard checks.
-const BACKGROUND_OPTIONS = [
+export const BACKGROUND_OPTIONS = [
   { label: 'White', value: 'white' },
   { label: 'Light grey', value: 'muted' },
   { label: 'Light blue accent', value: 'accent' },
@@ -237,6 +237,27 @@ export const anchorIdField: Field = {
     'Use lowercase letters, numbers and hyphens; must start with a letter.',
 }
 
+/**
+ * Lets a data-driven section take itself off the page when its query returns
+ * nothing — and take its Section Nav tab with it (see
+ * `src/blocks/sectionEmptiness.ts`).
+ *
+ * Defaults to OFF so that adding it moves nothing on any page that already
+ * exists; the sections meant to use it are switched on as data, by
+ * `src/endpoints/seed/repairHubEmptySections.ts`. Unticking it is how an editor
+ * previews a section that has no content yet.
+ */
+export const hideWhenEmptyField: Field = {
+  name: 'hideWhenEmpty',
+  type: 'checkbox',
+  defaultValue: false,
+  label: 'Hide this section when it has nothing to show',
+  admin: {
+    description:
+      'With nothing to list, hide the whole section — heading and all — instead of leaving an empty band. Its tab in a sticky Section Nav on the same page is hidden with it. Leave unticked to keep the empty section visible while you are still adding content.',
+  },
+}
+
 export const iconField = (overrides: Partial<Field> = {}): Field =>
   ({
     name: 'icon',
@@ -450,16 +471,28 @@ export const spacerSizeField: Field = {
   ],
 }
 
+// Shared so the Divider atom and any block drawing its own rule offer the same
+// choices and emit the same `.vf-divider--<slug>` classes. Same shape as
+// BACKGROUND_OPTIONS above: the plain field takes the list as-is, a block that
+// needs an "off" state prefixes its own entry. Two copies of these three styles
+// would be free to drift, and a drifted pair renders a class with no rule.
+export const DIVIDER_STYLE_OPTIONS = [
+  { label: 'Line', value: 'line' },
+  { label: 'Dots', value: 'dots' },
+  { label: 'Gradient', value: 'gradient' },
+]
+
+export const DIVIDER_WIDTH_OPTIONS = [
+  { label: 'Full', value: 'full' },
+  { label: 'Narrow', value: 'narrow' },
+]
+
 export const dividerStyleField: Field = {
   name: 'style',
   type: 'select',
   defaultValue: 'line',
   label: 'Divider style',
-  options: [
-    { label: 'Line', value: 'line' },
-    { label: 'Dots', value: 'dots' },
-    { label: 'Gradient', value: 'gradient' },
-  ],
+  options: DIVIDER_STYLE_OPTIONS,
 }
 
 export const dividerWidthField: Field = {
@@ -467,10 +500,7 @@ export const dividerWidthField: Field = {
   type: 'select',
   defaultValue: 'full',
   label: 'Divider width',
-  options: [
-    { label: 'Full', value: 'full' },
-    { label: 'Narrow', value: 'narrow' },
-  ],
+  options: DIVIDER_WIDTH_OPTIONS,
 }
 
 // Image display width → `.vf-image--<slug>`.

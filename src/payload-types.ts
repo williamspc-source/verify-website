@@ -83,6 +83,7 @@ export interface Config {
     locations: Location;
     streams: Stream;
     categories: Category;
+    departments: Department;
     specialists: Specialist;
     team: Team;
     'availability-sessions': AvailabilitySession;
@@ -121,6 +122,7 @@ export interface Config {
     locations: LocationsSelect<false> | LocationsSelect<true>;
     streams: StreamsSelect<false> | StreamsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
     specialists: SpecialistsSelect<false> | SpecialistsSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     'availability-sessions': AvailabilitySessionsSelect<false> | AvailabilitySessionsSelect<true>;
@@ -240,10 +242,6 @@ export interface Page {
      * Caption inside the image placeholder, e.g. "Company Image Placeholder".
      */
     imagePanelLabel?: string | null;
-    /**
-     * Optional bobbing "Scroll to explore" hint under the image panel.
-     */
-    scrollHint?: string | null;
     /**
      * Optional icon + text row under the hero (e.g. phone / email / hours on Contact).
      */
@@ -900,7 +898,18 @@ export interface Team {
    * e.g. "IT Manager | Lawyer".
    */
   role?: string | null;
+  /**
+   * Used on Meet the Team, and as the byline photo wherever this person is credited on an article. Also used on their own profile page unless a Profile photo is set below. Fix a bad crop by moving the focal point on the image in Media.
+   */
   photo?: (number | null) | Media;
+  /**
+   * Optional. Shown instead of the Team photo on this person’s own profile page only — Meet the Team and article bylines keep using the Team photo. Leave empty to use the Team photo in both places.
+   */
+  profilePhoto?: (number | null) | Media;
+  /**
+   * Hides the photo on this person’s profile page; they still appear with their Team photo on Meet the Team. This wins over both uploads, so you can hide the photo without deleting it.
+   */
+  hidePhotoOnProfile?: boolean | null;
   bio?: {
     root: {
       type: string;
@@ -954,7 +963,10 @@ export interface Team {
     image?: (number | null) | Media;
     description?: string | null;
   };
-  department: 'operations' | 'business-development' | 'client-support' | 'quality-assurance';
+  /**
+   * Which team this person is in. Add a new one under Taxonomy → Departments.
+   */
+  department: number | Department;
   /**
    * Sort order within the department (lower shows first).
    */
@@ -968,6 +980,30 @@ export interface Team {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * The teams staff are grouped into. Each becomes a labelled group on Meet the Team, in the order below. Add one here and it is immediately selectable on every team member.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments".
+ */
+export interface Department {
+  id: number;
+  /**
+   * e.g. "Operations", "Quality Assurance". Shown as the group heading.
+   */
+  title: string;
+  /**
+   * Order of the groups on Meet the Team (lower shows first). This genuinely drives the page — it replaced a list fixed in code.
+   */
+  order?: number | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * The external doctors on your panel. Each gets a profile page at /specialists/profiles/... Save as a draft to hide one from the site.
@@ -2107,7 +2143,10 @@ export interface Event {
     | 'webinar'
     | 'breakfast-seminar'
     | 'masterclass'
-    | 'specialist-seminar';
+    | 'specialist-seminar'
+    | 'conference'
+    | 'sponsorship'
+    | 'social';
   /**
    * Presenters who are on the panel or the team. They render as linked cards on the event page. For an outside speaker, use “Guest presenters” below instead.
    */
@@ -4109,6 +4148,126 @@ export interface ProcessStepsBlock {
     [k: string]: unknown;
   } | null;
   /**
+   * Optional photo below the intro copy. It fills a fixed 4:3 frame, cropped around the focal point set on the image in Media — so fix a bad crop there rather than re-exporting the file.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Draws the pale-blue placeholder tile until a photo is uploaded. Uploading one replaces it outright — caption and glyph with it — so you can leave this ticked.
+   */
+  imagePlaceholder?: boolean | null;
+  /**
+   * Optional caption inside the placeholder (e.g. "IMAGE PLACEHOLDER").
+   */
+  placeholderLabel?: string | null;
+  /**
+   * Optional glyph above the placeholder caption. Left unset the tile is the caption alone, which is how the reference draws its empty-photo boxes on /services.
+   */
+  placeholderIcon?:
+    | (
+        | 'activity'
+        | 'arrow-down'
+        | 'arrow-right'
+        | 'arrows-out'
+        | 'award'
+        | 'bag-simple'
+        | 'bell-ringing'
+        | 'bone'
+        | 'book-open'
+        | 'brain'
+        | 'briefcase'
+        | 'building'
+        | 'bus'
+        | 'calendar'
+        | 'calendar-blank'
+        | 'calendar-check'
+        | 'car'
+        | 'caret-left'
+        | 'caret-right'
+        | 'cell-signal-full'
+        | 'certificate'
+        | 'chart-bar'
+        | 'chat'
+        | 'chat-circle-text'
+        | 'chats'
+        | 'chats-circle'
+        | 'check'
+        | 'check-circle'
+        | 'check-square'
+        | 'clipboard-check'
+        | 'clipboard-text'
+        | 'clock'
+        | 'currency-dollar'
+        | 'desktop'
+        | 'download'
+        | 'download-simple'
+        | 'envelope'
+        | 'envelope-simple'
+        | 'file-magnifying-glass'
+        | 'file-plus'
+        | 'file-text'
+        | 'files'
+        | 'first-aid'
+        | 'gavel'
+        | 'globe'
+        | 'graduation-cap'
+        | 'handshake'
+        | 'headset'
+        | 'heart-pulse'
+        | 'heartbeat'
+        | 'home'
+        | 'house'
+        | 'identification-card'
+        | 'image'
+        | 'info'
+        | 'link'
+        | 'list'
+        | 'lock'
+        | 'lock-simple'
+        | 'magnifying-glass'
+        | 'mail'
+        | 'map-pin'
+        | 'medal'
+        | 'message'
+        | 'monitor'
+        | 'navigation-arrow'
+        | 'paper-plane-tilt'
+        | 'person-arms-spread'
+        | 'phone'
+        | 'question'
+        | 'scale'
+        | 'scales'
+        | 'seal-check'
+        | 'search'
+        | 'send'
+        | 'shield'
+        | 'shield-check'
+        | 'sign-in'
+        | 'sliders'
+        | 'sort-ascending'
+        | 'squares-four'
+        | 'star'
+        | 'stethoscope'
+        | 't-shirt'
+        | 'target'
+        | 'translate'
+        | 'upload'
+        | 'upload-simple'
+        | 'user'
+        | 'user-check'
+        | 'user-circle'
+        | 'user-plus'
+        | 'users'
+        | 'users-three'
+        | 'video'
+        | 'video-camera'
+        | 'warning'
+        | 'warning-circle'
+        | 'wheelchair'
+        | 'wifi-high'
+        | 'wind'
+      )
+    | null;
+  /**
    * How many steps per row on desktop (Cards + Two-row variants).
    */
   columns?: ('1' | '2' | '3' | '4' | '5') | null;
@@ -4790,7 +4949,7 @@ export interface PeopleGridBlock {
   /**
    * Optional — limit to one department.
    */
-  department?: ('operations' | 'business-development' | 'client-support' | 'quality-assurance') | null;
+  department?: (number | null) | Department;
   /**
    * Render each department as its own labelled group (Meet the Team layout).
    */
@@ -6309,7 +6468,7 @@ export interface SplitFeatureBlock {
     | {
         image?: (number | null) | Media;
         /**
-         * Keeps the two-column layout (reference grey box) until a real image is uploaded. Uploading an image above replaces the placeholder entirely — label and icon included — so you can leave this ticked.
+         * Keeps the two-column layout with a pale-blue placeholder tile until a real image is uploaded. Uploading an image above replaces the placeholder entirely — label and icon included — so you can leave this ticked.
          */
         imagePlaceholder?: boolean | null;
         /**
@@ -7925,7 +8084,7 @@ export interface Office {
       }[]
     | null;
   /**
-   * Any additional guidance shown in the location module.
+   * Any additional guidance shown in the location module. It reads as the last line of Nearby Car Parks — or, if this office lists no car parks, at the foot of the card.
    */
   note?: string | null;
   order?: number | null;
@@ -9084,6 +9243,10 @@ export interface ArchiveBlock {
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
   anchorId?: string | null;
+  /**
+   * With nothing to list, hide the whole section — heading and all — instead of leaving an empty band. Its tab in a sticky Section Nav on the same page is hidden with it. Leave unticked to keep the empty section visible while you are still adding content.
+   */
+  hideWhenEmpty?: boolean | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'archive';
@@ -9331,6 +9494,10 @@ export interface ResourcesGridBlock {
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
+  /**
+   * With nothing to list, hide the whole section — heading and all — instead of leaving an empty band. Its tab in a sticky Section Nav on the same page is hidden with it. Leave unticked to keep the empty section visible while you are still adding content.
+   */
+  hideWhenEmpty?: boolean | null;
   /**
    * Content width for this section.
    */
@@ -11070,6 +11237,10 @@ export interface FeaturedArticlesBlock {
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
+  /**
+   * With nothing to list, hide the whole section — heading and all — instead of leaving an empty band. Its tab in a sticky Section Nav on the same page is hidden with it. Leave unticked to keep the empty section visible while you are still adding content.
+   */
+  hideWhenEmpty?: boolean | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'featuredArticles';
@@ -11115,6 +11286,20 @@ export interface EventsExplorerBlock {
     pastIntro?: string | null;
     pastLinkLabel?: string | null;
     pastLinkUrl?: string | null;
+  };
+  /**
+   * How the two groups are told apart. Both are off by default, which is exactly how this block rendered before they existed. Only shown in “Upcoming & Past” mode — with one group there is nothing to separate.
+   */
+  separator?: {
+    /**
+     * A rule drawn between the two groups, aligned with the content.
+     */
+    divider?: ('none' | 'line' | 'dots' | 'gradient') | null;
+    dividerWidth?: ('full' | 'narrow') | null;
+    /**
+     * Give the Past group its own full-width coloured band, which is how the design reference separates the two. “Pale blue” is its treatment. The colours come from Design System → Section bands.
+     */
+    pastBackground?: ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
   };
   /**
    * Editable UI text for this block — buttons, group headings, the search bar and empty-state messages. Leave a field blank to use its default.
@@ -11490,6 +11675,10 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
+        relationTo: 'departments';
+        value: number | Department;
+      } | null)
+    | ({
         relationTo: 'specialists';
         value: number | Specialist;
       } | null)
@@ -11590,7 +11779,6 @@ export interface PagesSelect<T extends boolean = true> {
         showShield?: T;
         imagePanel?: T;
         imagePanelLabel?: T;
-        scrollHint?: T;
         metaItems?:
           | T
           | {
@@ -12145,6 +12333,10 @@ export interface ProcessStepsBlockSelect<T extends boolean = true> {
   variant?: T;
   numberStyle?: T;
   introRich?: T;
+  image?: T;
+  imagePlaceholder?: T;
+  placeholderLabel?: T;
+  placeholderIcon?: T;
   columns?: T;
   steps?:
     | T
@@ -12887,6 +13079,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
       };
   cssClass?: T;
   anchorId?: T;
+  hideWhenEmpty?: T;
   id?: T;
   blockName?: T;
 }
@@ -13008,6 +13201,7 @@ export interface ResourcesGridBlockSelect<T extends boolean = true> {
   limit?: T;
   anchorId?: T;
   cssClass?: T;
+  hideWhenEmpty?: T;
   containerWidth?: T;
   motion?: T;
   hoverEffect?: T;
@@ -13295,6 +13489,7 @@ export interface FeaturedArticlesBlockSelect<T extends boolean = true> {
   anchorId?: T;
   background?: T;
   cssClass?: T;
+  hideWhenEmpty?: T;
   id?: T;
   blockName?: T;
 }
@@ -13323,6 +13518,13 @@ export interface EventsExplorerBlockSelect<T extends boolean = true> {
         pastIntro?: T;
         pastLinkLabel?: T;
         pastLinkUrl?: T;
+      };
+  separator?:
+    | T
+    | {
+        divider?: T;
+        dividerWidth?: T;
+        pastBackground?: T;
       };
   labels?:
     | T
@@ -13694,6 +13896,18 @@ export interface CategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments_select".
+ */
+export interface DepartmentsSelect<T extends boolean = true> {
+  title?: T;
+  order?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialists_select".
  */
 export interface SpecialistsSelect<T extends boolean = true> {
@@ -13752,6 +13966,8 @@ export interface TeamSelect<T extends boolean = true> {
   title?: T;
   role?: T;
   photo?: T;
+  profilePhoto?: T;
+  hidePhotoOnProfile?: T;
   bio?: T;
   qualifications?:
     | T
@@ -14669,10 +14885,6 @@ export interface TeamSetting {
      * Second breadcrumb link (the team index). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.
      */
     breadcrumbSectionLabel?: string | null;
-    /**
-     * Sidebar label above the member’s role.
-     */
-    roleLabel?: string | null;
     /**
      * Sidebar label above each qualification.
      */
@@ -16517,7 +16729,6 @@ export interface TeamSettingsSelect<T extends boolean = true> {
     | T
     | {
         breadcrumbSectionLabel?: T;
-        roleLabel?: T;
         qualificationLabel?: T;
         aboutPrefix?: T;
       };

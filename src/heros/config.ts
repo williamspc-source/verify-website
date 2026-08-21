@@ -152,15 +152,6 @@ export const hero: Field = {
             condition: (_: unknown, s: { imagePanel?: boolean } = {}) => Boolean(s?.imagePanel),
           },
         },
-        {
-          name: 'scrollHint',
-          type: 'text',
-          admin: {
-            width: '50%',
-            description: 'Optional bobbing "Scroll to explore" hint under the image panel.',
-            condition: (_: unknown, s: { imagePanel?: boolean } = {}) => Boolean(s?.imagePanel),
-          },
-        },
       ],
     },
     {

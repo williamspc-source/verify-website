@@ -6,7 +6,6 @@ import type {
   Media as MediaType,
   ArchiveBlock as ArchiveBlockProps,
 } from '@/payload-types'
-import type { Where } from 'payload'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -22,6 +21,8 @@ import { bgClasses, type SectionBackground } from '@/components/Section'
 import { toClassName } from '@/utilities/cssClass'
 import { postPath, eventPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { EVENT_TYPE_LABELS } from '@/utilities/eventTypeLabels'
+import { archiveQuery, archiveSelectedDocs, type ArchiveSource } from './query'
 
 const MONTHS_SHORT = [
   'Jan',
@@ -71,16 +72,6 @@ const STREAM_TINT: Record<string, string> = {
   featured: 'news',
 }
 
-const EVENT_TYPE_LABELS: Record<string, string> = {
-  networking: 'Networking Event',
-  'client-training': 'Client Training',
-  'industry-briefing': 'Industry Briefing',
-  workshop: 'Workshop',
-  webinar: 'Webinar',
-  'breakfast-seminar': 'Breakfast Seminar',
-  masterclass: 'Masterclass',
-  'specialist-seminar': 'Specialist Seminar',
-}
 
 // Resolve a post's byline (name/role/photo) from the free-text author fields,
 // falling back to a linked Team member / Specialist (source relationship).
@@ -332,32 +323,25 @@ export const ArchiveBlock: React.FC<
     id?: string
   }
 > = async (props) => {
-  const {
-    id,
-    categories,
-    introContent,
-    limit: limitFromProps,
-    populateBy,
-    relationTo,
-    view,
-    columns,
-    stream,
-    featured,
-    selectedDocs,
-    viewAllLink,
-  } = props
+  // `categories`, `stream`, `featured`, `populateBy`, `relationTo` and
+  // `selectedDocs` are read by `archiveQuery` / `archiveSelectedDocs` off the
+  // whole props object rather than destructured here — they are the filter, and
+  // the filter has one owner. `view` stays because the cards also use it.
+  const { id, introContent, limit: limitFromProps, view, columns, viewAllLink } = props
   const {
     cssClass,
     postStyle,
     eventStyle,
     anchorId,
     background,
+    hideWhenEmpty,
   } = props as {
     cssClass?: string | string[] | null
     postStyle?: 'card' | 'narrative' | null
     eventStyle?: 'card' | 'compact' | null
     anchorId?: string | null
     background?: SectionBackground | null
+    hideWhenEmpty?: boolean | null
   }
   const readMoreLabel =
     (props as { readMoreLabel?: string | null }).readMoreLabel || 'Read More →'
@@ -368,18 +352,14 @@ export const ArchiveBlock: React.FC<
   let posts: Post[] = []
   let events: Event[] = []
 
-  if (populateBy === 'collection') {
+  // The filter comes from ./query, which the sticky Section Nav also reads to
+  // decide whether this section's tab survives. Limit, sort and depth stay here.
+  const query = archiveQuery(props as ArchiveSource, now)
+
+  if (query) {
     const payload = await getPayload({ config: configPromise })
 
-    if (relationTo === 'events') {
-      const nowISO = now.toISOString()
-      const where: Where | undefined =
-        view === 'upcoming'
-          ? { date: { greater_than_equal: nowISO } }
-          : view === 'past'
-            ? { date: { less_than: nowISO } }
-            : undefined
-
+    if (query.collection === 'events') {
       const fetched = await payload.find({
         collection: 'events',
         // Without this the Local API's overrideAccess default bypasses
@@ -387,29 +367,12 @@ export const ArchiveBlock: React.FC<
         overrideAccess: false,
         depth: 1,
         limit,
-        // upcoming → soonest first; past → most recent first
-        sort: view === 'past' ? '-date' : 'date',
-        ...(where ? { where } : {}),
+        sort: query.sort,
+        ...(query.where ? { where: query.where } : {}),
       })
 
       events = fetched.docs
     } else {
-      const flattenedCategories = categories?.map((category) =>
-        typeof category === 'object' ? category.id : category,
-      )
-      const streamId = stream ? (typeof stream === 'object' ? stream.id : stream) : null
-
-      const and: Where[] = []
-      if (flattenedCategories && flattenedCategories.length > 0) {
-        and.push({ categories: { in: flattenedCategories } })
-      }
-      if (streamId) {
-        and.push({ stream: { equals: streamId } })
-      }
-      if (featured) {
-        and.push({ featured: { equals: true } })
-      }
-
       const fetched = await payload.find({
         collection: 'posts',
         overrideAccess: false,
@@ -417,20 +380,27 @@ export const ArchiveBlock: React.FC<
         // are populated for the staff-narrative byline.
         depth: 2,
         limit,
-        sort: '-publishedAt',
-        ...(and.length > 0 ? { where: { and } } : {}),
+        sort: query.sort,
+        ...(query.where ? { where: query.where } : {}),
       })
 
       posts = fetched.docs
     }
-  } else if (selectedDocs?.length) {
+  } else {
     // Individual selection can mix posts and events.
-    selectedDocs.forEach((doc) => {
-      if (!doc || typeof doc.value !== 'object' || doc.value === null) return
+    archiveSelectedDocs(props as ArchiveSource).forEach((doc) => {
       if (doc.relationTo === 'events') events.push(doc.value as Event)
       else posts.push(doc.value as Post)
     })
   }
+
+  const hasContent = posts.length > 0 || events.length > 0
+
+  // Nothing to list, and the editor has asked for the section to stand down.
+  // The intro heading goes with it — an empty band under a live-looking heading
+  // is the thing this exists to remove. A sticky Section Nav on the same page
+  // drops the matching tab, deciding it through the same query (./query.ts).
+  if (hideWhenEmpty && !hasContent) return null
 
   // Only fetched when there are events to label — the cached global is cheap, but
   // a posts-only archive has no reason to touch it.
@@ -439,7 +409,6 @@ export const ArchiveBlock: React.FC<
         ?.labels ?? {}) as EventFactLabels)
     : {}
 
-  const hasContent = posts.length > 0 || events.length > 0
   const isNarrative = postStyle === 'narrative'
   const isCompactEvents = eventStyle === 'compact'
   const columnClass = `ni-grid-${columns || '3'}`

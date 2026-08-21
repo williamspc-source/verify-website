@@ -3,6 +3,7 @@ import React from 'react'
 import type { ProcessStepsBlock as Props } from '@/payload-types'
 
 import { Icon } from '@/components/Icon'
+import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
@@ -59,6 +60,10 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
     hoverEffect,
     shadow,
     bare,
+    image,
+    imagePlaceholder,
+    placeholderLabel,
+    placeholderIcon,
   } = props
   // New fields (regenerate types on deploy); read defensively until then.
   const variant = (props as { variant?: string | null }).variant || 'cards'
@@ -133,6 +138,24 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
             {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
             {heading ? <h2 className="section-title">{accentText(heading)}</h2> : null}
             {subheading ? <p>{subheading}</p> : null}
+            {/* An uploaded photo replaces the placeholder outright — caption and
+                glyph with it — which is what lets an editor leave the checkbox
+                ticked forever. Same precedence as SplitFeature's media column. */}
+            {image && typeof image === 'object' ? (
+              <div className="claimant-process-media">
+                <Media
+                  resource={image}
+                  fill
+                  pictureClassName="absolute inset-0"
+                  imgClassName="object-cover"
+                />
+              </div>
+            ) : imagePlaceholder ? (
+              <div className="claimant-process-media claimant-process-media--placeholder" aria-hidden>
+                {placeholderIcon ? <Icon name={placeholderIcon} /> : null}
+                {placeholderLabel ? <span>{placeholderLabel}</span> : null}
+              </div>
+            ) : null}
           </div>
           <div className="claimant-steps">
             {steps.map((step, i) => (

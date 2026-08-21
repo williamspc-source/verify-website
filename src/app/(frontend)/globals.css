@@ -4970,7 +4970,12 @@
 /* ── Split feature — mirrors .who-grid / .about-intro-grid ── */
 .vf-split { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
 .vf-split + .vf-split { margin-top: 64px; }
-.vf-split__media { width: 100%; aspect-ratio: 4 / 3; background: linear-gradient(135deg, var(--accent), var(--accent-light)); border-radius: var(--vf-radius-md); overflow: hidden; }
+/* `position: relative` is load-bearing: the photo is rendered with Next's `fill`
+   mode, which absolutely positions it, and without a positioned ancestor it
+   anchored further up the tree and sized to its own aspect ratio instead —
+   a 3:2 photograph in this 4:3 box left a 44px band of the gradient showing
+   along the bottom (measured: box 530x398, image 530x354). */
+.vf-split__media { position: relative; width: 100%; aspect-ratio: 4 / 3; background: linear-gradient(135deg, var(--accent), var(--accent-light)); border-radius: var(--vf-radius-md); overflow: hidden; }
 .vf-split__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .vf-split__lead { font-size: 1.1rem; color: var(--text-dark); line-height: 1.7; margin-bottom: 16px; }
 .vf-split__body { color: var(--text-mid); line-height: 1.75; }
@@ -6259,7 +6264,12 @@
   align-items: center;
 }
 .leadership-image-wrap { position: relative; }
-.leader-img-main { width: 100%; aspect-ratio: 4/4; border-radius: var(--vf-radius-md); }
+/* Portrait, not square. The founder photograph is 934×1400 (2:3); at the former
+   `4/4` it was cropped to a square and lost the top and bottom of the frame.
+   Only one Leadership Spotlight exists site-wide (/about), so nothing else moves
+   — but `.leader-badge` below is positioned against this box, so its offset was
+   re-measured after the change rather than assumed. */
+.leader-img-main { width: 100%; aspect-ratio: 2/3; border-radius: var(--vf-radius-md); }
 /* Real portrait: fill + crop the square box and clip to its rounded corners. */
 .leader-img-photo { position: relative; overflow: hidden; }
 .leader-img-photo .leadership-photo-img { object-fit: cover; }
@@ -11082,7 +11092,17 @@
 .staff-hero-role { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 600; color: var(--accent-light); margin: 0 0 24px; }
 .staff-body { padding: 64px 0 56px; background: #f8fbfe; border-top: 4px solid var(--primary); }
 .staff-body-grid { display: grid; grid-template-columns: 1fr 320px; gap: 56px; align-items: start; }
-.staff-photo { width: 100%; aspect-ratio: 1/1; border-radius: var(--vf-radius-md); overflow: hidden; background: var(--vf-grad-image-tint); box-shadow: 0 8px 32px rgba(0,35,70,0.1); margin-bottom: 24px; }
+/* No photo and no qualifications — the sidebar is not rendered at all, so the bio
+   takes the full width instead of leaving a 320px void beside a short bio. */
+.staff-body-grid--no-media { grid-template-columns: 1fr; }
+/* `position: relative` because the photo is a Next <Image fill>, which positions
+   absolutely and would otherwise anchor to an ancestor further up the tree.
+   Before `fill`, the <img> took its own 934x1400 ratio and measured 320x480 in
+   this 320x320 box — so the editor's focal point was honoured inside a 480px-tall
+   frame that `overflow: hidden` then cut to 320. Two crops, and a focal point set
+   low in the frame was clipped away after being applied. Same fix and the same
+   reason as `.vf-split__media`; see verify-website-design-diff.md Comparison 46. */
+.staff-photo { position: relative; width: 100%; aspect-ratio: 1/1; border-radius: var(--vf-radius-md); overflow: hidden; background: var(--vf-grad-image-tint); box-shadow: 0 8px 32px rgba(0,35,70,0.1); margin-bottom: 24px; }
 .staff-photo img, .staff-photo-img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .staff-sidebar-info { display: flex; flex-direction: column; gap: 12px; }
 .staff-sidebar-item { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: var(--accent); border-radius: var(--vf-radius-card); }
@@ -11237,6 +11257,54 @@
 .claimant-process-left .section-label { margin-bottom: 16px; }
 .claimant-process-left .section-title { font-size: clamp(1.9rem, 3.3vw, 2.55rem); margin-bottom: 18px; }
 .claimant-process-left p { color: var(--text-mid); font-size: 0.97rem; line-height: 1.85; margin: 0; }
+
+/* Left-column photo. NOT in the design reference: `.claimant-process-left` there
+   is label + title + paragraph and nothing else. Added at the client's request —
+   see verify-website-design-diff.md, Comparison 42.
+
+   The fixed 4:3 frame is the point: the column keeps the same height whatever is
+   uploaded, and the framing is chosen by the image's focal point in Media rather
+   than by CSS. Tokens are shared with the other placeholder tiles, so the pale
+   blue stays one decision (`--vf-grad-image-tint`), not three copies. */
+.claimant-process-media {
+  /* See `.vf-split__media` — `fill` needs a positioned ancestor or the photo
+     sizes to its own ratio and leaves the gradient showing beneath it. */
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  /* `.claimant-process-left p` above sets `margin: 0`, so there is no paragraph
+     margin below the intro to inherit — the gap has to come from here. */
+  margin-top: 28px;
+  border-radius: var(--vf-radius-md);
+  background: var(--vf-grad-image-tint);
+  overflow: hidden;
+}
+.claimant-process-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The modifier is emitted only on the placeholder branch, so these rules cannot
+   reach a tile holding a real photo. */
+.claimant-process-media--placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+/* Phosphor duotone is fill-based, so tint it — never `fill: none`, which blanks
+   the glyph. Same trap as `.as-accordion-img svg`. */
+.claimant-process-media--placeholder svg {
+  width: 42px;
+  height: 42px;
+  color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+.claimant-process-media--placeholder span {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7aafc8;
+}
 .claimant-steps { border-top: 1px solid rgba(65,64,66,0.22); }
 .claimant-step {
   display: grid;
@@ -11402,6 +11470,77 @@
 
 .events-explorer-group + .events-explorer-group {
   margin-top: 52px;
+}
+
+/* ── Separating Upcoming from Past (Events Explorer → "Separating Upcoming
+   from Past") ────────────────────────────────────────────────────────────
+   The design reference gives each group its own <section> and tints the past
+   one `bg-soft`; we render both inside a single <Section>, so neither device
+   was reaching the page and the two groups ran together. Both are drawn here,
+   and neither emits anything until an editor picks it. */
+
+/* The rule sits BETWEEN the two groups, which stops
+   `.events-explorer-group + .events-explorer-group` above from matching — so
+   the spacing that adjacency supplied has to come from the divider instead.
+   40px a side rather than 52px once: a rule needs air on both sides of it, and
+   without this the past group would sit hard against the line. */
+.events-explorer-divider {
+  margin: 40px 0;
+}
+
+/* `.vf-divider--narrow` is a 120px rule, which would otherwise sit hard left.
+   Centred here rather than in the atom, where left is the documented default
+   and `.vf-divider-wrap.vf-align-center` is how you change it. */
+.events-explorer-divider.vf-divider--narrow {
+  margin-inline: auto;
+}
+
+/* Full-bleed band behind the Past group. The group is inside the Section's
+   container, so a background on it alone would stop at the container edge —
+   this is the same escape `.ime-claim-faq` uses for the reference's light-blue
+   accordion band. `background: inherit` takes whichever `.vf-section--*` class
+   the editor chose, so the band re-themes from Design System like every other. */
+.events-explorer-group--band {
+  position: relative;
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+.events-explorer-group--band::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: calc(-50vw + 50%);
+  width: 100vw;
+  background: inherit;
+}
+.events-explorer-group--band > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* The band keeps the 52px it inherits from `.events-explorer-group +
+   .events-explorer-group` above. An earlier version zeroed it, reasoning that
+   the band's own 56px padding was separation enough — measured, that put the
+   band's top edge flush against the last line of the Upcoming group (gap: 0px)
+   and the two read as one block again. The padding separates the band's EDGE
+   from its heading; it does nothing for the content above the edge. */
+
+/* The band is the last thing in the block and runs to its bottom edge, so the
+   Section's own bottom padding comes off — otherwise the band stops and a strip
+   of page background shows between it and the footer (measured: 88px of Section
+   padding plus 64px of `.my-16` wrapper margin = 152px of white). Unlayered, so
+   it beats `.vf-section` inside `@layer components` without `!important` — the
+   same escape `.booking-section.vf-section` uses. */
+.events-explorer--band-to-edge {
+  padding-bottom: 0;
+}
+/* EventsExplorer is not in RenderBlocks' `selfSpaced` set, so it still gets the
+   legacy `.my-16` wrapper; its bottom margin would reinstate 64px of the gap.
+   Same collapse as `.my-16:has(> .ni-section)` above. See OUTSTANDING.md §16. */
+.my-16:has(> .events-explorer--band-to-edge) {
+  margin-bottom: 0;
 }
 
 .events-explorer-group > .section-label {
@@ -11866,25 +12005,6 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--primary) 45%, transparent);
-}
-.ph-scroll-hint {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
-  font-family: var(--font-heading);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--white) 35%, transparent);
-  animation: ph-bob 2.2s ease-in-out infinite;
-}
-.ph-scroll-hint svg { width: 14px; height: 14px; }
-@keyframes ph-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(5px); }
 }
 @media (max-width: 960px) { .ph-grid { grid-template-columns: 1fr; gap: 40px; } }
 @media (max-width: 640px) { .ph-card-wrap { display: none; } }

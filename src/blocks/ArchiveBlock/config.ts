@@ -8,7 +8,12 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { link } from '@/fields/link'
-import { anchorIdField, backgroundField, cssClassField } from '@/fields/blockFields'
+import {
+  anchorIdField,
+  backgroundField,
+  cssClassField,
+  hideWhenEmptyField,
+} from '@/fields/blockFields'
 
 export const Archive: Block = {
   slug: 'archive',
@@ -186,6 +191,7 @@ export const Archive: Block = {
     },
     cssClassField,
     anchorIdField,
+    hideWhenEmptyField,
   ],
   labels: {
     plural: 'Archives',

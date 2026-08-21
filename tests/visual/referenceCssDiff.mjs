@@ -139,16 +139,6 @@ const FAMILIES = {
     pages: ['.design-reference/services/medico-legal/admin-services.html'],
     match: /^\.as-how/,
   },
-  // /services/medico-legal/reporting-services → "Five Ways to Get the Specialist
-  // Opinion You Need". The strongest case of inline-only yet: `grep rs-service`
-  // over the WHOLE assets/ directory returns zero, and no other reference page
-  // uses an `.rs-` class, so this page's <style> block is the only source in
-  // existence for it. styles.css is still listed for `.container` /
-  // `.section-label`, which the section does use.
-  //
-  // Ours implements these through Split Feature *settings* (Row style, Text
-  // density, Bullet style) rather than a class scoped to this page, so the
-  // IMPLEMENTED_AS entries below map onto `.vf-split-feature--*` modifiers.
   // /information-centre/for-clients. This one is split BOTH ways, which is why
   // it needs both sources listed and neither can be trusted alone:
   //   · `.client-overview*` / `.client-support*` are INLINE-ONLY — grep over
@@ -175,31 +165,21 @@ const FAMILIES = {
     pages: ['.design-reference/specialists/profiles/dr-adam-parr.html'],
     match: /^\.profile-(hero|avatar|info|name|specialty|breadcrumb|section|bio|areas|area|types|type|sidebar|qual|grid|content|lang|location)/,
   },
+  // /services/medico-legal/reporting-services → "Five Ways to Get the Specialist
+  // Opinion You Need". The strongest case of inline-only yet: `grep rs-service`
+  // over the WHOLE assets/ directory returns zero, and no other reference page
+  // uses an `.rs-` class, so this page's <style> block is the only source in
+  // existence for it. styles.css is still listed for `.container` /
+  // `.section-label`, which the section does use.
+  //
+  // Ours implements these through Split Feature *settings* (Row style, Text
+  // density, Bullet style) rather than a class scoped to this page, so the
+  // IMPLEMENTED_AS entries below map onto `.vf-split-feature--*` modifiers.
   'reporting-services': {
     css: ['.design-reference/assets/css/styles.css'],
     pages: ['.design-reference/services/medico-legal/reporting-services.html'],
     match: /^\.rs-service/,
   },
-  // ── The FAQ accordion — the four sections on this site that have one ──────
-  //
-  // These four families exist because NONE of this was ever measured. `ime`
-  // above matches only `^\.ime-format` and `jme` only `^\.jme-process`, so both
-  // read zero while a second section on each of those same two pages went
-  // entirely uncovered — and there was no Information Centre family at all.
-  // A family's zero is scoped to its `match`, never to the page it is named
-  // after.
-  //
-  // Source split, and neither side can be trusted alone — they are the opposite
-  // way round from `for-clients`:
-  //   · `.faq-item` / `.faq-a` are SHARED-SHEET-ONLY. The two Information Centre
-  //     pages' inline blocks declare no base rules for them whatsoever.
-  //   · `.claimant-faqs` / `.client-faqs` / `.ic-faq-*` are INLINE-ONLY.
-  //
-  // Trap: `.ic-faq-unified`, `.ic-faq-header` and `.ic-faq-unified .faq-a a` are
-  // DEAD in the reference. They are declared in BOTH pages' inline blocks and no
-  // markup in the whole of .design-reference carries those classes — the live
-  // wrappers are `.claimant-faqs` / `.client-faqs`. Listed in NOT_PORTED so they
-  // can never answer for a live selector.
   // /specialists/join-expert-panel → the "Express Your Interest" enquiry band.
   // Split BOTH ways: `.join-form*` / `.join-contact*` are INLINE-ONLY (grep over
   // assets/ returns zero and no other reference page uses them), while
@@ -223,6 +203,26 @@ const FAMILIES = {
     // shared header the benefits and intro bands both use.
     match: /^\.(join-|contact-form|form-row|form-group|form-submit|form-confirm|section-label|section-title|section-subtitle)/,
   },
+  // ── The FAQ accordion — the four sections on this site that have one ──────
+  //
+  // These four families exist because NONE of this was ever measured. `ime`
+  // above matches only `^\.ime-format` and `jme` only `^\.jme-process`, so both
+  // read zero while a second section on each of those same two pages went
+  // entirely uncovered — and there was no Information Centre family at all.
+  // A family's zero is scoped to its `match`, never to the page it is named
+  // after.
+  //
+  // Source split, and neither side can be trusted alone — they are the opposite
+  // way round from `for-clients`:
+  //   · `.faq-item` / `.faq-a` are SHARED-SHEET-ONLY. The two Information Centre
+  //     pages' inline blocks declare no base rules for them whatsoever.
+  //   · `.claimant-faqs` / `.client-faqs` / `.ic-faq-*` are INLINE-ONLY.
+  //
+  // Trap: `.ic-faq-unified`, `.ic-faq-header` and `.ic-faq-unified .faq-a a` are
+  // DEAD in the reference. They are declared in BOTH pages' inline blocks and no
+  // markup in the whole of .design-reference carries those classes — the live
+  // wrappers are `.claimant-faqs` / `.client-faqs`. Listed in NOT_PORTED so they
+  // can never answer for a live selector.
   'faq-claimants': {
     css: ['.design-reference/assets/css/styles.css'],
     pages: ['.design-reference/information-centre/for-claimants.html'],
@@ -312,20 +312,20 @@ const NOT_PORTED = {
       'Our icons are Phosphor React components, which render <svg>, not an <i> webfont glyph. `.service-icon svg` carries the same sizing \u2014 measured 24px on both sides.',
     '.client-support-icon i': 'ditto.',
   },
-  // The three dead selectors below are declared in BOTH Information Centre pages'
-  // inline blocks and used by no markup anywhere in .design-reference — the live
-  // wrappers are `.claimant-faqs` / `.client-faqs`. Porting them would mean
-  // porting a rule the reference itself does not render.
   'join-expert-panel': {
     '.join-form-section': 'Section band and padding are editor-controlled Section presets — `muted` and the `normal` padding preset. Not a rule in globals.css for a declaration diff to match. (The band differs slightly: reference #f0f2f4 against our --band-muted #f5f6f8, and padding 100px against the preset\'s 88px. Both are editor-owned values, recorded in EXPLAINED.)',
     '.join-benefits':
-      'Section band and padding are editor-controlled Section presets — the `accent` band and the `normal` padding preset — so there is no globals.css rule for a declaration diff to match. Reference: a #eef6fc→#f8fbfe gradient with clamp(56px,8vw,88px) padding, against our --band-accent and the preset\'s 88px. Same shape as `.join-form-section` below.',
+      'Section band and padding are editor-controlled Section presets — the `accent` band and the `normal` padding preset — so there is no globals.css rule for a declaration diff to match. Reference: a #eef6fc→#f8fbfe gradient with clamp(56px,8vw,88px) padding, against our --band-accent and the preset\'s 88px. Same shape as `.join-form-section` above.',
     '.join-intro':
       'Ditto: the `white` band with the `normal` padding preset. Reference declares clamp(64px,9vw,100px) padding and a 1px #e4eff8 bottom rule; the band is editor-owned and the hairline is not carried — the next section\'s accent band already provides the visual break.',
     '.join-intro-image-placeholder svg':
       'Our image placeholder renders its label only; the reference also draws a picture glyph. Measured on this page: the placeholder\'s single child is a bare <span>, so there is no element for the rule to land on. Cosmetic, and the whole placeholder disappears the moment an editor uploads an image. Same exception already recorded for the /services and /for-clients placeholders.',
     '.join-form-intro': 'A 6px optical nudge on a bespoke wrapper we do not have — our left column is a plain grid track. Measured: the reference\'s eyebrow sits 6px below the card top, ours flush at 0. Deliberately not carried; a field for a 6px offset would be worse than the offset.',
   },
+  // The three dead selectors below are declared in BOTH Information Centre pages'
+  // inline blocks and used by no markup anywhere in .design-reference — the live
+  // wrappers are `.claimant-faqs` / `.client-faqs`. Porting them would mean
+  // porting a rule the reference itself does not render.
   'faq-claimants': {
     '.ic-faq-unified': 'Dead CSS in the reference — declared in both Information Centre pages, matched by no markup in the whole of .design-reference.',
     '.ic-faq-header': 'ditto',
@@ -824,6 +824,16 @@ const IMPLEMENTED_AS = {
  * difference is intended, and it needs a reason a reader can check. Anything
  * that is merely awkward to fix belongs in the code, not here. Counted and
  * printed in the summary so they stay visible.
+ *
+ * AGE WARNING, recorded 2026-08-21. The browser measurements that justify the
+ * entries below were taken on 2026-08-18 and 2026-08-19. globals.css has changed
+ * by 164 lines since, so each of those readings is now a claim about a stylesheet
+ * that has moved. The rule for this file is that an aged exception needs the
+ * measurement RE-RUN, not re-read — a skip justified by "verified equal in the
+ * browser" was once false and hid 11 real spacing gaps. Re-measuring is a design
+ * pass, not a documentation one, so it is recorded as an open item in
+ * OUTSTANDING.md rather than done here. Treat a dated reason below as unproven
+ * until you have re-taken it at 1440px.
  */
 const EXPLAINED = {
   // Every entry measured in the browser at 1440px on 2026-08-18, JavaScript

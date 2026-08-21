@@ -268,6 +268,15 @@ export const Events: CollectionConfig<'events'> = {
         { label: 'Breakfast Seminar', value: 'breakfast-seminar' },
         { label: 'Masterclass', value: 'masterclass' },
         { label: 'Specialist Seminar', value: 'specialist-seminar' },
+        // Added 2026-08-20 with the real event history. Conferences VERIFY
+        // exhibits at, events it sponsors, and its client/staff social events
+        // had no honest type — everything was landing on 'networking', which
+        // put a Christmas party and an industry briefing in the same filter.
+        // Adding enum values is the safe direction: it is NARROWING one that
+        // has taken the local site down (see CLAUDE.md).
+        { label: 'Conference', value: 'conference' },
+        { label: 'Sponsorship', value: 'sponsorship' },
+        { label: 'Social Event', value: 'social' },
       ],
     },
     {

@@ -140,6 +140,18 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
     </div>
   ) : null
 
+  // The array, not a boolean: hoisting `Array.isArray(...) && length > 0` into a
+  // const loses TypeScript's narrowing at the JSX use site below, so `office.parking`
+  // read as possibly-null there. Narrowing once, here, answers both questions.
+  const parking = Array.isArray(office?.parking) ? office.parking : []
+  // The office-wide note. The reference hangs this caveat off the Nearby Car
+  // Parks item (contact.html:735) rather than off the panel, because that is what
+  // it is about — ours sat at panel level, where the card's 28px flex gap made it
+  // read as a detached footer. Kept as ONE element with two possible homes: an
+  // office can have a note and no car parks, and the note must not vanish then.
+  // This is its only renderer in the repo, so nothing else would catch that.
+  const officeNote = office?.note ? <p className="ct-info-item-note">{office.note}</p> : null
+
   // Standalone white info card — built entirely from Office fields.
   const infoPanel = hasPanel ? (
     <div className="ct-info-panel">
@@ -198,14 +210,14 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
       ) : null}
 
       {/* Nearby Car Parks */}
-      {Array.isArray(office?.parking) && office.parking.length > 0 ? (
+      {parking.length > 0 ? (
         <div className="ct-info-item">
           <div className="ct-info-item-icon">
             <Icon name="car" />
           </div>
           <div className="ct-info-item-content">
             <div className="ct-info-item-title">{parkingHeading}</div>
-            {office.parking.map((p, i) => (
+            {parking.map((p, i) => (
               <React.Fragment key={p.id || i}>
                 <div className="ct-info-item-line" style={i > 0 ? { marginTop: 6 } : undefined}>
                   {p.href ? <ExtLink href={p.href}>{p.name}</ExtLink> : p.name}
@@ -223,11 +235,12 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
                 {p.note ? <p className="ct-info-item-note">{p.note}</p> : null}
               </React.Fragment>
             ))}
+            {officeNote}
           </div>
         </div>
       ) : null}
 
-      {office?.note ? <p className="ct-info-item-note">{office.note}</p> : null}
+      {parking.length > 0 ? null : officeNote}
     </div>
   ) : null
 

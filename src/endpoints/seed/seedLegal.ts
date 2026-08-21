@@ -8,7 +8,7 @@ type Ctx = { payload: Payload; req: PayloadRequest }
 // ── Minimal Lexical helpers ──
 // The shared plainTextToLexical helper only emits paragraphs, but the legal pages
 // need real <h2> section headings (styled by the `.prose` CSS family). These build
-// the minimal Lexical node shapes Payload expects (same shapes proven in seedShowcase).
+// the minimal Lexical node shapes Payload expects.
 const textNode = (t: string) => ({
   type: 'text',
   detail: 0,
