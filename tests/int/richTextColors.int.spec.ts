@@ -58,6 +58,26 @@ describe('the brand text-colour palette', () => {
     expect(BRAND_TEXT_COLORS.length).toBeGreaterThan(0)
   })
 
+  it('keeps the two band-following colours at the end of the list', () => {
+    // `heading` and `body` resolve to the colours the text already is on a light
+    // band — measured, Default and "Follows the band — heading" both compute
+    // rgb(65, 64, 66) on the homepage heading. They are useful (they flip on a
+    // dark band) and they are indistinguishable from doing nothing where an
+    // editor is usually looking, so they must not sit at the top of the dropdown
+    // directly under "Default". That is exactly what happened: the first thing
+    // tried was the first thing offered, nothing changed, and a working control
+    // was reported broken.
+    //
+    // The e2e in `richTextRender.e2e.spec.ts` excuses these two by name when it
+    // asserts every colour visibly differs; this keeps the two lists talking
+    // about the same entries.
+    expect(BRAND_TEXT_COLORS.slice(-2).map((c) => c.key)).toEqual(['heading', 'body'])
+    expect(
+      BRAND_TEXT_COLORS.slice(0, -2).map((c) => c.key),
+      'a band-following colour has moved up the list',
+    ).not.toContain('heading')
+  })
+
   it.each(BRAND_TEXT_COLORS.map((c) => [c.key, c] as const))(
     'every palette colour has a rule: %s',
     (key, colour) => {

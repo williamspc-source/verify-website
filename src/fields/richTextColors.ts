@@ -69,22 +69,24 @@ export type BrandTextColor = {
  * colour wheel: enough to express emphasis, de-emphasis and the two brand blues,
  * few enough that every combination has been looked at on both a light and a
  * dark band.
+ *
+ * ── Why the band-following pair is LAST ─────────────────────────────────────
+ * `heading` and `body` resolve to `--text-dark` and `--text-mid`, which on a
+ * light band are the colours the text already is. Measured on the homepage
+ * heading: **Default and "Heading text" both compute `rgb(65, 64, 66)`** — the
+ * same value, to the byte. They earn their place by flipping on a dark band,
+ * where they are the only way to say "this should stay readable if the band
+ * changes", but on the light band an editor is usually looking at, choosing one
+ * does nothing visible.
+ *
+ * They used to sit directly under "Default (as designed)", which is where an
+ * editor experimenting clicks first. That happened: the control was tried,
+ * "Heading text" was picked, nothing changed on the page, and it was reported —
+ * correctly — as a colour control that does not colour. So the five that visibly
+ * differ come first, and the two adaptive ones are labelled with what they are
+ * for rather than with the part of the page they are named after.
  */
 export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
-  {
-    key: 'heading',
-    label: 'Heading text',
-    token: '--text-dark',
-    fallback: '#414042',
-    description: 'The default colour of a heading. Turns white on a dark band.',
-  },
-  {
-    key: 'body',
-    label: 'Body text',
-    token: '--text-mid',
-    fallback: '#222222',
-    description: 'The default colour of body copy. Turns pale on a dark band.',
-  },
   {
     key: 'brand',
     label: 'Brand blue',
@@ -113,6 +115,23 @@ export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
     token: '--text-on-dark',
     fallback: '#ffffff',
     description: 'For text over a photograph or a coloured panel.',
+  },
+  // The two below follow the band rather than stating a colour. On a light band
+  // they are what the text already is — picking one is a no-op you can see, which
+  // is why they are last and why their labels lead with the flip.
+  {
+    key: 'heading',
+    label: 'Follows the band — heading',
+    token: '--text-dark',
+    fallback: '#414042',
+    description: 'Heading grey on a light band, white on a dark one.',
+  },
+  {
+    key: 'body',
+    label: 'Follows the band — body',
+    token: '--text-mid',
+    fallback: '#222222',
+    description: 'Body grey on a light band, pale on a dark one.',
   },
 ] as const
 
@@ -155,6 +174,6 @@ export const textColorField = (
     admin: {
       description:
         overrides.description ??
-        'Colours this text. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.',
+        'Colours this block’s heading and subheading — not its cards. To colour anything else, select the words and use the colour swatch in that field’s toolbar. The two “Follows the band” choices look identical to Default on a light background; they exist so text stays readable if the band is switched to dark.',
     },
   }) as Field

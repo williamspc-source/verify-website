@@ -299,7 +299,7 @@ export const sectionHeaderFields: Field[] = [
   inlineRichTextField('subheading'),
   textColorField({
     description:
-      'Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.',
+      'Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.',
   }),
 ]
 

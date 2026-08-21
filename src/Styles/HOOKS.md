@@ -268,16 +268,21 @@ take a colour back off.
 selecting anything — use the block's **Text colour** dropdown, usually just below
 the heading fields.
 
+> **The dropdown reaches the block's own heading and subheading, and nothing
+> else.** It does not colour the cards, list items or steps underneath. Those are
+> their own fields, so select their words and use the toolbar swatch. This is the
+> single most common reason the dropdown looks like it is doing nothing.
+
 Both offer the same brand palette:
 
 | Choice | What it is |
 | --- | --- |
 | **Default (as designed)** | Leave it here unless you have a reason. Nothing changes. |
-| **Heading text** / **Body text** | The site's own two text colours. **They flip automatically on a dark band**, so a card you switch from light to dark keeps readable text with no further action. |
 | **Brand blue** / **Deep navy** | The two brand blues. Both lighten on a dark band so they stay legible. |
 | **Bright blue** | A lighter accent blue. |
 | **Muted grey-blue** | For a line that should sit back from the copy around it. |
 | **White** | For text over a photograph or a coloured panel. |
+| **Follows the band — heading** / **— body** | The site's own two text colours. On a normal light background **these look exactly like Default, because they are the colour the text already is.** They earn their place on a dark band, where they turn white and pale — so a card you later switch from light to dark stays readable with no further action. If you are on a light background and want to see a change, pick one of the five above instead. |
 
 The colours come from **Site Settings → Brand colours**, so if the brand changes,
 every coloured line on the site changes with it. That is the reason to pick from
@@ -287,6 +292,10 @@ left behind.
 **One thing to know about White.** In the editor it is drawn with a faint dark
 outline so you can see it on the white background of the box. That outline is
 only in the admin — on the page the text is plain white.
+
+**And remember to Publish.** Pages save your typing to a draft as you go, so the
+live page keeps showing the old colour until you press **Publish**. A colour that
+"did not work" is worth re-checking for this first.
 
 ### `[[Brackets]]` still work, and are not the same thing
 

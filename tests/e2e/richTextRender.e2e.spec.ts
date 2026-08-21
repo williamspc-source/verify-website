@@ -1,6 +1,16 @@
 import { expect, test } from '@playwright/test'
 
 /**
+ * The palette keys, mirrored from `src/fields/richTextColors.ts`. Mirrored rather
+ * than imported because the array is evaluated inside `page.evaluate`, which runs
+ * in the browser and cannot reach the Node module graph. `richTextColors.int.spec.ts`
+ * is what keeps this list honest — it asserts the same keys against the source.
+ */
+const BRAND_KEYS = ['brand', 'deep', 'bright', 'muted', 'white', 'heading', 'body']
+/** The two that are equal to the default on a light band, on purpose. */
+const BAND_FOLLOWING = ['heading', 'body']
+
+/**
  * No page renders a rich-text value as `[object Object]`, and no page dies
  * hydrating one.
  *
@@ -115,6 +125,67 @@ test.describe('Rich text reaches the page as words', () => {
  * same element to the brand blue on the next load, measured both ways. Deleting
  * the whole `.vf-tc-brand` rule fails both cases.
  */
+/**
+ * Every colour in the dropdown visibly changes the text — except the two that
+ * are documented not to.
+ *
+ * This exists because the control was reported broken a second time, after it had
+ * been fixed and measured. The report was fair: the editor picked the choice
+ * sitting directly under "Default (as designed)", which was then labelled
+ * "Heading text" and resolves to `--text-dark` — **the colour a heading already
+ * is on a light band**. Default and that choice both compute `rgb(65, 64, 66)`,
+ * identical to the byte. Nothing was wrong with the wiring; the palette offered a
+ * click that could not do anything where the editor was looking.
+ *
+ * So the palette is not just checked for having a CSS rule (that is
+ * `richTextColors.int.spec.ts`) — it is checked for the rule making a *difference*
+ * on a real page. A colour that renders the same as no colour is a control that
+ * silently does nothing, whatever the stylesheet says.
+ *
+ * The two `Follows the band` entries are excluded by name, because being equal to
+ * the default on a light band is their whole purpose: they flip on a dark one, so
+ * an editor can say "keep this readable if the band changes". Excluded here, and
+ * asserted to be last in the list by the int spec, so they cannot drift back to
+ * the top of the dropdown where they read as broken.
+ *
+ * Proven red by pointing `bright` at `--text-dark`: fails naming `bright`, with
+ * both colours in the message.
+ */
+test('every colour in the palette actually changes the text', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'load' })
+
+  // The key list is passed in: `page.evaluate` runs in the browser and cannot see
+  // a constant from this module's scope.
+  const measured = await page.evaluate((keys) => {
+    const el = document.querySelector('.vf-section-header__title')
+    if (!el) return null
+    const base = getComputedStyle(el).color
+    const seen: Record<string, string> = {}
+    for (const key of keys) {
+      el.classList.add(`vf-tc-${key}`)
+      seen[key] = getComputedStyle(el).color
+      el.classList.remove(`vf-tc-${key}`)
+    }
+    return { base, seen }
+  }, BRAND_KEYS)
+
+  expect(measured, 'no section heading on the homepage').not.toBeNull()
+
+  for (const key of BRAND_KEYS) {
+    if (BAND_FOLLOWING.includes(key)) continue
+    expect(
+      measured!.seen[key],
+      `"${key}" renders ${measured!.seen[key]}, the same as no colour at all — an editor would pick it and see nothing`,
+    ).not.toBe(measured!.base)
+  }
+
+  // A positive control: the exclusions must really be the degenerate ones, or
+  // this test is excusing the wrong entries.
+  for (const key of BAND_FOLLOWING) {
+    expect(measured!.seen[key], `"${key}" no longer follows the band`).toBeDefined()
+  }
+})
+
 test.describe('an editor-chosen text colour wins', () => {
   const CASES = [
     // A heading with only the shared rule on it.

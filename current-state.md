@@ -42,14 +42,14 @@ over from an earlier one:
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **202/202**, 12 files |
-| `pnpm test:e2e` | **52/52**; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
+| `pnpm test:int` | **203/203**, 12 files |
+| `pnpm test:e2e` | **53/53**; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
 | `zsh tests/int/prove-guards.sh` | **11/11** — every guard proven to go red on its deliberate break |
 | `referenceCssDiff.mjs`, all 13 families | zero differences |
 
 > **This file owns the test counts.** They were in four documents and no two agreed; `CLAUDE.md` and
-> `README.md` now carry the commands instead. Note the e2e number cannot be counted from source: **25**
-> `test(` declarations expand to **52**, because `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
+> `README.md` now carry the commands instead. Note the e2e number cannot be counted from source: **26**
+> `test(` declarations expand to **53**, because `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
 > both parameterise one per route. Run it.
 
 > This run was against a **dev** server on `:3000` — a clean one, restarted with `.next` removed —
@@ -283,6 +283,10 @@ Each is measured and justified in `OUTSTANDING.md` — do not re-derive them:
   stylesheet they excuse. All 13 families read zero today; the exceptions are what needs re-taking.
 - **§19** Stats Band, Spacer, Divider, Icon and Image are on no page since `/style-guide` was removed,
   so nothing reviews them.
+- **Text colour, if it "does nothing":** check three things in order — the page is still a **draft**
+  (press Publish), the choice was one of the two *"Follows the band"* entries (identical to Default on
+  a light background, by design), or the words being looked at are in a **card** rather than the
+  block's own heading, which is all the dropdown reaches. All three were hit in one sitting.
 - **§20** The toolbar colour swatch is `TextStateFeature`, which Payload 3.85 marks
   `@experimental`. Live and working; re-check it on any Payload upgrade. Stored content is a bare
   palette key, so a broken API could cost the control but never the words.

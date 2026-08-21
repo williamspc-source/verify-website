@@ -3685,9 +3685,9 @@ export interface FAQBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Lay the questions out in one or two columns, or side by side — heading and intro in a left column with the questions beside them (the services-page treatment).
    */
@@ -3978,9 +3978,9 @@ export interface GatewayCardsBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -4595,9 +4595,9 @@ export interface FeatureGridBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -5057,9 +5057,9 @@ export interface ProcessStepsBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -5521,9 +5521,9 @@ export interface SpecialtyGridBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -6054,9 +6054,9 @@ export interface PeopleGridBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -6386,9 +6386,9 @@ export interface ServicesGridBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -6883,9 +6883,9 @@ export interface TestimonialsGridBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -7078,9 +7078,9 @@ export interface StatsBandBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -7235,9 +7235,9 @@ export interface TabsBlockType {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -8040,9 +8040,9 @@ export interface SplitFeatureBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -9341,9 +9341,9 @@ export interface ContactDetailsBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Pull phone / email / address / hours from the Footer + Site Settings globals.
    */
@@ -9583,9 +9583,9 @@ export interface IconListBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Alignment of the eyebrow, heading and intro above the list.
    */
@@ -9798,9 +9798,9 @@ export interface MapEmbedBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   kind?: ('map' | 'embed') | null;
   /**
    * Optional — pull the address + office info panel from an Office record.
@@ -10295,9 +10295,9 @@ export interface LeadershipSpotlightBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -11137,9 +11137,9 @@ export interface VideoEmbedBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Where the video is hosted.
    */
@@ -11900,9 +11900,9 @@ export interface SpecialistDirectoryBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -12054,9 +12054,9 @@ export interface SpecialtyDirectoryBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -12168,9 +12168,9 @@ export interface ResourcesGridBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -12455,9 +12455,9 @@ export interface AppointmentGuideBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Small uppercase label shown above the appointment-type toggle. Defaults to "Select your appointment type".
    */
@@ -13129,9 +13129,9 @@ export interface MissionPillarsBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Each pillar is auto-numbered 01, 02, 03… in display order.
    */
@@ -13232,9 +13232,9 @@ export interface ValueCardsBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -13354,9 +13354,9 @@ export interface WhyVerifyBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Each reason renders as a +/− disclosure row: the title is always visible and the body expands on click.
    */
@@ -13605,9 +13605,9 @@ export interface AudiencePathwaysBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Section background colour.
    */
@@ -14307,9 +14307,9 @@ export interface CostGridBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Translucent cards on the dark band (e.g. cost-control tips or inclusions).
    */
@@ -14804,9 +14804,9 @@ export interface EventsExplorerBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Colours the heading and subheading. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour regardless.
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'heading' | 'body' | 'brand' | 'deep' | 'bright' | 'muted' | 'white') | null;
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
   /**
    * Show upcoming and past, or restrict to one. The split uses the visitor’s current date.
    */
