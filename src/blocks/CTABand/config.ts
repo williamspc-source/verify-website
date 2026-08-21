@@ -1,7 +1,9 @@
 import type { Block } from 'payload'
 
 import { linkGroup } from '@/fields/linkGroup'
-import { cssClassField, displayFields, elementClassesField } from '@/fields/blockFields'
+import { cssClassField, displayFields, elementClassesField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 
 export const CTABand: Block = {
   slug: 'ctaBand',
@@ -9,20 +11,16 @@ export const CTABand: Block = {
   labels: { singular: 'CTA Band', plural: 'CTA Bands' },
   // Always a dark gradient band — no background option.
   fields: [
-    {
-      name: 'eyebrow',
-      type: 'text',
+    inlineRichTextField('eyebrow', {
       admin: { description: 'Small uppercase label above the heading (e.g. "Get Started").' },
-    },
-    {
-      name: 'heading',
-      type: 'text',
+    }),
+    inlineRichTextField('heading', {
       required: true,
       admin: {
         description: 'Wrap a word/phrase in [[brackets]] to highlight it in the accent colour.',
       },
-    },
-    { name: 'text', type: 'textarea' },
+    }),
+    inlineRichTextField('text'),
     linkGroup({ overrides: { maxRows: 2 } }),
     cssClassField,
     elementClassesField,

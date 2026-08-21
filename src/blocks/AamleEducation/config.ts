@@ -10,6 +10,8 @@ import {
   iconField,
   motionField,
   richBodyField,
+  inlineRichTextField,
+  richTextDefault,
 } from '@/fields/blockFields'
 
 // AAMLE educational-services section (Services page "Educational Services").
@@ -26,24 +28,18 @@ export const AamleEducation: Block = {
     backgroundField,
 
     // ── Left column: heading block ──
-    {
-      name: 'eyebrow',
-      type: 'text',
-      defaultValue: 'Educational Services',
+    inlineRichTextField('eyebrow', {
+      defaultValue: richTextDefault('Educational Services'),
       admin: { description: 'Small uppercase label above the wordmark.' },
-    },
-    {
-      name: 'wordmark',
-      type: 'text',
-      defaultValue: 'AAMLE',
+    }),
+    inlineRichTextField('wordmark', {
+      defaultValue: richTextDefault('AAMLE'),
       admin: { description: 'Large wordmark heading, e.g. "AAMLE".' },
-    },
-    {
-      name: 'subheading',
-      type: 'text',
-      defaultValue: 'Australian Academy of Medico-Legal Education',
+    }),
+    inlineRichTextField('subheading', {
+      defaultValue: richTextDefault('Australian Academy of Medico-Legal Education'),
       admin: { description: 'Uppercase subheading under the wordmark.' },
-    },
+    }),
 
     // ── CPD pill badge ──
     {
@@ -58,12 +54,10 @@ export const AamleEducation: Block = {
               defaultValue: 'graduation-cap',
               admin: { width: '50%', description: 'Icon inside the pill badge.' },
             }),
-            {
-              name: 'text',
-              type: 'text',
-              defaultValue: 'CPD-Eligible Programs',
+            inlineRichTextField('text', {
+              defaultValue: richTextDefault('CPD-Eligible Programs'),
               admin: { width: '50%', description: 'Pill badge text near the top.' },
-            },
+            }),
           ],
         },
       ],
@@ -119,15 +113,13 @@ export const AamleEducation: Block = {
         description: 'Keeps the two-column layout (reference placeholder box) until a real image is uploaded.',
       },
     },
-    {
-      name: 'placeholderLabel',
-      type: 'text',
-      defaultValue: 'Image Placeholder',
+    inlineRichTextField('placeholderLabel', {
+      defaultValue: richTextDefault('Image Placeholder'),
       admin: {
         condition: (_, sib) => Boolean((sib as { imagePlaceholder?: boolean })?.imagePlaceholder),
         description: 'Caption shown inside the placeholder box.',
       },
-    },
+    }),
 
     anchorIdField,
     cssClassField,

@@ -1,4 +1,6 @@
 'use client'
+import { richTextToPlain } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import { mediaSrc } from '@/utilities/mediaSrc'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -8,7 +10,6 @@ import type { SlideCarouselBlock as Props } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText, stripAccent } from '@/utilities/accentText'
 
 
 type Slide = NonNullable<Props['slides']>[number]
@@ -28,8 +29,8 @@ const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean; className?
     >
       <div className="events-offer-card-copy">
         <span className="events-offer-slide-label">{label}</span>
-        <h3>{slide.title}</h3>
-        {slide.body ? <p>{slide.body}</p> : null}
+        <InlineRichText as="h3" data={slide.title} />
+        <InlineRichText as="p" data={slide.body} />
         {pills.length > 0 ? (
           <div className="events-offer-pills">
             {pills.map((p, j) => (
@@ -43,7 +44,7 @@ const Card: React.FC<{ slide: Slide; label: string; hidden?: boolean; className?
           // eslint-disable-next-line @next/next/no-img-element
           <img src={img} alt="" />
         ) : null}
-        {slide.visualLabel ? <span>{slide.visualLabel}</span> : null}
+        <InlineRichText as="span" data={slide.visualLabel} />
       </div>
     </article>
   )
@@ -191,7 +192,8 @@ export const SlideCarouselBlock: React.FC<Props> = ({
 
   return (
     <section
-      aria-label={stripAccent(heading) || 'Carousel'}
+      // An ARIA label is an attribute: it needs words, not a tree.
+      aria-label={richTextToPlain(heading) || 'Carousel'}
       className={cn('events-offer-stage vf-slide-carousel', toClassName(cssClass))}
       data-offer-carousel
       // Hover/focus pause is bound to the whole STAGE, matching the reference,
@@ -208,8 +210,8 @@ export const SlideCarouselBlock: React.FC<Props> = ({
       <div className="events-offer-shell">
         <div className="events-offer-toolbar vf-slide-carousel__toolbar">
           <div>
-            {eyebrow ? <div className="events-offer-eyebrow">{eyebrow}</div> : null}
-            {heading ? <h2 className={headingClass || undefined}>{accentText(heading)}</h2> : null}
+            <InlineRichText as="div" className="events-offer-eyebrow" data={eyebrow} />
+            <InlineRichText as="h2" className={headingClass || undefined} data={heading} />
           </div>
         </div>
 

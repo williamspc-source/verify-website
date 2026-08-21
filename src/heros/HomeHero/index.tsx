@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import { mediaSrc } from '@/utilities/mediaSrc'
 import React from 'react'
 
@@ -8,7 +9,6 @@ import { Media } from '@/components/Media'
 import { cn } from '@/utilities/ui'
 import { bgClasses, widthClasses, type SectionBackground } from '@/components/Section'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 import { DefinitionPanel } from './DefinitionPanel'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 
@@ -63,9 +63,13 @@ export const HomeHero = async (props: HomeHeroProps) => {
       <div className={cn(widthClass)}>
         <div className="hero-layout">
           <div>
-            {eyebrow ? <div className="section-label">{eyebrow}</div> : null}
-            {heading ? <h1 className="hero-heading vf-home-hero__title">{accentText(heading)}</h1> : null}
-            {subtitle ? <p className="hero-subtext">{subtitle}</p> : null}
+            <InlineRichText as="div" className="section-label" data={eyebrow} />
+            <InlineRichText
+              as="h1"
+              className="hero-heading vf-home-hero__title"
+              data={heading}
+            />
+            <InlineRichText as="p" className="hero-subtext" data={subtitle} />
             {Array.isArray(links) && links.length > 0 ? (
               <div className="hero-cta-row">
                 {/* Style follows the editor's Appearance choice; list position is
@@ -101,9 +105,17 @@ export const HomeHero = async (props: HomeHeroProps) => {
                   </div>
                 ) : null}
                 <div className="hero-definition-block">
-                  {definition?.term ? <div className="hero-def-word">{definition.term}</div> : null}
-                  {definition?.pronunciation ? <div className="hero-def-pos">{definition.pronunciation}</div> : null}
-                  {definition?.text ? <div className="hero-def-meaning">{definition.text}</div> : null}
+                  <InlineRichText as="div" className="hero-def-word" data={definition?.term} />
+                  <InlineRichText
+                    as="div"
+                    className="hero-def-pos"
+                    data={definition?.pronunciation}
+                  />
+                  <InlineRichText
+                    as="div"
+                    className="hero-def-meaning"
+                    data={definition?.text}
+                  />
                 </div>
               </DefinitionPanel>
             ) : media && typeof media === 'object' ? (

@@ -1,7 +1,9 @@
 import type { Block } from 'payload'
 
 import { linkGroup } from '@/fields/linkGroup'
-import { anchorIdField, cssClassField, iconField } from '@/fields/blockFields'
+import { anchorIdField, cssClassField, iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 
 // Full-bleed 50/50 chooser from the "Make a Booking" page (.booking-split /
 // .booking-half). Two equal panels — a light-blue side and a dark-navy side —
@@ -103,21 +105,15 @@ export const BookingChooser: Block = {
             },
           ],
         },
-        {
-          name: 'eyebrow',
-          type: 'text',
+        inlineRichTextField('eyebrow', {
           admin: {
             description: 'Small uppercase label above the title, e.g. "Already Registered?".',
           },
-        },
-        {
-          name: 'title',
-          type: 'text',
-          admin: {
+        }),
+        inlineRichTextField('title', { admin: {
             description: 'Panel heading. Wrap a word/phrase in [[brackets]] to accent it.',
-          },
-        },
-        { name: 'description', type: 'textarea' },
+          } }),
+        inlineRichTextField('description'),
         linkGroup({
           appearances: false,
           // Resolved to a mailto by BookingChooserBlock before it reaches CMSLink.

@@ -5,6 +5,7 @@ import {
   headingLevelField,
   headingSizeField,
   textAlignField,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 // Atom block (nestable-only): a single heading. Level controls the HTML tag for
@@ -14,7 +15,7 @@ export const Heading: Block = {
   interfaceName: 'HeadingBlock',
   labels: { singular: 'Heading', plural: 'Headings' },
   fields: [
-    { name: 'text', type: 'text', required: true },
+    inlineRichTextField('text', { required: true }),
     { type: 'row', fields: [headingLevelField, headingSizeField] },
     textAlignField,
     cssClassField,

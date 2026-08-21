@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { BookingChooserBlock as Props } from '@/payload-types'
@@ -7,7 +8,6 @@ import { Icon } from '@/components/Icon'
 import { Section } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 import {
   applyRegistrationHref,
   getRegistrationEnquiryHref,
@@ -68,11 +68,11 @@ export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = async (
                   </span>
                 ) : null}
 
-                {half.eyebrow ? <div className="booking-half-eyebrow">{half.eyebrow}</div> : null}
+                <InlineRichText as="div" className="booking-half-eyebrow" data={half.eyebrow} />
 
-                {half.title ? <h2>{accentText(half.title)}</h2> : null}
+                <InlineRichText as="h2" data={half.title} />
 
-                {half.description ? <p className="booking-half-sub">{half.description}</p> : null}
+                <InlineRichText as="p" className="booking-half-sub" data={half.description} />
 
                 {links.length > 0 ? (
                   <div className="booking-half-actions">

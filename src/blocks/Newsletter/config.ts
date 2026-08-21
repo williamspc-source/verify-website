@@ -1,6 +1,9 @@
 import type { Block } from 'payload'
 
-import { anchorIdField, cssClassField } from '@/fields/blockFields'
+import { anchorIdField, cssClassField,
+  inlineRichTextField,
+  richTextDefault,
+} from '@/fields/blockFields'
 
 // Newsletter subscribe band (design ref: .ni-newsletter on the "In the Loop" page).
 // A full-bleed dark-gradient CTA with an email capture form. Every label is
@@ -33,28 +36,21 @@ export const Newsletter: Block = {
           'Where signups are stored. Create a form with a single "email" field under Forms, then choose it here — submissions appear under Form Submissions, and the form’s Emails tab controls who is notified. Leave this empty and the band will tell visitors that signups are unavailable rather than showing a subscribe box that discards their address.',
       },
     },
-    {
-      name: 'eyebrow',
-      type: 'text',
-      defaultValue: 'Stay in the Loop',
+    inlineRichTextField('eyebrow', {
+      defaultValue: richTextDefault('Stay in the Loop'),
       admin: { description: 'Small uppercase label above the heading.' },
-    },
-    {
-      name: 'heading',
-      type: 'text',
-      defaultValue: 'Be the First to Know About [[VERIFY & AAMLE Updates]]',
+    }),
+    inlineRichTextField('heading', {
+      defaultValue: richTextDefault('Be the First to Know About [[VERIFY & AAMLE Updates]]'),
       admin: {
         description:
           'Wrap a word/phrase in [[brackets]] to highlight it in the accent colour, e.g. "Be the First to Know About [[VERIFY & AAMLE Updates]]".',
       },
-    },
-    {
-      name: 'subheading',
-      type: 'textarea',
-      defaultValue:
-        'Subscribe to receive new articles from In the Loop, AAMLE industry event invitations, and announcements — delivered directly to your inbox.',
+    }),
+    inlineRichTextField('subheading', {
+      defaultValue: richTextDefault('Subscribe to receive new articles from In the Loop, AAMLE industry event invitations, and announcements — delivered directly to your inbox.'),
       admin: { description: 'Supporting paragraph beneath the heading.' },
-    },
+    }),
     {
       type: 'row',
       fields: [
@@ -64,20 +60,16 @@ export const Newsletter: Block = {
           defaultValue: 'Enter your email',
           admin: { width: '50%', description: 'Placeholder text inside the email input.' },
         },
-        {
-          name: 'buttonLabel',
-          type: 'text',
-          defaultValue: 'Subscribe',
+        inlineRichTextField('buttonLabel', {
+          defaultValue: richTextDefault('Subscribe'),
           admin: { width: '50%', description: 'Submit button label.' },
-        },
+        }),
       ],
     },
-    {
-      name: 'note',
-      type: 'text',
-      defaultValue: 'Unsubscribe at any time. We respect your privacy.',
+    inlineRichTextField('note', {
+      defaultValue: richTextDefault('Unsubscribe at any time. We respect your privacy.'),
       admin: { description: 'Small print shown below the form.' },
-    },
+    }),
     anchorIdField,
     cssClassField,
   ],

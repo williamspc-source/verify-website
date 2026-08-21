@@ -1,3 +1,5 @@
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { DefaultTypedEditorState } from '@payloadcms/richtext-lexical'
@@ -18,15 +20,15 @@ import { toClassName } from '@/utilities/cssClass'
 // Loosely typed against the generated block interface (regenerated on deploy) so
 // the component keeps compiling against either the old or new field shape.
 type Props = Omit<GeneratedProps, 'description' | 'image'> & {
-  eyebrow?: string | null
-  wordmark?: string | null
-  subheading?: string | null
+  eyebrow?: RichTextValue
+  wordmark?: RichTextValue
+  subheading?: RichTextValue
   badge?: { icon?: string | null; text?: string | null } | null
   description?: DefaultTypedEditorState | null
   items?: { icon?: string | null; label?: string | null }[] | null
   image?: MediaType | string | number | null
   imagePlaceholder?: boolean | null
-  placeholderLabel?: string | null
+  placeholderLabel?: RichTextValue
 }
 
 export const AamleEducationBlock: React.FC<Props & { bare?: boolean }> = ({
@@ -53,7 +55,13 @@ export const AamleEducationBlock: React.FC<Props & { bare?: boolean }> = ({
   const twoColumn = hasImage || showPlaceholder
   const hasCta = Boolean(link?.label)
   const hasContent = Boolean(
-    eyebrow || wordmark || subheading || badge?.text || description || list.length || hasCta,
+    hasRichText(eyebrow) ||
+    hasRichText(wordmark) ||
+    hasRichText(subheading) ||
+    badge?.text ||
+    description ||
+    list.length ||
+    hasCta,
   )
 
   if (!hasContent && !twoColumn) return null
@@ -69,14 +77,14 @@ export const AamleEducationBlock: React.FC<Props & { bare?: boolean }> = ({
     >
       <div className={cn('aamle-inner', !twoColumn && 'aamle-inner--solo')}>
         <div className="aamle-left">
-          {eyebrow ? <div className="section-label aamle-label">{eyebrow}</div> : null}
-          {wordmark ? <div className="aamle-wordmark">{wordmark}</div> : null}
-          {subheading ? <div className="aamle-wordmark-sub">{subheading}</div> : null}
+          <InlineRichText as="div" className="section-label aamle-label" data={eyebrow} />
+          <InlineRichText as="div" className="aamle-wordmark" data={wordmark} />
+          <InlineRichText as="div" className="aamle-wordmark-sub" data={subheading} />
 
           {badge?.text ? (
             <div className="aamle-cpd-badge">
               {badge.icon ? <Icon name={badge.icon} className="aamle-cpd-badge-icon" /> : null}
-              <span>{badge.text}</span>
+              <InlineRichText as="span" data={badge.text} />
             </div>
           ) : null}
 
@@ -127,8 +135,8 @@ export const AamleEducationBlock: React.FC<Props & { bare?: boolean }> = ({
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <polyline points="21 15 16 10 5 21" />
                 </svg>
-                {placeholderLabel ? (
-                  <span className="aamle-img-label">{placeholderLabel}</span>
+                {hasRichText(placeholderLabel) ? (
+                  <InlineRichText as="span" className="aamle-img-label" data={placeholderLabel} />
                 ) : null}
               </div>
             )}

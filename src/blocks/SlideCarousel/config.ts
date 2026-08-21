@@ -1,6 +1,8 @@
 import type { Block } from 'payload'
 
-import { cssClassField, elementClassesField } from '@/fields/blockFields'
+import { cssClassField, elementClassesField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 
 // Full-width slide carousel — faithful port of the design reference's
 // `.events-offer-*` carousel (one slide at a time, arrows + dots + pause/play).
@@ -12,8 +14,8 @@ export const SlideCarousel: Block = {
     {
       type: 'row',
       fields: [
-        { name: 'eyebrow', type: 'text', admin: { width: '40%' } },
-        { name: 'heading', type: 'text', required: true, admin: { width: '60%' } },
+        inlineRichTextField('eyebrow', { admin: { width: '40%' } }),
+        inlineRichTextField('heading', { required: true, admin: { width: '60%' } }),
       ],
     },
     {
@@ -40,8 +42,8 @@ export const SlideCarousel: Block = {
       minRows: 1,
       labels: { singular: 'Slide', plural: 'Slides' },
       fields: [
-        { name: 'title', type: 'text', required: true },
-        { name: 'body', type: 'textarea' },
+        inlineRichTextField('title', { required: true }),
+        inlineRichTextField('body'),
         {
           name: 'accent',
           type: 'select',
@@ -54,12 +56,10 @@ export const SlideCarousel: Block = {
             { label: 'Sky', value: 'sponsorships' },
           ],
         },
-        {
-          name: 'visualLabel',
-          type: 'text',
+        inlineRichTextField('visualLabel', {
           label: 'Visual label',
           admin: { description: 'Short word shown on the coloured panel (e.g. "Seminar").' },
-        },
+        }),
         {
           name: 'image',
           type: 'upload',

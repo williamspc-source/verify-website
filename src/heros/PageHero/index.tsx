@@ -1,10 +1,11 @@
+import { InlineRichText } from '@/components/RichText/Inline'
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
 import React from 'react'
 
 import type { Page } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 import { CMSLink } from '@/components/Link'
 import { Icon } from '@/components/Icon'
 import { Media } from '@/components/Media'
@@ -14,7 +15,17 @@ import type { Crumb } from '@/utilities/breadcrumbs'
 type MetaItem = { icon?: string | null; text?: string | null; href?: string | null }
 type HeroLink = { link?: Record<string, unknown> | null }
 
-type PageHeroProps = Page['hero'] & {
+/**
+ * `heading` and `subtitle` accept a plain string as well as the stored rich
+ * text. Not every hero comes from an editor — `/in-the-loop/[stream]` builds one
+ * in code from the stream's own title and description, which are plain fields —
+ * and `InlineRichText` renders both. Widening the type says that out loud
+ * instead of leaving the call site to cast the mismatch away.
+ */
+type PageHeroProps = Omit<NonNullable<Page['hero']>, 'heading' | 'subtitle'> & {
+  heading?: RichTextValue
+  subtitle?: RichTextValue
+} & {
   /** Derived in the route (see `@/utilities/breadcrumbs`), so this stays sync. */
   crumbs?: Crumb[] | null
   crumbSeparator?: string | null
@@ -42,8 +53,14 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
   const heroLinks = ((links as HeroLink[] | null | undefined) || []).filter((l) => l?.link)
   const headingText = heading || title
   const imagePanel = Boolean((props as { imagePanel?: boolean | null }).imagePanel)
-  const imagePanelLabel =
-    (props as { imagePanelLabel?: string | null }).imagePanelLabel || 'Company Image Placeholder'
+  // The `|| 'Company Image Placeholder'` fallback has to survive the field
+  // becoming rich text: an empty rich text is a truthy object, so `||` alone
+  // would stop falling back the day the field was converted and the placeholder
+  // panel would render with no caption at all.
+  const imagePanelLabelField = (props as { imagePanelLabel?: RichTextValue }).imagePanelLabel
+  const imagePanelLabel = hasRichText(imagePanelLabelField)
+    ? imagePanelLabelField
+    : 'Company Image Placeholder'
 
   // The trail and the eyebrow compete for one slot directly above the heading,
   // and they are near-identical in texture (uppercase, letter-spaced, ~13px), so
@@ -60,11 +77,18 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
           {hasCrumb ? (
             <Breadcrumbs items={trail} separator={crumbSeparator} label={crumbNavLabel} />
           ) : null}
-          {!hasCrumb && eyebrow ? (
-            <div className="section-label page-hero-eyebrow">{eyebrow}</div>
+          {!hasCrumb ? (
+            <InlineRichText
+              as="div"
+              className="section-label page-hero-eyebrow"
+              data={eyebrow}
+            />
           ) : null}
-          {headingText ? <h1>{accentText(headingText)}</h1> : null}
-          {subtitle ? <p className="page-hero-sub">{subtitle}</p> : null}
+          {/* `headingText` falls back to the page's own `title`, which stays a
+              plain string — the admin uses it as the record's name. Both shapes
+              render through here. */}
+          <InlineRichText as="h1" data={headingText} />
+          <InlineRichText as="p" className="page-hero-sub" data={subtitle} />
 
           {heroLinks.length ? (
             <div className="page-hero-actions">
@@ -93,7 +117,7 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
                 const inner = (
                   <>
                     {m.icon ? <Icon name={m.icon} className="size-5" /> : null}
-                    <span>{m.text}</span>
+                    <InlineRichText as="span" data={m.text} />
                   </>
                 )
                 return m.href ? (
@@ -140,7 +164,7 @@ export const PageHero: React.FC<PageHeroProps> = (props) => {
                 {heroMedia ? (
                   <Media resource={heroMedia} imgClassName="ph-company-img__media" />
                 ) : (
-                  <span className="ph-card-img-label">{imagePanelLabel}</span>
+                  <InlineRichText as="span" className="ph-card-img-label" data={imagePanelLabel} />
                 )}
               </div>
             </div>

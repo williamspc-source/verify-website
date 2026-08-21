@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { inlineRichTextField, richTextDefault } from '@/fields/blockFields'
 
 import {
   FixedToolbarFeature,
@@ -45,26 +46,20 @@ export const SpecialistAvailability: GlobalConfig = {
       }),
       admin: { description: 'Introductory copy shown above the availability list.' },
     },
-    {
-      name: 'carouselEyebrow',
-      type: 'text',
-      defaultValue: 'Featured Specialists',
+    inlineRichTextField('carouselEyebrow', {
+      defaultValue: richTextDefault('Featured Specialists'),
       admin: { description: 'Small label above the carousel heading.' },
-    },
-    {
-      name: 'carouselTitle',
-      type: 'text',
+    }),
+    inlineRichTextField('carouselTitle', {
       label: 'Carousel heading',
-      defaultValue: 'Available This Month',
+      defaultValue: richTextDefault('Available This Month'),
       admin: {
         description: 'Wrap a word in [[brackets]] to highlight it in the accent colour.',
       },
-    },
-    {
-      name: 'carouselSubtitle',
-      type: 'textarea',
+    }),
+    inlineRichTextField('carouselSubtitle', {
       admin: { description: 'Intro paragraph shown under the carousel heading.' },
-    },
+    }),
     {
       type: 'collapsible',
       label: 'Enquiry email',
@@ -124,13 +119,13 @@ export const SpecialistAvailability: GlobalConfig = {
               name: 'modeInPersonLabel',
               type: 'text',
               defaultValue: 'In-person',
-              admin: { width: '33%', description: 'Label for in-person sessions (legend + chips).' },
+              admin: { width: '33%', description: 'Label for in-person sessions (legend + chips). Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.' },
             },
             {
               name: 'modeTelehealthLabel',
               type: 'text',
               defaultValue: 'Telehealth',
-              admin: { width: '33%', description: 'Label for telehealth sessions (legend + chips).' },
+              admin: { width: '33%', description: 'Label for telehealth sessions (legend + chips). Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.' },
             },
             {
               name: 'modeEitherLabel',
@@ -138,7 +133,7 @@ export const SpecialistAvailability: GlobalConfig = {
               defaultValue: 'In-person / Telehealth',
               admin: {
                 width: '34%',
-                description: 'Label for sessions offered either way (legend + chips).',
+                description: 'Label for sessions offered either way (legend + chips). Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.',
               },
             },
           ],
@@ -147,7 +142,7 @@ export const SpecialistAvailability: GlobalConfig = {
           name: 'selectionHint',
           type: 'text',
           defaultValue: 'Tap sessions to select, then send us an enquiry.',
-          admin: { description: 'Hint shown in the legend when sessions are available to select.' },
+          admin: { description: 'Hint shown in the legend when sessions are available to select. Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.' },
         },
         {
           type: 'row',
@@ -156,13 +151,13 @@ export const SpecialistAvailability: GlobalConfig = {
               name: 'clearLabel',
               type: 'text',
               defaultValue: 'Clear',
-              admin: { width: '50%', description: 'Button that clears the current selection.' },
+              admin: { width: '50%', description: 'Button that clears the current selection. Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.' },
             },
             {
               name: 'sendEnquiryLabel',
               type: 'text',
               defaultValue: 'Send enquiry',
-              admin: { width: '50%', description: 'Button that opens the prefilled enquiry email.' },
+              admin: { width: '50%', description: 'Button that opens the prefilled enquiry email. Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.' },
             },
           ],
         },

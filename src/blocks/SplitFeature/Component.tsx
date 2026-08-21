@@ -1,3 +1,5 @@
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import { Check } from 'lucide-react'
 import React from 'react'
 
@@ -11,7 +13,6 @@ import { Section, type SectionBackground } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 
 export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
   eyebrow,
@@ -64,7 +65,7 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
         const imageLeft = side === 'left'
         const hasImage = row.image && typeof row.image === 'object'
         const placeholder = Boolean((row as { imagePlaceholder?: boolean }).imagePlaceholder)
-        const placeholderLabel = (row as { placeholderLabel?: string | null }).placeholderLabel
+        const placeholderLabel = (row as { placeholderLabel?: RichTextValue }).placeholderLabel
         const placeholderIcon = (row as { placeholderIcon?: string | null }).placeholderIcon
         // A placeholder keeps the two-column layout (reference grey box) even with
         // no real image; only rows with neither image nor placeholder go full-width.
@@ -98,7 +99,7 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
                 {placeholderIcon ? (
                   <Icon name={placeholderIcon} className="vf-split__placeholder-icon" />
                 ) : null}
-                {placeholderLabel ? <span>{placeholderLabel}</span> : null}
+                <InlineRichText as="span" data={placeholderLabel} />
               </div>
             ) : null}
 
@@ -108,17 +109,26 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
                   <Icon name={row.icon} />
                 </div>
               ) : null}
-              {row.eyebrow ? <div className="section-label">{row.eyebrow}</div> : null}
-              <h3 className={cn('section-title vf-split__title', toClassName(elementClasses?.heading))}>
-                {accentText(row.title)}
-              </h3>
+              <InlineRichText as="div" className="section-label" data={row.eyebrow} />
+              <InlineRichText
+                as="h3"
+                className={cn(
+                  'section-title vf-split__title',
+                  toClassName(elementClasses?.heading),
+                )}
+                data={row.title}
+              />
               {row.body ? (
                 <div className="vf-split__body">
                   <RichText data={row.body} enableGutter={false} enableProse={false} />
                 </div>
               ) : null}
 
-              {row.bulletsLabel ? <div className="vf-split__bullets-label">{row.bulletsLabel}</div> : null}
+              <InlineRichText
+                as="div"
+                className="vf-split__bullets-label"
+                data={row.bulletsLabel}
+              />
               {row.bullets && row.bullets.length > 0 ? (
                 <ul className="vf-split__list">
                   {/* `dot` replaces only the *default* tick. A bullet the editor
@@ -132,7 +142,7 @@ export const SplitFeatureBlock: React.FC<Props & { bare?: boolean }> = ({
                       ) : dotBullets ? null : (
                         <Check className="vf-split__check size-5" aria-hidden />
                       )}
-                      <span>{b.text}</span>
+                      <InlineRichText as="span" data={b.text} />
                     </li>
                   ))}
                 </ul>

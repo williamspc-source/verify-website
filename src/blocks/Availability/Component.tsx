@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -11,7 +12,6 @@ import RichText from '@/components/RichText'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 import { mediaFocal } from '@/utilities/focalPoint'
 import { specialistPath } from '@/utilities/routes'
 
@@ -234,15 +234,13 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
         <Section id="availability" background="accent" className="vf-availability-carousel">
           {global.carouselEyebrow || global.carouselTitle || global.carouselSubtitle ? (
             <div className="vf-availability-carousel__header">
-              {global.carouselEyebrow ? (
-                <div className="section-label">{global.carouselEyebrow}</div>
-              ) : null}
-              {global.carouselTitle ? (
-                <h2 className="section-title">{accentText(global.carouselTitle)}</h2>
-              ) : null}
-              {global.carouselSubtitle ? (
-                <p className="section-subtitle">{global.carouselSubtitle}</p>
-              ) : null}
+              <InlineRichText as="div" className="section-label" data={global.carouselEyebrow} />
+              <InlineRichText as="h2" className="section-title" data={global.carouselTitle} />
+              <InlineRichText
+                as="p"
+                className="section-subtitle"
+                data={global.carouselSubtitle}
+              />
             </div>
           ) : null}
           {/* Specialist marquee auto-scrolls; no direction arrows (per design). */}

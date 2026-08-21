@@ -8,7 +8,9 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 import { linkGroup } from '@/fields/linkGroup'
-import { backgroundField, containerWidthField, cssClassField, iconField } from '@/fields/blockFields'
+import { backgroundField, containerWidthField, cssClassField, iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 
 const isType =
   (...types: string[]) =>
@@ -58,31 +60,26 @@ export const hero: Field = {
       ],
     },
     // ── pageHero / homeHero fields ──
-    {
-      name: 'eyebrow',
-      type: 'text',
+    inlineRichTextField('eyebrow', {
       admin: {
         description: 'Small uppercase label above the heading.',
         condition: isType('pageHero', 'homeHero'),
       },
-    },
-    {
-      // Textarea so the reference's two-line hero lockup is typable; see the
-      // note in src/utilities/accentText.tsx.
-      name: 'heading',
-      type: 'textarea',
+    }),
+    // Was a textarea purely so the reference's two-line hero lockup was typable.
+    // Rich text keeps that — a paragraph break renders as `<br>` through
+    // `InlineRichText` — and adds bold, italic and links to the largest piece of
+    // copy on the page.
+    inlineRichTextField('heading', {
       admin: {
         condition: isType('pageHero', 'homeHero'),
-        rows: 2,
         description:
-          'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour. Press Enter to force a line break.',
+          'Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour. Press Enter to start a new line of the same heading.',
       },
-    },
-    {
-      name: 'subtitle',
-      type: 'textarea',
+    }),
+    inlineRichTextField('subtitle', {
       admin: { condition: isType('pageHero', 'homeHero') },
-    },
+    }),
     {
       name: 'showBreadcrumb',
       type: 'checkbox',
@@ -143,15 +140,13 @@ export const hero: Field = {
       type: 'row',
       admin: { condition: isType('pageHero') },
       fields: [
-        {
-          name: 'imagePanelLabel',
-          type: 'text',
+        inlineRichTextField('imagePanelLabel', {
           admin: {
             width: '50%',
             description: 'Caption inside the image placeholder, e.g. "Company Image Placeholder".',
             condition: (_: unknown, s: { imagePanel?: boolean } = {}) => Boolean(s?.imagePanel),
           },
-        },
+        }),
       ],
     },
     {
@@ -168,7 +163,7 @@ export const hero: Field = {
           type: 'row',
           fields: [
             iconField({ admin: { width: '25%' } }),
-            { name: 'text', type: 'text', required: true, admin: { width: '45%' } },
+            inlineRichTextField('text', { required: true, admin: { width: '45%' } }),
             { name: 'href', type: 'text', admin: { width: '30%' } },
           ],
         },
@@ -216,9 +211,9 @@ export const hero: Field = {
         condition: isType('homeHero'),
       },
       fields: [
-        { name: 'term', type: 'text', admin: { description: 'e.g. "verify"' } },
-        { name: 'pronunciation', type: 'text', admin: { description: 'e.g. "/ˈvɛrɪfʌɪ/ · verb"' } },
-        { name: 'text', type: 'textarea', label: 'Definition' },
+        inlineRichTextField('term', { admin: { description: 'e.g. "verify"' } }),
+        inlineRichTextField('pronunciation', { admin: { description: 'e.g. "/ˈvɛrɪfʌɪ/ · verb"' } }),
+        inlineRichTextField('text', { label: 'Definition' }),
         {
           name: 'definitionStyle',
           type: 'select',

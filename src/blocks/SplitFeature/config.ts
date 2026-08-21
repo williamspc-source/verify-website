@@ -12,6 +12,7 @@ import {
   headingWeightField,
   sectionHeaderFields,
   richBodyField,
+  inlineRichTextField,
 } from '@/fields/blockFields'
 
 export const SplitFeature: Block = {
@@ -81,14 +82,12 @@ export const SplitFeature: Block = {
               'Keeps the two-column layout with a pale-blue placeholder tile until a real image is uploaded. Uploading an image above replaces the placeholder entirely — label and icon included — so you can leave this ticked.',
           },
         },
-        {
-          name: 'placeholderLabel',
-          type: 'text',
+        inlineRichTextField('placeholderLabel', {
           admin: {
             condition: (_, sib) => Boolean((sib as { imagePlaceholder?: boolean })?.imagePlaceholder),
             description: 'Optional caption inside the placeholder (e.g. "COMPANY PHOTO PLACEHOLDER").',
           },
-        },
+        }),
         iconField({
           name: 'placeholderIcon',
           admin: {
@@ -109,23 +108,21 @@ export const SplitFeature: Block = {
         {
           type: 'row',
           fields: [
-            { name: 'eyebrow', type: 'text', admin: { width: '50%' } },
+            inlineRichTextField('eyebrow', { admin: { width: '50%' } }),
             iconField({ admin: { width: '50%', description: 'Optional icon above the title.' } }),
           ],
         },
-        { name: 'title', type: 'text', required: true },
+        inlineRichTextField('title', { required: true }),
         richBodyField('body'),
-        {
-          name: 'bulletsLabel',
-          type: 'text',
+        inlineRichTextField('bulletsLabel', {
           admin: { description: 'Optional mini-heading above the bullets (e.g. "When to Request").' },
-        },
+        }),
         {
           name: 'bullets',
           type: 'array',
           labels: { singular: 'Bullet', plural: 'Bullets' },
           fields: [
-            { name: 'text', type: 'text', required: true },
+            inlineRichTextField('text', { required: true }),
             iconField({ admin: { description: 'Optional per-bullet icon.' } }),
           ],
         },

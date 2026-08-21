@@ -1,3 +1,5 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React from 'react'
 
 import type { PortalCtaBlock as Props } from '@/payload-types'
@@ -7,7 +9,6 @@ import { Icon } from '@/components/Icon'
 import { Section } from '@/components/Section'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
-import { accentText } from '@/utilities/accentText'
 
 // Dark-blue "Online Booking Portal" CTA band (design reference `.portal-opt4`).
 // Always the branded gradient band — the `background="primary"` fallback keeps it
@@ -35,14 +36,14 @@ export const PortalCtaBlock: React.FC<Props & { bare?: boolean }> = ({
       bare={bare}
     >
       <div className="portal-opt4-inner">
-        {eyebrow || heading ? (
+        {hasRichText(eyebrow) || hasRichText(heading) ? (
           <div className="portal-opt4-header">
-            {eyebrow ? <div className="portal-opt4-eyebrow">{eyebrow}</div> : null}
-            {heading ? <h2 className="opt-heading">{accentText(heading)}</h2> : null}
+            <InlineRichText as="div" className="portal-opt4-eyebrow" data={eyebrow} />
+            <InlineRichText as="h2" className="opt-heading" data={heading} />
           </div>
         ) : null}
 
-        {subheading ? <p className="opt-sub">{subheading}</p> : null}
+        <InlineRichText as="p" className="opt-sub" data={subheading} />
 
         {hasTiles ? (
           <div className="portal-opt4-tiles">

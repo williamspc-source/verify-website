@@ -215,12 +215,54 @@ export interface Page {
     /**
      * Small uppercase label above the heading.
      */
-    eyebrow?: string | null;
+    eyebrow?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     /**
-     * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour. Press Enter to force a line break.
+     * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour. Press Enter to start a new line of the same heading.
      */
-    heading?: string | null;
-    subtitle?: string | null;
+    heading?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    subtitle?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     /**
      * Show the breadcrumb trail above the heading.
      */
@@ -241,7 +283,21 @@ export interface Page {
     /**
      * Caption inside the image placeholder, e.g. "Company Image Placeholder".
      */
-    imagePanelLabel?: string | null;
+    imagePanelLabel?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     /**
      * Optional icon + text row under the hero (e.g. phone / email / hours on Contact).
      */
@@ -352,7 +408,21 @@ export interface Page {
                 | 'wind'
               )
             | null;
-          text: string;
+          text: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
           href?: string | null;
           id?: string | null;
         }[]
@@ -380,12 +450,54 @@ export interface Page {
       /**
        * e.g. "verify"
        */
-      term?: string | null;
+      term?: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      } | null;
       /**
        * e.g. "/ˈvɛrɪfʌɪ/ · verb"
        */
-      pronunciation?: string | null;
-      text?: string | null;
+      pronunciation?: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      } | null;
+      text?: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      } | null;
       /**
        * Visual treatment for the definition panel.
        */
@@ -2336,7 +2448,21 @@ export interface RowBlock {
  * via the `definition` "HeadingBlock".
  */
 export interface HeadingBlock {
-  text: string;
+  text: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   /**
    * HTML tag for SEO/accessibility. Visual size is set separately.
    */
@@ -6459,15 +6585,57 @@ export interface AamleEducationBlock {
   /**
    * Small uppercase label above the wordmark.
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Large wordmark heading, e.g. "AAMLE".
    */
-  wordmark?: string | null;
+  wordmark?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Uppercase subheading under the wordmark.
    */
-  subheading?: string | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   badge?: {
     /**
      * Icon inside the pill badge.
@@ -6580,7 +6748,21 @@ export interface AamleEducationBlock {
     /**
      * Pill badge text near the top.
      */
-    text?: string | null;
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
   };
   /**
    * Short intro paragraph under the badge. Bold is supported.
@@ -6870,7 +7052,21 @@ export interface AamleEducationBlock {
   /**
    * Caption shown inside the placeholder box.
    */
-  placeholderLabel?: string | null;
+  placeholderLabel?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
@@ -6980,7 +7176,21 @@ export interface SplitFeatureBlock {
         /**
          * Optional caption inside the placeholder (e.g. "COMPANY PHOTO PLACEHOLDER").
          */
-        placeholderLabel?: string | null;
+        placeholderLabel?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         /**
          * Optional glyph drawn above the placeholder caption.
          */
@@ -7090,7 +7300,21 @@ export interface SplitFeatureBlock {
             )
           | null;
         imageSide?: ('auto' | 'left' | 'right') | null;
-        eyebrow?: string | null;
+        eyebrow?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         /**
          * Optional icon above the title.
          */
@@ -7199,7 +7423,21 @@ export interface SplitFeatureBlock {
               | 'wind'
             )
           | null;
-        title: string;
+        title: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         body?: {
           root: {
             type: string;
@@ -7218,10 +7456,38 @@ export interface SplitFeatureBlock {
         /**
          * Optional mini-heading above the bullets (e.g. "When to Request").
          */
-        bulletsLabel?: string | null;
+        bulletsLabel?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         bullets?:
           | {
-              text: string;
+              text: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              };
               /**
                * Optional per-bullet icon.
                */
@@ -7527,12 +7793,54 @@ export interface CTABandBlock {
   /**
    * Small uppercase label above the heading (e.g. "Get Started").
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Wrap a word/phrase in [[brackets]] to highlight it in the accent colour.
    */
-  heading: string;
-  text?: string | null;
+  heading: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  text?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   links?:
     | {
         link: {
@@ -9143,12 +9451,54 @@ export interface PortalCtaBlock {
   /**
    * Small uppercase label above the heading.
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Wrap a word/phrase in [[brackets]] to highlight it in the accent colour.
    */
-  heading?: string | null;
-  subheading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Feature tiles shown in the band (icon + label).
    */
@@ -10014,19 +10364,89 @@ export interface AvailabilityBlock {
  * via the `definition` "SlideCarouselBlock".
  */
 export interface SlideCarouselBlock {
-  eyebrow?: string | null;
-  heading: string;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  heading: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   autoplay?: boolean | null;
   interval?: number | null;
   slides?:
     | {
-        title: string;
-        body?: string | null;
+        title: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         accent?: ('seminars' | 'insights' | 'networking' | 'sponsorships') | null;
         /**
          * Short word shown on the coloured panel (e.g. "Seminar").
          */
-        visualLabel?: string | null;
+        visualLabel?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         /**
          * Optional. Fills the coloured panel when set.
          */
@@ -11885,12 +12305,54 @@ export interface BookingChooserBlock {
         /**
          * Small uppercase label above the title, e.g. "Already Registered?".
          */
-        eyebrow?: string | null;
+        eyebrow?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         /**
          * Panel heading. Wrap a word/phrase in [[brackets]] to accent it.
          */
-        title?: string | null;
-        description?: string | null;
+        title?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         /**
          * One or two CTA buttons. Choose "Outline" appearance for a secondary button; the button icon renders as a trailing arrow.
          */
@@ -12272,15 +12734,57 @@ export interface NewsletterBlock {
   /**
    * Small uppercase label above the heading.
    */
-  eyebrow?: string | null;
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Wrap a word/phrase in [[brackets]] to highlight it in the accent colour, e.g. "Be the First to Know About [[VERIFY & AAMLE Updates]]".
    */
-  heading?: string | null;
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Supporting paragraph beneath the heading.
    */
-  subheading?: string | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Placeholder text inside the email input.
    */
@@ -12288,11 +12792,39 @@ export interface NewsletterBlock {
   /**
    * Submit button label.
    */
-  buttonLabel?: string | null;
+  buttonLabel?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Small print shown below the form.
    */
-  note?: string | null;
+  note?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
@@ -16322,15 +16854,57 @@ export interface SpecialistAvailability {
   /**
    * Small label above the carousel heading.
    */
-  carouselEyebrow?: string | null;
+  carouselEyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Wrap a word in [[brackets]] to highlight it in the accent colour.
    */
-  carouselTitle?: string | null;
+  carouselTitle?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Intro paragraph shown under the carousel heading.
    */
-  carouselSubtitle?: string | null;
+  carouselSubtitle?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Where the prefilled enquiry email is sent.
    */
@@ -16343,27 +16917,27 @@ export interface SpecialistAvailability {
    */
   labels?: {
     /**
-     * Label for in-person sessions (legend + chips).
+     * Label for in-person sessions (legend + chips). Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.
      */
     modeInPersonLabel?: string | null;
     /**
-     * Label for telehealth sessions (legend + chips).
+     * Label for telehealth sessions (legend + chips). Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.
      */
     modeTelehealthLabel?: string | null;
     /**
-     * Label for sessions offered either way (legend + chips).
+     * Label for sessions offered either way (legend + chips). Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.
      */
     modeEitherLabel?: string | null;
     /**
-     * Hint shown in the legend when sessions are available to select.
+     * Hint shown in the legend when sessions are available to select. Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.
      */
     selectionHint?: string | null;
     /**
-     * Button that clears the current selection.
+     * Button that clears the current selection. Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.
      */
     clearLabel?: string | null;
     /**
-     * Button that opens the prefilled enquiry email.
+     * Button that opens the prefilled enquiry email. Plain text on purpose: it is handed to the availability picker as a button or legend label and goes into the enquiry email, where markup cannot render.
      */
     sendEnquiryLabel?: string | null;
     /**

@@ -1,7 +1,10 @@
 import type { Block } from 'payload'
 
 import { linkGroup } from '@/fields/linkGroup'
-import { anchorIdField, cssClassField, iconField } from '@/fields/blockFields'
+import { anchorIdField, cssClassField, iconField,
+  inlineRichTextField,
+  richTextDefault,
+} from '@/fields/blockFields'
 
 // The recurring dark-blue "Online Booking Portal" CTA band (design reference
 // `.portal-opt4`). Appears on the specialist panel, specialty lists, specialist
@@ -12,26 +15,20 @@ export const PortalCta: Block = {
   interfaceName: 'PortalCtaBlock',
   labels: { singular: 'Portal CTA Band', plural: 'Portal CTA Bands' },
   fields: [
-    {
-      name: 'eyebrow',
-      type: 'text',
-      defaultValue: 'Everything You Need, In One Place',
+    inlineRichTextField('eyebrow', {
+      defaultValue: richTextDefault('Everything You Need, In One Place'),
       admin: { description: 'Small uppercase label above the heading.' },
-    },
-    {
-      name: 'heading',
-      type: 'text',
-      defaultValue: 'Online Booking Portal',
+    }),
+    inlineRichTextField('heading', {
+      defaultValue: richTextDefault('Online Booking Portal'),
       admin: {
         description: 'Wrap a word/phrase in [[brackets]] to highlight it in the accent colour.',
       },
-    },
-    {
-      name: 'subheading',
-      type: 'textarea',
+    }),
+    inlineRichTextField('subheading', {
       defaultValue:
-        "VERIFY's Online Booking Portal gives registered clients immediate access to specialist scheduling, real-time availability, and key specialist documents, bringing everything together in one place. To get started, simply submit an enquiry or contact our team directly, and we will promptly set up your account.",
-    },
+        richTextDefault("VERIFY's Online Booking Portal gives registered clients immediate access to specialist scheduling, real-time availability, and key specialist documents, bringing everything together in one place. To get started, simply submit an enquiry or contact our team directly, and we will promptly set up your account."),
+    }),
     {
       name: 'tiles',
       type: 'array',
