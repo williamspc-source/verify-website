@@ -413,6 +413,32 @@ page:
 
 ---
 
+## 7a. Formatting: what the toolbars mean
+
+Almost every box you type words into is a **rich-text box**. Select a word and a
+small toolbar appears with bold, italic, underline and a link — in headings and
+card titles as much as in body copy.
+
+**This is a change of kind, not of degree.** These fields used to be plain inputs;
+a bold word had to be asked for. Now it does not.
+
+Three things follow, and they are the ones worth knowing:
+
+- **A box with no toolbar is deliberate.** Web and email addresses, anchor ids,
+  CSS classes, colour values and a few labels that the page assembles with
+  JavaScript stay plain, because formatting there could be typed and would never
+  appear — a control that does nothing is worse than one that is absent.
+- **Colour is a block control, not a per-word one.** Blocks carry a **Text
+  colour** picker that colours the whole line from the brand palette. Two of the
+  choices, *Heading text* and *Body text*, flip automatically on a dark band, so
+  a card switched from light to dark stays readable on its own. `HOOKS.md` §6a is
+  the reference.
+- **Pasting from Word brings its formatting with it.** That has always been true;
+  it is more visible now that the field keeps it. If a pasted line looks wrong,
+  select it and clear the formatting rather than retyping around it.
+
+---
+
 ## 8. Admin word → site word
 
 Where the admin and the site use different words for the same thing.

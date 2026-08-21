@@ -46,6 +46,24 @@ drops its stylesheet and makes everything read as an unstyled default:
 
 ## Site-wide — review once, not per page
 
+### Rich text and colour (new — check once, on any page with a block)
+
+Every copy field is rich text now, so these are worth one pass before the
+page-by-page list:
+
+- [ ] Open a block in the admin: the heading, subheading and card fields show a
+      formatting toolbar, not a plain input
+- [ ] Bold a word in a heading, save, and confirm it renders bold on the page
+- [ ] Set **Text colour** on a block to *Brand blue* — the heading and subheading
+      both take the colour
+- [ ] Set the same block's band to a dark background: text set to *Heading text*
+      or *Body text* stays readable; *Brand blue* lightens rather than vanishing
+- [ ] A heading containing `[[brackets]]` still shows the accent colour on the
+      bracketed words, inside a coloured heading
+- [ ] Press Enter in a heading: it makes a second line of the same heading, not a
+      second heading
+- [ ] Nothing anywhere on the page reads `[object Object]`
+
 - [ ] **Header nav** — every item resolves, including any pointing at an article
 - [ ] **Footer** — nav columns, contact block, opening hours, social links
 - [ ] **Enquiry drawer** — opens, submits, and a row appears under **Form Submissions**

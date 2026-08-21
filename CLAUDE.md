@@ -96,6 +96,15 @@ Every rule below is here because that failure already happened once in this repo
 | **An id a link can target must be in the server HTML, and the id and the link must come from one function** (`src/utilities/headingId.ts`; opt in per `RichText` with `headingIds`). Assigning ids in a `useEffect` is too late for the browser and too late to be worth doing. | Article heading ids were assigned by `ArticleToc` on mount, so a *pasted* `…/article#section` URL found nothing and stayed at the top — the browser resolves a fragment while parsing. Restoring that mount loop as a test break confirmed it: `scrollY 0`, heading still resting at y=972. The two slugify copies (one for the contents hrefs, one for the ids) were also free to drift, and a drifted pair renders perfectly and does nothing. |
 | **A nav that hides an item for a sibling section decides emptiness through the SAME query the section runs.** Extract the block's filter to a `query.ts` beside it (`src/blocks/*/query.ts`), consumed by the block to fetch and by `src/blocks/sectionEmptiness.ts` to count. | The sticky Section Nav on `/in-the-loop` drops the tab of any section that renders nothing. Two copies of "which posts does this list" are free to disagree, and the failure is silent in both directions — a tab pointing at a section that is not there, or a live section with no way to reach it. Exactly how the five copies of the collection→prefix map in `routes.ts` drifted, and how three byte-identical event-type label maps nearly shipped a blank badge. The alternative — the client dropping pills whose `#id` is missing — cannot drift either, but costs a visible flash of tabs that then vanish and does nothing with JavaScript off. |
 | **A walk over a block tree guards `Array.isArray` on EVERY child key.** Block field names are not unique across configs, so a key that holds children on one block holds a scalar on another. | `columns` is the Row block's array of columns *and* Archive's/ResourcesGrid's "how many per row" select, where it is the string `'3'`. `flattenBlocks` read it without the guard and threw `flatMap is not a function`, 500-ing `/in-the-loop` — the runtime form of the shared-field-name hole already recorded for the orphan-field guard. The neighbouring repairs in `src/endpoints/seed/` had the guard; the new helper was written from the same shape and lost it. |
+| **A field an editor types words into is rich text; a field a machine reads is not.** Convert with `inlineRichTextField`, render with `InlineRichText`, and where a value is also read — an `aria-label`, an iframe `title`, a search haystack, a `{count}` template — flatten it with `richTextToPlain` at that point rather than refusing to convert the field. Guarded by `tests/int/proseFields.int.spec.ts`, which fails on any plain text field with no recorded reason. | Staff came from WordPress and could not bold a word. Two fields even claimed they could: AudiencePathways' step lead-in described itself as *"Bold step lead-in"* and LeadershipSpotlight's tagline as a *"Short italic pull-quote"*, both on plain inputs. |
+| **Payload ACCEPTS a plain string in a rich-text field and stores it verbatim.** Nothing validates it. The seed's writes therefore go through `seedCreate`/`seedUpdate` (`src/endpoints/seed/seedWrite.ts`), which lift strings using the sanitised config; guarded by `tests/int/seedWrites.int.spec.ts`. | Measured with a probe: `payload.update({ heading: 'PROBE STRING VALUE' })` was accepted and came back out of the `jsonb` column as a string. The front end even rendered it, because `InlineRichText` takes both. The only place it showed was the admin, where the field would not open. |
+| **An empty rich text is a TRUTHY object.** Every `if (!heading)` and `x \|\| 'Default'` guarding a converted field has to become `hasRichText(x)`. | Nine block components guarded their header with `Boolean(eyebrow \|\| heading \|\| subheading)`. Converted, that is permanently true — every blank header would have started painting an empty band, on every page. |
+| **A `defaultValue` on a rich-text field must be a FUNCTION.** `richTextDefault('…')` returns one. | Payload writes a literal default into the DDL. A string default produced `"heading" jsonb DEFAULT 'What Sets Us [[Apart]]'`, which Postgres rejects as invalid JSON; the correct Lexical object produced an *unescaped* JSON literal, so the apostrophe in "Minimising Your Client's Report Costs" closed the SQL string and killed the `CREATE TABLE` with a bare syntax error naming the table, not the field. |
+| **The compiler cannot see a component that declares its own `string` props.** `RenderBlocks` spreads a block loosely, so the lie stays inside the file and surfaces as a failed production build naming a *page*, or as React error #31 during hydration. Sweep for raw renders instead of trusting `tsc`. | `/events` returned HTTP 200 with complete, correct server HTML and then died hydrating, leaving 11 rendered nodes where there had been 425. `/specialists/specialty-list` and three profile pages each failed a build the same way, one at a time. |
+| **Never join or interpolate a copy value.** `.join(' ')` and `` `${x}` `` over rich text print `[object Object]` — no error, no warning, just the wrong words. Guarded by `tests/e2e/richTextRender.e2e.spec.ts`. | FAQ joined its help card's heading and body; `/information-centre/for-clients` shipped "[object Object] [object Object]" beside an info icon. `computedSnapshot` found it only because the paragraph had become one line instead of two. `/contact` printed it four more times, from `` ` \| ${t.note}` `` separators. |
+| **`InlineRichText` adds no wrapper unless you ask for one**, and a heading must render `as={Tag}` rather than wrapping its text in a span. | Defaulting to `<span>` added 48 elements sitewide and nested `<span class="ni-card-link"><span>…</span></span>`. Worse, the Heading block's `<Tag><span>text</span></Tag>` handed the brand colour to the wrapper — `.section-title span` is the *accent* rule — and the heading itself went grey. |
+| **Booting Payload runs a dev schema push, so a deliberately-broken config is applied to the local database.** `pnpm test:e2e` boots it through `tests/helpers/seedUser.ts`; so does any `payload run` script. Repair with `src/migrations/REFERENCE-inline-richtext.sql`, which is idempotent for this reason. | Proving one guard red converted **156 columns** back to varchar, keeping the Lexical JSON as text. Nothing said so; the next build simply failed. |
+| **A scratch table in the app's own database hangs the dev push.** Drizzle reads an unknown table as one to drop, and waits on the invisible "Accept warnings?" prompt. | A `shape_cols` helper table left in `verify_cms` hung `getPayload()` for ten minutes with an empty log and no DB activity — indistinguishable from a slow boot. |
 | **Don't cache a value that is already stable.** For a `useSyncExternalStore` snapshot, prefer a naturally-stable computation over a module-level memo. | `startOfDay(Date.now())` already returns the same number all day. Memoising it in a module variable froze "today" for the life of the JS bundle — which outlives a page, since client-side navigation doesn't re-evaluate modules — so a tab open overnight never re-bucketed events. |
 
 ## Commands
@@ -141,9 +150,27 @@ and the specs read as deletable. Counts are deliberately **not** recorded here �
 | `tests/e2e/frontend.e2e.spec.ts` | The largest e2e file: skip link (both states), centred-heading wrap, hero weight, testimonial hover. Most of the browser traps below are its assertions. |
 | `tests/e2e/links.e2e.spec.ts` | Every `#fragment` link has a target, plus the behavioural Videolink assertion — the "an anchor link is two halves" invariant. |
 | `tests/e2e/images.e2e.spec.ts` | Images are served at the size they render, per route. **The guard for the four image invariants below** (`sizes`, width-only derivatives, the no-derivative majority case, `object-fit` without `fill`). |
+| `tests/int/proseFields.int.spec.ts` | Every field an editor types words into is rich text, or is named with a reason. Walks the sanitised config, so it sees fields nested in arrays, groups, tabs and rows. |
+| `tests/int/richTextColors.int.spec.ts` | The brand text-colour palette and its CSS agree — every key has a rule, every rule resolves through the token it claims, every token is in `:root`. |
+| `tests/int/lexicalText.int.spec.ts` | `richTextToPlain` / `hasRichText` — reading a copy value's words whether it holds a string or a tree. |
+| `tests/int/inlineRichText.int.spec.tsx` | `InlineRichText` renders no `<p>`, no wrapper `<div>`, a `<br>` between paragraphs, and no element at all when none was asked for. |
+| `tests/int/seedWrites.int.spec.ts` | No seed file calls `payload.create`/`update` directly, bypassing the rich-text lift. |
+| `tests/e2e/richTextRender.e2e.spec.ts` | No route renders `[object Object]` or throws while hydrating. |
 | `tests/e2e/carousel.e2e.spec.ts` | `SlideCarousel` bounds: rapid next/prev, arrow keys, dot recovery, autoplay wrap. **The guard for the carousel invariant below** — and note it clicks with `{ force: true }`, without which the burst is not rapid. |
 | `tests/e2e/admin.e2e.spec.ts` | The admin loads and the Pages create form renders. Seeds its own user, and deletes the autosave draft it creates. |
 | `tests/helpers/` | `seedUser.ts` (deletes and recreates `dev@payloadcms.com`) and `login.ts`. |
+
+**Changing a field's type (`text` → `richText`) is done by hand, in three steps**, because
+the dev push stops on a prompt you cannot see:
+
+1. Boot the app against an empty scratch database — everything is `CREATE TABLE`, so no
+   prompt — and dump its catalog. That database *is* the shape the config wants, including
+   every `_v` version shadow and every block nested in Tabs/Section/Row.
+2. Load that catalog into `verify_cms` as `shape_cols`, run
+   `src/migrations/REFERENCE-inline-richtext.sql` (it generates the `ALTER … USING` from
+   the join rather than being typed), then **drop `shape_cols`** — an unknown table hangs
+   the next push.
+3. Diff the two catalogs and expect zero rows.
 
 There is no typecheck script — use `pnpm exec tsc --noEmit`. ESLint ignores `src/payload-types.ts`.
 Imports resolve through `@/*` → `src/*` and `@payload-config` → `src/payload.config.ts`.
@@ -267,6 +294,14 @@ Page-scope only what is genuinely a per-page *literal* rather than a design choi
 one reference page tilts differently, a palette value. Say which it is in the comment. And a variant
 must never make an existing field dead — when `bulletStyle: dot` replaces the tick, it replaces only
 the *default* tick, because a bullet the editor gave an icon still has to keep it.
+
+**Copy fields are rich text.** `inlineRichTextField(name, overrides)` is the one-line
+form (headings, card titles, button labels — compact editor, no headings or lists) and
+`richBodyField` the multi-paragraph one. Render both through
+`src/components/RichText/Inline.tsx`, never by interpolating the value. `textColorField`
+(`src/fields/richTextColors.ts`) gives the block a brand-palette `textColour`, emitted as
+`.vf-tc-*`; the palette is one array feeding both the field's options and the CSS, kept in
+step by `tests/int/richTextColors.int.spec.ts`.
 
 Shared field helpers live in `src/fields/blockFields.ts` (`backgroundField`, `containerWidthField`,
 `spacingFields`, `motionField`, `sectionHeaderFields`, `anchorIdField`, `iconField`,

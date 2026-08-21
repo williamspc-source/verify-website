@@ -21,7 +21,7 @@ section below points at the document that owns the detail.
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
 | `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 48 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 49 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -41,8 +41,8 @@ One application serves both the public site and `/admin`.
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **135/135**, 7 files |
-| `pnpm test:e2e` | **31/31** in 56s against the production server; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
+| `pnpm test:int` | **190/190**, 12 files |
+| `pnpm test:e2e` | **50/50** in 56s against the production server; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
 | `zsh tests/int/prove-guards.sh` | **10/10** — every guard proven to go red on its deliberate break |
 | `referenceCssDiff.mjs`, all 13 families | zero differences |
 
@@ -234,6 +234,15 @@ Upcoming and Past on `/events` (45); team profiles given a second photo, with a 
 (48). The detail is in `verify-website-design-diff.md`; this list exists so a reader can see that the
 narrative above stops at 38 on purpose.
 
+**Comparison 49 (2026-08-21) is a capability pass, not a design one.** Every field
+an editor types words into is rich text — 585 columns, up from ~50 — with bold,
+italic, underline and links on the field and a brand-palette **Text colour** on
+the block. Colour is per element rather than per word, and `[[brackets]]` still
+paint a phrase in the accent. `computedSnapshot` reads 8385 nodes before and
+after with an empty diff, so it moved no pixels; six new guards keep it that way.
+What stays plain — URLs, mailto bodies, alt text, CSS classes, tokens, `<option>`
+labels — is listed with a reason in `tests/int/proseFields.int.spec.ts`.
+
 The next input is your pass through `REVIEW-CHECKLIST.md`.
 
 ### 3. Smaller known items
@@ -259,6 +268,11 @@ Each is measured and justified in `OUTSTANDING.md` — do not re-derive them:
   stylesheet they excuse. All 13 families read zero today; the exceptions are what needs re-taking.
 - **§19** Stats Band, Spacer, Divider, Icon and Image are on no page since `/style-guide` was removed,
   so nothing reviews them.
+- **§20 / §21** Deliberate limits of the rich-text pass: colour is per element rather than per
+  word, and Enter in a heading makes a paragraph in the editor (the page renders it as a line
+  break either way). Both have their cost measured.
+- **§22** Payload now boots in ~7s, which silently *skipped* two integration specs until their
+  timeouts were raised — a suite reporting green while checking nothing.
 
 ### 4. /in-the-loop shows one section, because one stream has articles
 

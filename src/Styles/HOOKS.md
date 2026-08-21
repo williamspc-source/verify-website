@@ -242,7 +242,58 @@ everything listed here as live, and they should not be renamed without updating 
 
 ---
 
+## 6a. Formatting copy — bold, italic, links and colour
+
+**Every box you type words into is a rich-text box.** Select a word and the small
+toolbar above the field gives you **bold**, *italic*, underline and a link. That
+is true of headings, card titles, bullets, captions, button labels and body copy
+alike — not just the big text areas.
+
+A few boxes are deliberately still plain, and they are the ones where formatting
+could not show up even if you applied it: a web address, an email address, an
+anchor id, a CSS class, a colour value, and a handful of labels that the page
+builds into a button or a filter with JavaScript. If a box has no toolbar, that
+is why.
+
+### Colouring a line
+
+Blocks have a **Text colour** control, usually beside the heading fields. It
+colours that whole piece of copy — the heading and its subheading, a card's text
+— from the brand palette:
+
+| Choice | What it is |
+| --- | --- |
+| **Default (as designed)** | Leave it here unless you have a reason. Nothing changes. |
+| **Heading text** / **Body text** | The site's own two text colours. **They flip automatically on a dark band**, so a card you switch from light to dark keeps readable text with no further action. |
+| **Brand blue** / **Deep navy** | The two brand blues. Both lighten on a dark band so they stay legible. |
+| **Bright blue** | A lighter accent blue. |
+| **Muted grey-blue** | For a line that should sit back from the copy around it. |
+| **White** | For text over a photograph or a coloured panel. |
+
+The colours come from **Site Settings → Brand colours**, so if the brand changes,
+every coloured line on the site changes with it. That is the reason to pick from
+this list rather than to reach for CSS: a hex typed into a style sheet would be
+left behind.
+
+### `[[Brackets]]` still work, and are not the same thing
+
+Wrapping a phrase in `[[double brackets]]` paints *that phrase* in the brand
+accent — a heading's highlighted words. **Text colour** paints the *whole line*.
+They compose: bracketed words keep the accent colour inside a coloured heading.
+Use brackets for a phrase, Text colour for a line.
+
+### Pressing Enter in a heading
+
+You get a second line of the same heading, which is how the two-line lockups on
+the home page are built ("Ensuring Accuracy," / "Empowering Justice"). It does
+not start a new heading or a new paragraph on the page.
+
+---
+
 ## 7. Built-in options (no CSS needed)
+
+**Formatting is not in this list** — bold, italic, links and Text colour are on
+the field itself; see §6a. What follows is the block-level layout options.
 
 **Not every block has all of these** — that sentence used to say "every block exposes…" and sent
 people hunting for a Background field on Heading, Text and Spacer, which have never had one.

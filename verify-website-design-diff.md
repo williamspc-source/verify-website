@@ -3130,3 +3130,105 @@ reference families re-run after the edits, with the guard proof run **immediatel
 changes to `src/` and `tests/int/` — a comment near that guard can re-arm the blind spot it exists to
 close. The seed was **not** run, so no `computedSnapshot` baseline was invalidated, and none was
 captured: no CSS changed in this pass. `HOMEPAGE-CHANGES.md` was not touched — it is closed history.
+
+---
+
+## Comparison 49: every copy field made rich text, and given a brand colour (2026-08-21)
+
+Not a design comparison — a capability pass, recorded here because it touched
+every page and had to prove it moved none of them.
+
+### Why
+
+The people who will run this site came from WordPress, where you can make a piece
+of copy look right yourself. Here they could not: most copy fields were plain
+`text` or `textarea` inputs, so a word could not be bolded, italicised, linked or
+coloured. Two fields even said they could — AudiencePathways' step lead-in
+described itself as *"Bold step lead-in"*, LeadershipSpotlight's tagline as a
+*"Short italic pull-quote"* — both on plain inputs, which is the "control that
+looks editable and isn't" this repo's first invariant forbids.
+
+### What changed
+
+**585 columns are rich text now**, from ~50 before. Every field a visitor reads as
+words: headings, eyebrows and subheadings across 26 blocks; card titles and
+descriptions; bullets, captions, badges, quotes, empty-state lines, button and
+link labels; both heroes; the taxonomy descriptions; and the label copy in
+Article Settings, Events Settings, Specialist Profile, Team Settings and the
+Footer.
+
+**Colour is a per-element control, not per-word.** Blocks carry a `textColour`
+select drawn from the Design System tokens, emitted as `.vf-tc-*`. Two of the
+choices ride the existing `.vf-on-dark` token flip, so a card switched from light
+to dark keeps readable text with no editor action; the two brand blues re-point
+so they do not vanish. `[[bracketed]]` accent text still works and composes
+inside a coloured line — the bracket colours a phrase, the field colours the line.
+
+**What stays plain, and why it is written down.** Roughly 290 fields are read by
+something: URLs, `tel:`/`mailto:` bodies, anchor ids, alt text, CSS classes, the
+38 brand colours, the 51 design tokens, `<option>` labels, and a set of labels
+that client components take as string props. Formatting there could be typed and
+would never appear. Each has a recorded reason in
+`tests/int/proseFields.int.spec.ts`, which fails on any plain field that has none.
+
+### What it moved
+
+Nothing. `computedSnapshot` reads **8385 nodes before and after, DIFF EMPTY**, and
+all 13 `referenceCssDiff` families still read zero. That claim was checked after
+every wave, and twice it was false:
+
+- `InlineRichText` defaulted to wrapping in a `<span>`, which added 48 elements
+  and produced `<span class="ni-card-link"><span>…</span></span>`;
+- the Heading block rendered `<Tag><span>text</span></Tag>`, and `.section-title
+  span` is the *accent* colour rule — so the wrapper took the brand blue and the
+  heading itself went grey.
+
+Both were found by the snapshot, not by eye.
+
+### The failures worth keeping
+
+Everything the compiler could see, it caught — 166 errors at the first
+regeneration, which is what a good safety net looks like. The interesting ones are
+the four it could not:
+
+1. **Payload accepts a plain string in a rich-text field** and stores it verbatim.
+   No error. The page even renders it; only the admin cannot open the field. The
+   seed's 67 writes now go through lifting wrappers.
+2. **A component that declares its own `string` props** hides the mismatch,
+   because `RenderBlocks` spreads a block loosely. `/events` returned HTTP 200
+   with complete server HTML and then died hydrating — 425 rendered nodes down to
+   11. Four more pages failed production builds one at a time.
+3. **Joining or interpolating** a copy value prints `[object Object]`.
+   `/information-centre/for-clients` shipped it beside an info icon; `/contact`
+   four more times, from `` ` | ${t.note}` `` separators.
+4. **A `defaultValue` is written into the DDL**, unescaped — so the apostrophe in
+   "Minimising Your Client's Report Costs" closed the SQL string and killed a
+   `CREATE TABLE` with a syntax error naming the table, not the field.
+
+### Two traps that cost real time
+
+**Booting Payload runs a dev schema push.** `pnpm test:e2e` boots it through
+`tests/helpers/seedUser.ts`. Proving a guard red therefore *applied the broken
+config to the database*: 156 columns went back to varchar, keeping their Lexical
+JSON as text, and nothing said so. The conversion SQL is idempotent because of it.
+
+**A scratch table in the app's own database hangs the push.** A `shape_cols`
+helper left behind read as an unknown table to drop, and `getPayload()` sat for
+ten minutes on the invisible "Accept warnings?" prompt with an empty log.
+
+### Guards added
+
+`proseFields` (every prose field is rich text or explained), `richTextColors`
+(palette and CSS agree), `lexicalText` and `inlineRichText` (the flattening and
+the renderer), `seedWrites` (no write bypasses the lift), and
+`richTextRender.e2e` (no route renders `[object Object]` or dies hydrating).
+Each was proven red on the real defect, and two existing guards were repaired
+after the sweep silently disarmed them — the orphan-field guard could no longer
+see fields named by a helper, and `prove-guards.sh` broke a field whose name had
+become common.
+
+### Deferred, with the cost measured
+
+Per-word colour (`OUTSTANDING.md` §20), Enter-as-line-break in the editor (§21),
+and the ~7s Payload boot that silently skipped two specs (§22).
+

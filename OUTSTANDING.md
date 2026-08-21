@@ -39,6 +39,9 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 16 | Two self-sectioning blocks are missing from `selfSpaced` | Yes | A stray 64px above and below Events Explorer and Featured Articles | ~5 min + re-baseline | Next spacing pass — it moves pages, so measure |
 | 17 | An article is bylined to someone who is not on the team | Yes | A byline that does not link, where the others do | ~5 min + a reseed | Needs a content decision first |
 | 18 | The reference-diff exceptions rest on measurements older than the stylesheet | No | None — but the tool's exceptions cannot be trusted until re-taken | ~45 min | Before the next port that leans on them |
+| 20 | Per-word text colour is not offered, only per-element | By design | None — [[brackets]] cover the common case | ~10 lines + importmap | Only if someone asks |
+| 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~20 lines of custom Lexical | Low priority |
+| 22 | Payload boots in ~7s, and two specs were silently skipped for it | Dev/test only | A suite can report green while checking nothing | Unknown | Watch the admin, not the boot |
 | 19 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min for an unlisted style-guide page | A decision — doing nothing is defensible |
 
 ---
@@ -570,6 +573,71 @@ the sitemap — which is close to what was just deleted, so it is a real decisio
 oversight to correct. Doing nothing is defensible: these are the five simplest blocks in the builder.
 
 **Do not** put them on a real page to make the checklist tidy.
+
+---
+
+## 20. Per-word text colour is not offered, only per-element
+
+Editors colour a *line* — a heading, a subheading, a card's copy — through the
+block's **Text colour** control. They cannot colour one word mid-sentence from
+the toolbar.
+
+**Live today?** By design, and it is what was asked for: "they don't need to
+change text colour mid paragraph". Recorded because the capability exists and
+someone will eventually ask.
+
+**User impact:** none reported. `[[bracketed]]` text already covers the common
+case — a highlighted phrase in a heading, in the brand accent.
+
+**Cost of adding it:** small but not free. Payload 3.85 ships `TextStateFeature`,
+which puts a colour dropdown in the rich-text toolbar and stores only a key, so
+~3 lines to register it with the brand palette, ~5 lines in the `text` converter
+in `src/components/RichText/shared.tsx` to render the key as a class, and a
+re-run of `generate:importmap`. The reasons it was not done: it is marked
+`@experimental` in that version, and it would give an editor two ways to colour
+one phrase — the bracket and the picker — fighting over the same run, with the
+bracket winning and no way to tell why.
+
+---
+
+## 21. Enter in a heading makes a paragraph, not a line break, in the editor
+
+Pressing Enter inside a one-line rich-text field creates a second *paragraph* in
+the stored value. `InlineRichText` renders a paragraph break as `<br>`, so **the
+page is correct** — the two-line lockups render exactly as they did when these
+were textareas, verified in the database as a `linebreak` node and on the page by
+`computedSnapshot`.
+
+**Live today?** Only in the admin, and only as a mild oddity: the editor shows
+two paragraphs where the page shows two lines of one heading.
+
+**Cost of fixing:** ~20 lines. A client feature via `createClientFeature`
+intercepting `INSERT_PARAGRAPH_COMMAND` to dispatch `INSERT_LINE_BREAK_COMMAND`,
+wired into `inlineRichTextField` only, plus an `importMap` entry. It was left out
+because it is the only genuinely novel Lexical code the conversion would need,
+and the visible result is already right — so the risk bought nothing a visitor
+could see.
+
+---
+
+## 22. Payload boots in ~7 seconds, and that is now load-bearing
+
+Measured 2026-08-21: `getPayload()` takes ~7s against the local database, up from
+the low single digits, because the config carries 585 rich-text fields and each
+one generates a Lexical editor config.
+
+**Live today?** In development and in tests, not for visitors — the production
+server boots once.
+
+**User impact:** two integration specs that boot Payload exceeded vitest's 10s
+hook timeout and were reported as **skipped**, not failed. The suite went green
+while checking nothing. Their timeouts are 30s now, but the number will keep
+creeping.
+
+**Cost of fixing:** unknown, and probably not worth chasing until it bites. The
+thing to watch is the *admin* rather than the boot: a page with 30 blocks now
+renders many more Lexical editors than it did. Time the heaviest page's admin
+load before assuming it is fine.
 
 ---
 
