@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import { resolveBrandLogo } from '@/components/Logo/Logo'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getPrimaryOffice } from '@/utilities/primaryOffice'
@@ -103,7 +104,7 @@ export async function Footer() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={logoSrc} alt="VERIFY Medico-Legal Solutions" className="footer-logo-img" />
             </Link>
-            {footer?.tagline ? <p className="footer-brand-desc">{footer.tagline}</p> : null}
+            <InlineRichText as="p" className="footer-brand-desc" data={footer.tagline} />
             {social.length ? (
               <div className="footer-brand-connect">
                 <p className="footer-brand-connect-label">Connect with us</p>
@@ -127,7 +128,7 @@ export async function Footer() {
 
           {columns.map((column, i) => (
             <div className="footer-col" key={i}>
-              {column.title ? <h4 className="footer-col-heading">{column.title}</h4> : null}
+              <InlineRichText as="h4" className="footer-col-heading" data={column.title} />
               <ul className="footer-links">
                 {(column.links || []).map((item, j) => (
                   <li key={j}>

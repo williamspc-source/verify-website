@@ -1,3 +1,4 @@
+import { hasRichText } from '@/utilities/lexicalText'
 import { InlineRichText } from '@/components/RichText/Inline'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -151,7 +152,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
   // read as a detached footer. Kept as ONE element with two possible homes: an
   // office can have a note and no car parks, and the note must not vanish then.
   // This is its only renderer in the repo, so nothing else would catch that.
-  const officeNote = office?.note ? <p className="ct-info-item-note">{office.note}</p> : null
+  const officeNote = <InlineRichText as="p" className="ct-info-item-note" data={office?.note} />
 
   // Standalone white info card — built entirely from Office fields.
   const infoPanel = hasPanel ? (
@@ -187,7 +188,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
                 {h.time ? <div className="ct-info-item-line">{h.time}</div> : null}
               </React.Fragment>
             ))}
-            {office.hoursNote ? <p className="ct-info-item-note">{office.hoursNote}</p> : null}
+            <InlineRichText as="p" className="ct-info-item-note" data={office.hoursNote} />
           </div>
         </div>
       ) : null}
@@ -202,8 +203,22 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
             <InlineRichText as="div" className="ct-info-item-title" data={transportHeading} />
             {office.transport.map((t, i) => (
               <div key={t.id || i} className="ct-info-item-line">
-                {t.href ? <ExtLink href={t.href}>{t.label}</ExtLink> : t.label}
-                {t.note ? ` | ${t.note}` : null}
+                {t.href ? (
+                <ExtLink href={t.href}>
+                  <InlineRichText data={t.label} />
+                </ExtLink>
+              ) : (
+                <InlineRichText data={t.label} />
+              )}
+                {/* A template literal over rich text prints "[object Object]" —
+                    no error, just the wrong words. The separator is its own text
+                    node instead. */}
+                {hasRichText(t.note) ? (
+                  <>
+                    {' | '}
+                    <InlineRichText data={t.note} />
+                  </>
+                ) : null}
               </div>
             ))}
           </div>
@@ -223,17 +238,22 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
                 <div className="ct-info-item-line" style={i > 0 ? { marginTop: 6 } : undefined}>
                   {p.href ? <ExtLink href={p.href}>{p.name}</ExtLink> : p.name}
                   {p.address ? ` (${p.address})` : null}
-                  {p.walkTime ? ` | ${p.walkTime}` : null}
+                  {hasRichText(p.walkTime) ? (
+                    <>
+                      {' | '}
+                      <InlineRichText data={p.walkTime} />
+                    </>
+                  ) : null}
                 </div>
                 {p.heightLimit ? (
                   <div
                     className="ct-info-item-line"
                     style={{ color: 'var(--text-mid)', fontSize: '0.78rem' }}
                   >
-                    {p.heightLimit}
+                    <InlineRichText data={p.heightLimit} />
                   </div>
                 ) : null}
-                {p.note ? <p className="ct-info-item-note">{p.note}</p> : null}
+                <InlineRichText as="p" className="ct-info-item-note" data={p.note} />
               </React.Fragment>
             ))}
             {officeNote}

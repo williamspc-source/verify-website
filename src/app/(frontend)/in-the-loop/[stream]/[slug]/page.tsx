@@ -1,3 +1,5 @@
+import { hasRichText } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import type { Metadata } from 'next'
 
 import configPromise from '@payload-config'
@@ -183,7 +185,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
             <div className="art-meta-right">
               {authorName ? (
                 <div className="art-meta-author">
-                  {labels.bylinePrefix || 'By '}
+                  {hasRichText(labels.bylinePrefix) ? <InlineRichText data={labels.bylinePrefix} /> : 'By '}
                   <strong>{authorName}</strong>
                   {authorRole ? `, ${authorRole}` : ''}
                 </div>
@@ -224,7 +226,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
         <div className="art-layout">
           {/* LEFT: table of contents (scroll-spy client component) */}
           {toc.length ? (
-            <ArticleToc items={toc} label={labels.toc || 'In This Article'} />
+            <ArticleToc items={toc} label={hasRichText(labels.toc) ? <InlineRichText data={labels.toc} /> : 'In This Article'} />
           ) : (
             <aside aria-hidden className="art-toc" />
           )}
@@ -240,7 +242,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
                 it, so an editor could attach a PDF that no reader could reach. */}
             {Array.isArray(post.attachments) && post.attachments.length ? (
               <div className="art-attachments">
-                <h2 className="art-attachments__heading">{labels.attachmentsHeading || 'Downloads'}</h2>
+                <h2 className="art-attachments__heading">{hasRichText(labels.attachmentsHeading) ? <InlineRichText data={labels.attachmentsHeading} /> : 'Downloads'}</h2>
                 <ul className="art-attachments__list">
                   {post.attachments.map((a, i) => {
                     const file = a?.file && typeof a.file === 'object' ? a.file : null
@@ -249,7 +251,13 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
                       <li key={i}>
                         <a href={file.url} className="art-attachment" download>
                           <Icon name="file-text" className="size-5" />
-                          <span>{a?.label || file.filename || 'Download'}</span>
+                          <span>
+                            {hasRichText(a?.label) ? (
+                              <InlineRichText data={a?.label} />
+                            ) : (
+                              file.filename || 'Download'
+                            )}
+                          </span>
                         </a>
                       </li>
                     )
@@ -260,7 +268,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
 
             {tags.length ? (
               <div className="art-tags-footer">
-                <span className="art-tags-label">{labels.topics || 'Topics'}:</span>
+                <span className="art-tags-label">{hasRichText(labels.topics) ? <InlineRichText data={labels.topics} /> : 'Topics'}:</span>
                 {tags.map((tag) => (
                   <span key={tag} className="art-tag-pill">
                     {tag}
@@ -288,8 +296,8 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
                 </div>
                 <div>
                   <div className="art-author-name">{authorName}</div>
-                  {authorRole ? <div className="art-author-role">{authorRole}</div> : null}
-                  {authorBio ? <div className="art-author-bio">{authorBio}</div> : null}
+                  <InlineRichText as="div" className="art-author-role" data={authorRole} />
+                  <InlineRichText as="div" className="art-author-bio" data={authorBio} />
                 </div>
               </div>
             ) : null}
@@ -299,7 +307,7 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
           <aside className="art-sidebar">
             {related.length ? (
               <div className="art-related-section">
-                <div className="art-related-label">{labels.related || 'You Might Also Like'}</div>
+                <div className="art-related-label">{hasRichText(labels.related) ? <InlineRichText data={labels.related} /> : 'You Might Also Like'}</div>
                 <div className="art-related-list">
                   {related.map((rp) => {
                     const rpStream =
@@ -329,8 +337,8 @@ export default async function InTheLoopArticlePage({ params: paramsPromise }: Ar
                       <Icon name={card.icon} className="size-6" weight="regular" />
                     </div>
                   ) : null}
-                  <h4>{card.heading}</h4>
-                  {card.body ? <p>{card.body}</p> : null}
+                  <InlineRichText as="h4" data={card.heading} />
+                  <InlineRichText as="p" data={card.body} />
                   {/* Spread the whole link rather than naming props: listing them
                       individually silently dropped `icon`, so Article Settings'
                       per-card link Icon picker did nothing here while working

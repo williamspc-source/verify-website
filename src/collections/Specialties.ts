@@ -3,7 +3,9 @@ import type { CollectionConfig } from 'payload'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // Canonical medical disciplines — one per specialist. Admin-editable taxonomy.
@@ -38,10 +40,7 @@ export const Specialties: CollectionConfig = {
         description: 'Filter group on the Specialty List page (Surgery / Psychiatry / …).',
       },
     },
-    {
-      name: 'description',
-      type: 'textarea',
-    },
+    inlineRichTextField('description'),
     {
       name: 'keyAreas',
       type: 'array',

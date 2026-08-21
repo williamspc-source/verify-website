@@ -1,3 +1,5 @@
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -15,9 +17,9 @@ type CardData = {
   id: string
   icon?: string | null
   title: string
-  description?: string | null
+  description?: RichTextValue
   href?: string | null
-  ctaLabel: string
+  ctaLabel: RichTextValue
   download: boolean
   resourceType?: string | null
   audience?: string | null
@@ -88,10 +90,10 @@ const NiResourceCard: React.FC<CardData> = (c) => (
       <div className="ni-resource-title">{c.title}</div>
     </div>
     <div className="ni-resource-body">
-      {c.description ? <p className="ni-resource-desc">{c.description}</p> : null}
+      <InlineRichText as="p" className="ni-resource-desc" data={c.description} />
       {c.href ? (
         <a className="ni-resource-link" href={c.href} {...linkAttrs(c.href, c.download)}>
-          {c.ctaLabel} →
+          <InlineRichText data={c.ctaLabel} /> →
         </a>
       ) : null}
     </div>
@@ -106,12 +108,12 @@ const Card: React.FC<CardData> = ({ icon, title, description, href, ctaLabel, do
       </div>
     ) : null}
     <h3 className="service-title vf-card__title">{title}</h3>
-    {description ? <p className="service-desc">{description}</p> : null}
+    <InlineRichText as="p" className="service-desc" data={description} />
     {href ? (
       <div className="vf-resource-card__cta">
         <a className="btn btn-outline vf-resource-card__btn" href={href} {...linkAttrs(href, download)}>
           <Icon name={download ? 'download-simple' : 'arrow-right'} />
-          {ctaLabel}
+          <InlineRichText data={ctaLabel} />
         </a>
       </div>
     ) : null}

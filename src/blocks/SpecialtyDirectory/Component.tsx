@@ -1,4 +1,4 @@
-import { type RichTextValue } from '@/utilities/lexicalText'
+import { richTextToPlain, type RichTextValue } from '@/utilities/lexicalText'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -59,7 +59,7 @@ export const SpecialtyDirectoryBlock: React.FC<Props & { bare?: boolean }> = asy
     const person: RosterPerson = {
       id: String(s.id),
       name: s.title,
-      position: s.position ?? null,
+      position: richTextToPlain(s.position) || null,
       slug: s.slug ?? null,
       locations: relTitles(s.locations),
       photoUrl: photo.url,

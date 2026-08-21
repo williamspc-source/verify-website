@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import { anyone } from '../../access/anyone'
 import { authenticated } from '../../access/authenticated'
@@ -103,14 +104,10 @@ export const AvailabilitySessions: CollectionConfig<'availability-sessions'> = {
             { label: 'Either (in-person or telehealth)', value: 'either' },
           ],
         },
-        {
-          name: 'location',
-          type: 'text',
-          admin: {
+        inlineRichTextField('location', { admin: {
             width: '50%',
             description: 'Optional — for in-person sessions, e.g. "Brisbane CBD".',
-          },
-        },
+          } }),
       ],
     },
     {

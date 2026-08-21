@@ -6,7 +6,7 @@ type TocItem = { id: string; text: string }
 
 type Props = {
   items: TocItem[]
-  label: string
+  label: React.ReactNode
 }
 
 /**

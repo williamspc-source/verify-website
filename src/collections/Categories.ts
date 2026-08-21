@@ -3,7 +3,9 @@ import type { CollectionConfig } from 'payload'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 export const Categories: CollectionConfig = {
@@ -36,10 +38,7 @@ export const Categories: CollectionConfig = {
       type: 'text',
       admin: { description: 'Optional hex for the category chip, e.g. #1c75bc.' },
     },
-    {
-      name: 'description',
-      type: 'textarea',
-    },
+    inlineRichTextField('description'),
     slugField({
       position: undefined,
     }),

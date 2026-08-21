@@ -1,4 +1,5 @@
 import type { Field, GlobalConfig } from 'payload'
+import { inlineRichTextField, richTextDefault } from '@/fields/blockFields'
 
 import { revalidateGlobal } from '@/utilities/revalidateGlobal'
 
@@ -18,11 +19,11 @@ const hostGroup = (name: string, label: string): Field => ({
     {
       type: 'row',
       fields: [
-        { name: 'attendHeading', type: 'text', defaultValue: 'How to Attend', admin: { width: '50%' } },
-        { name: 'recapHeading', type: 'text', defaultValue: 'Event Recap', admin: { width: '50%' } },
+        inlineRichTextField('attendHeading', { defaultValue: richTextDefault('How to Attend'), admin: { width: '50%' } }),
+        inlineRichTextField('recapHeading', { defaultValue: richTextDefault('Event Recap'), admin: { width: '50%' } }),
       ],
     },
-    { name: 'attendBody', type: 'textarea', label: 'How-to-attend copy' },
+    inlineRichTextField('attendBody', { label: 'How-to-attend copy' }),
     {
       type: 'row',
       fields: [
@@ -51,12 +52,8 @@ const labelsGroup: Field = {
     description: 'Generic UI labels shown on every event detail page, regardless of host.',
   },
   fields: [
-    {
-      name: 'presentersHeading',
-      type: 'text',
-      defaultValue: 'Presenters',
-      admin: { description: 'Heading above the presenter cards on an event page.' },
-    },
+    inlineRichTextField('presentersHeading', { defaultValue: richTextDefault('Presenters'),
+      admin: { description: 'Heading above the presenter cards on an event page.' } }),
     {
       name: 'breadcrumbSectionLabel',
       type: 'text',
@@ -109,27 +106,18 @@ const labelsGroup: Field = {
         },
       ],
     },
-    {
-      name: 'concludedFallback',
-      type: 'textarea',
-      label: 'Concluded-event fallback',
-      defaultValue:
-        'This event has now concluded. Contact our team for recordings or resources from this session.',
+    inlineRichTextField('concludedFallback', { label: 'Concluded-event fallback',
+      defaultValue: richTextDefault('This event has now concluded. Contact our team for recordings or resources from this session.'),
       admin: {
         description:
           'Shown under a past event that has no recap AND no photos or downloads. If there are photos or downloads, the line below is used instead — this one would be telling people to ask for something already on the page.',
-      },
-    },
-    {
-      name: 'concludedWithMaterials',
-      type: 'textarea',
-      label: 'Concluded-event fallback (materials available)',
-      defaultValue: 'This event has now concluded. Photos and resources from the session are below.',
+      } }),
+    inlineRichTextField('concludedWithMaterials', { label: 'Concluded-event fallback (materials available)',
+      defaultValue: richTextDefault('This event has now concluded. Photos and resources from the session are below.'),
       admin: {
         description:
           'Shown under a past event that has no recap written yet but does have photos or downloads attached.',
-      },
-    },
+      } }),
     {
       name: 'backToEventsLabel',
       type: 'text',
@@ -149,26 +137,14 @@ const labelsGroup: Field = {
     {
       type: 'row',
       fields: [
-        {
-          name: 'recapTocLabel',
-          type: 'text',
-          defaultValue: 'In this recap',
-          admin: { width: '50%', description: 'Heading above the recap’s contents list.' },
-        },
-        {
-          name: 'galleryHeading',
-          type: 'text',
-          defaultValue: 'From the day',
-          admin: { width: '50%', description: 'Heading above an event’s photo gallery.' },
-        },
+        inlineRichTextField('recapTocLabel', { defaultValue: richTextDefault('In this recap'),
+          admin: { width: '50%', description: 'Heading above the recap’s contents list.' } }),
+        inlineRichTextField('galleryHeading', { defaultValue: richTextDefault('From the day'),
+          admin: { width: '50%', description: 'Heading above an event’s photo gallery.' } }),
       ],
     },
-    {
-      name: 'attachmentsHeading',
-      type: 'text',
-      defaultValue: 'Downloads',
-      admin: { description: 'Heading above an event’s downloads / attachments list.' },
-    },
+    inlineRichTextField('attachmentsHeading', { defaultValue: richTextDefault('Downloads'),
+      admin: { description: 'Heading above an event’s downloads / attachments list.' } }),
   ],
 }
 

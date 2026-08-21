@@ -6,7 +6,9 @@ import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateSpecialist } from './hooks/revalidateSpecialist'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 import { slugField } from 'payload'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 
 import {
   MetaDescriptionField,
@@ -59,12 +61,8 @@ export const Specialists: CollectionConfig<'specialists'> = {
         {
           label: 'Profile',
           fields: [
-            {
-              name: 'position',
-              type: 'text',
-              label: 'Position / title line',
-              admin: { description: 'e.g. "Consultant Spinal Surgeon".' },
-            },
+            inlineRichTextField('position', { label: 'Position / title line',
+              admin: { description: 'e.g. "Consultant Spinal Surgeon".' } }),
             {
               name: 'photo',
               type: 'upload',
@@ -89,7 +87,7 @@ export const Specialists: CollectionConfig<'specialists'> = {
               name: 'qualifications',
               type: 'array',
               fields: [
-                { name: 'qualification', type: 'text', required: true },
+                inlineRichTextField('qualification', { required: true }),
                 iconField({
                   admin: { description: 'Optional icon (e.g. graduation-cap, certificate).' },
                 }),

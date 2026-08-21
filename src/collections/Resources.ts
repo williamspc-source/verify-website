@@ -3,7 +3,9 @@ import type { CollectionConfig } from 'payload'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // Downloadable / link-out resources shown in the "In the Loop → Resources" grid
@@ -60,10 +62,7 @@ export const Resources: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'description',
-      type: 'textarea',
-    },
+    inlineRichTextField('description'),
     {
       name: 'file',
       type: 'upload',
@@ -78,12 +77,8 @@ export const Resources: CollectionConfig = {
         description: 'Used when no file is uploaded — links the card to this URL instead.',
       },
     },
-    {
-      name: 'ctaLabel',
-      type: 'text',
-      label: 'Button label',
-      admin: { description: 'e.g. "Download", "Read guide". Defaults to "Download" if empty.' },
-    },
+    inlineRichTextField('ctaLabel', { label: 'Button label',
+      admin: { description: 'e.g. "Download", "Read guide". Defaults to "Download" if empty.' } }),
     {
       name: 'order',
       type: 'number',

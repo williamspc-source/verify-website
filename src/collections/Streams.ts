@@ -3,7 +3,9 @@ import type { CollectionConfig } from 'payload'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // "In the Loop" content streams (Featured, News & Updates, Industry Insights,
@@ -34,10 +36,7 @@ export const Streams: CollectionConfig = {
       admin: { description: 'e.g. "QA Insights", "News & Updates", "Specialist Spotlights".' },
     },
     iconField({ admin: { description: 'Icon shown on the stream tab / category chip.' } }),
-    {
-      name: 'description',
-      type: 'textarea',
-    },
+    inlineRichTextField('description'),
     {
       name: 'order',
       type: 'number',

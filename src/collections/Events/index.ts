@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
@@ -67,17 +68,13 @@ export const Events: CollectionConfig<'events'> = {
                       'Start date & time. Decides whether the event shows as Upcoming or Past — it counts as upcoming for the whole of its day.',
                   },
                 },
-                {
-                  name: 'timeLabel',
-                  type: 'text',
-                  admin: { width: '50%', description: 'e.g. "12:30 pm – 1:30 pm".' },
-                },
+                inlineRichTextField('timeLabel', { admin: { width: '50%', description: 'e.g. "12:30 pm – 1:30 pm".' } }),
               ],
             },
             {
               type: 'row',
               fields: [
-                { name: 'location', type: 'text', admin: { width: '50%' } },
+                inlineRichTextField('location', { admin: { width: '50%' } }),
                 {
                   name: 'host',
                   type: 'select',
@@ -99,15 +96,11 @@ export const Events: CollectionConfig<'events'> = {
                   label: 'Registration URL',
                   admin: { width: '50%', description: 'External booking link (e.g. AAMLE).' },
                 },
-                {
-                  name: 'registrationLabel',
-                  type: 'text',
-                  label: 'Registration button label',
+                inlineRichTextField('registrationLabel', { label: 'Registration button label',
                   admin: {
                     width: '50%',
                     description: 'e.g. "Register on AAMLE", "Register Your Interest". Optional.',
-                  },
-                },
+                  } }),
               ],
             },
             {
@@ -148,11 +141,7 @@ export const Events: CollectionConfig<'events'> = {
                   label: 'CPD points',
                   admin: { width: '33%' },
                 },
-                {
-                  name: 'cost',
-                  type: 'text',
-                  admin: { width: '34%', description: 'e.g. "Free", "$120". Defaults to Free if empty.' },
-                },
+                inlineRichTextField('cost', { admin: { width: '34%', description: 'e.g. "Free", "$120". Defaults to Free if empty.' } }),
               ],
             },
             {
@@ -214,7 +203,7 @@ export const Events: CollectionConfig<'events'> = {
               },
               fields: [
                 { name: 'image', type: 'upload', relationTo: 'media', required: true },
-                { name: 'caption', type: 'text' },
+                inlineRichTextField('caption'),
               ],
             },
             {
@@ -228,7 +217,7 @@ export const Events: CollectionConfig<'events'> = {
               },
               fields: [
                 { name: 'file', type: 'upload', relationTo: 'media', required: true },
-                { name: 'label', type: 'text', admin: { description: 'Shown instead of the filename.' } },
+                inlineRichTextField('label', { admin: { description: 'Shown instead of the filename.' } }),
               ],
             },
           ],
@@ -307,18 +296,10 @@ export const Events: CollectionConfig<'events'> = {
           type: 'row',
           fields: [
             { name: 'name', type: 'text', required: true, admin: { width: '50%' } },
-            {
-              name: 'role',
-              type: 'text',
-              admin: { width: '50%', placeholder: 'e.g. Barrister' },
-            },
+            inlineRichTextField('role', { admin: { width: '50%', placeholder: 'e.g. Barrister' } }),
           ],
         },
-        {
-          name: 'organisation',
-          type: 'text',
-          admin: { placeholder: 'e.g. Queensland Law Society' },
-        },
+        inlineRichTextField('organisation', { admin: { placeholder: 'e.g. Queensland Law Society' } }),
       ],
     },
     slugField(),

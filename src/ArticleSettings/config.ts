@@ -1,7 +1,10 @@
 import type { GlobalConfig } from 'payload'
 
 import { link } from '@/fields/link'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+  richTextDefault,
+} from '@/fields/blockFields'
 import { revalidateGlobal } from '@/utilities/revalidateGlobal'
 
 // Shared chrome for every "In the Loop" article/resource page: the fixed sidebar
@@ -24,8 +27,8 @@ export const ArticleSettings: GlobalConfig = {
       admin: { description: 'The fixed cards in the article right rail (e.g. "Have a Question?", "Make a Referral").' },
       fields: [
         iconField(),
-        { name: 'heading', type: 'text', required: true },
-        { name: 'body', type: 'textarea' },
+        inlineRichTextField('heading', { required: true }),
+        inlineRichTextField('body'),
         link({ appearances: false }),
       ],
     },
@@ -34,28 +37,16 @@ export const ArticleSettings: GlobalConfig = {
       type: 'group',
       label: 'Fixed labels',
       fields: [
-        {
-          name: 'attachmentsHeading',
-          type: 'text',
-          defaultValue: 'Downloads',
-          admin: { description: 'Heading above an article’s attached files.' },
-        },
+        inlineRichTextField('attachmentsHeading', { defaultValue: richTextDefault('Downloads'),
+          admin: { description: 'Heading above an article’s attached files.' } }),
         {
           type: 'row',
           fields: [
-            {
-              name: 'related',
-              type: 'text',
-              defaultValue: 'You Might Also Like',
-              admin: { width: '33%' },
-            },
-            {
-              name: 'toc',
-              type: 'text',
-              defaultValue: 'In This Article',
-              admin: { width: '33%' },
-            },
-            { name: 'topics', type: 'text', defaultValue: 'Topics', admin: { width: '34%' } },
+            inlineRichTextField('related', { defaultValue: richTextDefault('You Might Also Like'),
+              admin: { width: '33%' } }),
+            inlineRichTextField('toc', { defaultValue: richTextDefault('In This Article'),
+              admin: { width: '33%' } }),
+            inlineRichTextField('topics', { defaultValue: richTextDefault('Topics'), admin: { width: '34%' } }),
           ],
         },
         {
@@ -67,15 +58,11 @@ export const ArticleSettings: GlobalConfig = {
               'Second breadcrumb link (the In the Loop hub). The first crumb — “Home” — is shared site-wide and lives in Site Settings → Breadcrumbs.',
           },
         },
-        {
-          name: 'streamFallbackSubtitle',
-          type: 'text',
-          defaultValue: 'Browse every article in this stream.',
+        inlineRichTextField('streamFallbackSubtitle', { defaultValue: richTextDefault('Browse every article in this stream.'),
           admin: {
             description:
               'Shown under a stream heading when that stream has no description of its own.',
-          },
-        },
+          } }),
         {
           type: 'row',
           fields: [

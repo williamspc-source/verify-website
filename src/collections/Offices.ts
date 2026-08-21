@@ -10,6 +10,7 @@ import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 import { safeRevalidateTag as revalidateTag } from '@/utilities/safeRevalidate'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 /**
  * Purge the `primary-office` cache tag.
@@ -172,19 +173,15 @@ export const Offices: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'hoursNote',
-      type: 'text',
-      admin: { description: 'Optional caveat, e.g. the 7:30am staffing note.' },
-    },
+    inlineRichTextField('hoursNote', { admin: { description: 'Optional caveat, e.g. the 7:30am staffing note.' } }),
     {
       name: 'transport',
       type: 'array',
       label: 'Public transport',
       labels: { singular: 'Transport item', plural: 'Transport items' },
       fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'note', type: 'text' },
+        inlineRichTextField('label', { required: true }),
+        inlineRichTextField('note'),
         { name: 'href', type: 'text', label: 'Optional link' },
       ],
     },
@@ -199,22 +196,18 @@ export const Offices: CollectionConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'walkTime', type: 'text', admin: { width: '50%', placeholder: '3 min walk' } },
-            { name: 'heightLimit', type: 'text', admin: { width: '50%', placeholder: '2.0 m' } },
+            inlineRichTextField('walkTime', { admin: { width: '50%', placeholder: '3 min walk' } }),
+            inlineRichTextField('heightLimit', { admin: { width: '50%', placeholder: '2.0 m' } }),
           ],
         },
         { name: 'href', type: 'text', label: 'Optional link' },
-        { name: 'note', type: 'text' },
+        inlineRichTextField('note'),
       ],
     },
-    {
-      name: 'note',
-      type: 'textarea',
-      admin: {
+    inlineRichTextField('note', { admin: {
         description:
           'Any additional guidance shown in the location module. It reads as the last line of Nearby Car Parks — or, if this office lists no car parks, at the foot of the card.',
-      },
-    },
+      } }),
     {
       name: 'order',
       type: 'number',

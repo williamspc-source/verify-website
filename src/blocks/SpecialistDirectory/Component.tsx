@@ -1,3 +1,4 @@
+import { richTextToPlain } from '@/utilities/lexicalText'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -88,7 +89,9 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
     return {
       id: String(s.id),
       name: s.title,
-      position: s.position ?? null,
+      // Flattened: the directory's client-side search builds one haystack
+      // string from name/position/specialty/accreditations/locations.
+      position: richTextToPlain(s.position) || null,
       slug: s.slug ?? null,
       photoUrl: photo.url,
       photoFocus: photo.focus,

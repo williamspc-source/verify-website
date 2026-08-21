@@ -1,3 +1,5 @@
+import { InlineRichText } from '@/components/RichText/Inline'
+import { type RichTextValue } from '@/utilities/lexicalText'
 import Link from 'next/link'
 import React from 'react'
 
@@ -6,7 +8,7 @@ import { focalImgStyle } from '@/utilities/focalPoint'
 
 export type PersonCardData = {
   name: string
-  position?: string | null
+  position?: RichTextValue
   location?: string | null
   badge?: string | null
   photoUrl?: string | null
@@ -67,7 +69,7 @@ export const TeamCard: React.FC<PersonCardData> = ({
       </div>
       <div className="vf-team-card__body">
         <div className="vf-team-card__name vf-card__title">{name}</div>
-        {position ? <div className="vf-team-card__role">{position}</div> : null}
+        <InlineRichText as="div" className="vf-team-card__role" data={position} />
         {href ? <span className="vf-team-card__link">View profile →</span> : null}
       </div>
     </>
@@ -135,7 +137,7 @@ export const PersonCard: React.FC<PersonCardData> = ({
         )}
       </div>
       <div className="spec-name vf-card__title">{name}</div>
-      {position ? <div className="spec-title">{position}</div> : null}
+      <InlineRichText as="div" className="spec-title" data={position} />
       {location ? <div className="spec-loc">{location}</div> : null}
       {href ? <span className="spec-more">View profile →</span> : null}
     </>
@@ -186,7 +188,7 @@ export const ExpertCard: React.FC<
       </div>
       <div className="expert-info">
         <div className="expert-name vf-card__title">{name}</div>
-        {position ? <div className="expert-role">{position}</div> : null}
+        <InlineRichText as="div" className="expert-role" data={position} />
         {tags && tags.length > 0 ? (
           <div className="expert-tags">
             {tags.map((t, i) => (

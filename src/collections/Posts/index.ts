@@ -1,4 +1,5 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import type { Post } from '../../payload-types'
 
@@ -166,15 +167,11 @@ export const Posts: CollectionConfig<'posts'> = {
                   type: 'row',
                   fields: [
                     { name: 'name', type: 'text', admin: { width: '50%' } },
-                    {
-                      name: 'role',
-                      type: 'text',
-                      admin: { width: '50%', description: 'e.g. "Senior Coordination Manager".' },
-                    },
+                    inlineRichTextField('role', { admin: { width: '50%', description: 'e.g. "Senior Coordination Manager".' } }),
                   ],
                 },
                 { name: 'photo', type: 'upload', relationTo: 'media' },
-                { name: 'bio', type: 'textarea' },
+                inlineRichTextField('bio'),
               ],
             },
             {
@@ -203,7 +200,7 @@ export const Posts: CollectionConfig<'posts'> = {
               admin: { description: 'Optional downloadable files (e.g. a checklist PDF).' },
               fields: [
                 { name: 'file', type: 'upload', relationTo: 'media', required: true },
-                { name: 'label', type: 'text' },
+                inlineRichTextField('label'),
               ],
             },
             {

@@ -1,3 +1,4 @@
+import { richTextToPlain } from '@/utilities/lexicalText'
 import type { Metadata } from 'next'
 
 import configPromise from '@payload-config'
@@ -104,7 +105,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   if (!stream) return {}
   return {
     title: `${stream.title} — In the Loop | VERIFY`,
-    description: stream.description || undefined,
+    // A meta description is an attribute: it needs words, not a tree.
+    description: richTextToPlain(stream.description) || undefined,
   }
 }
 

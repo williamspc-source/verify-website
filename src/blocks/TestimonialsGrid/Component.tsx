@@ -1,3 +1,4 @@
+import { InlineRichText } from '@/components/RichText/Inline'
 import configPromise from '@payload-config'
 import { getPayload, type Where } from 'payload'
 import React from 'react'
@@ -21,10 +22,10 @@ const Card: React.FC<{ t: Testimonial; className?: string }> = ({ t, className }
       <div className="testimonial-quote" aria-hidden="true">
         &ldquo;
       </div>
-      <div className="testimonial-text">{t.quote}</div>
+      <InlineRichText as="div" className="testimonial-text" data={t.quote} />
       <div className="testimonial-author">
-        <div className="testimonial-position">{t.authorRole}</div>
-        {t.org ? <div className="testimonial-org-loc">{t.org}</div> : null}
+        <InlineRichText as="div" className="testimonial-position" data={t.authorRole} />
+        <InlineRichText as="div" className="testimonial-org-loc" data={t.org} />
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { hasRichText, richTextToPlain, type RichTextValue } from '@/utilities/lexicalText'
 import { InlineRichText } from '@/components/RichText/Inline'
 import type {
   Post,
@@ -81,19 +81,21 @@ type AuthorInfo = { name: string | null; role: string | null; photo: MediaType |
 const resolveAuthor = (post: Post): AuthorInfo => {
   const author = post.author
   let name = author?.name || null
-  let role = author?.role || null
+  // Flattened to words: this byline is joined with the author's name into one
+  // meta line and also feeds the card's alt text, so it needs a string.
+  let role = richTextToPlain(author?.role) || null
   let photo = author?.photo && typeof author.photo === 'object' ? (author.photo as MediaType) : null
 
   const source = author?.source
   if (source && typeof source === 'object' && source.value && typeof source.value === 'object') {
     const person = source.value as {
       title?: string | null
-      role?: string | null
-      position?: string | null
+      role?: RichTextValue
+      position?: RichTextValue
       photo?: unknown
     }
     if (!name) name = person.title || null
-    if (!role) role = person.role || person.position || null
+    if (!role) role = richTextToPlain(person.role) || richTextToPlain(person.position) || null
     if (!photo && person.photo && typeof person.photo === 'object') {
       photo = person.photo as MediaType
     }
@@ -236,7 +238,8 @@ const eventFormatLine = (
         : labels.cpdEligibleLabel || 'CPD Eligible',
     )
   }
-  const cost = typeof event.cost === 'string' ? event.cost.trim() : ''
+  // Flattened: this is a meta line joined with '·' separators, not a render.
+  const cost = richTextToPlain(event.cost)
   if (cost) parts.push(cost)
   else if (event.cpdEligible) parts.push(labels.freeLabel || 'Free')
   return parts.join('  ·  ')
@@ -267,7 +270,12 @@ const EventHubCard: React.FC<{
         </a>
         {event.excerpt && <p className="ni-event-desc">{event.excerpt}</p>}
         <a className="ni-event-link" href={event.registrationUrl || href}>
-          {event.registrationLabel || 'Register Now'} →
+          {hasRichText(event.registrationLabel) ? (
+            <InlineRichText data={event.registrationLabel} />
+          ) : (
+            'Register Now'
+          )}{' '}
+          →
         </a>
       </div>
     </div>
@@ -317,8 +325,8 @@ const EventCard: React.FC<{
         <h3>{event.title}</h3>
         {event.excerpt && <p className="event-card-desc">{event.excerpt}</p>}
         <div className="event-card-meta">
-          {event.timeLabel && <span>{event.timeLabel}</span>}
-          {event.location && <span>{event.location}</span>}
+          <InlineRichText as="span" data={event.timeLabel} />
+          <InlineRichText as="span" data={event.location} />
         </div>
         <a className="event-card-link" href={href}>
           {isPast ? 'View recap' : 'More info'} →

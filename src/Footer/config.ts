@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import { link } from '@/fields/link'
 import { revalidateFooter } from './hooks/revalidateFooter'
@@ -15,11 +16,7 @@ export const Footer: GlobalConfig = {
       'The footer on every page: link columns, contact details and opening hours. Contact fields left blank fall back to your primary Office.',
   },
   fields: [
-    {
-      name: 'tagline',
-      type: 'text',
-      admin: { description: 'Optional line under the footer logo. Blank by default (reference footer has none).' },
-    },
+    inlineRichTextField('tagline', { admin: { description: 'Optional line under the footer logo. Blank by default (reference footer has none).' } }),
     {
       name: 'columns',
       label: 'Link columns',
@@ -32,11 +29,7 @@ export const Footer: GlobalConfig = {
         },
       },
       fields: [
-        {
-          name: 'title',
-          type: 'text',
-          required: true,
-        },
+        inlineRichTextField('title', { required: true }),
         {
           name: 'links',
           type: 'array',

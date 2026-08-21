@@ -1,3 +1,5 @@
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import configPromise from '@payload-config'
 import Link from 'next/link'
 import { getPayload, type Where } from 'payload'
@@ -15,7 +17,13 @@ import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
 import { ServicesAccordionItem } from './ServicesAccordionClient'
 
-type CardData = { id: string; icon?: string | null; title: string; description?: string | null; href?: string | null }
+type CardData = {
+  id: string
+  icon?: string | null
+  title: string
+  description?: RichTextValue
+  href?: string | null
+}
 
 const Card: React.FC<CardData & { className?: string; enquire?: boolean }> = ({
   icon,
@@ -33,7 +41,7 @@ const Card: React.FC<CardData & { className?: string; enquire?: boolean }> = ({
         </div>
       ) : null}
       <h3 className="service-title vf-card__title">{title}</h3>
-      {description ? <p className="service-desc">{description}</p> : null}
+      <InlineRichText as="p" className="service-desc" data={description} />
       {enquire ? (
         <button type="button" className="service-enquire" data-enquiry-panel>
           Enquire →
@@ -206,7 +214,7 @@ export const ServicesGridBlock: React.FC<Props & { bare?: boolean }> = async (pr
             id={String(s.id)}
             icon={s.icon}
             title={s.title}
-            description={hideDescription ? null : s.shortDescription}
+            description={hideDescription ? null : (s.shortDescription as RichTextValue)}
             href={hrefFor(s)}
             enquire={Boolean(showEnquire)}
             className={toClassName(elementClasses?.card)}

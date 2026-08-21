@@ -1,3 +1,5 @@
+import { hasRichText, richTextToPlain } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import type { Metadata } from 'next'
 
 import configPromise from '@payload-config'
@@ -129,16 +131,28 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   // they could no longer use. The per-event registration label is likewise only
   // meaningful while registration is open ("Register on AAMLE" is wrong once it
   // isn't).
+  // One label, two buttons, three sources — and each source is rich text now, so
+  // the `||` chain has to ask `hasRichText` rather than lean on truthiness: an
+  // untouched rich-text field is a truthy object and would win over both
+  // fallbacks, rendering a button with no words in it.
+  const registerLabel = hasRichText(event.registrationLabel) ? (
+    <InlineRichText data={event.registrationLabel} />
+  ) : hasRichText(host.registerLabel) ? (
+    <InlineRichText data={host.registerLabel} />
+  ) : (
+    'Register Your Interest'
+  )
+
   const registerHref = event.registrationUrl?.trim() || ''
   const contactHref = labels.contactUrl?.trim() || '/contact'
   const primaryCta = registrationOpen ? (
     registerHref ? (
       <a className="btn btn-primary" href={registerHref} target="_blank" rel="noopener noreferrer">
-        {event.registrationLabel || host.registerLabel || 'Register Your Interest'}
+        {registerLabel}
       </a>
     ) : (
       <button type="button" data-enquiry-panel className="btn btn-primary">
-        {event.registrationLabel || host.registerLabel || 'Register Your Interest'}
+        {registerLabel}
       </button>
     )
   ) : (
@@ -258,7 +272,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
           {presenterCards.length ? (
             <div className="event-presenters">
-              <h2 className="event-presenters__heading">{presentersHeading}</h2>
+              <InlineRichText as="h2" className="event-presenters__heading" data={presentersHeading} />
               <div className="spec-grid" style={{ '--vf-cols': 3 } as React.CSSProperties}>
                 {presenterCards.map((c, i) => (
                   <PersonCard key={i} {...c} />
@@ -273,14 +287,20 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
       <section className="content-section" style={{ paddingTop: 0 }}>
         <div className="container">
           <div className="event-attend">
-            <h2 className="event-attend__heading">{attendHeading}</h2>
+            <InlineRichText as="h2" className="event-attend__heading" data={attendHeading} />
 
             {isPast ? (
               hasRecap ? (
                 <>
                   {toc.length >= 2 ? (
-                    <nav className="event-toc" aria-label={labels.recapTocLabel || 'In this recap'}>
-                      <p className="event-toc__label">{labels.recapTocLabel || 'In this recap'}</p>
+                    <nav className="event-toc" aria-label={richTextToPlain(labels.recapTocLabel) || 'In this recap'}>
+                      <p className="event-toc__label">
+                        {hasRichText(labels.recapTocLabel) ? (
+                          <InlineRichText data={labels.recapTocLabel} />
+                        ) : (
+                          'In this recap'
+                        )}
+                      </p>
                       <ul className="event-toc__list">
                         {toc.map((t) => (
                           <li key={t.id}>
@@ -303,15 +323,15 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 // this session." and then rendered "Downloads · Session recording".
                 <p>
                   {hasMaterials
-                    ? labels.concludedWithMaterials ||
+                    ? richTextToPlain(labels.concludedWithMaterials) ||
                       'This event has now concluded. Photos and resources from the session are below.'
-                    : labels.concludedFallback ||
+                    : richTextToPlain(labels.concludedFallback) ||
                       'This event has now concluded. Contact our team for recordings or resources from this session.'}
                 </p>
               )
             ) : (
               <p>
-                {host.attendBody?.trim() ||
+                {richTextToPlain(host.attendBody) ||
                   'Contact our team to register your interest or reserve a place — places are confirmed by email.'}
               </p>
             )}
@@ -319,12 +339,18 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
           {gallery.length ? (
             <div className="event-gallery">
-              <h2 className="event-gallery__heading">{labels.galleryHeading || 'From the day'}</h2>
+              <h2 className="event-gallery__heading">
+                {hasRichText(labels.galleryHeading) ? (
+                  <InlineRichText data={labels.galleryHeading} />
+                ) : (
+                  'From the day'
+                )}
+              </h2>
               <div className="event-gallery__grid">
                 {gallery.map((g, i) => (
                   <figure key={i} className="event-gallery__item">
                     <Media resource={g.image as never} imgClassName="event-gallery__img" />
-                    {g.caption ? <figcaption>{g.caption}</figcaption> : null}
+                    <InlineRichText as="figcaption" data={g.caption} />
                   </figure>
                 ))}
               </div>
@@ -334,7 +360,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
           {attachments.length ? (
             <div className="art-attachments event-attachments">
               <h2 className="art-attachments__heading">
-                {labels.attachmentsHeading || 'Downloads'}
+                {hasRichText(labels.attachmentsHeading) ? (
+                  <InlineRichText data={labels.attachmentsHeading} />
+                ) : (
+                  'Downloads'
+                )}
               </h2>
               <ul className="art-attachments__list">
                 {attachments.map((a, i) => {
@@ -344,7 +374,13 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                     <li key={i}>
                       <a href={file.url} className="art-attachment" download>
                         <Icon name="file-text" className="size-5" />
-                        <span>{a.label || file.filename || 'Download'}</span>
+                        <span>
+                          {hasRichText(a.label) ? (
+                            <InlineRichText data={a.label} />
+                          ) : (
+                            file.filename || 'Download'
+                          )}
+                        </span>
                       </a>
                     </li>
                   )

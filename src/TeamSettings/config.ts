@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { inlineRichTextField, richTextDefault } from '@/fields/blockFields'
 
 import { revalidateGlobal } from '@/utilities/revalidateGlobal'
 
@@ -32,22 +33,14 @@ export const TeamSettings: GlobalConfig = {
         // (it repeated the role already under the name in the hero), so the label
         // had nothing left to label — a setting an editor can change that does
         // nothing is the failure `tests/int/adminControls.int.spec.ts` guards.
-        {
-          name: 'qualificationLabel',
-          type: 'text',
-          defaultValue: 'Qualification',
+        inlineRichTextField('qualificationLabel', { defaultValue: richTextDefault('Qualification'),
           admin: {
             description: 'Sidebar label above each qualification.',
-          },
-        },
-        {
-          name: 'aboutPrefix',
-          type: 'text',
-          defaultValue: 'About',
+          } }),
+        inlineRichTextField('aboutPrefix', { defaultValue: richTextDefault('About'),
           admin: {
             description: 'Prefix for the bio heading, e.g. “About” in “About Wes”.',
-          },
-        },
+          } }),
       ],
     },
   ],

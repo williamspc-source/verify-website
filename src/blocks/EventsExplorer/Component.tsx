@@ -1,5 +1,5 @@
 import { InlineRichText } from '@/components/RichText/Inline'
-import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { hasRichText, richTextToPlain, type RichTextValue } from '@/utilities/lexicalText'
 import type { Event } from '@/payload-types'
 import { mediaSrc } from '@/utilities/mediaSrc'
 
@@ -61,12 +61,16 @@ const serialise = (e: Event, photoWidth: number): EventItem => ({
   title: e.title,
   slug: e.slug ?? '',
   date: e.date ? new Date(e.date).toISOString() : '',
-  timeLabel: e.timeLabel ?? '',
-  location: e.location ?? '',
+  // Flattened, not rendered: the events list filters on these client-side —
+  // `[title, excerpt, typeLabel, location].some(v => v.toLowerCase().includes(q))`
+  // — so a tree here would stringify to "[object Object]" and match nothing,
+  // silently. The search box would simply stop finding events.
+  timeLabel: richTextToPlain(e.timeLabel),
+  location: richTextToPlain(e.location),
   eventType: e.eventType ?? '',
   typeLabel: EVENT_TYPE_LABELS[e.eventType ?? ''] || 'Event',
   cpdEligible: Boolean(e.cpdEligible),
-  cost: e.cost ?? '',
+  cost: richTextToPlain(e.cost),
   excerpt: e.excerpt ?? '',
   registrationUrl: e.registrationUrl ?? '',
   image: mediaSrc(e.image, photoWidth * 2),

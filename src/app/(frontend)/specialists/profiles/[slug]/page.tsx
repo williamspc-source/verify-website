@@ -1,3 +1,5 @@
+import { InlineRichText } from '@/components/RichText/Inline'
+import { hasRichText, richTextToPlain, type RichTextValue } from '@/utilities/lexicalText'
 import type { Metadata } from 'next'
 
 import configPromise from '@payload-config'
@@ -65,8 +67,8 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   if (!specialist) return <PayloadRedirects url={specialistPath(decodedSlug) ?? `/specialists/profiles/${decodedSlug}`} />
 
   const settings = await getCachedGlobal('specialist-profile', 1)()
-  const portal = (settings as { portalCta?: Record<string, unknown> })?.portalCta ?? {}
-  const labels = (settings as { labels?: Record<string, string> })?.labels ?? {}
+  const portal = (settings as { portalCta?: Record<string, RichTextValue> })?.portalCta ?? {}
+  const labels = (settings as { labels?: Record<string, RichTextValue> })?.labels ?? {}
   const breadcrumb = (settings as { breadcrumb?: Record<string, string> })?.breadcrumb ?? {}
   const crumbSettings = await getCrumbSettings()
   const portalEnquirySubject =
@@ -103,14 +105,20 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   // optional, hence the fallback: a specialist added without one still gets a
   // line rather than an empty gap.
   const subtitle =
-    (s.position as string) ||
+    // Flattened: this subtitle also feeds the profile's meta description and
+    // the card alt text, both of which are attributes.
+    richTextToPlain(s.position) ||
     (typeof s.specialty === 'object' && s.specialty
       ? ((s.specialty as { title?: string }).title ?? '')
       : '') ||
     ''
   const locations = relTitles(s.locations)
   const languages = Array.isArray(s.languages)
-    ? (s.languages as { language?: string }[]).map((l) => l.language).filter(Boolean)
+    ? // Flattened: these are joined with ", " into one line, and joining trees
+      // would print "[object Object], [object Object]".
+      (s.languages as { language?: RichTextValue }[])
+        .map((l) => richTextToPlain(l.language))
+        .filter(Boolean)
     : []
   const areas = relTitles(s.areasOfExpertise)
   // Two distinct taxonomies, rendered separately. They used to be concatenated
@@ -120,7 +128,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
   const claimTypes = relTitles(s.claimTypes)
   const assessmentTypes = relTitles(s.assessmentTypes)
   const qualifications = Array.isArray(s.qualifications)
-    ? (s.qualifications as { qualification?: string; icon?: string }[])
+    ? (s.qualifications as { qualification?: RichTextValue; icon?: string }[])
     : []
   // `relTitles` keeps only the title, which is why the accreditation icon could
   // not reach the JSX and was hardcoded there instead — leaving `Accreditations.icon`
@@ -187,7 +195,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
             <div>
               {s.bio ? (
                 <div className="profile-section">
-                  <div className="profile-section-label">{labels.biography || 'Biography'}</div>
+                  <div className="profile-section-label">{hasRichText(labels.biography) ? <InlineRichText data={labels.biography} /> : 'Biography'}</div>
                   <div className="profile-bio">
                     <RichText data={s.bio as never} enableGutter={false} />
                   </div>
@@ -197,7 +205,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
               {areas.length ? (
                 <div className="profile-section">
                   <div className="profile-section-label">
-                    {labels.assessmentAreas || 'Assessment Areas'}
+                    {hasRichText(labels.assessmentAreas) ? <InlineRichText data={labels.assessmentAreas} /> : 'Assessment Areas'}
                   </div>
                   <div className="profile-areas-list">
                     {areas.map((a) => (
@@ -212,7 +220,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
               {assessmentTypes.length ? (
                 <div className="profile-section">
                   <div className="profile-section-label">
-                    {labels.assessmentTypes || 'Assessment Types'}
+                    {hasRichText(labels.assessmentTypes) ? <InlineRichText data={labels.assessmentTypes} /> : 'Assessment Types'}
                   </div>
                   <div className="profile-types">
                     {assessmentTypes.map((a) => (
@@ -227,7 +235,11 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
               {claimTypes.length ? (
                 <div className="profile-section">
                   <div className="profile-section-label">
-                    {labels.claimTypes || 'Claim Types'}
+                    {hasRichText(labels.claimTypes) ? (
+                      <InlineRichText data={labels.claimTypes} />
+                    ) : (
+                      'Claim Types'
+                    )}
                   </div>
                   <div className="profile-types">
                     {claimTypes.map((c) => (
@@ -245,13 +257,18 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
               {qualifications.length ? (
                 <div className="profile-sidebar-card">
                   <div className="profile-sidebar-title">
-                    {labels.qualifications || 'Qualifications'}
+                    {hasRichText(labels.qualifications) ? <InlineRichText data={labels.qualifications} /> : 'Qualifications'}
                   </div>
                   <ul className="profile-qual-list">
                     {qualifications.map((q, i) => (
                       <li key={i}>
-                        <Icon name={q.icon || qualificationIcon(q.qualification)} className="profile-qual-icon" />
-                        {q.qualification}
+                        {/* `qualificationIcon` infers the glyph from the wording,
+                            so it needs the words rather than the tree. */}
+                        <Icon
+                          name={q.icon || qualificationIcon(richTextToPlain(q.qualification))}
+                          className="profile-qual-icon"
+                        />
+                        <InlineRichText data={q.qualification} />
                       </li>
                     ))}
                   </ul>
@@ -261,7 +278,7 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
               {accreditations.length ? (
                 <div className="profile-sidebar-card">
                   <div className="profile-sidebar-title">
-                    {labels.accreditations || 'Accreditations'}
+                    {hasRichText(labels.accreditations) ? <InlineRichText data={labels.accreditations} /> : 'Accreditations'}
                   </div>
                   <ul className="profile-qual-list">
                     {accreditations.map((a) => (
@@ -279,18 +296,18 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
       </section>
 
       {/* Shared booking-portal CTA (from the Specialist Profile global) */}
-      {portal.heading ? (
+      {hasRichText(portal.heading) ? (
         <section className="portal-opt4">
           <div className="container">
             <div className="portal-opt4-inner">
               <div className="portal-opt4-header">
-                {portal.eyebrow ? (
-                  <div className="portal-opt4-eyebrow">{portal.eyebrow as string}</div>
+                {hasRichText(portal.eyebrow) ? (
+                  <InlineRichText as="div" className="portal-opt4-eyebrow" data={portal.eyebrow} />
                 ) : null}
-                <h2 className="opt-heading">{portal.heading as string}</h2>
+                <InlineRichText as="h2" className="opt-heading" data={portal.heading} />
               </div>
-              {portal.subheading ? (
-                <p className="opt-sub">{portal.subheading as string}</p>
+              {hasRichText(portal.subheading) ? (
+                <InlineRichText as="p" className="opt-sub" data={portal.subheading} />
               ) : null}
               {portalTiles.length ? (
                 <div className="portal-opt4-tiles">
@@ -299,7 +316,11 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
                       {tile.icon ? (
                         <Icon name={tile.icon} className="portal-opt4-tile-icon" />
                       ) : null}
-                      <div className="portal-opt4-tile-label">{tile.label}</div>
+                      <InlineRichText
+                        as="div"
+                        className="portal-opt4-tile-label"
+                        data={tile.label}
+                      />
                     </div>
                   ))}
                 </div>

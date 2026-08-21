@@ -1,6 +1,9 @@
 import type { GlobalConfig } from 'payload'
 
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+  richTextDefault,
+} from '@/fields/blockFields'
 import { revalidateGlobal } from '@/utilities/revalidateGlobal'
 import { SPECIALIST_INDEX_PATH } from '@/utilities/routes'
 
@@ -24,11 +27,11 @@ export const SpecialistProfile: GlobalConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'eyebrow', type: 'text', admin: { width: '50%' } },
-            { name: 'heading', type: 'text', admin: { width: '50%' } },
+            inlineRichTextField('eyebrow', { admin: { width: '50%' } }),
+            inlineRichTextField('heading', { admin: { width: '50%' } }),
           ],
         },
-        { name: 'subheading', type: 'textarea' },
+        inlineRichTextField('subheading'),
         {
           name: 'tiles',
           type: 'array',
@@ -36,7 +39,7 @@ export const SpecialistProfile: GlobalConfig = {
           maxRows: 4,
           fields: [
             iconField(),
-            { name: 'label', type: 'text', required: true },
+            inlineRichTextField('label', { required: true }),
           ],
         },
         {
@@ -113,41 +116,25 @@ export const SpecialistProfile: GlobalConfig = {
         {
           type: 'row',
           fields: [
-            { name: 'biography', type: 'text', defaultValue: 'Biography', admin: { width: '50%' } },
-            {
-              name: 'assessmentAreas',
-              type: 'text',
-              defaultValue: 'Assessment Areas',
-              admin: { width: '50%' },
-            },
+            inlineRichTextField('biography', { defaultValue: richTextDefault('Biography'), admin: { width: '50%' } }),
+            inlineRichTextField('assessmentAreas', { defaultValue: richTextDefault('Assessment Areas'),
+              admin: { width: '50%' } }),
           ],
         },
         {
           type: 'row',
           fields: [
-            {
-              name: 'qualifications',
-              type: 'text',
-              defaultValue: 'Qualifications',
-              admin: { width: '50%' },
-            },
-            {
-              name: 'accreditations',
-              type: 'text',
-              defaultValue: 'Accreditations',
-              admin: { width: '50%' },
-            },
+            inlineRichTextField('qualifications', { defaultValue: richTextDefault('Qualifications'),
+              admin: { width: '50%' } }),
+            inlineRichTextField('accreditations', { defaultValue: richTextDefault('Accreditations'),
+              admin: { width: '50%' } }),
           ],
         },
         {
           type: 'row',
           fields: [
-            {
-              name: 'assessmentTypes',
-              type: 'text',
-              defaultValue: 'Assessment Types',
-              admin: { width: '50%' },
-            },
+            inlineRichTextField('assessmentTypes', { defaultValue: richTextDefault('Assessment Types'),
+              admin: { width: '50%' } }),
             {
               // Claim Types used to be concatenated into the Assessment Types
               // list, so a claim type never appeared under its own name on any

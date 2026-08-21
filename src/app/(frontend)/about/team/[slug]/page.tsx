@@ -1,3 +1,5 @@
+import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import type { Metadata } from 'next'
 
 import configPromise from '@payload-config'
@@ -72,10 +74,10 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
       : null
   const photo = hidePhoto ? null : (overridePhoto ?? teamPhoto)
   const sections = Array.isArray(m.sections)
-    ? (m.sections as { heading?: string; body?: unknown }[])
+    ? (m.sections as { heading?: RichTextValue; body?: unknown }[])
     : []
   const qualifications = Array.isArray(m.qualifications)
-    ? (m.qualifications as { qualification?: string }[])
+    ? (m.qualifications as { qualification?: RichTextValue }[])
     : []
   // Accent word for the bio heading — the member's first name ("About Wes").
   const firstName = (m.title ?? '').split(/\s+/)[0]
@@ -103,7 +105,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
           />
           <div className="staff-hero-content">
             <h1 className="staff-hero-name">{m.title}</h1>
-            {m.role ? <p className="staff-hero-role">{m.role}</p> : null}
+            <InlineRichText as="p" className="staff-hero-role" data={m.role} />
           </div>
         </div>
       </section>
@@ -117,7 +119,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
               {m.bio ? (
                 <div className="staff-section">
                   <div className="staff-section-heading">
-                    {labels?.aboutPrefix || 'About'} <span>{firstName}</span>
+                    {hasRichText(labels?.aboutPrefix) ? <InlineRichText data={labels?.aboutPrefix} /> : 'About'} <span>{firstName}</span>
                   </div>
                   <div className="staff-bio">
                     <RichText data={m.bio as never} enableGutter={false} enableProse={false} />
@@ -127,7 +129,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
               {sections.map((sec, i) => (
                 <div className="staff-section" key={i}>
                   <div className="staff-section-heading">
-                    <span>{sec.heading}</span>
+                    <InlineRichText data={sec.heading} />
                   </div>
                   {sec.body ? (
                     <div className="staff-bio">
@@ -178,9 +180,17 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
                           </div>
                           <div>
                             <div className="staff-sidebar-item-label">
-                              {labels?.qualificationLabel || 'Qualification'}
+                              {hasRichText(labels?.qualificationLabel) ? (
+                                <InlineRichText data={labels?.qualificationLabel} />
+                              ) : (
+                                'Qualification'
+                              )}
                             </div>
-                            <div className="staff-sidebar-item-text">{q.qualification}</div>
+                            <InlineRichText
+                              as="div"
+                              className="staff-sidebar-item-text"
+                              data={q.qualification}
+                            />
                           </div>
                         </div>
                       ) : null,

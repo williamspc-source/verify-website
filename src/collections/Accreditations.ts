@@ -3,7 +3,9 @@ import type { CollectionConfig } from 'payload'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // Specialist accreditations / impairment-rating credentials (AMA 5, GEPI 2,
@@ -33,10 +35,7 @@ export const Accreditations: CollectionConfig = {
       admin: { description: 'e.g. "AMA 5", "GEPI 2", "CIME (ABIME)", "PIRS".' },
     },
     iconField({ admin: { description: 'Icon shown with the accreditation chip (e.g. seal-check).' } }),
-    {
-      name: 'description',
-      type: 'textarea',
-    },
+    inlineRichTextField('description'),
     slugField({
       position: undefined,
     }),

@@ -1,5 +1,7 @@
 'use client'
 
+import { InlineRichText } from '@/components/RichText/Inline'
+import { type RichTextValue } from '@/utilities/lexicalText'
 import React, { useMemo, useState } from 'react'
 
 import { cn } from '@/utilities/ui'
@@ -18,7 +20,7 @@ export type AvailabilityChip = {
 export type AvailabilityRow = {
   id: string
   name: string
-  position?: string | null
+  position?: RichTextValue
   initials: string
   photoUrl?: string | null
   photoFocus?: string | null
@@ -151,7 +153,7 @@ export const AvailabilityClient: React.FC<{
 
             <div className="sa-content">
               <div className="sa-name">{row.name}</div>
-              {row.position ? <div className="sa-title">{row.position}</div> : null}
+              <InlineRichText as="div" className="sa-title" data={row.position} />
               {row.accreditations.length > 0 ? (
                 <div className="sa-accred">{row.accreditations.join('; ')}</div>
               ) : null}

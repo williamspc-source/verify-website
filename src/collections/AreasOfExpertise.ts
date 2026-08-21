@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
@@ -32,10 +33,7 @@ export const AreasOfExpertise: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    {
-      name: 'description',
-      type: 'textarea',
-    },
+    inlineRichTextField('description'),
     slugField({
       position: undefined,
     }),

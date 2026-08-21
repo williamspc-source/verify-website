@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
@@ -27,29 +28,17 @@ export const Testimonials: CollectionConfig = {
   // name; these are anonymised client quotes. `authorName` and `avatar` used to
   // exist here and were removed rather than left as controls that render nothing.
   fields: [
-    {
-      name: 'quote',
-      type: 'textarea',
-      required: true,
-      admin: { description: 'The testimonial text (no surrounding quotation marks needed).' },
-    },
-    {
-      name: 'authorRole',
-      type: 'text',
-      required: true,
+    inlineRichTextField('quote', { required: true,
+      admin: { description: 'The testimonial text (no surrounding quotation marks needed).' } }),
+    inlineRichTextField('authorRole', { required: true,
       admin: {
         description: 'Line 1 of the attribution — the position, e.g. "Senior Associate".',
-      },
-    },
-    {
-      name: 'org',
-      type: 'text',
-      label: 'Organisation and location',
+      } }),
+    inlineRichTextField('org', { label: 'Organisation and location',
       admin: {
         description:
           'Line 2 of the attribution, e.g. "Personal Injury Law Firm — Brisbane, QLD". Leave empty to show the position alone.',
-      },
-    },
+      } }),
     {
       type: 'row',
       fields: [

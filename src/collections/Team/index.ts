@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { inlineRichTextField } from '@/fields/blockFields'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
@@ -53,11 +54,7 @@ export const Team: CollectionConfig<'team'> = {
         {
           label: 'Profile',
           fields: [
-            {
-              name: 'role',
-              type: 'text',
-              admin: { description: 'e.g. "IT Manager | Lawyer".' },
-            },
+            inlineRichTextField('role', { admin: { description: 'e.g. "IT Manager | Lawyer".' } }),
             {
               name: 'photo',
               type: 'upload',
@@ -119,7 +116,7 @@ export const Team: CollectionConfig<'team'> = {
                   'Optional titled sections beyond the bio (e.g. Expertise, Affiliations).',
               },
               fields: [
-                { name: 'heading', type: 'text', required: true },
+                inlineRichTextField('heading', { required: true }),
                 { name: 'body', type: 'richText' },
               ],
             },

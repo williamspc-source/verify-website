@@ -23,7 +23,7 @@ export type RosterPerson = {
 export type SpecialtyEntry = {
   id: string
   title: string
-  description: string | null
+  description: RichTextValue
   categoryId: string | null
   keyAreas: string[]
   specialists: RosterPerson[]
@@ -141,7 +141,7 @@ export const SpecialtyClient: React.FC<{
                 <div className="vf-specialty-namerow">
                   <h3>{e.title}</h3>
                 </div>
-                {e.description ? <p className="vf-specialty-copy">{e.description}</p> : null}
+                <InlineRichText as="p" className="vf-specialty-copy" data={e.description} />
                 {showKeyAreas && e.keyAreas.length ? (
                   <div className="vf-specialty-tags">
                     {e.keyAreas.map((k) => (

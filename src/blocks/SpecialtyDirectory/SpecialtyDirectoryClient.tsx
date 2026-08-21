@@ -1,4 +1,6 @@
 'use client'
+import { type RichTextValue } from '@/utilities/lexicalText'
+import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useMemo, useState } from 'react'
 
 import { Icon } from '@/components/Icon'
@@ -15,7 +17,7 @@ export type DirectoryItem = {
   categoryId: string | null
   title: string
   iconName?: string | null
-  description?: string | null
+  description?: RichTextValue
   keyAreas: string[]
   /** Number of specialists in this specialty's roster. */
   count: number
@@ -90,7 +92,7 @@ export const SpecialtyDirectoryClient: React.FC<{
                   <span className="block font-heading text-base font-semibold">{item.title}</span>
                   {item.description ? (
                     <span className="mt-0.5 line-clamp-2 block text-sm text-muted-foreground">
-                      {item.description}
+                      <InlineRichText data={item.description} />
                     </span>
                   ) : null}
                 </span>

@@ -3,7 +3,9 @@ import type { CollectionConfig } from 'payload'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 import { slugField } from 'payload'
-import { iconField } from '@/fields/blockFields'
+import { iconField,
+  inlineRichTextField,
+} from '@/fields/blockFields'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 
 // The services VERIFY offers. One source of truth for: home service cards, the
@@ -73,12 +75,8 @@ export const Services: CollectionConfig = {
           'Optional. Point the service card at a specific URL/anchor (e.g. /services/medico-legal/reporting-services#file-review) instead of the auto-generated service page.',
       },
     },
-    {
-      name: 'shortDescription',
-      type: 'textarea',
-      label: 'Short description',
-      admin: { description: 'Card blurb shown in grids (1–2 sentences).' },
-    },
+    inlineRichTextField('shortDescription', { label: 'Short description',
+      admin: { description: 'Card blurb shown in grids (1–2 sentences).' } }),
     {
       name: 'body',
       type: 'richText',

@@ -1,12 +1,14 @@
 'use client'
 
+import { InlineRichText } from '@/components/RichText/Inline'
+import { type RichTextValue } from '@/utilities/lexicalText'
 import React, { useEffect, useMemo, useState } from 'react'
 
 export type TestimonialCard = {
   rating: number
-  quote: string
-  position?: string | null
-  orgLoc?: string | null
+  quote: RichTextValue
+  position?: RichTextValue
+  orgLoc?: RichTextValue
 }
 
 const Chevron: React.FC<{ dir: 'prev' | 'next' }> = ({ dir }) => (
@@ -73,10 +75,10 @@ export const TestimonialsClient: React.FC<{
               <div className="testimonial-quote" aria-hidden>
                 &ldquo;
               </div>
-              <div className="testimonial-text">{t.quote}</div>
+              <InlineRichText as="div" className="testimonial-text" data={t.quote} />
               <div className="testimonial-author">
-                {t.position ? <div className="testimonial-position">{t.position}</div> : null}
-                {t.orgLoc ? <div className="testimonial-org-loc">{t.orgLoc}</div> : null}
+                <InlineRichText as="div" className="testimonial-position" data={t.position} />
+                <InlineRichText as="div" className="testimonial-org-loc" data={t.orgLoc} />
               </div>
             </div>
           ))}
