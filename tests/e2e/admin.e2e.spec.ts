@@ -102,23 +102,80 @@ test.describe('Admin Panel', () => {
     await expect(contentTab).toBeVisible({ timeout: 30_000 })
     // The layout lives behind this tab. On load the form shows only the Hero
     // fields.
-    await contentTab.click()
+    // Click until the tab is actually selected, rather than once and hoping.
+    //
+    // A single click is silently lost: the button is visible and stable, so
+    // Playwright's actionability checks pass, but React has not attached its
+    // handler yet. Measured at this point in the test — `activeTab: "Hero"`,
+    // `hasLayoutField: false`, one collapsible, zero editors — and waiting a
+    // further **30 seconds** for the tab to become active never helped, because
+    // there was nothing still in flight. The click simply never happened.
+    //
+    // That was masked for months by a `waitForTimeout(300)` in the expansion loop
+    // below, which gave a later re-render time to land, so the counts came out
+    // right for the wrong reason. When the admin slowed down the mask slipped and
+    // the test began reporting 3 editors against an expected 6 — reading exactly
+    // like a page that had lost its rich-text fields. Raising that sleep to
+    // 1500ms made it pass again and would have hidden the cause a second time.
+    await expect(async () => {
+      await contentTab.click()
+      await expect(page.locator('.tabs-field__tab-button--active')).toHaveText(/Content/, {
+        timeout: 2_000,
+      })
+    }).toPass({ timeout: 30_000 })
+
+    // And the pane's own field, not just the tab's styling.
+    await expect(page.locator('[id*="field-layout"]').first()).toBeAttached({ timeout: 30_000 })
 
     // Blocks render collapsed, and a collapsed block's fields are not in the DOM
     // at all — so counting editors without expanding one reports zero on a
     // perfectly converted page. Same shape as the Tabs trap in CLAUDE.md: the
     // content is not hidden, it is absent.
+    // Converted: a Lexical editing surface. A plain text field renders an
+    // `<input>`, so this is what distinguishes "rich text" from "still a text box".
+    const editors = page.locator('[data-lexical-editor="true"]')
+
+    /**
+     * Wait until expanding a block has finished adding editors.
+     *
+     * This used to be `waitForTimeout(300)` after each click, and it began
+     * failing consistently at **3 editors** against an expected 6. Not flake and
+     * not a regression: `/about` had not been touched since the last green run,
+     * the admin had simply got slower, and 300ms stopped covering the mount.
+     * Raising the sleep to 1500ms made it pass — which is the diagnosis, not the
+     * fix, because a fixed delay is wrong in both directions.
+     *
+     * Two things had to be true and only one was obvious. Polling harder at the
+     * END does not work: measured, with the four clicks fired back to back the
+     * page settles at 3 editors and stays there for a full 30s, because the list
+     * reflows as blocks expand and a later `nth(i)` no longer resolves to the row
+     * it was counted for. So the wait has to sit BETWEEN the clicks, which is
+     * what the original sleep was really doing.
+     */
+    const settled = async () => {
+      let previous = -1
+      let stableFor = 0
+      for (let i = 0; i < 100; i++) {
+        const now = await editors.count()
+        // One matching read is not stability. The first version of this returned
+        // on the first repeat and still reported 3, because immediately after a
+        // click the count has not moved YET — so "unchanged" meant "nothing has
+        // started" rather than "everything has finished". Require a plateau.
+        stableFor = now === previous ? stableFor + 1 : 0
+        if (stableFor >= 6) return now
+        previous = now
+        await page.waitForTimeout(100)
+      }
+      return previous
+    }
+
     const toggles = page.locator('.collapsible__toggle')
     const toExpand = Math.min(await toggles.count(), 4)
     for (let i = 0; i < toExpand; i++) {
       await toggles.nth(i).click()
-      await page.waitForTimeout(300)
+      await settled()
     }
 
-    // Converted: a Lexical editing surface. A plain text field renders an
-    // `<input>`, so this is the assertion that distinguishes "rich text" from
-    // "still a text box".
-    const editors = page.locator('[data-lexical-editor="true"]')
     await expect(editors.first()).toBeVisible({ timeout: 30_000 })
     expect(await editors.count()).toBeGreaterThan(5)
 

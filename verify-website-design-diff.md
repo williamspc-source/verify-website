@@ -3303,3 +3303,79 @@ The real competitors were found by parsing the served stylesheet for rules setti
 `.why-verify--light .why-header .section-title` goes brand blue with the flag and
 stays `rgb(65, 64, 66)` without it. The comment and the guard both name it now.
 
+---
+
+## Comparison 51: a hover effect removed from tiles that were never clickable (2026-08-23)
+
+Reported from the specialist profile template: the "Online Booking Portal" band ends in three tiles —
+**Specialist Availability**, **Download CV**, **Sample Redacted Report** — that brighten under the
+pointer. *"Because they shine on hover, it looks like there's meant to be a download option, but
+there isn't one, and we won't be uploading CVs or sample reports directly to this website."*
+
+### The reference has the same flaw, and we ported it faithfully
+
+`.design-reference/specialists/profiles/*.html` renders those tiles as plain `<div>`s — no anchor, no
+button — and still declares `.portal-opt4-tile:hover { background: rgba(255,255,255,0.17) }`. So the
+misleading affordance is the reference's, not a porting mistake, and matching its *intent* here means
+not matching its *declaration*. Same family as its `ph-activity` icon, which it styles and cannot
+draw.
+
+Removed here, with the now-dead `transition: background 0.2s` alongside it. `.opt-btn-white` keeps
+its hover — that one is the real **Make an Enquiry** link.
+
+### Reach
+
+One rule, 29 places: the 26 specialist profiles (via the `SpecialistProfile` global, which the
+profile page renders with its own copy of the band's markup) plus `/specialists`,
+`/specialists/specialty-list` and `/specialists/specialist-panel` (via the `PortalCta` block).
+
+### Measured
+
+On `/specialists/profiles/dr-adam-parr`, resting against hovered:
+
+| | Before | After |
+|---|---|---|
+| `.portal-opt4-tile` | `color(srgb 1 1 1 / 0.1)` → `/ 0.17` | `/ 0.1` → `/ 0.1` |
+| `.opt-btn-white` (control) | `#fff` → `rgb(223,240,252)` | unchanged — still responds |
+
+`computedSnapshot` is **empty at 8385 nodes**: the resting state did not move. That proves nothing
+about the hover, which the harness never fires — the browser reading above is the claim, and
+`frontend.e2e.spec.ts` encodes it.
+
+**Two things had to be got right for that measurement to mean anything**, and the first attempt got
+neither. Both rules carry a transition, so a value read straight after `.hover()` is caught
+mid-flight — the first probe reported the tile changing *and* the control button not changing, and
+the control is what exposed it: a positive control that fails is a broken instrument, not a finding.
+And the pointer must be parked before each resting read, or `scrollIntoViewIfNeeded` can leave the
+element already hovered.
+
+### Nothing would have caught this, and now something does
+
+**No `referenceCssDiff` family matches `.portal-opt4*`** — `specialist-profile` matches
+`/^\.profile-(hero|avatar|…)/`. All 13 families read zero before and after, which is exactly the
+"a family's zero is scoped to its regex, not the page it is named after" trap, on a third page.
+`computedSnapshot` never fires a hover. A declaration diff cannot tell a `<div>` from a link.
+
+So the pass added `tests/visual/findFalseHover.mjs`: it parses every `:hover` rule in `globals.css`
+from disk, finds the compound that actually bears the pseudo-class (`.card:hover .title` → `.card`),
+and reports matches with no clickable element in, on or around them. Run before the fix it found
+`.portal-opt4-tile` on 5 routes — the positive control that made it trustworthy — and **15
+candidates**; after, **14**.
+
+The remaining 14 are recorded as candidates, not defects. Most are cards carrying the editor's own
+`Hover effect` setting, where the answer is a content decision rather than a CSS one.
+
+### Two unrelated things this pass had to fix to get a green run
+
+- **`admin.e2e.spec.ts` was failing before any of this**, on a clean tree, reporting 3 rich-text
+  editors against an expected 6 — which reads exactly like a page that had lost its converted
+  fields. It had not: the Content tab click was being **silently dropped** because the button was
+  visible and stable but not yet hydrated, so the test was counting the *Hero* tab's fields
+  (`activeTab: "Hero"`, `hasLayoutField: false`). A `waitForTimeout(300)` in the expansion loop had
+  masked it for months by giving a later re-render time to land; the admin got slower and the mask
+  slipped. Raising that sleep to 1500ms made it pass and would have hidden the cause again. Fixed by
+  retrying the click until the tab reports itself active.
+- **A deleted CSS rule kept being served.** The source had no `.portal-opt4-tile:hover`, and the
+  served stylesheet had two copies — so the new guard passed in isolation and failed in a full run.
+  `./stop.sh && rm -rf .next && ./start.sh`, source unchanged, and it went. The documented stale-
+  Turbopack trap, in the direction where the *old* rule survives a deletion.

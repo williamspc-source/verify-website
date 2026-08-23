@@ -30,7 +30,8 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 7 | A Service with no `linkOverride` would render a link to a page that does not exist | Latent — 0 broken links today | Only if someone adds one of the 6 override-less services to the one grid with linking on; `links.e2e.spec.ts` catches it | ~20 min + a schema change | Before anyone builds a new services grid |
 | 8 | The availability button says "Send enquiry"; form submits say "Send Enquiry" | Cosmetic | One word, one button | ~10 min + a repair | With the next copy sweep |
 | 9 | The Join the Expert Panel intro is 2–4px off, on selectors ~29 pages share | Cosmetic, 1 page | Sub-pixel to 4px on one intro band | ~15 min + re-baseline | Only with a wider type pass — the selectors are shared |
-| 10 | Two deliberate departures from the reference on the events listings | By design | None — both are improvements on the reference | — | Recorded so nobody "fixes" them back |
+| 10 | Three deliberate departures from the reference | By design | None — all three are improvements on the reference | — | Recorded so nobody "fixes" them back |
+| 10a | The portal tiles still read as instructions ("Download CV") | Yes, mild | A visitor may try to click a tile that does nothing | Editing 12 labels in the admin | Whenever you want the wording changed |
 | 11 | Photo derivatives are PNG, which costs ~1.5 MB across two pages | Yes | `/` and `/specialists` carry ~1.5 MB more than they need | 2 lines + regenerating every derivative | Its own pass — the regeneration is migration-shaped |
 | 12 | The bundled homepage shield is a 1166px PNG in a 50px box | Yes | 73 KB for a 50px logo, on every page | ~10 min | With the next asset sweep |
 | 13 | Twelve of the twenty image placeholders have no photograph | Yes | Twelve pale-blue placeholders where a photo belongs | Per photo: drop the file in and map it | As the photographs arrive |
@@ -325,7 +326,7 @@ measurement, so the `join-expert-panel` family reads zero honestly rather than b
 
 ---
 
-## 10. Two deliberate departures from the reference on the events listings
+## 10. Three deliberate departures from the reference
 
 **Decided 2026-08-19** (`verify-website-design-diff.md` Comparison 40). Both will read as *defects*
 to anyone diffing `/events/upcoming-events` or `/events/past-events` against the reference, and the
@@ -356,6 +357,45 @@ which has 2 events; `/past-events` has 14 and shows the control normally.
 Chosen because a control that cannot go anywhere is noise. *To reverse it:* delete the
 `if (pages <= 1) return null` guard — the rest of the component already matches the reference's
 `renderPagination` verbatim, disabled arrows included.
+
+**3. No hover effect on the booking-portal tiles.** *(Decided 2026-08-23,
+`verify-website-design-diff.md` Comparison 51.)* The reference declares
+`.portal-opt4-tile:hover { background: rgba(255,255,255,0.17) }`; we declare nothing, and removed the
+`transition` with it.
+
+Its tiles — Specialist Availability, Download CV, Sample Redacted Report — are non-interactive
+`<div>`s in the reference exactly as they are here, so the hover promised a click that could never
+do anything. There is no CV or sample report on this site and there will not be; those live behind
+the booking portal. The band appears on 26 specialist profiles plus `/specialists`,
+`/specialists/specialty-list` and `/specialists/specialist-panel`, so it was wrong in 29 places.
+
+This is the reference failing to execute its own intent rather than us mis-porting it — the same
+shape as its `ph-activity` icon that renders nothing. Nothing will flag a re-port: **no
+`referenceCssDiff` family matches `.portal-opt4*`** (`specialist-profile` matches
+`/^\.profile-(hero|avatar|…)/` only), which is why this entry and the comment in globals.css both
+exist. Guarded by `frontend.e2e.spec.ts` → *"nothing that cannot be clicked reacts to the pointer"*.
+
+*To reverse it:* restore the two declarations. But if the tiles ever become links, restore the hover
+**and** rewrite that guard — it asserts they are not clickable, so it would otherwise be satisfied by
+deleting the effect again.
+
+---
+
+## 10a. The portal tiles still read as instructions
+
+"Download CV" and "Sample Redacted Report" are imperative labels on tiles that cannot be clicked.
+Removing the hover (§10.3) stops them *looking* like buttons; it does not stop them *reading* like
+one, and "Download CV" still names a file this site does not serve.
+
+**Live today?** Yes. Raised on 2026-08-23 alongside the hover, with noun-phrase wording offered
+("Live Availability", "Specialist CVs", "Sample Redacted Reports"), and **declined for now** — the
+hover was the reported problem and the wording is a content decision.
+
+**User impact:** a visitor may still try to click. Lower than before, since nothing responds.
+
+**Cost of changing it:** none in code. The labels are rich-text fields an editor can edit — three on
+the **Specialist Profile** global (which feeds all 26 profiles) and three on each of the three pages
+carrying the Portal CTA block. No deploy, no migration.
 
 ---
 

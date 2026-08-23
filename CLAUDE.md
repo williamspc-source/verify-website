@@ -102,6 +102,8 @@ Every rule below is here because that failure already happened once in this repo
 | **A `defaultValue` on a rich-text field must be a FUNCTION.** `richTextDefault('…')` returns one. | Payload writes a literal default into the DDL. A string default produced `"heading" jsonb DEFAULT 'What Sets Us [[Apart]]'`, which Postgres rejects as invalid JSON; the correct Lexical object produced an *unescaped* JSON literal, so the apostrophe in "Minimising Your Client's Report Costs" closed the SQL string and killed the `CREATE TABLE` with a bare syntax error naming the table, not the field. |
 | **The compiler cannot see a component that declares its own `string` props.** `RenderBlocks` spreads a block loosely, so the lie stays inside the file and surfaces as a failed production build naming a *page*, or as React error #31 during hydration. Sweep for raw renders instead of trusting `tsc`. | `/events` returned HTTP 200 with complete, correct server HTML and then died hydrating, leaving 11 rendered nodes where there had been 425. `/specialists/specialty-list` and three profile pages each failed a build the same way, one at a time. |
 | **A field a SHARED HELPER supplies is invisible to the orphan guard unless the guard reads the helper.** `declaredFieldNames` scans a block's own `config.ts`; anything arriving through `...sectionHeaderFields` is declared in `blockFields.ts` and was never in the set being checked. It resolves the bundles now (`HELPER_BUNDLES`, derived from the module so it cannot drift), guarded by the `A-bundle` case in `prove-guards.sh`. | `textColour` was added to `sectionHeaderFields`, appeared on **26 blocks**, saved to Postgres — and **not one component passed it on**. `SectionHeader` declares a `colour` prop and a grep for `colour=` across `src/blocks`, `src/heros` and `src/components` returned exactly one file: `SectionHeader` itself, defining it. Every editor on every section heading could pick a colour and watch nothing happen, for as long as the suite reported green. Fixing the guard immediately found a **second** case in the same shape — `SpecialistDirectory.subheading`, whose own component comment says "there is no subheading" — now hidden with `admin.condition: () => false`, which is the other half of the invariant. Third instance of this family, after the common-name hole (`icon`, `title`) and one name serving two purposes in one file. |
+| **A hover effect belongs only on something that can be clicked.** A pointer response is a promise; on a `<div>` with no link in, on or around it, the promise is broken by design. Audit with `tests/visual/findFalseHover.mjs`; the portal case is guarded by `frontend.e2e.spec.ts`. | The booking-portal band's three tiles — Specialist Availability, Download CV, Sample Redacted Report — brightened on hover and did nothing, on 26 specialist profiles plus three pages. They are non-interactive `<div>`s **in the design reference too**, which still declares `.portal-opt4-tile:hover`, so a faithful port inherited the reference's own mistake. Nothing could have caught it: `computedSnapshot` never fires a hover, a declaration diff cannot tell a `<div>` from a link, and **no diff family matches `.portal-opt4*`** — a third instance of the `match`-regex trap, on a page whose family reads zero. |
+
 | **An option that renders identically to "no option" is a dead control, even when its CSS rule is perfect.** A palette guard that checks each key *has* a rule cannot see this; the check has to be that the rule makes a **difference** on a real page. Guarded by `richTextRender.e2e.spec.ts`. | `heading` and `body` resolve to `--text-dark`/`--text-mid`, which on a light band are the colours the text already is: Default and "Heading text" both computed **`rgb(65, 64, 66)`**, identical to the byte. They sat first in the dropdown, directly under "Default (as designed)" — so the first thing an editor tried was the one thing that could not show a change, and a control that had just been fixed and measured was reported broken a second time. They are last now, labelled *"Follows the band"*, and excused by name in the guard rather than by silence. |
 
 | **Payload's own JSX converters read `node.format` and ignore node state entirely.** Anything stored as Lexical NodeState — which serialises under `$` — renders only if *our* converter reads it (`nodeColorClass` in `src/components/RichText/shared.tsx`). | `TextStateFeature` puts a colour swatch in the toolbar and writes `{"$":{"color":"brand"}}` onto the text node. Registering it alone gives an editor a control that colours the text in the admin, saves cleanly, and paints nothing on the page — a brand-new instance of the failure it was added to fix. The two halves must ship together. |
@@ -440,6 +442,24 @@ Most wrong conclusions here came from a bad *measurement*, not bad code. Before 
   rule you know works (`nav.site-nav` → `position: sticky`). Do not try to read `document.styleSheets`
   — cross-sheet access throws, and a `try/catch` around it reports zero matches for *every* selector,
   including ones that are plainly applied.
+- **A deleted CSS rule can go on being SERVED.** The stale-Turbopack trap already recorded runs in
+  this direction too: `.portal-opt4-tile:hover` was gone from `globals.css` — verified by stripping
+  comments and searching the source — while the served stylesheet still carried **two** copies. The
+  new guard therefore passed in isolation and failed in a full run, which reads like a flaky test and
+  is not. `./stop.sh && rm -rf .next && ./start.sh`, source unchanged, and the served sheet went to
+  zero. When a hover/CSS assertion disagrees with itself between runs, `curl` the stylesheet the page
+  actually links and grep it before touching the test.
+- **A click on a visible, stable element can be silently dropped before hydration.** Playwright's
+  actionability checks pass — the button is there and not moving — but React has not attached its
+  handler, so nothing happens and nothing errors. `admin.e2e.spec.ts` clicked the **Content** tab,
+  never switched panes (`activeTab: "Hero"`, `hasLayoutField: false`), and went on to count the
+  *Hero* tab's fields: 3 rich-text editors against an expected 6, which reads exactly like a page
+  that lost its converted fields. Waiting 30s for the tab to activate does not help — there is
+  nothing in flight. Retry the click until the state changes (`expect(async () => { click; assert
+  })` `.toPass()`). **A `waitForTimeout(300)` had masked this for months**, by giving a later
+  re-render time to land, so the counts were right for the wrong reason; when the admin slowed the
+  mask slipped, and raising the sleep to 1500ms "fixed" it and would have hidden the cause again.
+
 - **`computedSnapshot.mjs` reporting *every* node as changed means it captured nothing, not that
   everything moved.** Its header line is the tell: `nodes: baseline 8385, now 0` followed by
   `DIFF: 8385 node(s) changed`. Seen after several back-to-back `pnpm test` and `prove-guards.sh`
@@ -986,6 +1006,15 @@ a bullet):
   exception entry ages**: `NOT_PORTED`/`EXPLAINED` reasons that cite a past measurement need the
   measurement re-run, not re-read. A skip justified by "verified equal in the browser" was once false
   and hid 11 real spacing gaps.
+- `node tests/visual/findFalseHover.mjs [--verbose]` — finds hover effects on elements nothing can
+  click. Parses every `:hover` rule in `globals.css` **from disk** (never `document.styleSheets`,
+  which throws cross-sheet and reports zero for everything), takes the compound that actually bears
+  the pseudo-class — `.card:hover .title` → `.card` — and reports matches that are not interactive,
+  contain nothing interactive and sit inside nothing interactive. Rules that *neutralise* a hover
+  (`.vf-hover-none .vf-card:hover { transform: none }`, the editor's "no hover effect" option) are
+  skipped, or the tool would tell you to delete the fix. Routes come from the sitemaps, not a
+  hand-written list. **Candidates, not a verdict** — a row highlighted for readability is legitimate.
+  Baseline 2026-08-23: 15 before the portal-tile fix, **14** after.
 - `node tests/visual/findDeadCss.mjs` — emits **candidates, not a verdict**. It has already
   produced false positives that would each have broken a live page; read the header's caveats
   before deleting any selector.

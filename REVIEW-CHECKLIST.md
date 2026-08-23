@@ -71,6 +71,13 @@ page-by-page list:
 - [ ] Press Enter in a heading: it makes a second line of the same heading, not a
       second heading
 - [ ] Nothing anywhere on the page reads `[object Object]`
+- [ ] **Nothing that cannot be clicked reacts to the mouse.** Run the pointer over
+      cards, tiles and panels: if something lifts, brightens or shifts, clicking
+      it should do something. The booking-portal tiles at the foot of a specialist
+      profile are the case that prompted this — they shone and did nothing, on 29
+      pages, because the design reference does the same. `node
+      tests/visual/findFalseHover.mjs` lists candidates; the answer for a card is
+      usually its **Hover effect** setting rather than a code change
 
 - [ ] **Header nav** — every item resolves, including any pointing at an article
 - [ ] **Footer** — nav columns, contact block, opening hours, social links

@@ -43,13 +43,13 @@ over from an earlier one:
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
 | `pnpm test:int` | **203/203**, 12 files |
-| `pnpm test:e2e` | **53/53**; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
+| `pnpm test:e2e` | **54/54**; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
 | `zsh tests/int/prove-guards.sh` | **11/11** — every guard proven to go red on its deliberate break |
 | `referenceCssDiff.mjs`, all 13 families | zero differences |
 
 > **This file owns the test counts.** They were in four documents and no two agreed; `CLAUDE.md` and
-> `README.md` now carry the commands instead. Note the e2e number cannot be counted from source: **26**
-> `test(` declarations expand to **53**, because `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
+> `README.md` now carry the commands instead. Note the e2e number cannot be counted from source: **27**
+> `test(` declarations expand to **54**, because `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
 > both parameterise one per route. Run it.
 
 > This run was against a **dev** server on `:3000` — a clean one, restarted with `.next` removed —
@@ -256,9 +256,22 @@ colour is available per *selection* as well as per element. Measured: `.vf-tc-br
 computes `rgb(28,117,188)` against a `rgb(65,64,66)` control, and `computedSnapshot`
 is empty at the same 8385 nodes because nothing is coloured until someone colours it.
 
-The next input is your pass through `REVIEW-CHECKLIST.md` — and the two colour
-lines in it are worth doing carefully, since one of them passed by eye for a
-whole pass while the control underneath it did nothing.
+**Comparison 51 (2026-08-23) removed a hover effect from tiles nothing can click.**
+The booking-portal band's three tiles brightened under the pointer and did
+nothing — on 26 specialist profiles plus three pages — because the design
+reference declares that hover on its own non-interactive `<div>`s. One CSS rule
+covered all 29. Measured: the tile went `/ 0.1` → `/ 0.17` before and `/ 0.1` →
+`/ 0.1` after, with the enquiry button unchanged as the control. Nothing in the
+suite could have caught it, so `tests/visual/findFalseHover.mjs` now audits for
+the shape; it reports **14** further candidates, mostly cards carrying the
+editor's own **Hover effect** setting, which are content decisions rather than
+defects. Two unrelated blockers were fixed to get a green run — see
+`verify-website-design-diff.md` Comparison 51.
+
+The next input is your pass through `REVIEW-CHECKLIST.md` — the two colour lines
+in it are worth doing carefully, since one of them passed by eye for a whole pass
+while the control underneath it did nothing, and there is now a line for hover
+affordances too.
 
 ### 3. Smaller known items
 

@@ -520,3 +520,91 @@ test.describe('Frontend', () => {
     expect(bands.grid, `the team grid band is ${bands.grid}`).toContain(toRgb(gridDeclared!))
   })
 })
+
+/**
+ * A hover response is a promise that a click will do something.
+ *
+ * The booking-portal band ends in three tiles — Specialist Availability,
+ * Download CV, Sample Redacted Report — which are plain `<div>`s naming what the
+ * portal offers. They used to brighten under the pointer, so they read as
+ * buttons, and clicking did nothing: there is no CV or sample report on this
+ * site. They were faithful ports — the design reference declares
+ * `.portal-opt4-tile:hover` on its own non-interactive `<div>`s — which is why
+ * nothing flagged it until someone noticed by eye, across 26 specialist profiles
+ * and three pages.
+ *
+ * Nothing else running can see this. `computedSnapshot.mjs` never fires a hover,
+ * and a declaration diff cannot tell a `<div>` from a link. Only a browser can.
+ *
+ * ── Three things this test needs to be worth anything ───────────────────────
+ *  1. **A positive control.** `.opt-btn-white` — the real "Make an Enquiry" link,
+ *     in the same band — must be asserted to CHANGE. Without it the test passes
+ *     just as happily on a page where hover never fires at all, which is the
+ *     degenerate pass the skip-link guard once shipped with.
+ *  2. **Park the pointer first.** Playwright's mouse is stationary while
+ *     `scrollIntoViewIfNeeded` moves the page underneath it, so an element can
+ *     already be hovered when its "resting" value is read. `mouse.move(4, 4)`
+ *     before every rest reading.
+ *  3. **Wait for the transition.** Written without this, the first run of this
+ *     measurement reported the tile changing AND the control button not changing
+ *     — both wrong, because a value read immediately after `.hover()` is caught
+ *     mid-flight. The tell was the control: a positive control that fails is a
+ *     broken instrument, not a finding.
+ *
+ * Proven red by restoring `.portal-opt4-tile:hover { background: color-mix(in
+ * srgb, var(--white) 17%, transparent) }` — fails naming the tile, with
+ * `color(srgb 1 1 1 / 0.17)` against a resting `/ 0.1`.
+ */
+test.describe('nothing that cannot be clicked reacts to the pointer', () => {
+  test('the booking-portal tiles do not, and the enquiry button does', async ({ page }) => {
+    await page.goto('/specialists/profiles/dr-adam-parr', { waitUntil: 'load' })
+
+    const background = (selector: string) =>
+      page.locator(selector).first().evaluate((el) => getComputedStyle(el).backgroundColor)
+
+    /** Poll until the value stops moving, so a transition is never read mid-flight. */
+    const settled = async (selector: string) => {
+      let previous = await background(selector)
+      for (let i = 0; i < 40; i++) {
+        await page.waitForTimeout(50)
+        const now = await background(selector)
+        if (now === previous) return now
+        previous = now
+      }
+      return previous
+    }
+
+    const measure = async (selector: string) => {
+      const el = page.locator(selector).first()
+      await el.scrollIntoViewIfNeeded()
+      await page.mouse.move(4, 4)
+      const rest = await settled(selector)
+      await el.hover()
+      const hover = await settled(selector)
+      await page.mouse.move(4, 4)
+      return { rest, hover }
+    }
+
+    const tile = page.locator('.portal-opt4-tile').first()
+    await expect(tile, 'no booking-portal tile on this profile').toBeVisible()
+
+    // The tiles must not be links either — if one ever becomes clickable, a hover
+    // response is correct and this whole test should be rewritten rather than
+    // silently kept passing by removing the effect again.
+    expect(
+      await tile.evaluate((el) => !!(el.closest('a[href], button') || el.querySelector('a[href], button'))),
+      'a portal tile is now clickable — it should have a hover effect, and this guard needs rewriting',
+    ).toBe(false)
+
+    const button = await measure('.opt-btn-white')
+    expect(button.hover, 'the enquiry button did not respond to hover — the measurement is broken, not the page').not.toBe(
+      button.rest,
+    )
+
+    const tileColour = await measure('.portal-opt4-tile')
+    expect(
+      tileColour.hover,
+      'a booking-portal tile brightens on hover, so it reads as a button — and nothing happens when it is clicked',
+    ).toBe(tileColour.rest)
+  })
+})
