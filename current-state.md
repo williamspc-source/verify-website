@@ -21,7 +21,7 @@ section below points at the document that owns the detail.
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
 | `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 53 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 54 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -42,7 +42,7 @@ carried over from an earlier one:
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **205/205**, 12 files — but **fails intermittently** on a schema-push race, measured 2 runs in 3; see `OUTSTANDING.md` §24 |
+| `pnpm test:int` | **205/205**, 12 files — measured 5 runs in 5 after the identifier fix, where it previously failed 1–2 in 3 |
 | `pnpm test:e2e` | **61/61**; `admin.e2e.spec.ts` and `links.e2e.spec.ts` still flake under a full run on a *dev* server — `OUTSTANDING.md` §2 |
 | `zsh tests/int/prove-guards.sh` | **11/11** — every guard proven to go red on its deliberate break |
 | `referenceCssDiff.mjs`, all 13 families | zero differences |

@@ -232,9 +232,13 @@ describe('admin controls are wired', () => {
    * Pattern A, corollary — a field name that is a PREFIX of a field the component
    * already reads must not satisfy the guard.
    *
-   * `PeopleGrid` declares `assessmentType` (the filter) and reads
-   * `sp.assessmentTypes` (the specialist's own tags) in the same file. If
-   * `readsField` matched on prefix, the filter would look consumed no matter what
+   * `PeopleGrid` declares `asmtType` (the filter) and reads `sp.assessmentTypes`
+   * (the specialist's own tags) in the same file. The two now share no prefix at
+   * all — the field was shortened because its foreign key overran Postgres's
+   * 63-character limit — but the boundary this asserts is what made the ORIGINAL
+   * singular/plural pair safe, and it is what any future rename must preserve. If
+   * `readsField` matched on prefix, a filter named for its plural sibling would
+   * look consumed no matter what
    * — the shape that makes `icon` and `title` permanently invisible to Pattern A,
    * and that let `Accreditations.icon` ship reading nothing.
    *
@@ -245,8 +249,8 @@ describe('admin controls are wired', () => {
    *
    * ── What this does NOT cover, measured ──
    * Pattern A cannot tell "read" from "destructured and then ignored". Deleting
-   * the whole `assessmentType` query from PeopleGrid/Component.tsx leaves the
-   * `assessmentType,` line in the props destructure, which satisfies the
+   * the whole `asmtType` query from PeopleGrid/Component.tsx leaves the
+   * `asmtType,` line in the props destructure, which satisfies the
    * `[{,] name [,}:=]` alternative — so **Pattern A stayed green on a genuinely
    * dead field**. `tsc --noEmit` also passed; ESLint reported it, but only as a
    * *warning*, and `pnpm lint` exits 0 on warnings, so `pnpm test` was green too.
@@ -259,11 +263,11 @@ describe('admin controls are wired', () => {
     expect(readsField('sp.assessmentTypes.map(t => t.id)', 'assessmentType')).toBe(false)
     expect(readsField('const { assessmentTypes } = doc', 'assessmentType')).toBe(false)
     // Positive control, in the two forms the field is genuinely read in: the props
-    // destructure, and a member access. `if (assessmentType)` on its own is NOT
+    // destructure, and a member access. `if (asmtType)` on its own is NOT
     // one of readsField's four patterns — an earlier version of this control used
     // it, asserted true, and failed, which is the check working.
-    expect(readsField('const { specialty, assessmentType, department } = props', 'assessmentType')).toBe(true)
-    expect(readsField('block.assessmentType', 'assessmentType')).toBe(true)
+    expect(readsField('const { specialty, asmtType, department } = props', 'asmtType')).toBe(true)
+    expect(readsField('block.asmtType', 'asmtType')).toBe(true)
   })
 
   /**

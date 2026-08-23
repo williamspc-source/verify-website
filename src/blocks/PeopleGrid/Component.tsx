@@ -82,7 +82,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     featuredOnly,
     specialty,
     location,
-    assessmentType,
+    asmtType,
     department,
     groupByDepartment,
     people,
@@ -179,10 +179,10 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     // their carousels. Verified against the REST API before this was written —
     // the failure mode is an empty result, and an empty result returns null below
     // and deletes the whole band, heading and buttons included.
-    if (assessmentType)
+    if (asmtType)
       and.push({
         assessmentTypes: {
-          equals: typeof assessmentType === 'object' ? assessmentType.id : assessmentType,
+          equals: typeof asmtType === 'object' ? asmtType.id : asmtType,
         },
       })
     const res = await payload.find({

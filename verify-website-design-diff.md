@@ -3529,8 +3529,64 @@ All 13 `referenceCssDiff` families still zero. `findFalseHover` still 14. e2e 61
 ### The defect this pass surfaced but did not cause
 
 `pnpm test:int` now fails intermittently — 2 runs in 3, against 0 in 3 on the previous commit. The
-cause is `e6b789a`: `PeopleGrid.assessmentType` generates a 69-character foreign-key name against
-Postgres's 63-character limit, so Drizzle recreates the constraint on every boot and parallel test
-boots race it. The extra tables here merely widened the window. `dbName` is not the fix — Payload
-3.85 rejects it on a relationship field, and trying it broke `pnpm build`. Recorded as
-`OUTSTANDING.md` §24, with §25 covering the deliberate soft-navigation fallback.
+cause is `e6b789a`: `PeopleGrid.assessmentType` generated a 69-character foreign-key name against
+Postgres's 63-character limit, so Drizzle recreated the constraint on every boot and parallel test
+boots raced it. The extra tables here merely widened the window. `dbName` is not the fix — Payload
+3.85 rejects it on a relationship field, and trying it broke `pnpm build`.
+
+**Fixed in the following commit** by renaming the field to `asmtType`; see Comparison 54.
+`OUTSTANDING.md` §25 still covers the deliberate soft-navigation fallback.
+
+---
+
+## Comparison 54: a field renamed so Postgres stops rewriting the schema (2026-08-23)
+
+No rendering change — recorded because the cause is a trap any future relationship field can fall
+into, and because it was twice misdiagnosed before it was measured.
+
+### The defect
+
+`PeopleGrid.assessmentType` (added in Comparison 52) produced a foreign key of **69 characters**:
+
+```
+_pages_v_blocks_people_grid_assessment_type_id_assessment_types_id_fk
+```
+
+Postgres truncates identifiers at 63, so Drizzle never found the name it generates and **dropped and
+recreated the constraint on every boot**. Vitest boots Payload per test file in parallel, so two
+boots raced that DDL and one died with `42704 undefined_object`. `pnpm test:int` failed 1–2 runs in 3.
+
+**It was dismissed twice as "the environment"** before anyone measured it. What settled it was
+reading the constraint's oid across boots: 1674921 → 1674968 → 1675016. A name that merely *looks*
+long proves nothing; an oid that changes proves the schema is being rewritten.
+
+### The fix, and the one that did not work
+
+`dbName: 'asmt_type'` looked like the obvious answer and **is not available** — Payload 3.85 rejects
+it on a relationship field. It was added, `tsc` was not re-run afterwards, and it broke `pnpm build`.
+That is its own lesson: re-run the check you already ran after changing the thing it checked.
+
+The field is renamed `assessmentType` → `asmtType` (column `asmt_type_id`, 12 characters), with
+`label: 'Assessment Type'` so the admin is unchanged. The budget is worth stating because it applies
+to every future relationship on a block:
+
+> 63 − `_pages_v_blocks_people_grid` (27) − `assessment_types` (16) − `_id_fk` (6) − 2 separators
+> = **12 characters for the column**.
+
+### Verification
+
+**The oid held still across three boots** (1676899 and 1676904, unchanged), and both names now end in
+a full `_id_fk` rather than a truncated `_types`. `pnpm test:int` passed **5 runs in 5**, against
+1–2 failures in 3 before.
+
+`/jme` still lists the same eight JME-tagged specialists, which is what the renamed field drives.
+`computedSnapshot`: node count identical at 8349, and the handful of differing nodes moved between
+two consecutive compares — the documented noise, not a change.
+
+### An unrelated flake this surfaced, and fixed
+
+`tryBooking.e2e.spec.ts` began failing **only in full runs**, passing alone and alongside
+`admin.e2e.spec.ts`. The tell was a long *"Pulling schema from database…"* spinner: both specs boot
+Payload in-process, and under the load of all 61 tests that boot exceeds Playwright's default 30s
+hook timeout — failing with no assertion error, which reads like a broken test rather than a slow
+one. The hooks now carry a timeout sized to the real work. Full e2e: **61/61, twice**.

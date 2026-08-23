@@ -73,19 +73,31 @@ export const PeopleGrid: Block = {
       type: 'row',
       admin: { condition: sourceIs('specialists') },
       fields: [
-        // Singular here, plural on the Specialist record — the same asymmetry
-        // `location` → `locations` above already has, and deliberate: the orphan
-        // guard's readsField matches `.assessmentType\b`, which a read of
-        // `sp.assessmentTypes` does NOT satisfy. Naming this field plural would
-        // make it permanently invisible to that guard, the way `icon` and `title`
-        // already are.
+        // Abbreviated, and NOT for tidiness — the full name does not fit.
+        //
+        // Drizzle names a foreign key `<table>_<column>_<reftable>_id_fk`, and
+        // Postgres truncates identifiers at 63 characters. On the version shadow
+        // that budget is 63 − 27 (`_pages_v_blocks_people_grid`) − 16
+        // (`assessment_types`) − 6 (`_id_fk`) − 2 separators = **12 characters
+        // for the column**. `assessment_type_id` is 18, so the name was truncated,
+        // Drizzle never found the one it wanted, and it dropped and recreated the
+        // constraint on EVERY boot — measured by the oid changing on each
+        // `getPayload()`. Two boots racing that DDL fail with `42704`, which is
+        // what made `pnpm test:int` fail one run in three. `asmt_type_id` is 12.
+        // `dbName` is not a way out: Payload 3.85 rejects it on a relationship
+        // field and `pnpm build` fails to type check.
+        //
+        // Still singular against the Specialist's plural `assessmentTypes`, and
+        // still sharing no prefix with it, so the orphan guard's `\b` boundary can
+        // tell them apart — the reason the original name was singular.
         //
         // Without this filter a service page could only reach specialists by
         // specialty or location, neither of which answers "who performs this kind
         // of assessment" — so /jme listed the first ten specialists alphabetically
         // under a heading promising the ones who conduct JMEs.
         {
-          name: 'assessmentType',
+          name: 'asmtType',
+          label: 'Assessment Type',
           // NOTE: this column's foreign key hits Postgres's 63-character
           // identifier limit on the `_pages_v` shadow table, so Drizzle drops and
           // recreates the constraint on every boot (measured: the oid changes each

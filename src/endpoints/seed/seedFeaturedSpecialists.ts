@@ -205,7 +205,7 @@ export const repairFeaturedSpecialists = async (ctx: Ctx): Promise<void> => {
     return
   }
 
-  const jme = await patchPeopleGrid(ctx, 'jme', { assessmentType: jmeType.id })
+  const jme = await patchPeopleGrid(ctx, 'jme', { asmtType: jmeType.id })
   if (jme === 'written') {
     payload.logger.info(
       `— Repaired /jme: specialist carousel limited to the ${jmeCount.totalDocs} JME-accredited specialists`,

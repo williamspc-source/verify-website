@@ -32,7 +32,18 @@ const EVENT_ID = '1525708'
 
 let pageId: number | string | undefined
 
+// Both hooks boot Payload in-process, and a boot runs a dev schema pull — visible
+// in a full run as a long "Pulling schema from database…" spinner. Under the load
+// of all 61 specs that comfortably exceeds Playwright's default 30s hook timeout,
+// and the spec then fails with no assertion error, which reads like a broken test
+// rather than a slow one. Measured: this file passes alone and alongside
+// admin.e2e.spec.ts, and failed only in the full run. The timeout is sized to the
+// real work rather than masking anything — see OUTSTANDING.md §22 on Payload's
+// boot cost being load-bearing in the suite.
+const PAYLOAD_BOOT_TIMEOUT = 120_000
+
 test.beforeAll(async () => {
+  test.setTimeout(PAYLOAD_BOOT_TIMEOUT)
   pageId = await createPageWithBlock(SLUG, {
     blockType: 'tryBooking',
     eventId: EVENT_ID,
@@ -41,6 +52,7 @@ test.beforeAll(async () => {
 })
 
 test.afterAll(async () => {
+  test.setTimeout(PAYLOAD_BOOT_TIMEOUT)
   if (pageId) await cleanupPage(pageId)
 })
 
