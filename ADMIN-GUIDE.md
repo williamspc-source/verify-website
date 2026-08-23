@@ -262,7 +262,31 @@ changes it on every specialist who holds it, and it doubles as a filter on the s
 Leave the **Position line** empty and the specialty is used instead, so the line under a name is never
 blank. `HOOKS.md` §9 covers changing the icons themselves.
 
-**You can drag to reorder** this list; the order is used on the panel page.
+**You can drag to reorder** this list; the order is used on the panel page — and it is also the order
+the carousels below render in, so a carousel has no "first" you can set except by dragging here.
+
+**Three different things decide which carousel a specialist appears in**, and they are independent.
+Two are tickboxes in the sidebar of their profile; the third is a taxonomy pick.
+
+| Setting | Where it is | What it drives |
+|---|---|---|
+| **Featured** | Specialist profile, sidebar | The homepage's *Meet Our Expert Panel* carousel |
+| **Feature in availability carousel** (advertise) | Specialist profile, sidebar | The carousel at the top of *Make a Booking* and *Specialist Availability* |
+| **Assessment Types** | Specialist profile — see Taxonomy above | Which service page carousels they appear in, e.g. tagging *Joint Medical Examination (JME)* puts them on the JME page |
+
+They deliberately do not have to agree. Someone can be Featured on the homepage without being
+advertised for booking, and vice versa.
+
+> **The list below the Make a Booking carousel is a fourth thing again**, and the tickbox does not
+> control it. That list is built purely from **Availability Sessions** — a specialist appears in it
+> only while they have a session that is available, dated today or later, and not past its
+> *Advertise until* date. So an advertised specialist with no sessions shows in the carousel and not
+> in the list, which is correct and is what Dr Beer does today.
+
+**If a carousel disappears entirely, this is why.** A carousel that filters to nobody renders
+*nothing* — the whole band goes, including its heading and buttons. Untick the last Featured
+specialist and the homepage section vanishes rather than showing an empty space. The fix is always to
+tick someone, not to hunt for the missing section.
 
 **Draft or instant:** has a Draft/Published toggle — saving as a draft removes them from the site.
 

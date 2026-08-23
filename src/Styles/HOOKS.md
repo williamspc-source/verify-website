@@ -568,6 +568,27 @@ while anything inside has keyboard focus; that is deliberate and not something y
 Arrows and dots also hide themselves automatically when there is only one item to show, whatever the
 tickbox says.
 
+### Which specialists a carousel shows
+
+Not a styling question, but it is the one people ask next, and the answer is not in the block.
+
+A **People Grid** set to *Specialists* shows **everyone** unless you narrow it. The four narrowing
+options sit together on the block:
+
+| Option | Shows |
+|---|---|
+| **Only featured specialists** | Those with **Featured** ticked on their profile — the homepage carousel uses this |
+| **Only advertised specialists** | Those with **Feature in availability carousel** ticked |
+| **Specialty** / **Location** | Those carrying that one specialty or location |
+| **Assessment Type** | Those whose profile lists it — the JME page uses this, so tagging a specialist with *Joint Medical Examination (JME)* puts them on that page with no other edit |
+
+> **A carousel that matches nobody renders nothing at all** — the whole band goes, heading and
+> buttons with it, rather than leaving an empty space. So if a section has vanished, check the filter
+> before checking the CSS. Untick the last Featured specialist and the homepage section disappears.
+
+Changing *who* is on a profile — Featured, the availability tick, the Assessment Types list — is
+`ADMIN-GUIDE.md` → **Specialists**. This section only owns how the ribbon looks and moves.
+
 ### Step numbers can be `1` or `01`
 
 **Pages → the page → the Process Steps block → Step number style.** The design uses both, so this is

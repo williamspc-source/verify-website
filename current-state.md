@@ -1,6 +1,6 @@
 # Current state
 
-**Snapshot: 2026-08-21.** Where the project actually stands — what is working, what is not, and what
+**Snapshot: 2026-08-23.** Where the project actually stands — what is working, what is not, and what
 has to happen to get it onto the box. Written for the person driving the work, not as a handover.
 
 This file is a **status snapshot**, not a reference. It deliberately does not restate architecture,
@@ -21,7 +21,7 @@ section below points at the document that owns the detail.
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
 | `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 49 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 52 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -35,15 +35,15 @@ One application serves both the public site and `/admin`.
 
 ## What is working well
 
-**The build is green on every gate.** Re-measured 2026-08-21 after the text-colour pass, not carried
-over from an earlier one:
+**The build is green on every gate.** Re-measured 2026-08-23 after the specialist-carousel pass, not
+carried over from an earlier one:
 
 | Gate | Result |
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
 | `pnpm lint` | clean — no errors, no warnings, no new suppressions |
-| `pnpm test:int` | **203/203**, 12 files |
-| `pnpm test:e2e` | **54/54**; `admin.e2e.spec.ts` still flakes under a full run on a *dev* server — `OUTSTANDING.md` §2 |
+| `pnpm test:int` | **204/204**, 12 files |
+| `pnpm test:e2e` | **57/57**; `admin.e2e.spec.ts` and `links.e2e.spec.ts` still flake under a full run on a *dev* server — `OUTSTANDING.md` §2 |
 | `zsh tests/int/prove-guards.sh` | **11/11** — every guard proven to go red on its deliberate break |
 | `referenceCssDiff.mjs`, all 13 families | zero differences |
 
@@ -99,15 +99,15 @@ That produces a single `CREATE TABLE` migration: no drops, no type conversions, 
 nothing to hand-review for data loss. **Do it last**, once the polishing work has stopped changing
 fields — a superseded migration file in `src/migrations/` is a trap, because someone will run it.
 
-Current drift, re-measured 2026-08-21 (`verify_cms` against the checked-in baseline):
+Current drift, re-measured 2026-08-23 (`verify_cms` against the checked-in baseline):
 
 | | Baseline | Now |
 |---|---|---|
-| Columns | 3207 | 3518 |
+| Columns | 3207 | 3572 |
 | Tables | 301 | 308 |
-| Indexes | 946 | 1295 |
+| Indexes | 946 | 1297 |
 
-At column level that is **323 added and 12 removed** — six of the twelve are the department columns
+At column level that is **377 added and 12 removed** — six of the twelve are the department columns
 moving to the Departments taxonomy, which is a change of shape rather than a loss. The commands that
 re-take all of this (psql counts, then a column-level ADDED/REMOVED diff against the baseline JSON)
 are in `OUTSTANDING.md` §1, which is otherwise a superseded record: the twelve drops are exactly why

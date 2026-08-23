@@ -814,6 +814,10 @@ export const seedServices = async (ctx: Ctx): Promise<void> => {
         background: 'primary',
         cssClass: ['svc-glow-band'],
         source: 'specialists',
+        // `assessmentType` is set by `repairFeaturedSpecialists`, not here: it
+        // needs the JME taxonomy row's id, which is resolved by slug at run time
+        // rather than hardcoded (a deleted-and-reseeded row returns with a new
+        // one). The repair is unconditional, so a fresh install is covered too.
         layout: 'carousel',
         limit: 10,
         linkProfiles: true,

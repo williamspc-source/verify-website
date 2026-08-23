@@ -488,6 +488,11 @@ export const seedHomepage = async ({ payload, req }: Ctx): Promise<void> => {
       // --band-muted (#f5f6f8), which is correct for the gateway band above.
       cssClass: ['band-grey-deep'],
       source: 'specialists',
+      // `featuredOnly` is deliberately NOT set here. It is written by
+      // `repairFeaturedSpecialists`, which flags the specialists first — setting
+      // the filter in this fixture would turn it on before any specialist carries
+      // the flag, and a People Grid matching nothing returns null and removes the
+      // whole band. The repair is unconditional, so a fresh install still gets it.
       layout: 'carousel',
       limit: 8,
       linkProfiles: true,

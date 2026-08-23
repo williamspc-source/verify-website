@@ -29,6 +29,7 @@ import {
   repairMedicalNegligenceRemoval,
 } from './seed/seedServices'
 import { repairSpecialistIcons } from './seed/seedSpecialistIcons'
+import { repairFeaturedSpecialists } from './seed/seedFeaturedSpecialists'
 import { repairForClientsCards } from './seed/seedForClients'
 import { repairFaqVariants } from './seed/repairFaqVariants'
 import { repairHeroCopy } from './seed/repairHeroCopy'
@@ -1172,6 +1173,7 @@ export const seedVerify = async ({
   await repairServicesFeatureIcon({ payload, req })
   await repairImeFormatsCardStyle({ payload, req })
   await repairJmeSpecialistCarousel({ payload, req })
+  await repairFeaturedSpecialists({ payload, req })
   await repairCompactProcessSteps({ payload, req })
   await repairReportingSplitVariants({ payload, req })
   await repairMedicalNegligenceRemoval({ payload, req })

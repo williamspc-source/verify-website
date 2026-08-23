@@ -43,6 +43,7 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 20 | The toolbar colour swatch rides an `@experimental` Payload API | Live and working | None today; a Payload upgrade could remove the control, never the content | ~20 lines to rebuild or drop back | Re-check on every Payload upgrade |
 | 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~40 lines **+ two pinned Lexical deps** | Only with the pin guarded |
 | 22 | Payload boots in ~7s, and two specs were silently skipped for it | Dev/test only | A suite can report green while checking nothing | Unknown | Watch the admin, not the boot |
+| 23 | `Specialists.availabilityHighlight` is written by the seed and read by nothing | No | None — hidden from the admin | ~5 min **+ a destructive DDL by hand** | Fold into the fresh baseline, not before |
 | 19 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min for an unlisted style-guide page | A decision — doing nothing is defensible |
 
 ---
@@ -744,7 +745,50 @@ not about which migration you generate:
   empty database sidesteps this — but the moment there is data, it applies again.
 
 **Cost of the fresh baseline:** ~20 minutes, and it is the deploy's critical path. The measured drift
-against the old baseline — 3518 columns against 3207, 308 tables against 301, 1295 indexes against
-946, with 323 columns added and the 12 above removed (2026-08-21) — is now only useful as a sense of
+against the old baseline — 3572 columns against 3207, 308 tables against 301, 1297 indexes against
+946, with 377 columns added and the 12 above removed (2026-08-23) — is now only useful as a sense of
 how far the two had diverged. `current-state.md` §1 carries the live numbers and the commands that
 re-take them.
+
+---
+
+## 23. `Specialists.availabilityHighlight` is written on every seed run and read by nothing
+
+Found while tracing which flag drives which specialist carousel (Comparison 52).
+
+**What it is.** A checkbox on every specialist, hidden from the admin (`admin.hidden: true`) and
+carrying a comment in `src/collections/Specialists/index.ts` saying it is deprecated — superseded by
+`advertise` for the carousel and by the Availability Sessions collection for the list beneath it.
+
+**Why it is not simply dead code.** `seedAvailability.ts` still writes it on **every** run:
+
+```ts
+data: { advertise: true, availabilityHighlight: highlight, availabilityNote: 'Call to book' }
+```
+
+so the column is actively maintained with values nothing consumes. Measured: four specialists carry
+`true`, and a repo-wide search for a read outside the seed and the generated types returns **nothing**.
+
+**The orphan-field guard already knows.** It is not a hole — `adminControls.int.spec.ts` names both
+this field and its sibling `availabilityNote` in the collection allowlist, each with a reason:
+
+```
+availabilityHighlight: 'deprecated, admin.hidden — superseded by `advertise`',
+```
+
+which is the guard working as designed. The point of this entry is not that something slipped past a
+check, but that an *allowlisted* field is still a real column being written on every seed run, and
+an allowlist entry is a deferral rather than a resolution. Worth recording so the deferral is visible
+somewhere other than a test file.
+
+**Impact: none.** No editor can see it, and no page reads it. It costs one boolean column on
+`specialists` and on `_specialists_v`.
+
+**Cost of fixing it.** Removing the field is a *destructive* schema change, which stops the dev push
+on the invisible "Accept warnings?" prompt and takes the whole local site down until it is applied by
+hand in `psql` — the failure mode CLAUDE.md records twice, most recently from removing a field added
+ten minutes earlier. Not worth doing on its own.
+
+**Recommendation.** Delete the field and the seed's write **in the same pass as the fresh baseline**
+(`current-state.md` §1), where the column simply never gets created and no ALTER is needed. Doing it
+before that means paying for a hand-applied DDL to remove something nobody can see.

@@ -6077,6 +6077,10 @@ export interface PeopleGridBlock {
    */
   location?: (number | null) | Location;
   /**
+   * Optional — limit to specialists who perform this assessment type (set on their profile).
+   */
+  assessmentType?: (number | null) | AssessmentType;
+  /**
    * Optional — limit to one department.
    */
   department?: (number | null) | Department;
@@ -16087,6 +16091,7 @@ export interface PeopleGridBlockSelect<T extends boolean = true> {
   featuredOnly?: T;
   specialty?: T;
   location?: T;
+  assessmentType?: T;
   department?: T;
   groupByDepartment?: T;
   people?: T;

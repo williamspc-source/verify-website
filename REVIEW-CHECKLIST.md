@@ -114,7 +114,9 @@ page-by-page list:
       - [ ] **Button** (1 links)
     - [ ] Column 2 of 2
       - [ ] **Specialty Grid** (auto, checklist)
-- [ ] **People Grid** — "Meet Our Expert Panel" (specialists, carousel)
+- [ ] **People Grid** — "Meet Our Expert Panel" (specialists, carousel, **Featured only**)
+  - [ ] Exactly seven: Beer, Fox, Garg, Lenardon, Murphy, Perkins, Reidy — and **no one else**
+  - [ ] The band is there at all. A filter matching nobody removes the whole section, heading and buttons included, with no gap left behind.
 - [ ] **Testimonials** — "What Our Clients Say" (auto, carousel)
 - [ ] **Section** (#contact)
   - [ ] **Row**
@@ -254,6 +256,8 @@ review a hidden section's wording, untick "Hide this section when it has nothing
 - [ ] **Hero** (pageHero) — "Make a Booking" — subtitle, breadcrumb
 - [ ] **Booking Chooser** (2 halves)
 - [ ] **Availability**
+  - [ ] Carousel = the six with *Feature in availability carousel* ticked: Beer, Garg, Lenardon, Murphy, Perkins, Reidy
+  - [ ] The session list **below** it is a different set — only those with live sessions, so Beer is correctly in the carousel and not in the list
 - [ ] **CTA Band** — "Ready to Book Your Next Appointment with VERIFY?" (2 links)
 
 ### Privacy Policy  
@@ -316,7 +320,9 @@ review a hidden section's wording, untick "Hide this section when it has nothing
 - [ ] **Split Feature** (1 rows)
 - [ ] **Feature Grid** (3 items)
 - [ ] **Feature Grid** — "The Benefits of a Joint Approach" (6 items)
-- [ ] **People Grid** — "Specialists Who Conduct JME Assessments" (specialists, carousel)
+- [ ] **People Grid** — "Specialists Who Conduct JME Assessments" (specialists, carousel, **Assessment Type = JME**)
+  - [ ] Every name shown has *Joint Medical Examination (JME)* on their profile — the heading is a promise, and this page used to list the first ten alphabetically
+  - [ ] Lenardon is present (tagged) and Karpa is absent (not tagged)
 - [ ] **Process Steps** — "The JME Process, Step by Step" (5 steps, cards)
 - [ ] **FAQ** — "Common Questions About JMEs" (5 items)
 - [ ] **CTA Band** — "Ready to Refer Your Next Matter to VERIFY?" (2 links)

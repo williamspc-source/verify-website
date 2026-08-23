@@ -3379,3 +3379,84 @@ The remaining 14 are recorded as candidates, not defects. Most are cards carryin
   served stylesheet had two copies — so the new guard passed in isolation and failed in a full run.
   `./stop.sh && rm -rf .next && ./start.sh`, source unchanged, and it went. The documented stale-
   Turbopack trap, in the direction where the *old* rule survives a deletion.
+
+---
+
+## Comparison 52: three specialist carousels pointed at a real selection (2026-08-23)
+
+The homepage's **Meet Our Expert Panel** and /jme's **Specialists Who Conduct JME Assessments** were
+both showing the alphabet. Not a styling gap — a data one, and invisible to every tool in this repo,
+because a list of the wrong people renders exactly as well as a list of the right ones.
+
+### What was actually wrong
+
+`PeopleGrid` builds no `where` clause when its filters are unset:
+
+```ts
+if (onlyAdvertised) and.push({ advertise: { equals: true } })
+if (featuredOnly)  and.push({ featured:  { equals: true } })
+…
+limit: lim ?? 8, sort: '_order'
+```
+
+Both blocks had every filter empty, so each returned the first N specialists in admin drag order.
+Measured before the change:
+
+| Page | Rendered | Should have been |
+|---|---|---|
+| `/` | Beer, Davidson, Donnelly, Doyle, English, Erzetic, Fox, Garg | the seven Featured |
+| `/services/medico-legal/jme` | Beer, Davidson, Donnelly, Doyle, English, Erzetic, Fox, Garg, Hodge, Karpa | the eight tagged for JME |
+
+**Three of the ten on the JME page were tagged for JME.** Five who were tagged — Lenardon, Murphy,
+Parr, Sabet, Ulahannan — did not appear at all, under a heading naming them as the people who conduct
+those assessments.
+
+### The two halves of the fix
+
+**The homepage had a control and no data.** "Only featured specialists" was wired correctly, but
+`Specialists.featured` was `false` on all 26 and nothing in the seed had ever written it. So the
+control was not merely useless — ticking it would have hit `if (cards.length === 0) return null` and
+removed the entire band, heading, subheading and both footer buttons, with no error anywhere. The
+seed now asserts the flag on seven specialists, and `repairFeaturedSpecialists` writes the flags
+**before** the filter and refuses to set the filter at all if the count is zero.
+
+**The JME page had data and no control.** Every specialist already carries an `assessmentTypes`
+relationship and eight were tagged *Joint Medical Examination (JME)* — the site knew the answer.
+`PeopleGrid` simply offered no filter on that axis, only Specialty and Location, so no editor could
+reach it. Adding `assessmentType` makes the page self-maintaining: tag a specialist and they appear,
+with no code change. The same lever now serves any service page that wants a panel.
+
+`equals` against a hasMany relationship was **verified against the REST API before** the field was
+written, not assumed — the failure mode is an empty result, and an empty result deletes the band.
+
+### Make a Booking: examined, correctly left alone
+
+Its carousel is hardcoded to `advertise: true`, and `seedAvailability`'s `ADVERTISED` table sets that
+flag *unconditionally* — the loop sits above the `if (existing.totalDocs > 0) return`, so it
+re-asserts on every run and already reached a fresh install. The list **below** the carousel is a
+different query again, driven purely by Availability Sessions, which is why Dr Beer is correctly in
+the carousel and not in the list. The work here was a guard, not a change.
+
+### What moved
+
+`computedSnapshot`: **38 nodes over exactly two routes** — `/services/medico-legal/jme` (25) and `/`
+(13) — read from a baseline-to-after JSON diff rather than the printed output, which truncates. The
+printed run additionally showed one node each on `/about/team/wes-lerch` and
+`/information-centre/for-clients`; both are the documented `.vf-section__inner` margin flip, and both
+are **absent** from the JSON diff, which is what confirms them as noise rather than argues it.
+
+All 13 `referenceCssDiff` families still zero (read from the verdict line). `findFalseHover` still
+14. No CSS changed in this pass at all.
+
+### The guard hole this found
+
+Deleting the whole `assessmentType` query to prove the new e2e red also proved something unwelcome:
+**the orphan-field guard stayed green.** The `assessmentType,` line in the props destructure
+satisfies `readsField`'s destructuring alternative, so a field can be destructured and then entirely
+ignored without Pattern A noticing. `tsc --noEmit` passed too, and ESLint reported it only as a
+*warning* — which `pnpm lint` exits 0 on, so `pnpm test` was green on a dead control.
+
+The e2e is what goes red. This is a third shape of a family CLAUDE.md already records twice (the
+common-name hole, and one name serving two purposes in one file): here the guard is not fooled by a
+coincidental match but by the declaration of intent to read. Recorded in the Invariants table rather
+than fixed — widening Pattern A would touch every block.

@@ -82,6 +82,7 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     featuredOnly,
     specialty,
     location,
+    assessmentType,
     department,
     groupByDepartment,
     people,
@@ -173,6 +174,17 @@ export const PeopleGridBlock: React.FC<Props & { bare?: boolean }> = async (prop
     if (featuredOnly) and.push({ featured: { equals: true } })
     if (specialty) and.push({ specialty: { equals: typeof specialty === 'object' ? specialty.id : specialty } })
     if (location) and.push({ locations: { equals: typeof location === 'object' ? location.id : location } })
+    // `equals` against a hasMany relationship matches "contains", which is what is
+    // wanted: a specialist tagged with several assessment types belongs in each of
+    // their carousels. Verified against the REST API before this was written —
+    // the failure mode is an empty result, and an empty result returns null below
+    // and deletes the whole band, heading and buttons included.
+    if (assessmentType)
+      and.push({
+        assessmentTypes: {
+          equals: typeof assessmentType === 'object' ? assessmentType.id : assessmentType,
+        },
+      })
     const res = await payload.find({
       collection: 'specialists',
       overrideAccess: false,

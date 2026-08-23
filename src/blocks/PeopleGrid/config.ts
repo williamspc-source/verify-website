@@ -69,6 +69,33 @@ export const PeopleGrid: Block = {
         },
       ],
     },
+    {
+      type: 'row',
+      admin: { condition: sourceIs('specialists') },
+      fields: [
+        // Singular here, plural on the Specialist record — the same asymmetry
+        // `location` → `locations` above already has, and deliberate: the orphan
+        // guard's readsField matches `.assessmentType\b`, which a read of
+        // `sp.assessmentTypes` does NOT satisfy. Naming this field plural would
+        // make it permanently invisible to that guard, the way `icon` and `title`
+        // already are.
+        //
+        // Without this filter a service page could only reach specialists by
+        // specialty or location, neither of which answers "who performs this kind
+        // of assessment" — so /jme listed the first ten specialists alphabetically
+        // under a heading promising the ones who conduct JMEs.
+        {
+          name: 'assessmentType',
+          type: 'relationship',
+          relationTo: 'assessment-types',
+          admin: {
+            width: '50%',
+            description:
+              'Optional — limit to specialists who perform this assessment type (set on their profile).',
+          },
+        },
+      ],
+    },
     // Team filter
     {
       // Was one of four hardcoded copies of the department list; it is now a
