@@ -43,6 +43,8 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 20 | The toolbar colour swatch rides an `@experimental` Payload API | Live and working | None today; a Payload upgrade could remove the control, never the content | ~20 lines to rebuild or drop back | Re-check on every Payload upgrade |
 | 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~40 lines **+ two pinned Lexical deps** | Only with the pin guarded |
 | 22 | Payload boots in ~7s, and two specs were silently skipped for it | Dev/test only | A suite can report green while checking nothing | Unknown | Watch the admin, not the boot |
+| 24 | A People Grid foreign key exceeds Postgres's 63-char limit, so `pnpm test:int` fails intermittently | Test-only | None on the site; `pnpm test` is unreliable | ~30 min **+ a schema change** | Worth doing before handover — a suite that fails randomly carries no signal |
+| 25 | The TryBooking form does not load on a client-side navigation; the fallback link shows instead | Yes, mild | A visitor arriving via the menu gets a booking button rather than the embedded form | Not fixable without vendor internals | Leave it — the fallback is the designed answer |
 | 23 | `Specialists.availabilityHighlight` is written by the seed and read by nothing | No | None — hidden from the admin | ~5 min **+ a destructive DDL by hand** | Fold into the fresh baseline, not before |
 | 19 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min for an unlisted style-guide page | A decision — doing nothing is defensible |
 
@@ -792,3 +794,65 @@ ten minutes earlier. Not worth doing on its own.
 **Recommendation.** Delete the field and the seed's write **in the same pass as the fresh baseline**
 (`current-state.md` §1), where the column simply never gets created and no ALTER is needed. Doing it
 before that means paying for a hand-applied DDL to remove something nobody can see.
+
+
+---
+
+## 24. A People Grid foreign key exceeds Postgres's identifier limit, so the schema never settles
+
+Introduced by `e6b789a` (the specialist-carousel pass) and surfaced by `8c127c8`.
+
+**What happens.** Drizzle names a foreign key `<table>_<column>_<reftable>_id_fk`. For
+`PeopleGrid.assessmentType` on the version shadow that is
+
+```
+_pages_v_blocks_people_grid_assessment_type_id_assessment_types_id_fk
+```
+
+— **69 characters**. Postgres truncates identifiers at 63, so the name Drizzle looks for never
+exists, and it **drops and recreates the constraint on every boot**.
+
+**Measured, not inferred.** The constraint's oid changed on each `getPayload()`:
+1674921 → 1674968 → 1675016. Vitest boots Payload per test file in parallel, so two boots race that
+DDL and one fails with `42704 undefined_object`.
+
+**Impact: test-only.** No page, editor or build is affected, and no data is at risk — the constraint
+is recreated correctly each time. But `pnpm test:int` fails intermittently: measured **2 of 3 runs**
+on `8c127c8` against **0 of 3** on `e6b789a`, because the extra tables widen the race window. It
+reads exactly like a flaky test, and was twice dismissed as "the environment" before being measured.
+
+**`dbName` is not the fix.** Payload 3.85 does not accept `dbName` on a relationship field; adding it
+type-checks locally only if you forget to re-run `tsc`, and **fails `pnpm build`**. That mistake was
+made and reverted; the column is back to `assessment_type_id`.
+
+**The fix** is a shorter field name so the generated identifier fits — the column has to be ≤12
+characters, which means a field name of about 9. That is a rename across `PeopleGrid/config.ts`, its
+component, `seedFeaturedSpecialists.ts`, the guard in `adminControls.int.spec.ts` and the generated
+types, plus hand-applied DDL because renaming a column stops the dev push on the invisible
+"Accept warnings?" prompt. ~30 minutes, and it belongs in its own pass.
+
+**Do not fold it into the fresh baseline and forget it** — the baseline will simply create the same
+over-long name again.
+
+---
+
+## 25. The TryBooking form does not load on a client-side navigation
+
+By design, and recorded so nobody reports it as a bug.
+
+TryBooking's `widget.js` scans for `.tryb-widget` once at `load`, sets a private
+`trybWidgetsInitialized` global and exposes no re-init API. React inserts the block's container
+*after* that scan during a soft navigation, so the widget never renders. Confirmed in a browser: a
+widget div added after `load` got no iframe at all.
+
+**What a visitor sees:** the **Book on TryBooking** button instead of the embedded form. They can
+still book. Arriving by a fresh page load — which includes every `target="_blank"` link, and the
+event Register button is one — the form embeds normally.
+
+**Why it is not chased.** The only way to force re-initialisation is to delete TryBooking's private
+global and re-inject their script. That is an undocumented internal on a site with no maintainer, and
+their own guidance is to always load `widget.js` live so their fixes apply. A fallback that always
+works is the better trade.
+
+`tests/e2e/tryBooking.e2e.spec.ts` asserts this degraded state deliberately, so a future change that
+silently removes the fallback fails the suite.

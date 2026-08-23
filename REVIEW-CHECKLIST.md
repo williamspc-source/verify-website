@@ -85,6 +85,10 @@ page-by-page list:
 - [ ] **Breadcrumbs** — see Comparison 22 §A before logging anything
 - [ ] **`/search`** — results render and each links somewhere real
 - [ ] **404 page** — an unmatched URL lands somewhere sensible
+- [ ] **TryBooking Form** (wherever one is placed) — **on the live https site, not a local preview**
+  - [ ] The booking form loads and is fully usable, not just visible
+  - [ ] Block a request to `trybooking.com` in DevTools and reload: the **Book on TryBooking** button
+        appears, links to `trybooking.com/<event id>`, and **no empty panel is left above it**
 - [ ] **Mobile** — nav, hero, and any carousel at a narrow width
 - [ ] **Skip link** — tab from the top of any page; it should appear on focus
 

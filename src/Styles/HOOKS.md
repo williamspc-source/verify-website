@@ -589,6 +589,28 @@ options sit together on the block:
 Changing *who* is on a profile — Featured, the availability tick, the Assessment Types list — is
 `ADMIN-GUIDE.md` → **Specialists**. This section only owns how the ribbon looks and moves.
 
+### A TryBooking booking form on a page
+
+Add the **TryBooking Form** block and put the event's number in **TryBooking event ID** — digits
+only, so `1525708` for `trybooking.com/1525708`. Everything else is the usual section furniture:
+eyebrow, heading and subheading above it, plus **Background**, **Container width**, **Spacing** and
+**Motion**.
+
+What is *not* adjustable is the form's height. TryBooking sizes its own frame and tells the page how
+tall to be, so there is no height setting and none is wanted — declaring one would either clip the
+booking steps or leave dead space beneath them.
+
+> **The form is hidden until it has actually loaded**, and a **Book on TryBooking** button shows in
+> its place until then. That is deliberate: a booking form that fails to load would otherwise leave a
+> large empty panel, so the visitor always sees something that works. Change the button's words with
+> **Fallback button label**; it is rich text like every other label.
+>
+> On a local preview you will usually see only the button, because TryBooking allows its form to be
+> embedded on secure (`https`) addresses only. That is expected, and it works on the live site.
+
+For which event, and how to link one from an event page, see the TryBooking section in
+`ADMIN-GUIDE.md`.
+
 ### Step numbers can be `1` or `01`
 
 **Pages → the page → the Process Steps block → Step number style.** The design uses both, so this is

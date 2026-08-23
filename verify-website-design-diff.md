@@ -3460,3 +3460,77 @@ The e2e is what goes red. This is a third shape of a family CLAUDE.md already re
 common-name hole, and one name serving two purposes in one file): here the guard is not fooled by a
 coincidental match but by the declaration of intent to read. Recorded in the Invariants table rather
 than fixed — widening Pattern A would touch every block.
+
+---
+
+## Comparison 53: a TryBooking booking form, built to fail safely (2026-08-23)
+
+Not a design-reference pass — the reference has no booking form. This is a capability the site
+lacked, and it is recorded here because the decisions were all about failure modes rather than
+appearance.
+
+### What staff asked for
+
+The snippet their WordPress site used:
+
+```html
+<script async defer src="https://www.trybooking.com/widget.js"></script>
+<div class="tryb-widget" data-type="landingPageEmbed" data-eid="1525708"></div>
+```
+
+There was no way to do this. The `Code` block is the Payload template's syntax-highlighted *display*
+block, article-only, and executes nothing; Video Embed and Map Embed build their `src` from an ID.
+
+**A general paste-any-HTML block was rejected.** There are no user roles, so every logged-in account
+is a full admin, and it would have hit a worse bug than it solved.
+
+### Three measurements that each changed the design
+
+- **`widget.js` initialises once per page load.** It scans `.tryb-widget` at `load`, sets a private
+  `trybWidgetsInitialized` global, and has no re-init API. A div added afterwards — what a
+  client-side navigation produces — never renders. Confirmed in a browser.
+- **The embed is refused over `http`.** It sends `frame-ancestors 'self' https:`, so it cannot load
+  on the dev server. Over https it works: the frame loaded 1498 characters of the real listing and
+  sized to 1328px.
+- **A refused frame still creates an iframe ELEMENT, with a height** — 380px, holding
+  `chrome-error://chromewebdata/`. So "an iframe appeared" is not success. A first probe read
+  `iframe: true` and reported the widget working while the page showed the browser's *"refused to
+  connect"* panel. The component waits for a `postMessage` from TryBooking's origin instead, which a
+  frame that never loaded cannot send.
+
+### What ships
+
+The block takes the event ID and builds the rest. `trybooking.com/<id>` is TryBooking's documented
+numeric Booking URL, verified against the live event (`1525708` resolves; an invented id 404s), so
+the fallback needs no second field.
+
+The fallback booking link renders in the **server HTML** and is hidden only on confirmed success, so
+a visitor with JavaScript off still gets a way to book. The embed stays **collapsed** until it
+proves it loaded — measured: the widget initialises perfectly inside `height: 0; overflow: hidden`
+and sizes correctly the moment it is revealed — so a failed load takes no space rather than painting
+a grey panel. That last part was added after seeing exactly that panel on a local page.
+
+### An idea that was researched and scrapped
+
+`widget.js` builds an iframe internally, and reverse-engineering that URL was attractive until
+TryBooking's own documentation said: *"We recommend you do not cache widget.js locally. Doing so will
+mean that any system updates or fixes made will not be automatically applied."* Freezing their
+internals is precisely wrong for a site with no maintainer. Their API was also checked and is
+read-only reporting, not an embedding route.
+
+### What moved
+
+`computedSnapshot`: **6 nodes over 5 routes, all noise** — proven by capturing twice on identical
+code, where `/` reproduced its 2 nodes; the rest are the documented `.vf-section__inner` margin flip.
+Node count identical at 8349. The block is on no measured route, so this is the expected result.
+
+All 13 `referenceCssDiff` families still zero. `findFalseHover` still 14. e2e 61/61.
+
+### The defect this pass surfaced but did not cause
+
+`pnpm test:int` now fails intermittently — 2 runs in 3, against 0 in 3 on the previous commit. The
+cause is `e6b789a`: `PeopleGrid.assessmentType` generates a 69-character foreign-key name against
+Postgres's 63-character limit, so Drizzle recreates the constraint on every boot and parallel test
+boots race it. The extra tables here merely widened the window. `dbName` is not the fix — Payload
+3.85 rejects it on a relationship field, and trying it broke `pnpm build`. Recorded as
+`OUTSTANDING.md` §24, with §25 covering the deliberate soft-navigation fallback.

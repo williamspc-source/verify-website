@@ -390,6 +390,34 @@ that is the first place to look.
 > form to use. Fix it at **Site → Site Settings → Enquiry drawer form**. The usual cause is that
 > someone renamed the form.
 
+### Taking bookings with TryBooking
+
+Events are booked through TryBooking, and there are two ways to send someone there.
+
+**A link** — the simplest, and it always works. On the event, fill in **Registration URL** with the
+event's TryBooking address (`https://www.trybooking.com/1525708`, using your event's own number).
+The Register button then opens TryBooking in a new tab.
+
+**The booking form embedded in the page** — build a page, add the **TryBooking Form** block, and put
+the event's number in **TryBooking event ID**. Digits only: for `trybooking.com/1525708` the ID is
+`1525708`. Then point an event's **Registration URL** at that page.
+
+> **Event pages cannot hold blocks.** An event is a fixed template, so the TryBooking Form block goes
+> on a *page*, which you then link to from the event. That is a limitation of how events are built,
+> not something you are doing wrong.
+
+**Two things that look like faults and are not:**
+
+- **On a test or preview address the form may not appear**, showing a **Book on TryBooking** button
+  instead. TryBooking only allows its form to be embedded on secure (`https`) addresses, so it will
+  not load on a local preview but works correctly on the live site.
+- **If the form ever fails to load, the button appears in its place.** That is deliberate. Visitors
+  always get a working way to book, and you should never see an empty gap where the form was. The
+  button's wording is editable on the block as **Fallback button label**.
+
+`HOOKS.md` covers where the block sits on the page and how it is spaced; this section owns what it is
+and where the number comes from.
+
 ### Users, Redirects, Search Results
 
 **Users** are admin logins. **Everyone has full access** — there are no restricted roles — so only
