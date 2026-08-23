@@ -81,7 +81,15 @@ const TARGETS: Target[] = [
     blockType: 'splitFeature',
     // Deliberately the full title: a bare 'Medico-Legal' would match any future
     // row on the homepage, and the first match wins.
-    rowMatch: 'VERIFY [[Medico-Legal]] Solutions',
+    //
+    // Written WITHOUT the [[accent]] brackets even though the stored title has
+    // them — `storedText` strips them, so a literal that keeps them can never
+    // match. That is the documented contract in `repairMatch.ts` ("the table's
+    // literals should be written without them") and it was missed when this
+    // comparison moved from a raw string to `storedText`: the row stopped
+    // throwing and started silently not matching, which is how the homepage kept
+    // its grey placeholder while the seed reported only a skipped file.
+    rowMatch: 'VERIFY Medico-Legal Solutions',
     field: 'image',
     alt: 'The VERIFY team',
   },

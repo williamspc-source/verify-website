@@ -3698,3 +3698,30 @@ before-reading taken first, since "0 remaining" is only evidence against a non-z
 A second run reports 0 changes, so the repairs remain idempotent. Recorded as `OUTSTANDING.md` §27
 (the seed has no coverage) and §28 (`LABEL_SCOPED_FIXES` is untracked), both left undone
 deliberately rather than forgotten.
+
+### A fifth fault, caused by the fix for the third
+
+The seed then completed but logged `who-we-are.jpg (no splitFeature matching on /home)`, and the
+homepage kept its grey placeholder.
+
+`repairContentImages` keyed that row on `rowMatch: 'VERIFY [[Medico-Legal]] Solutions'` — **with the
+accent brackets**. While the title was a plain string that matched. Moving the comparison to
+`storedText` stopped the `TypeError` but `storedText` *strips* `[[…]]`, so the stored title flattens
+to `VERIFY Medico-Legal Solutions` and a literal carrying brackets can never match. The row went from
+throwing to silently not matching.
+
+`repairMatch.ts` states this contract in its own doc — *"Accent brackets are stripped, so the
+table's literals should be written **without** them"* — and it was not applied when the call site
+changed. The other four `rowMatch` literals are substrings that sit *inside* brackets
+(`'Trust & Precision'`), so they survive stripping and were unaffected; only this one spelled the
+markers out.
+
+Worth noting the reporting worked: the step logged the miss by name rather than failing silently,
+which is the only reason it was found immediately rather than at the next content review.
+
+**Diagnosing it also produced a bad measurement worth recording.** A first query concluded there was
+*no* Split Feature on the homepage — wrong, and it was the join, not the data:
+`pages_blocks_split_feature_rows._parent_id` is a **varchar block id**, not a page id, so
+`JOIN pages p ON p.id = r._parent_id` compares a varchar to an integer and matches nothing. The
+correct path is rows → `pages_blocks_split_feature.id` → `pages.id`. A join that silently returns
+zero rows reads exactly like absent content.
