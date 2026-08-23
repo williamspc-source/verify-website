@@ -43,6 +43,8 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 20 | The toolbar colour swatch rides an `@experimental` Payload API | Live and working | None today; a Payload upgrade could remove the control, never the content | ~20 lines to rebuild or drop back | Re-check on every Payload upgrade |
 | 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~40 lines **+ two pinned Lexical deps** | Only with the pin guarded |
 | 22 | Payload boots in ~7s, and two specs were silently skipped for it | Dev/test only | A suite can report green while checking nothing | Unknown | Watch the admin, not the boot |
+| 27 | Nothing exercises the seed, the largest untested surface in the repo | Test-only | Four seed faults shipped under a fully green suite | ~2 h for a scratch-DB smoke test | Worth doing before the next person inherits it |
+| 28 | `LABEL_SCOPED_FIXES` is not wired to `matchTracker`, so a stale key is silent | Latent | A link fix quietly stops applying when copy is reworded | ~2 lines | Next time the seed is touched |
 | 26 | This deployment runs without email (`ALLOW_MISSING_SMTP`) | Yes, by choice | Enquiries are captured but nobody is emailed; admin password reset does not work | ~5 min once SMTP credentials exist | **Must be undone before the site takes real enquiries** |
 | 25 | The TryBooking form does not load on a client-side navigation; the fallback link shows instead | Yes, mild | A visitor arriving via the menu gets a booking button rather than the embedded form | Not fixable without vendor internals | Leave it — the fallback is the designed answer |
 | 23 | `Specialists.availabilityHighlight` is written by the seed and read by nothing | No | None — hidden from the admin | ~5 min **+ a destructive DDL by hand** | Fold into the fresh baseline, not before |
@@ -853,3 +855,52 @@ the thing most likely to be wrong after a handover.
 
 **The risk this entry exists for:** leaving the flag set on the site that takes real enquiries. It
 fails silently by design — the visitor is thanked, the submission is stored, and nobody is told.
+
+
+---
+
+## 27. Nothing exercises the seed
+
+`grep -rln "seedVerify\|repairEventTimeDash" tests/` returns **nothing**. The seed is ~30 repair
+steps plus the whole content fixture, and no test runs any of it.
+
+**This is not theoretical.** Four defects shipped under 215/215 integration and 61/61 e2e, and were
+found only by wiping a database and reseeding:
+
+1. `repairEventTimeDash` querying a jsonb column with `contains` — a hard Postgres error that
+   stopped the seed dead.
+2. The same file's `typeof === 'string'` guard, which skipped every document and logged a success
+   count for work it had not done.
+3. `repairContentImages` calling `.includes` on a rich-text `title` — a `TypeError` that stopped the
+   chain one step later.
+4. `seedLinkRepairs.norm()` returning `''` for every rich-text link label, killing all three
+   `LABEL_SCOPED_FIXES`.
+
+**The local database cannot substitute for a fresh one.** It holds **0** en-dashed events against
+**11** in the fixtures — those rows were repaired while the column was still `varchar` — so running
+the seed here would have passed too. The reproduction needs `createdb` → `migrate` → seed.
+
+**The fix** is a smoke test that creates a scratch database, migrates, runs the full seed and asserts
+it completes. It is slow (a full seed per run) and needs `createdb` in the test environment, so it
+likely cannot live inside `pnpm test` and becomes a separate command — which is the honest reason it
+was not done on the night the deploy was going out.
+
+---
+
+## 28. `LABEL_SCOPED_FIXES` is not tracked, so a stale key is silent
+
+`repairMatch.ts` provides `matchTracker`, which reports at error level — and throws outside
+production — when a table's key matches nothing. `seedLinkRepairs.ts` wires it to `SUPERSEDED_BLOCKS`
+and `APPOINTMENT_TYPE_ANCHORS`, and **not** to `LABEL_SCOPED_FIXES`.
+
+That is exactly how the gateway-card link fix stayed broken. It carried two independent faults on one
+line — `norm()` could not read a rich-text label, *and* the key `'Join Expert Panel'` no longer
+matched the copy, which had been reworded to `"Join VERIFY's Expert Panel"`. Both are fixed, but
+nothing would have said so, and nothing will say so if the wording changes again.
+
+`LABEL_SCOPED_FIXES` **is** a legitimate tracker target: unlike `LEGACY_PATHS` or the `SUPERSEDED_*`
+tables, its keys are *current* copy that must still be there, so zero matches means drift rather
+than a healthy steady state.
+
+Left undone only because `matchTracker.report` throws outside production, and making the seed newly
+capable of failing in development is a behaviour change that was not worth introducing mid-deploy.

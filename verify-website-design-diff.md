@@ -3632,3 +3632,69 @@ to avoid.
 
 The schema is frozen: any further field change needs its own `migrate:create` on top. On the box the
 sequence is pull → `pnpm payload migrate` → `pnpm build`, then `POST /next/seed-verify`.
+
+---
+
+## Comparison 56: four seed faults from one field conversion (2026-08-24)
+
+Not a design pass. A fresh seed on the box died, and the investigation found three more of the same
+family behind it.
+
+### The reported error
+
+```
+operator does not exist: jsonb ~~* unknown
+select count(*) from events where events.time_label ilike '%–%'
+```
+
+`timeLabel` became `inlineRichTextField` in Comparison 49, so it is a **jsonb** column.
+`repairEventTimeDash` filtered it with `contains`, which Payload emits as `ILIKE` — an operator with
+no jsonb overload, rejected at **plan time** whether or not any row matches.
+
+### The three that were hiding behind it
+
+**Fixing the query alone would have produced a repair that lies.** The same file guarded on
+`typeof doc.timeLabel !== 'string'`, which skips every document once the field is a Lexical object —
+and then logged `docs.length` as its success count. It would have run clean, reported
+`converted: 7`, and converted nothing.
+
+**`repairContentImages` called `.includes` on a rich-text `title`**, throwing
+`(r.title ?? "").includes is not a function` and stopping the chain one step later. This one was
+missed by the first sweep, which looked for `typeof` and `contains:` but not for string *methods* —
+and cost an extra reseed to find. The sweep was widened to every string method applied to any of the
+94 converted field names; it now returns clean.
+
+**`seedLinkRepairs.norm()` returned `''` for every link label**, because a link's `label` is rich
+text too. So every `LABEL_SCOPED_FIXES` comparison was `'' === '<literal>'` and all three entries had
+been dead since the conversion — silently, because `matchTracker` is wired to two sibling tables in
+that same file and not to this one.
+
+**And behind that, a second independent fault on the same line.** With `norm` fixed the gateway entry
+*still* matched nothing: its key was `'Join Expert Panel'` while the homepage copy had been reworded
+to `"Join VERIFY's Expert Panel"`. Confirmed against fresh data before changing it, and the
+`#join-form` target was confirmed to exist, so the link is live rather than a fragment pointing at
+nothing.
+
+### Why a green suite meant nothing
+
+**No test runs the seed.** `grep -rln "seedVerify" tests/` returns nothing, so 215/215 and 61/61 were
+never evidence about this path.
+
+**And the local database cannot reproduce any of it**: 0 en-dashed events here against 11 in the
+fixtures, because those rows were repaired while the column was still `varchar`. Seeding locally
+would have passed too.
+
+The proof therefore had to be a scratch database — `createdb`, `migrate`, seed — with the
+before-reading taken first, since "0 remaining" is only evidence against a non-zero start:
+
+| | Before | After |
+|---|---|---|
+| Events with an en dash | **7** | **0** |
+| Events with a hyphenated range | 0 | **7** |
+| Gateway card link | `/specialists/join-expert-panel` | `…#join-form` |
+| People Grid footer link | fragment-free | **still** fragment-free |
+| Seed outcome | dies at the event repair | **completes** |
+
+A second run reports 0 changes, so the repairs remain idempotent. Recorded as `OUTSTANDING.md` §27
+(the seed has no coverage) and §28 (`LABEL_SCOPED_FIXES` is untracked), both left undone
+deliberately rather than forgotten.

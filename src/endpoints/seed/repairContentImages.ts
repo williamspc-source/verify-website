@@ -3,6 +3,7 @@ import type { Payload, PayloadRequest } from 'payload'
 import path from 'path'
 
 import { getOrCreateMedia } from './media'
+import { storedText } from './repairMatch'
 
 type Ctx = { payload: Payload; req: PayloadRequest }
 
@@ -165,7 +166,12 @@ export const repairContentImages = async (ctx: Ctx): Promise<void> => {
       if (b.blockType !== t.blockType) return
       if (t.blockType === 'splitFeature') {
         for (const r of b.rows ?? []) {
-          if (t.rowMatch && (r.title ?? '').includes(t.rowMatch)) {
+          // `storedText`, not `(r.title ?? '')`: a SplitFeature row's title is
+          // rich text, so `.includes` on it throws
+          // `(r.title ?? "").includes is not a function` and takes the whole seed
+          // down. Same conversion, same family as the timeLabel and link-label
+          // faults fixed alongside this.
+          if (t.rowMatch && storedText(r.title).includes(t.rowMatch)) {
             slotFound = true
             if (!r.image) slotEmpty = true
           }
@@ -201,7 +207,7 @@ export const repairContentImages = async (ctx: Ctx): Promise<void> => {
         return {
           ...b,
           rows: (b.rows ?? []).map((r) =>
-            t.rowMatch && (r.title ?? '').includes(t.rowMatch) && !r.image
+            t.rowMatch && storedText(r.title).includes(t.rowMatch) && !r.image
               ? { ...r, image: mediaId }
               : r,
           ),

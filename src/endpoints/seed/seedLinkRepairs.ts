@@ -66,7 +66,19 @@ export const LABEL_SCOPED_FIXES: {
   // The gateway CTA jumps to the form; the Featured Specialists button below it
   // keeps the plain page link, as the reference has it (index.html:135 vs :446).
   {
-    label: 'Join Expert Panel',
+    // The homepage wording, verbatim. It was reworded from "Join Expert Panel"
+    // to this at some point and the key here was not updated, so even once
+    // `norm` was fixed to read rich text this entry still matched nothing — two
+    // independent faults stacked on the same line. Confirmed against a fresh
+    // seed: the stored label is "Join VERIFY's Expert Panel" and the gateway
+    // link had never received its fragment. The `#join-form` target does exist
+    // (a Section with that anchorId on the page), so this is a live link, not a
+    // fragment pointing at nothing.
+    //
+    // Nothing notices when a key like this goes stale, because `matchTracker` is
+    // wired to SUPERSEDED_BLOCKS and APPOINTMENT_TYPE_ANCHORS but not to this
+    // table — see OUTSTANDING.md.
+    label: "Join VERIFY's Expert Panel",
     block: 'gatewayCards',
     from: '/specialists/join-expert-panel',
     to: '/specialists/join-expert-panel#join-form',
@@ -101,7 +113,14 @@ export const LABEL_SCOPED_FIXES: {
   { label: 'View Full Panel', from: '/specialists', to: '/specialists/specialist-panel' },
 ]
 
-const norm = (s: unknown): string => (typeof s === 'string' ? s.trim().toLowerCase() : '')
+// `storedText`, not a `typeof === 'string'` test: a link's `label` is
+// `inlineRichTextField` (src/fields/link.ts), so it is a Lexical object in every
+// table. The old form returned '' for every link on the site, making each
+// LABEL_SCOPED_FIXES comparison `'' === '<literal>'` — so all three entries had
+// been dead since the rich-text conversion, silently. Confirmed in real data: the
+// homepage gateway card's link was stored without the #join-form fragment this
+// table exists to add.
+const norm = (s: unknown): string => storedText(s).trim().toLowerCase()
 
 /**
  * Anchor IDs for the Appointment Guide's type toggle, keyed by the type's label.

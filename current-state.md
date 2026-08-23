@@ -22,7 +22,7 @@ section below points at the document that owns the detail.
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
 | `HANDOVER.md` | Standing a box up from nothing — for whoever inherits the project |
 | `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 55 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 56 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -122,6 +122,20 @@ banner and a standing red banner on the admin dashboard say so; the dashboard on
 **Before the final box takes real enquiries:** fill the `SMTP_*` block, delete
 `ALLOW_MISSING_SMTP`, and check Forms → Forms → Emails for who is notified. `OUTSTANDING.md` §26
 carries this so it cannot be lost; `HANDOVER.md` §4 is the version written for whoever inherits it.
+
+### 1b. The seed completes on a fresh database — verified 2026-08-24
+
+A fresh seed on the box died on `repairEventTimeDash`, which filtered a rich-text (jsonb) column with
+`contains`. Three more faults of the same family were behind it; all four are fixed. See
+`verify-website-design-diff.md` Comparison 56.
+
+**Verified against a scratch database rather than locally**, because the local one cannot reproduce
+it: 0 en-dashed events here against 11 in the fixtures. `createdb` → `migrate` → seed now runs to
+completion, converts 7 event labels (7 → 0 en dashes), and applies the gateway-card link fix that had
+never fired. A second run reports 0 changes.
+
+**The seed itself still has no test coverage** — `OUTSTANDING.md` §27. It is the only way to run
+~30 repair steps, and all four of these shipped under a fully green suite.
 
 ### What is left before pushing
 
