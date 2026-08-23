@@ -16,8 +16,37 @@ const baseClass = 'before-dashboard'
  * first screen after login, so it should orient rather than mislead.
  */
 const BeforeDashboard: React.FC = () => {
+  // A server component, so this reads the real server environment — no client
+  // bundle, no NEXT_PUBLIC_ prefix, and nothing to plumb through.
+  //
+  // Keyed on SMTP_HOST being absent rather than on ALLOW_MISSING_SMTP, because
+  // the statement is about what is actually happening: with no mail server
+  // configured the notification is dropped whether or not anyone has waived the
+  // boot check. That makes it equally true on a developer's machine.
+  //
+  // This is the half of the no-email warning that matters. The boot banner is
+  // correct and loud, and nobody logging in to check their enquiries will ever
+  // see it. Enquiries are NOT lost — `emailNotSentAdapter` resolves so the Form
+  // Submission still commits — which is exactly why the failure is invisible
+  // without this.
+  const mailIsOff = !process.env.SMTP_HOST
+
   return (
     <div className={baseClass}>
+      {mailIsOff ? (
+        <Banner className={`${baseClass}__banner`} type="error">
+          <h4>No notification emails are being sent</h4>
+          <p>
+            {'Enquiries are still being captured — read them under '}
+            <strong>Forms → Form Submissions</strong>
+            {'. Nobody is emailed when one arrives, so check that list regularly. '}
+            <strong>Admin password resets will not work</strong>
+            {' while this is the case: if you are locked out you will need a developer. '}
+            {'This is a setting on the server, not something you can change from here.'}
+          </p>
+        </Banner>
+      ) : null}
+
       <Banner className={`${baseClass}__banner`} type="success">
         <h4>VERIFY Medico-Legal Solutions — content admin</h4>
       </Banner>

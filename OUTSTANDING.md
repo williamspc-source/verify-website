@@ -43,6 +43,7 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 | 20 | The toolbar colour swatch rides an `@experimental` Payload API | Live and working | None today; a Payload upgrade could remove the control, never the content | ~20 lines to rebuild or drop back | Re-check on every Payload upgrade |
 | 21 | Enter in a heading makes a paragraph, not a line break, in the editor | Admin only | The page renders correctly either way | ~40 lines **+ two pinned Lexical deps** | Only with the pin guarded |
 | 22 | Payload boots in ~7s, and two specs were silently skipped for it | Dev/test only | A suite can report green while checking nothing | Unknown | Watch the admin, not the boot |
+| 26 | This deployment runs without email (`ALLOW_MISSING_SMTP`) | Yes, by choice | Enquiries are captured but nobody is emailed; admin password reset does not work | ~5 min once SMTP credentials exist | **Must be undone before the site takes real enquiries** |
 | 25 | The TryBooking form does not load on a client-side navigation; the fallback link shows instead | Yes, mild | A visitor arriving via the menu gets a booking button rather than the embedded form | Not fixable without vendor internals | Leave it — the fallback is the designed answer |
 | 23 | `Specialists.availabilityHighlight` is written by the seed and read by nothing | No | None — hidden from the admin | ~5 min **+ a destructive DDL by hand** | Fold into the fresh baseline, not before |
 | 19 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min for an unlisted style-guide page | A decision — doing nothing is defensible |
@@ -815,3 +816,40 @@ works is the better trade.
 
 `tests/e2e/tryBooking.e2e.spec.ts` asserts this degraded state deliberately, so a future change that
 silently removes the fallback fails the suite.
+
+
+---
+
+## 26. This deployment runs without email, on purpose
+
+Not a defect — a chosen condition of the current box, recorded here so it cannot be forgotten on the
+one that matters.
+
+`ALLOW_MISSING_SMTP=1` in `.env` lets the app boot with `SMTP_HOST` unset. Without it the app
+refuses to start, which is correct: Payload's own fallback adapter reports every unsent message as
+**sent**, and a server that half-works passes a deploy smoke test.
+
+**It waives `SMTP_HOST` and nothing else.** `NEXT_PUBLIC_SERVER_URL` and `PREVIEW_SECRET` stay
+required, so a genuinely misconfigured deploy still refuses to boot. That negative property is the
+load-bearing assertion in `tests/int/productionEnv.int.spec.ts`, proven red both by deleting the
+waiver and by widening it to all three.
+
+**What it costs while set**
+
+- Enquiries, contact forms and newsletter signups are **captured normally** — Forms → Form
+  Submissions. Nothing is lost: `emailNotSentAdapter` resolves rather than throwing, precisely so
+  the submission still commits.
+- **Nobody is emailed** when one arrives. That list has to be read by hand.
+- **Admin password resets silently fail.** The reset appears to send; nothing arrives. A locked-out
+  admin needs a developer.
+
+**How it announces itself.** A boxed banner on every boot, `[EMAIL NOT SENT]` at error level per
+attempt, and — the one that matters — a **red banner on the admin dashboard on every login**, which
+keys on `SMTP_HOST` rather than on the flag, so it is equally true on a developer's machine.
+
+**Undoing it:** fill the `SMTP_*` block in `.env`, delete the `ALLOW_MISSING_SMTP` line, restart,
+then check **Forms → Forms → *(each form)* → Emails** for the notification addresses — per form, and
+the thing most likely to be wrong after a handover.
+
+**The risk this entry exists for:** leaving the flag set on the site that takes real enquiries. It
+fails silently by design — the visitor is thanked, the submission is stored, and nobody is told.

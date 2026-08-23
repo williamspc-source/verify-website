@@ -7,9 +7,9 @@ This file is a **status snapshot**, not a reference. It deliberately does not re
 invariants, or editor instructions — those live elsewhere and would rot here as a second copy. Every
 section below points at the document that owns the detail.
 
-> **Keep it true, and keep it short.** This is the sixth record in a set whose whole rule is that a
+> **Keep it true, and keep it short.** This is one record in a set whose whole rule is that a
 > change lands in every document it touches, in the same pass. A status file is the easiest of the
-> six to let drift, and a stale status file is the most misleading of the six — it is the one people
+> ten to let drift, and a stale status file is the most misleading of the six — it is the one people
 > read to decide whether something needs doing. If an item here is fixed, delete it; do not annotate
 > it. The history is in `git log` and in `HOMEPAGE-CHANGES.md`.
 
@@ -20,6 +20,7 @@ section below points at the document that owns the detail.
 | `README.md` | Running, testing, deploying, and where images go |
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
+| `HANDOVER.md` | Standing a box up from nothing — for whoever inherits the project |
 | `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
 | `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 55 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
@@ -107,6 +108,20 @@ invariant in `CLAUDE.md`.
 
 **The schema is frozen.** Any field change from here needs its own `migrate:create` on top, so treat
 a new collection/global/block field as a deliberate decision rather than a tweak.
+
+### 1a. This deployment runs without email, deliberately
+
+`ALLOW_MISSING_SMTP=1` lets the box boot with no mail server. It is a condition of *this*
+installation, not a defect, and it waives `SMTP_HOST` and nothing else.
+
+**What that costs, while it is set:** enquiries are captured normally under Forms → Form
+Submissions, but nobody is emailed that one arrived, and admin password resets silently fail. A boot
+banner and a standing red banner on the admin dashboard say so; the dashboard one keys on
+`SMTP_HOST`, so it is equally true on a dev machine.
+
+**Before the final box takes real enquiries:** fill the `SMTP_*` block, delete
+`ALLOW_MISSING_SMTP`, and check Forms → Forms → Emails for who is notified. `OUTSTANDING.md` §26
+carries this so it cannot be lost; `HANDOVER.md` §4 is the version written for whoever inherits it.
 
 ### What is left before pushing
 

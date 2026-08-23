@@ -108,11 +108,15 @@ rm -f /tmp/wt/node_modules && git worktree remove --force /tmp/wt
 Production builds and migrates on a remote box: commit and push, then the box pulls, builds and
 migrates against the live database.
 
-> **Current plan: nothing is pushed until the polishing work is finished.** Commits accumulate on
-> `main` locally; the migration is generated once, at the end, against whatever the schema has
-> become by then. `OUTSTANDING.md` §1 holds the full detail — what it will add, the **five columns
-> it drops**, the two type changes a generated migration gets wrong, and the pre-flight check to run
-> on the box before any of it. Read it before you push, not after.
+> **New here?** Read `HANDOVER.md` first. It covers standing a box up from nothing, which this
+> section assumes you have already done.
+
+The schema is **frozen behind one baseline**. `src/migrations/` holds a single
+`20260823_130006_baseline`, generated on 2026-08-23 and verified against an empty scratch database:
+310 `CREATE TABLE`, 995 `CREATE INDEX`, no drops and no type conversions, with a column-level diff
+against the working database returning zero differences either way. The catch-up migration that
+`OUTSTANDING.md` §1 used to describe — the one that dropped five columns — was abandoned and that
+entry is closed history.
 
 After changing any collection, global or block field:
 
@@ -123,20 +127,27 @@ pnpm payload migrate
 pnpm build
 ```
 
-**Keep the schema additive.** The only migration in the repo today is the baseline, and it only adds.
-A dropped column is irreversible data loss on a live site, and the `migrate:create` prompt that asks
+**Keep the schema additive.** The only migration in the repo is the baseline, and it only adds. A
+dropped column is irreversible data loss on a live site, and the `migrate:create` prompt that asks
 "created or renamed from another column?" is where that happens by accident — choosing *rename*
-moves an unrelated column's data into the new field.
+moves an unrelated column's data into the new field. **If a generated migration drops a column,
+stop and find out why.**
 
-The pending migration is the exception, and a deliberate one: it drops five columns whose data has
-either moved elsewhere or stopped being rendered. Each is named and justified in `OUTSTANDING.md`
-§1, with the SQL to check whether the box actually holds anything in them. **If a generated
-migration ever drops a column that file does not list, stop.**
+**Budget the column name before adding a relationship field to a block.** Postgres truncates
+identifiers at 63 characters and Drizzle builds foreign-key names from the table, column and
+referenced table; overrun it and Drizzle recreates the constraint on every boot, which surfaces as
+an intermittent `42704` in the test suite rather than as anything obviously schema-shaped. See the
+identifier invariant in `CLAUDE.md`.
 
 Three environment variables are required in production and the app refuses to boot without them:
 `SMTP_HOST`, `NEXT_PUBLIC_SERVER_URL`, `PREVIEW_SECRET`. Each fails *silently* rather than loudly
 when missing — most dangerously `SMTP_HOST`, whose absence makes Payload fall back to a console mock
-that reports every enquiry notification and password-reset email as sent. See `.env.example`.
+that reports every enquiry notification and password-reset email as sent.
+
+`ALLOW_MISSING_SMTP=1` waives **`SMTP_HOST` only**, for a box deliberately running without mail; the
+other two stay required. While it is set, enquiries are still stored but nobody is emailed and admin
+password resets fail, so the admin dashboard carries a standing red warning. See `HANDOVER.md` §4
+and `.env.example`.
 
 ## Guards you should not delete
 

@@ -386,6 +386,15 @@ visitors have sent — read-only.
 **Who gets notified is set per form**, on that form's **Emails** tab. If enquiries stop arriving,
 that is the first place to look.
 
+> **If the dashboard shows a red "No notification emails are being sent" banner**, that is not a
+> fault you can fix from here, and **no enquiry is being lost**. Everything visitors submit is still
+> arriving under **Form Submissions** — but nobody is emailed when one does, so that list has to be
+> checked by hand. It also means **password reset will not work**: if you are locked out of the
+> admin you will need whoever looks after the server.
+>
+> The banner disappears on its own once mail is configured on the server. It is showing because this
+> installation is deliberately running without an email account attached yet.
+
 > If the **Make an Enquiry** drawer opens but says it is unavailable, the drawer does not know which
 > form to use. Fix it at **Site → Site Settings → Enquiry drawer form**. The usual cause is that
 > someone renamed the form.

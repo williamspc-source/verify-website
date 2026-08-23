@@ -1,4 +1,9 @@
-import { assertProductionEnv, missingProductionEnv, productionEnvError } from '@/utilities/assertProductionEnv'
+import {
+  assertProductionEnv,
+  missingProductionEnv,
+  productionEnvError,
+  warnSmtpWaived,
+} from '@/utilities/assertProductionEnv'
 
 /**
  * Next runs `register()` once, before the first request is served.
@@ -14,6 +19,11 @@ import { assertProductionEnv, missingProductionEnv, productionEnvError } from '@
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return
+
+  // Announced whether or not anything is missing: with the flag set, nothing IS
+  // missing by definition, so a banner printed only on the failure path would
+  // never appear on exactly the boxes it is meant for.
+  warnSmtpWaived()
 
   const missing = missingProductionEnv()
   if (!missing.length) return

@@ -37,11 +37,38 @@ export const REQUIRED_PRODUCTION_ENV = [
   'PREVIEW_SECRET',
 ] as const
 
+/**
+ * A deliberate, temporary waiver for `SMTP_HOST` **only**.
+ *
+ * Set on a box that is knowingly running without mail — a staging install, or one
+ * standing up before mail credentials exist. It is NOT `LOCAL_PROD_REPRO`: that
+ * one is for `pnpm dev:prod` on a laptop, its banner says "not a real
+ * deployment", and it waives all three variables at once. Waiving
+ * `NEXT_PUBLIC_SERVER_URL` or `PREVIEW_SECRET` on a real server is never
+ * intended, so this flag cannot do it.
+ *
+ * Named for what it permits rather than for a state: `EMAIL_DISABLED` would read
+ * as "mail is off by design", when the intent is always to turn it on later.
+ *
+ * What it costs, while set: enquiries are still stored and visible under Forms →
+ * Form Submissions, but **nobody is emailed that one arrived**, and **admin
+ * password resets silently fail** — an admin locked out cannot recover without a
+ * developer. Both are surfaced on the admin dashboard by `BeforeDashboard`, which
+ * keys on `SMTP_HOST` rather than on this flag, so the warning is equally true on
+ * a machine that simply has no mail configured.
+ */
 export const missingProductionEnv = (): string[] => {
   if (process.env.NODE_ENV !== 'production') return []
   if (process.env.NEXT_PHASE === 'phase-production-build') return []
-  return REQUIRED_PRODUCTION_ENV.filter((key) => !process.env[key])
+  const waived = process.env.ALLOW_MISSING_SMTP ? ['SMTP_HOST'] : []
+  return REQUIRED_PRODUCTION_ENV.filter((key) => !process.env[key] && !waived.includes(key))
 }
+
+/** True when mail is deliberately waived AND genuinely absent — the state the
+ *  boot banner describes. Both halves matter: the flag set on a box that *does*
+ *  have SMTP configured is merely redundant, not worth shouting about. */
+export const smtpDeliberatelyMissing = (): boolean =>
+  Boolean(process.env.ALLOW_MISSING_SMTP) && !process.env.SMTP_HOST
 
 const banner = (missing: string[]): string => {
   const rule = '='.repeat(78)
@@ -71,6 +98,35 @@ export const productionEnvError = (missing: string[]): string =>
  * twice.
  */
 const BANNER_FLAG = Symbol.for('verify.prodEnvBannerPrinted')
+const SMTP_BANNER_FLAG = Symbol.for('verify.smtpWaivedBannerPrinted')
+
+/**
+ * Announces, on every boot, that the server is running without mail.
+ *
+ * Separate flag from the LOCAL_PROD_REPRO banner because both can be true at
+ * once and they say different things — and separate symbol on `globalThis` for
+ * the reason given above: Next bundles `instrumentation.ts` and
+ * `payload.config.ts` into different chunks, so a module-level boolean prints
+ * twice.
+ */
+export const warnSmtpWaived = (): void => {
+  if (!smtpDeliberatelyMissing()) return
+  const g = globalThis as unknown as Record<symbol, boolean>
+  if (g[SMTP_BANNER_FLAG]) return
+  g[SMTP_BANNER_FLAG] = true
+  const rule = '='.repeat(78)
+  console.error(
+    `\n${rule}\n` +
+      `  RUNNING WITHOUT EMAIL — ALLOW_MISSING_SMTP is set\n` +
+      `\n` +
+      `  Enquiries ARE still captured: Admin -> Forms -> Form Submissions.\n` +
+      `  Nobody is emailed when one arrives, so that list must be checked by hand.\n` +
+      `  Admin password resets will NOT work while this is set.\n` +
+      `\n` +
+      `  To turn mail on: fill the SMTP_* block in .env and REMOVE this variable.\n` +
+      `${rule}\n`,
+  )
+}
 
 export const assertProductionEnv = (): void => {
   const missing = missingProductionEnv()

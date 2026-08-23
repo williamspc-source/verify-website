@@ -16,11 +16,12 @@ something undone.
 
 ## The records, and the rule for all of them
 
-Nine documents describe this repo to someone who was not there. **A change lands in all the ones it
+Ten documents describe this repo to someone who was not there. **A change lands in all the ones it
 touches, in the same pass, or the set starts lying** — and a reader cannot tell which one is stale.
 
 | File | Holds | Reader |
 |---|---|---|
+| `HANDOVER.md` | Standing a box up from nothing, and the handful of traps worth knowing on day one | Whoever inherits the project, having never seen it |
 | `CLAUDE.md` | Architecture, invariants, traps | Whoever changes the code |
 | `OUTSTANDING.md` | What is knowingly imperfect, and what fixing it costs | Whoever inherits it |
 | `README.md` | Running, testing, deploying, and where images go | Whoever maintains it |
@@ -32,8 +33,15 @@ touches, in the same pass, or the set starts lying** — and a reader cannot tel
 | `current-state.md` | Status *now*: what works, what is open, how to get it onto the box | Whoever is driving the work |
 
 It said **seven** while listing seven and `REVIEW-CHECKLIST.md` already existed unlisted — the rule
-this section states, broken by the section itself. It is nine now: the two additions are
-`ADMIN-GUIDE.md` and the checklist that was always there.
+this section states, broken by the section itself. It went to nine with `ADMIN-GUIDE.md` and the
+checklist that was always there, and to **ten** with `HANDOVER.md`.
+
+`HANDOVER.md` and `README.md` are the pair most likely to be confused, and the split is by reader,
+not by topic. **`README.md` is for whoever maintains it** and assumes the project is already
+running. **`HANDOVER.md` is for someone who has never seen the repo**: how to get from an empty box
+to a serving site, what the environment variables cost when wrong, and the small number of traps
+that will otherwise eat their first day. Where they touch — deploying, testing — `HANDOVER.md` gives
+the short path and points at `README.md`, rather than restating it.
 
 `ADMIN-GUIDE.md` and `src/Styles/HOOKS.md` share a reader and must not share content. HOOKS.md owns
 *"how do I change how this looks"*; ADMIN-GUIDE.md owns *"what is this thing and what feeds off it"*.
@@ -161,6 +169,7 @@ and the specs read as deletable. Counts are deliberately **not** recorded here �
 | `tests/int/headingId.int.spec.ts` | `headingId`/`slugify` — stable slugs, `[[accent]]` stripping, collision disambiguation. The unit half of the anchor-id invariant. |
 | `tests/int/qualificationIcon.int.spec.ts` | Re-derives every qualification→icon pair from the design reference and asserts `qualificationIcon()` reproduces it, returns only icons in `iconMap`, and falls back. |
 | `tests/int/api.int.spec.ts` | **One boot smoke test** (`fetches users`). The name promises a suite; it is not one. |
+| `tests/int/productionEnv.int.spec.ts` | The boot gate: which environment variables are required while serving, that `next build` waives them all, and that `ALLOW_MISSING_SMTP` waives `SMTP_HOST` **and nothing else**. The negative assertion is the point — a test of only the happy branch cannot tell a targeted opt-out from a waiver of everything. |
 | `tests/e2e/frontend.e2e.spec.ts` | The largest e2e file: skip link (both states), centred-heading wrap, hero weight, testimonial hover. Most of the browser traps below are its assertions. |
 | `tests/e2e/links.e2e.spec.ts` | Every `#fragment` link has a target, plus the behavioural Videolink assertion — the "an anchor link is two halves" invariant. |
 | `tests/e2e/images.e2e.spec.ts` | Images are served at the size they render, per route. **The guard for the four image invariants below** (`sizes`, width-only derivatives, the no-derivative majority case, `object-fit` without `fill`). |
@@ -222,6 +231,16 @@ Fully isolated from production — it never touches the live database.
   - `pnpm dev:prod` runs `next start`, which *is* serving, so it needs **`LOCAL_PROD_REPRO=1`**
     in your local `.env`. That prints a boxed banner on every boot and disables nothing else.
     **Never set it on the box.**
+  - **`ALLOW_MISSING_SMTP=1` is the server-side equivalent, and waives `SMTP_HOST` and nothing
+    else** — `NEXT_PUBLIC_SERVER_URL` and `PREVIEW_SECRET` stay required, so a genuinely
+    misconfigured deploy still refuses to start. It exists because the staging box runs before mail
+    credentials do. Guarded by `tests/int/productionEnv.int.spec.ts`, whose load-bearing assertion is
+    the *negative* one: that the flag is not a blanket waiver. Proven red both ways — waiver deleted,
+    and waiver widened to all three.
+    **It must be removed before the site takes real enquiries.** While set, submissions are still
+    stored but nobody is emailed, and admin password resets silently fail — surfaced by a boot banner
+    and, more usefully, a red banner on the admin dashboard (`BeforeDashboard`), which keys on
+    `SMTP_HOST` rather than on the flag so it is equally true on a dev machine.
   - `SMTP_HOST` is unset locally. Payload's built-in fallback is a console adapter that logs at
     *info* and resolves successfully — indistinguishable from a real send — so it is replaced by
     `src/email/emailNotSentAdapter.ts`, which logs `[EMAIL NOT SENT] to=… subject=…` at **error**
