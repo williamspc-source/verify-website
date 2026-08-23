@@ -21,7 +21,7 @@ section below points at the document that owns the detail.
 | `src/Styles/HOOKS.md` | The non-technical editor's manual — every control and where it lives |
 | `HOMEPAGE-CHANGES.md` | What each implementation pass changed, and what it verified |
 | `ADMIN-GUIDE.md` | What every admin sidebar item is for — the editor's system guide |
-| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 54 is the latest**; 22 is the last full cross-page audit |
+| `verify-website-design-diff.md` | Design reference vs build, page by page. **Comparison 55 is the latest**; 22 is the last full cross-page audit |
 | `REVIEW-CHECKLIST.md` | Every page and block, to tick off during manual review. Working document — it is spent once the review is done |
 
 ---
@@ -80,38 +80,40 @@ guard can actually go red — run it if you change a test.
 
 ## What is not done
 
-### 1. The box is out of date and is being rebuilt from scratch
+### 1. The box is out of date and is being rebuilt from scratch — baseline now generated
 
 The version deployed on the Proxmox box predates the data layer, the branding work and the whole
 redesign. **The decision is to wipe it and do a fresh install rather than migrate.** Nothing in the
 live database needs preserving — no editor content, no uploads, no submissions.
 
-**This decision retires the single largest risk in the repo.** `OUTSTANDING.md` §1 describes a
-catch-up migration that drops five columns, needs a hand-pasted `USING` clause for two
-`varchar → jsonb` conversions, and carries a pre-flight SQL check against live data. All of that
-exists *only* to protect data on the current box. With the database discarded, the correct move is
-instead:
+**The blocker is cleared.** `src/migrations/` now holds a single
+`20260823_130006_baseline.{ts,json}`, generated from the current schema; the stale 5 July baseline
+is deleted and `index.ts` points at the new one. `OUTSTANDING.md` §1 — the catch-up migration with
+its five drops, hand-pasted `USING` clauses and pre-flight check — is fully superseded and exists
+only as history.
 
-> Delete `src/migrations/20260705_105320_baseline.{ts,json}`, empty the array in
-> `src/migrations/index.ts`, and generate **one fresh baseline** from the current schema.
+**It was verified against an empty database rather than left for the box to discover.** A scratch
+`verify_cms_migtest` was created, `pnpm payload migrate` ran it in 685ms with no errors, and a
+column-level diff of the result against `verify_cms` — table, column and data type — returned
+**zero differences in both directions**: 310 tables, 3605 columns, 1305 indexes on each. The scratch
+database was then dropped.
 
-That produces a single `CREATE TABLE` migration: no drops, no type conversions, no pre-flight, and
-nothing to hand-review for data loss. **Do it last**, once the polishing work has stopped changing
-fields — a superseded migration file in `src/migrations/` is a trap, because someone will run it.
+The `up` function is **310 `CREATE TABLE` and 995 `CREATE INDEX … USING btree`, with no `DROP` and
+no `ALTER … USING`**; the 310 drops are all in `down`, as they should be. Exactly one identifier
+reaches 63 characters — `_pages_v_blocks_people_grid_asmt_type_id_assessment_types_id_fk`, which is
+the *complete* name rather than a truncated one (next longest is 62). That check exists because a
+name truncated at 63 is what made the schema rewrite itself on every boot; see the identifier
+invariant in `CLAUDE.md`.
 
-Current drift, re-measured 2026-08-23 evening (`verify_cms` against the checked-in baseline):
+**The schema is frozen.** Any field change from here needs its own `migrate:create` on top, so treat
+a new collection/global/block field as a deliberate decision rather than a tweak.
 
-| | Baseline | Now |
-|---|---|---|
-| Columns | 3207 | 3605 |
-| Tables | 301 | 310 |
-| Indexes | 946 | 1305 |
+### What is left before pushing
 
-At column level that is **410 added and 12 removed** — six of the twelve are the department columns
-moving to the Departments taxonomy, which is a change of shape rather than a loss. The commands that
-re-take all of this (psql counts, then a column-level ADDED/REMOVED diff against the baseline JSON)
-are in `OUTSTANDING.md` §1, which is otherwise a superseded record: the twelve drops are exactly why
-its old "expect exactly five" pre-flight had to go. **Re-measure rather than editing these numbers.**
+Nothing in the repo. On the box: pull → `pnpm payload migrate` → `pnpm build`, then seed with
+`POST /next/seed-verify` (needs `ENABLE_SEED_ENDPOINT=true` and a logged-in user). Its `.env` must
+set `SMTP_HOST`, `NEXT_PUBLIC_SERVER_URL` and `PREVIEW_SECRET` or `instrumentation.ts` exits 1 — and
+**`LOCAL_PROD_REPRO` must never be set there**.
 
 ### 2. Design gaps — none open
 

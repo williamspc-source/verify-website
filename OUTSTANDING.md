@@ -21,7 +21,7 @@ and `zsh tests/int/prove-guards.sh` (proves the automated guards can actually fa
 
 | # | Issue | Live today? | User impact | Effort | Recommendation |
 |---|---|---|---|---|---|
-| 1 | The catch-up migration, abandoned — a **fresh baseline** replaces it | — | **Blocks deploy** until the baseline is generated | ~20 min | Superseded; the live procedure is `current-state.md` §1 |
+| 1 | The catch-up migration, abandoned — a **fresh baseline** replaces it | — | None — the baseline is generated and verified against an empty database | done | History only; `current-state.md` §1 has the state |
 | 2 | Two e2e specs are flaky under a loaded dev server, and can 500 an unrelated route | Test-only | `pnpm test` fails intermittently on a machine that is otherwise fine, sometimes reporting a page as broken when it is not | ~10 min | Worth doing before handover |
 | 3 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** | After the deploy, not before |
 | 4 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min | Only if someone confirms which is intended |
@@ -708,7 +708,7 @@ load before assuming it is fine.
 for taking the **live** database from the checked-in baseline to the current shape with one generated
 catch-up migration. That is no longer the plan: the box is being wiped and rebuilt, so the move is a
 **fresh baseline** — delete `src/migrations/`'s baseline, empty its index, and generate one
-`CREATE TABLE` migration against an empty database. **The live procedure is `current-state.md` §1.**
+`CREATE TABLE` migration against an empty database. **Done on 2026-08-23**: `20260823_130006_baseline` is generated, verified against an empty scratch database (zero column-level differences either way), and is the only migration. `current-state.md` §1 has the detail.
 
 Deleting it rather than leaving it was the point. Its pre-flight told the operator to confirm
 *"exactly five `DROP COLUMN` statements … anything else dropping is a mistake — stop and

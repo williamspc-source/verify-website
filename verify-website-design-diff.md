@@ -3590,3 +3590,45 @@ two consecutive compares — the documented noise, not a change.
 Payload in-process, and under the load of all 61 tests that boot exceeds Playwright's default 30s
 hook timeout — failing with no assertion error, which reads like a broken test rather than a slow
 one. The hooks now carry a timeout sized to the real work. Full e2e: **61/61, twice**.
+
+
+---
+
+## Comparison 55: one fresh baseline, verified before it reaches the box (2026-08-23)
+
+Not a design pass. The deploy blocker, closed.
+
+The checked-in migration was `20260705_105320_baseline` — **four months stale**, 410 columns behind
+the local schema, with none of the data-layer, rich-text, carousel or TryBooking work in it. Since
+the box pulls, builds *and* migrates, a deploy against it would have built a July schema and served
+against a database missing hundreds of columns.
+
+`current-state.md` §1 already carried the decision — the box is wiped, nothing in its database needs
+keeping, so the move is a single fresh baseline generated **last**. This is that.
+
+### Order mattered
+
+The identifier defect (Comparison 54) was fixed **first**, deliberately. A baseline generated before
+that rename would have baked the truncated 69-character foreign key in permanently, and fixing it
+afterwards would need a second migration on top — exactly the accumulation the fresh baseline exists
+to avoid.
+
+### What was checked, rather than assumed
+
+- The `up` function is **310 `CREATE TABLE` and 995 `CREATE INDEX … USING btree`** — **zero** `DROP`,
+  zero `ALTER … USING`. The 310 drops are all in `down`, as they should be.
+- **Exactly one identifier reaches 63 characters**, and it is the *complete*
+  `_pages_v_blocks_people_grid_asmt_type_id_assessment_types_id_fk` rather than a truncated name;
+  next longest is 62. 63 is the length truncation lands on, which is why it is the thing to grep for.
+- **It was run, not just read.** A scratch `verify_cms_migtest` database was created, the migration
+  applied in 685ms with no errors, and a column-level diff of the result against `verify_cms` —
+  table, column and data type — returned **zero differences in both directions** (310 tables, 3605
+  columns, 1305 indexes each). The scratch database was then dropped, because an unknown table left
+  in the app's own database hangs the next dev push.
+
+`pnpm build` passes, `tsc` and `lint` clean.
+
+### From here
+
+The schema is frozen: any further field change needs its own `migrate:create` on top. On the box the
+sequence is pull → `pnpm payload migrate` → `pnpm build`, then `POST /next/seed-verify`.
