@@ -40,6 +40,7 @@ import { CostGridBlock } from '@/blocks/CostGrid/Component'
 import { PortalCtaBlock } from '@/blocks/PortalCta/Component'
 import { NewsletterBlock } from '@/blocks/Newsletter/Component'
 import { VideoEmbedBlock } from '@/blocks/VideoEmbed/Component'
+import { TryBookingBlock } from '@/blocks/TryBooking/Component'
 import { SectionNavBlock } from '@/blocks/SectionNav/Component'
 import { FeaturedArticlesBlock } from '@/blocks/FeaturedArticles/Component'
 import { EventsExplorerBlock } from '@/blocks/EventsExplorer/Component'
@@ -95,6 +96,7 @@ const blockComponents = {
   portalCta: PortalCtaBlock,
   newsletter: NewsletterBlock,
   videoEmbed: VideoEmbedBlock,
+  tryBooking: TryBookingBlock,
   sectionNav: SectionNavBlock,
   featuredArticles: FeaturedArticlesBlock,
   eventsExplorer: EventsExplorerBlock,
@@ -147,6 +149,7 @@ const selfSpaced = new Set([
   'portalCta',
   'newsletter',
   'videoEmbed',
+  'tryBooking',
   'sectionNav',
   'section',
   'row',

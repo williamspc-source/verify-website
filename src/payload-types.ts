@@ -737,6 +737,7 @@ export interface Page {
     | PortalCtaBlock
     | NewsletterBlock
     | VideoEmbedBlock
+    | TryBookingBlock
     | SectionNavBlock
     | FeaturedArticlesBlock
     | EventsExplorerBlock
@@ -2702,6 +2703,7 @@ export interface SectionBlock {
         | LeadershipSpotlightBlock
         | PortalCtaBlock
         | VideoEmbedBlock
+        | TryBookingBlock
         | FormBlock
       )[]
     | null;
@@ -2775,6 +2777,7 @@ export interface RowBlock {
               | LeadershipSpotlightBlock
               | PortalCtaBlock
               | VideoEmbedBlock
+              | TryBookingBlock
               | FormBlock
             )[]
           | null;
@@ -11208,6 +11211,116 @@ export interface VideoEmbedBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TryBookingBlock".
+ */
+export interface TryBookingBlock {
+  /**
+   * Small uppercase label above the heading (optional).
+   */
+  eyebrow?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Wrap a word/phrase in [[brackets]] to highlight it in the brand accent colour, e.g. "Meet Our [[Expert Panel]]". Press Enter to start a new line of the same heading.
+   */
+  heading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  subheading?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
+   */
+  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  /**
+   * The digits from the event’s TryBooking address — e.g. 1525708 for trybooking.com/1525708. Numbers only.
+   */
+  eventId: string;
+  /**
+   * TryBooking currently publishes one embeddable form type. Kept as a list so another can be added without a data migration.
+   */
+  widgetType?: 'landingPageEmbed' | null;
+  /**
+   * Shown as a button linking straight to TryBooking whenever the embedded form cannot load — so a visitor is never left looking at an empty space. Leave it as is unless you have a reason.
+   */
+  fallbackLabel?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Section background colour.
+   */
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  /**
+   * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
+   */
+  anchorId?: string | null;
+  /**
+   * Pick styles defined in Globals → Custom Styles.
+   */
+  cssClass?: string[] | null;
+  /**
+   * Content width for this section.
+   */
+  containerWidth?: ('normal' | 'narrow' | 'wide' | 'full') | null;
+  /**
+   * Animate the section in as it scrolls into view.
+   */
+  motion?: ('none' | 'fade-up' | 'fade-in' | 'zoom-in') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'tryBooking';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "FormBlock".
  */
 export interface FormBlock {
@@ -15514,6 +15627,7 @@ export interface PagesSelect<T extends boolean = true> {
         portalCta?: T | PortalCtaBlockSelect<T>;
         newsletter?: T | NewsletterBlockSelect<T>;
         videoEmbed?: T | VideoEmbedBlockSelect<T>;
+        tryBooking?: T | TryBookingBlockSelect<T>;
         sectionNav?: T | SectionNavBlockSelect<T>;
         featuredArticles?: T | FeaturedArticlesBlockSelect<T>;
         eventsExplorer?: T | EventsExplorerBlockSelect<T>;
@@ -15586,6 +15700,7 @@ export interface SectionBlockSelect<T extends boolean = true> {
         leadershipSpotlight?: T | LeadershipSpotlightBlockSelect<T>;
         portalCta?: T | PortalCtaBlockSelect<T>;
         videoEmbed?: T | VideoEmbedBlockSelect<T>;
+        tryBooking?: T | TryBookingBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
       };
   cssClass?: T;
@@ -15638,6 +15753,7 @@ export interface RowBlockSelect<T extends boolean = true> {
               leadershipSpotlight?: T | LeadershipSpotlightBlockSelect<T>;
               portalCta?: T | PortalCtaBlockSelect<T>;
               videoEmbed?: T | VideoEmbedBlockSelect<T>;
+              tryBooking?: T | TryBookingBlockSelect<T>;
               formBlock?: T | FormBlockSelect<T>;
             };
         id?: T;
@@ -16689,6 +16805,26 @@ export interface VideoEmbedBlockSelect<T extends boolean = true> {
   url?: T;
   videoTitle?: T;
   caption?: T;
+  background?: T;
+  anchorId?: T;
+  cssClass?: T;
+  containerWidth?: T;
+  motion?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TryBookingBlock_select".
+ */
+export interface TryBookingBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  subheading?: T;
+  textColour?: T;
+  eventId?: T;
+  widgetType?: T;
+  fallbackLabel?: T;
   background?: T;
   anchorId?: T;
   cssClass?: T;

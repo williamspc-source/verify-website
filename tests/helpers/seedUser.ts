@@ -69,3 +69,43 @@ export async function cleanupPage(id: string | number): Promise<void> {
 
   await payload.delete({ collection: 'pages', id })
 }
+
+/**
+ * Creates a published page carrying one block, for a spec that needs to see that
+ * block rendered on a real route.
+ *
+ * `_status: 'published'` is not optional. Pages are draft-enabled, and the
+ * front end queries them with `overrideAccess: false`, so a page created
+ * without it is invisible to the very request the test is about to make — the
+ * spec then fails with a 404 that looks like a routing bug.
+ *
+ * Pair every call with `cleanupPage` in `afterAll`; see its note on why the
+ * delete goes through Payload rather than SQL.
+ */
+export async function createPageWithBlock(
+  slug: string,
+  block: Record<string, unknown>,
+): Promise<number | string> {
+  const payload = await getPayload({ config })
+
+  // Clear a leftover from an interrupted run, or the slug lookup finds two.
+  const existing = await payload.find({
+    collection: 'pages',
+    where: { slug: { equals: slug } },
+    limit: 10,
+    depth: 0,
+  })
+  for (const doc of existing.docs) await payload.delete({ collection: 'pages', id: doc.id })
+
+  const created = await payload.create({
+    collection: 'pages',
+    data: {
+      title: `Test — ${slug}`,
+      slug,
+      _status: 'published',
+      layout: [block],
+    } as never,
+    context: { disableRevalidate: true },
+  })
+  return created.id
+}

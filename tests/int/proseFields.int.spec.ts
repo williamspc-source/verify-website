@@ -53,6 +53,7 @@ const PLAIN_BY_NAME: Record<string, string> = {
   href: 'href',
   embedUrl: 'iframe src',
   videoId: 'provider id, interpolated into an embed URL',
+  eventId: 'TryBooking event id — interpolated into a booking URL and a data-eid attribute',
   externalUrl: 'href',
   linkOverride: 'href',
   registrationUrl: 'href',

@@ -40,6 +40,7 @@ import { CostGrid } from '../../blocks/CostGrid/config'
 import { PortalCta } from '../../blocks/PortalCta/config'
 import { Newsletter } from '../../blocks/Newsletter/config'
 import { VideoEmbed } from '../../blocks/VideoEmbed/config'
+import { TryBooking } from '../../blocks/TryBooking/config'
 import { SectionNav } from '../../blocks/SectionNav/config'
 import { FeaturedArticles } from '../../blocks/FeaturedArticles/config'
 import { EventsExplorer } from '../../blocks/EventsExplorer/config'
@@ -162,6 +163,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 PortalCta,
                 Newsletter,
                 VideoEmbed,
+                TryBooking,
                 SectionNav,
                 FeaturedArticles,
                 EventsExplorer,

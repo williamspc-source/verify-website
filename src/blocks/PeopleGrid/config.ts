@@ -86,6 +86,14 @@ export const PeopleGrid: Block = {
         // under a heading promising the ones who conduct JMEs.
         {
           name: 'assessmentType',
+          // NOTE: this column's foreign key hits Postgres's 63-character
+          // identifier limit on the `_pages_v` shadow table, so Drizzle drops and
+          // recreates the constraint on every boot (measured: the oid changes each
+          // time). It is harmless to data but causes intermittent `42704` failures
+          // when two boots race. `dbName` is NOT the fix — Payload 3.85 does not
+          // accept it on a relationship field and the build fails to type check.
+          // Recorded in OUTSTANDING.md; the real fix is a shorter field name,
+          // which is a rename across the config, component, seed and tests.
           type: 'relationship',
           relationTo: 'assessment-types',
           admin: {

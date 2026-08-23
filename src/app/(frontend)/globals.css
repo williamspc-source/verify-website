@@ -12487,3 +12487,47 @@
 .vf-tc--inline .vf-accent {
   color: inherit !important;
 }
+
+/* ── TryBooking embed ──────────────────────────────────────────────────────
+   The widget builds its own iframe inside `.tryb-widget` and sizes it through
+   iframe-resizer, so nothing here sets a height — declaring one would fight the
+   resizer and either clip the booking form or leave dead space beneath it.
+
+   The fallback button is centred and given room above it because it renders in
+   the server HTML and is hidden only once the embedded form proves it loaded;
+   it is a real, working control for as long as it is on screen, not a spinner. */
+.vf-trybooking {
+  width: 100%;
+}
+
+.vf-trybooking .tryb-widget {
+  width: 100%;
+}
+
+/* Collapsed until the embedded form confirms it loaded — see the comment in
+   TryBookingClient.tsx. A refused iframe still occupies space, so without this a
+   failed embed paints a large empty panel above the fallback button. Measured:
+   the widget loads and messages the parent normally while collapsed, and sizes
+   itself correctly the moment `is-loaded` is added. */
+.vf-trybooking__embed {
+  height: 0;
+  overflow: hidden;
+}
+
+.vf-trybooking__embed.is-loaded {
+  height: auto;
+  overflow: visible;
+}
+
+.vf-trybooking__fallback {
+  margin-top: 24px;
+  text-align: center;
+}
+
+/* `hidden` is an attribute, and `display: flex/block` in a component rule beats
+   the browser's `[hidden] { display: none }` default. Nothing sets a display on
+   this element today, so this is belt-and-braces against a later utility class
+   silently un-hiding a fallback that has already been satisfied. */
+.vf-trybooking__fallback[hidden] {
+  display: none;
+}
