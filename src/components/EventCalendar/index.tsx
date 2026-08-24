@@ -20,7 +20,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
  * Note the reference's own `.event-list-calendar*` rules (events.css:749-806) are
  * DEAD there — its JS renders a blue "Event Photo" placeholder on every row and
  * never this glyph. We render it deliberately: it tells a visitor the date, which
- * a placeholder box does not. Recorded in OUTSTANDING.md so it is not read as a
+ * a placeholder box does not. Recorded in README.md > Deliberate departures so it is not read as a
  * defect by the next person diffing against the reference.
  *
  * `variant="card"` is for the 260px `.event-card-media` panel, whose blue

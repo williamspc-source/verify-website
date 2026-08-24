@@ -5,14 +5,14 @@ write code, and nothing in this guide asks you to.
 
 **What it covers:** every item in the left-hand sidebar — what it is, what it changes on the public
 site, and what happens if you delete something. It does **not** cover colours, fonts, spacing or
-CSS; that is [`src/Styles/HOOKS.md`](src/Styles/HOOKS.md), the styling manual. The split is:
+CSS; that is [`src/Styles/HOOKS.md`](../src/Styles/HOOKS.md), the styling manual. The split is:
 
 > **HOOKS.md** answers *"how do I change how this looks?"*
 > **This guide** answers *"what is this thing, and what feeds off it?"*
 
 **The one rule worth knowing before anything else:** changes go live when you press **Save**. There
 is no deployment to run and no cache to clear. The only gate is the **Draft / Published** toggle,
-and only five things have one (see [Drafts](#drafts-and-what-hides-a-page)).
+and only five things have one (see [Drafts](#9-drafts-and-what-hides-a-page)).
 
 ---
 
@@ -62,7 +62,7 @@ them apart.
 | Change the wording of the "register for the portal" email | **Site → Site Settings** → *Booking portal registration email* |
 | Fix a badly cropped photo | **Media** → the image → move the focal point |
 | Change a heading like "Assessment Areas" on every profile | **Page settings → Specialist Profile** |
-| Change colours, spacing, fonts | See [`HOOKS.md`](src/Styles/HOOKS.md) |
+| Change colours, spacing, fonts | See [`HOOKS.md`](../src/Styles/HOOKS.md) |
 
 ---
 
@@ -351,7 +351,7 @@ photos beside it. Fixed on 2026-08-19.
 
 **One thing still worth knowing:** save photographs as **JPEG**, not PNG. PNG is lossless and is the
 right choice for a logo, but a PNG photograph is roughly ten times the file size of the identical
-JPEG, and the site cannot convert between formats. See OUTSTANDING.md §11. The exception is the
+JPEG, and the site cannot convert between formats. See `README.md` → *Known issues*. The exception is the
 **specialist** headshots: those are cut-outs with a transparent background, and JPEG cannot store
 transparency, so they stay PNG.
 
@@ -470,7 +470,7 @@ page:
 
 ### Design
 
-**Custom Styles** and **Design System** — see [`HOOKS.md`](src/Styles/HOOKS.md).
+**Custom Styles** and **Design System** — see [`HOOKS.md`](../src/Styles/HOOKS.md).
 
 ---
 
@@ -555,6 +555,5 @@ to those, so make them when you are ready.
 
 | File | For |
 |---|---|
-| [`src/Styles/HOOKS.md`](src/Styles/HOOKS.md) | Colours, fonts, spacing, block options, CSS |
-| [`README.md`](README.md) | Running and deploying the site; where images go |
-| [`OUTSTANDING.md`](OUTSTANDING.md) | Known-imperfect things, deliberately left |
+| [`src/Styles/HOOKS.md`](../src/Styles/HOOKS.md) | Colours, fonts, spacing, block options, CSS |
+| [`README.md`](../README.md) | Running and deploying the site, where images go, and every known-imperfect thing |

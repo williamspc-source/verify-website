@@ -4278,7 +4278,7 @@
    The inline copy is what those pages render; the shared one is dead.
    This was already got wrong once: a typography pass took the size from the
    inline rule and the weight from the shared one, logged it as "aligned to the
-   reference" in verify-website-design-diff.md §5, and left every interior hero
+   reference", and left every interior hero
    title (59 pages, plus /events/event/*) a step light. Guarded by the hero
    weight test in tests/e2e/frontend.e2e.spec.ts, which reads the expected value
    out of the reference page rather than hardcoding it. */
@@ -6751,7 +6751,7 @@
 
    The reference is wrong here rather than us mis-porting it, so this is one of
    the cases where matching its *intent* means not matching its declaration —
-   see `verify-website-design-diff.md` Comparison 51. `.opt-btn-white` below keeps
+   see README.md > Deliberate departures. `.opt-btn-white` below keeps
    its hover: that one is a real link. */
 .portal-opt4-tile { background: color-mix(in srgb, var(--white) 10%, transparent); border: 1px solid color-mix(in srgb, var(--white) 20%, transparent); border-radius: var(--vf-radius-tile); padding: 26px 18px 22px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .portal-opt4-tile-icon { font-size: 2.2rem; color: var(--accent-light); line-height: 1; width: 2.2rem; height: 2.2rem; }
@@ -11116,7 +11116,7 @@
    this 320x320 box — so the editor's focal point was honoured inside a 480px-tall
    frame that `overflow: hidden` then cut to 320. Two crops, and a focal point set
    low in the frame was clipped away after being applied. Same fix and the same
-   reason as `.vf-split__media`; see verify-website-design-diff.md Comparison 46. */
+   reason as `.vf-split__media`; see README.md > Deliberate departures. */
 .staff-photo { position: relative; width: 100%; aspect-ratio: 1/1; border-radius: var(--vf-radius-md); overflow: hidden; background: var(--vf-grad-image-tint); box-shadow: 0 8px 32px rgba(0,35,70,0.1); margin-bottom: 24px; }
 .staff-photo img, .staff-photo-img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .staff-sidebar-info { display: flex; flex-direction: column; gap: 12px; }
@@ -11275,7 +11275,7 @@
 
 /* Left-column photo. NOT in the design reference: `.claimant-process-left` there
    is label + title + paragraph and nothing else. Added at the client's request —
-   see verify-website-design-diff.md, Comparison 42.
+   see README.md > Deliberate departures.
 
    The fixed 4:3 frame is the point: the column keeps the same height whatever is
    uploaded, and the framing is chosen by the image's focal point in Media rather
@@ -11553,7 +11553,7 @@
 }
 /* EventsExplorer is not in RenderBlocks' `selfSpaced` set, so it still gets the
    legacy `.my-16` wrapper; its bottom margin would reinstate 64px of the gap.
-   Same collapse as `.my-16:has(> .ni-section)` above. See OUTSTANDING.md §16. */
+   Same collapse as `.my-16:has(> .ni-section)` above. See README.md > Known issues. */
 .my-16:has(> .events-explorer--band-to-edge) {
   margin-bottom: 0;
 }

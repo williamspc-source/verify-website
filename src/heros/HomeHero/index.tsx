@@ -27,7 +27,7 @@ export const HomeHero = async (props: HomeHeroProps) => {
   }
   // Measured 50px on screen. The bundled fallback is a static 1166px / 73 KB PNG
   // that mediaSrc cannot help with (no derivatives exist for a file outside the
-  // Media collection) — noted in OUTSTANDING.md; an uploaded shield IS sized.
+  // Media collection) — see README.md > Known issues; an uploaded shield IS sized.
   const shieldSrc = settings?.shield?.url
     ? (mediaSrc(settings.shield, 50 * 2) ?? '/assets/images/VERIFY Shield.png')
     : '/assets/images/VERIFY Shield.png'

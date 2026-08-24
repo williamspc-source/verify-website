@@ -30,7 +30,7 @@ export type PostSeed = {
 const RAW_POSTS: PostSeed[] = [
   // The four real "In the Loop" volumes. Everything else in this fixture was
   // AI-written scaffold content and was removed on 2026-08-20 — see the
-  // Records section of verify-website-design-diff.md. Deleting a fixture entry
+  // 2026-08-20 content cull; `git log` has the pass. Deleting a fixture entry
   // does NOT remove the document from an existing install: `createIfNew` only
   // ever adds. These were cleared by a full reseed, which is also how the box
   // is built.

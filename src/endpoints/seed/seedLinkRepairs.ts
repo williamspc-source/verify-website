@@ -77,7 +77,7 @@ export const LABEL_SCOPED_FIXES: {
     //
     // Nothing notices when a key like this goes stale, because `matchTracker` is
     // wired to SUPERSEDED_BLOCKS and APPOINTMENT_TYPE_ANCHORS but not to this
-    // table — see OUTSTANDING.md.
+    // table — see README.md > Known issues.
     label: "Join VERIFY's Expert Panel",
     block: 'gatewayCards',
     from: '/specialists/join-expert-panel',

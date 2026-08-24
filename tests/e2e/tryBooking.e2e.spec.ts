@@ -38,7 +38,7 @@ let pageId: number | string | undefined
 // and the spec then fails with no assertion error, which reads like a broken test
 // rather than a slow one. Measured: this file passes alone and alongside
 // admin.e2e.spec.ts, and failed only in the full run. The timeout is sized to the
-// real work rather than masking anything — see OUTSTANDING.md §22 on Payload's
+// real work rather than masking anything — see README.md > Known issues on Payload's
 // boot cost being load-bearing in the suite.
 const PAYLOAD_BOOT_TIMEOUT = 120_000
 

@@ -134,7 +134,7 @@ export const EventsExplorer: Block = {
       // The design reference gives each group its own <section> and tints the
       // past one `bg-soft` (#f6fbff). We render both inside a single <Section>,
       // so neither its band nor any rule was reaching the page and the two ran
-      // together — see verify-website-design-diff.md, Comparison 45.
+      // together — see README.md > Deliberate departures.
       //
       // Two independent controls rather than one combined "separator style":
       // a rule and a band are different devices, an editor may reasonably want

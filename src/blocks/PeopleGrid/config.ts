@@ -104,7 +104,7 @@ export const PeopleGrid: Block = {
           // time). It is harmless to data but causes intermittent `42704` failures
           // when two boots race. `dbName` is NOT the fix — Payload 3.85 does not
           // accept it on a relationship field and the build fails to type check.
-          // Recorded in OUTSTANDING.md; the real fix is a shorter field name,
+          // The real fix is a shorter field name,
           // which is a rename across the config, component, seed and tests.
           type: 'relationship',
           relationTo: 'assessment-types',

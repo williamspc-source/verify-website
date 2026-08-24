@@ -17,7 +17,7 @@ import { test, expect, type Page } from '@playwright/test'
  * are what the fix governs: Payload generates sized derivatives for them and
  * `mediaSrc`/`<Media>` choose one. Bundled static assets under `/assets/` are
  * excluded — the decorative shield on the homepage is a 1166px PNG in a 50px box
- * (23.4×) with no derivatives to choose from, recorded in OUTSTANDING.md.
+ * (23.4×) with no derivatives to choose from, recorded in README.md > Known issues.
  */
 
 // 4×, set from measurement rather than taste. The binding case is the brand
@@ -28,7 +28,7 @@ const MAX_OVERSIZE = 4
 
 // The largest CMS image currently served is a 477 KB PNG derivative. PNG is what
 // forces this ceiling so high — the same headshots as JPEG/WebP are ~30 KB — see
-// OUTSTANDING.md. It is still far below the 3094 KB original that prompted this.
+// README.md > Known issues. It is still far below the 3094 KB original that prompted this.
 const MAX_IMAGE_KB = 600
 
 const ROUTES = [

@@ -2,9 +2,14 @@
 
 Everything visual on this site can be changed from the admin. This document tells you where.
 
-> **Looking for what something *is* rather than how it looks?** `ADMIN-GUIDE.md` (repo root) explains
-> every item in the admin sidebar — what it holds, where it appears on the site, and what happens if
-> you delete one. This file is the styling half.
+> **Looking for what something *is* rather than how it looks?** [`docs/ADMIN-GUIDE.md`](../../docs/ADMIN-GUIDE.md)
+> explains every item in the admin sidebar — what it holds, where it appears on the site, and what
+> happens if you delete one. This file is the styling half.
+
+<!-- FOR DEVELOPERS: this file cannot move, and §6 cannot be restructured.
+     tests/int/adminControls.int.spec.ts reads it at this exact path and parses §6 by name;
+     tests/visual/findDeadCss.mjs builds its dead-CSS allowlist from it. Both break silently
+     if the path changes, and the allowlist failing open would mark live CSS as dead. -->
 
 Start with **§1** if you only read one section: it explains why edits sometimes appear not to
 work, and how to guarantee they always do.
@@ -429,7 +434,7 @@ then pick **quiet-cards** in that block's *Custom CSS class(es)*.
 
 If the **"Make an Enquiry"** drawer opens but its Send button is greyed out and it says
 *"This form is temporarily unavailable"*, nothing is hidden and no styling is at fault — so there is
-nothing to fix on this page. **`ADMIN-GUIDE.md` → Forms explains what has happened and how to fix
+nothing to fix on this page. **`docs/ADMIN-GUIDE.md` → Forms explains what has happened and how to fix
 it.**
 
 Same for a **newsletter band** that shows a heading and *"Signups are temporarily unavailable"*
@@ -587,7 +592,7 @@ options sit together on the block:
 > before checking the CSS. Untick the last Featured specialist and the homepage section disappears.
 
 Changing *who* is on a profile — Featured, the availability tick, the Assessment Types list — is
-`ADMIN-GUIDE.md` → **Specialists**. This section only owns how the ribbon looks and moves.
+`docs/ADMIN-GUIDE.md` → **Specialists**. This section only owns how the ribbon looks and moves.
 
 ### A TryBooking booking form on a page
 
@@ -609,7 +614,7 @@ booking steps or leave dead space beneath them.
 > embedded on secure (`https`) addresses only. That is expected, and it works on the live site.
 
 For which event, and how to link one from an event page, see the TryBooking section in
-`ADMIN-GUIDE.md`.
+`docs/ADMIN-GUIDE.md`.
 
 ### Step numbers can be `1` or `01`
 
@@ -662,7 +667,7 @@ rather than offered and ignored.
 
 The frame is a fixed 4:3 whatever you upload, so the column keeps the same height and the page never
 reflows around a tall or panoramic photo. If the crop cuts through the wrong part of the picture,
-that is a Media setting rather than a styling one — **`ADMIN-GUIDE.md` → Media** explains the focal
+that is a Media setting rather than a styling one — **`docs/ADMIN-GUIDE.md` → Media** explains the focal
 point. The tile shows the pale blue placeholder with "IMAGE PLACEHOLDER" until a photo is added.
 
 
@@ -678,7 +683,7 @@ point. The tile shows the pale blue placeholder with "IMAGE PLACEHOLDER" until a
   choice always wins.
 - **Accreditations** carry their own icon too, and default to the seal-check tick, which is what the
   design calls for. They are *shared records*, so changing one changes every specialist who holds it
-  — **`ADMIN-GUIDE.md` → Specialists** covers what they are and what else reads them.
+  — **`docs/ADMIN-GUIDE.md` → Specialists** covers what they are and what else reads them.
 
 
 ### Card styles on a Feature Grid, and what makes service cards centre

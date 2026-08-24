@@ -40,8 +40,7 @@ type Ctx = { payload: Payload; req: PayloadRequest }
  * fresh install: whatever this repair writes is what ships, so a repair still
  * drawing the rule would hand the box a look that had been turned off — and the
  * chosen one would exist only in the local database. Turning on both would be
- * choosing a third look nobody picked. See verify-website-design-diff.md,
- * Comparison 45.
+ * choosing a third look nobody picked. See README.md > Deliberate departures.
  */
 
 const PAGE_SLUG = 'events'

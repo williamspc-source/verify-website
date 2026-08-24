@@ -69,7 +69,7 @@ export const ProcessSteps: Block = {
     // ── Claimant left-column photo ──────────────────────────────────────────
     // The design reference has NO image in this column — `.claimant-process-left`
     // is label + title + paragraph and nothing else. This was added at the
-    // client's request; see verify-website-design-diff.md, Comparison 42, so it
+    // client's request; see README.md > Deliberate departures, so it
     // does not get "corrected" back out later.
     //
     // Only the `claimant` variant has a left column to hold a photo; the other

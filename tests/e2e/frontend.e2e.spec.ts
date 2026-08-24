@@ -337,8 +337,8 @@ test.describe('Frontend', () => {
    * The interior hero title is as bold as the reference renders it.
    *
    * This exists because the opposite was shipped, deliberately, and written up as
-   * a correction. `verify-website-design-diff.md` §5 lists `.page-hero h1` weight
-   * "800 → 700" among seventeen values "aligned to the reference".
+   * a correction: `.page-hero h1` weight "800 → 700" was listed among seventeen
+   * values "aligned to the reference". See README.md > Deliberate departures.
    *
    * **The reference holds this rule twice and the two copies disagree.** The
    * shared sheet (`.design-reference/assets/css/styles.css:2587`) says 700. Every

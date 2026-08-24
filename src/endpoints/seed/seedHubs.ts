@@ -442,8 +442,8 @@ export const seedHubs = async (ctx: Ctx): Promise<void> => {
   // opens with a four-way carousel of what VERIFY runs.
   //
   // The carousel used to be here and was removed, on the grounds that it was
-  // "not present in either Target page" (verify-website-design-diff.md
-  // Comparison 15 §3). That comparison only ever looked at the two listing
+  // "not present in either Target page" on the strength of a comparison that
+  // only ever looked at the two listing
   // pages, so it could not have found it. It is on the hub, and it is back.
   //
   // What the reference does NOT have is a search bar; its hub offers two static

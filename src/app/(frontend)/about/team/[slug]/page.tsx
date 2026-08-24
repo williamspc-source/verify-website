@@ -147,7 +147,7 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
                 The ROLE pin that used to head this list is gone. It is in every
                 reference profile, so this is a deliberate departure: it repeated
                 the role already printed under the name in the hero. See
-                verify-website-design-diff.md, Comparison 46. The Role label in
+                README.md > Deliberate departures. The Role label in
                 Team Settings went with it — a label for something nothing renders
                 is a control that silently does nothing.
 

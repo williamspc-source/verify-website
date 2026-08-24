@@ -16,7 +16,7 @@ type Ctx = { payload: Payload; req: PayloadRequest }
  * early-returns on an authored page — the trap recorded in CLAUDE.md and hit
  * twice on /specialists/join-expert-panel alone. A repair reaches every install.
  *
- * It is also the mechanism `OUTSTANDING.md` §13 described as missing: before
+ * It is also the mechanism `README.md` > Known issues describes: before
  * this, filling a placeholder meant uploading in the admin, which a rebuilt
  * database silently loses.
  *
@@ -29,7 +29,7 @@ type Ctx = { payload: Payload; req: PayloadRequest }
  * ── Scope, stated plainly ──
  * The site has 20 image placeholders. This fills EIGHT. The other twelve are
  * waiting on photography and stay as pale-blue tiles, which is their designed
- * empty state — see `OUTSTANDING.md` §13 for the list and what closing each costs.
+ * empty state — `README.md` > Known issues lists them and what closing each costs.
  */
 
 type Target = {

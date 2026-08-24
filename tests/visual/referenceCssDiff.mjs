@@ -91,7 +91,7 @@ const FAMILIES = {
   // faithfully, so every declaration matches and the count reads zero, while the
   // pages rendered a completely different panel. A declaration diff compares
   // rules, not which BRANCH of a component renders; nothing here can catch that.
-  // Our calendar fallback is deliberate — see OUTSTANDING.md.
+  // Our calendar fallback is deliberate — see README.md > Deliberate departures.
   events: {
     css: ['.design-reference/assets/css/events.css'],
     pages: [
@@ -832,7 +832,7 @@ const IMPLEMENTED_AS = {
  * measurement RE-RUN, not re-read — a skip justified by "verified equal in the
  * browser" was once false and hid 11 real spacing gaps. Re-measuring is a design
  * pass, not a documentation one, so it is recorded as an open item in
- * OUTSTANDING.md rather than done here. Treat a dated reason below as unproven
+ * README.md > Known issues rather than done here. Treat a dated reason below as unproven
  * until you have re-taken it at 1440px.
  */
 const EXPLAINED = {
@@ -873,7 +873,7 @@ const EXPLAINED = {
     // treatment — 2.4rem/800, margin-bottom 20px, body line-height 1.85 — as a
     // PAGE SCOPE for /for-clients, whose reference intro is the same pattern.
     // The honest next step is one shared "editorial intro" variant serving both,
-    // rather than a second page scope. Recorded in OUTSTANDING.md.
+    // rather than a second page scope. Recorded in README.md > Known issues.
     '.join-intro-text .section-label': {
       'margin-bottom':
         'The shared `.section-label` rule, 12px against this page\'s 14px. Measured 12px. A 2px change to a class used by every eyebrow on the site.',
@@ -1113,14 +1113,14 @@ const EXPLAINED = {
     // 49 / 23 / 46 times across its pages — so the fix is three token values in
     // the light `--bc-*` context, NOT a page-scoped override. That ripples to
     // every interior page with a breadcrumb, which makes it a decision rather
-    // than a tidy-up. Logged in OUTSTANDING.md with its cost.
+    // than a tidy-up. Logged in README.md > Known issues with its cost.
     //
     // They sit here so this family reads zero and can catch the NEXT regression.
     // That is only legitimate because the entry says what the difference is and
     // where the decision lives — an excuse that merely asserts equivalence is the
     // failure mode recorded in CLAUDE.md.
     '.profile-breadcrumb': {
-      color: 'Deferred site-wide breadcrumb colour — see OUTSTANDING.md.',
+      color: 'Deferred site-wide breadcrumb colour — see README.md > Known issues.',
       position: 'Ours is never sticky to begin with; the reference resets it only because a global `nav {}` rule makes it so. Nothing to undo.',
       top: 'ditto.',
       'z-index': 'ditto.',
@@ -1128,15 +1128,15 @@ const EXPLAINED = {
       'box-shadow': 'ditto.',
     },
     '.profile-breadcrumb a': {
-      color: 'Deferred site-wide breadcrumb colour — see OUTSTANDING.md.',
+      color: 'Deferred site-wide breadcrumb colour — see README.md > Known issues.',
       transition: 'Ours uses the shared `--transition` token (0.28s) against the reference literal 0.15s. Retuning motion is a Design System edit.',
     },
-    '.profile-breadcrumb a:hover': { color: 'ditto — deferred, see OUTSTANDING.md.' },
+    '.profile-breadcrumb a:hover': { color: 'ditto — deferred, see README.md > Known issues.' },
     '.profile-breadcrumb span': {
-      color: 'ditto — deferred, see OUTSTANDING.md.',
+      color: 'ditto — deferred, see README.md > Known issues.',
       'font-size': 'ditto; the separator renders 12.48px against the reference 10.6px.',
     },
-    '.profile-breadcrumb strong': { color: 'ditto — deferred, see OUTSTANDING.md.' },
+    '.profile-breadcrumb strong': { color: 'ditto — deferred, see README.md > Known issues.' },
   },
   'reporting-services': {
     '.rs-services': {
