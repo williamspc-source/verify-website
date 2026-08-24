@@ -1,4 +1,5 @@
 import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+import { portraitShapeClass } from '@/fields/portraitShape'
 import { InlineRichText } from '@/components/RichText/Inline'
 import type { Metadata } from 'next'
 
@@ -159,7 +160,10 @@ export default async function TeamProfilePage({ params: paramsPromise }: Args) {
             {showSidebar ? (
               <div>
                 {photo ? (
-                  <div className="staff-photo">
+                  <div className={['staff-photo', portraitShapeClass(m.profilePhotoShape)]
+                    .filter(Boolean)
+                    .join(' ')}
+                  >
                     <Media
                       resource={photo}
                       fill

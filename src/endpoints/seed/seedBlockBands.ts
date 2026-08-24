@@ -36,6 +36,17 @@ export const BLOCK_BAND_FIXES: BandFix[] = [
       'The reference splits this into `.team-intro` (light blue) over `.team-grid-section` (grey). ' +
       'The block keeps background: muted for the photo grid and puts its heading on its own accent band.',
   },
+  {
+    page: 'about',
+    blockType: 'missionPillars',
+    set: { background: 'hero' },
+    reason:
+      'The panel used to get its hero gradient from a page-scoped `.mv-mission-panel` rule, which ' +
+      'silently beat whatever band an editor picked — the control looked live and was not. That ' +
+      'declaration is gone and the gradient is now the `hero` band option, so the block paints ' +
+      'itself. Existing documents store `dark` from the old default and would render flat charcoal ' +
+      'without this; a changed defaultValue never moves a document that already exists.',
+  },
 ]
 
 export const repairBlockBands = async ({ payload, req }: Ctx): Promise<void> => {

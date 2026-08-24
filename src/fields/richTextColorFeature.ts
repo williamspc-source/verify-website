@@ -22,8 +22,25 @@ import { BRAND_TEXT_COLORS } from './richTextColors'
  *
  * The `css` below is **the editor's swatch and preview only** — it is not written
  * into the document, which is what makes this free of any schema change: no new
- * column, no migration, and a colour retired from the palette degrades to
- * uncoloured text rather than to a stale hex.
+ * column and no migration. ADDING a colour is therefore free.
+ *
+ * ## Retiring a colour is NOT free — it deletes stored data
+ *
+ * Measured in `node_modules`, both ends of it:
+ *
+ *   · `registerTextStates` (…/features/textState/textState.js) compiles
+ *     `parse: value => Object.keys(stateValues).includes(value) ? value : undefined`
+ *     — so a stored key that is no longer in this palette parses to `undefined`;
+ *   · lexical 0.41's `NodeState.toJSON` then runs
+ *     `if (stateConfig.isEqual(v, stateConfig.defaultValue)) delete state[key]`,
+ *     and that default IS `undefined`.
+ *
+ * So the next time an editor opens and saves a document containing a retired
+ * colour, the key is **removed from the stored JSON**. Rendering degrades
+ * gracefully — `colorClass()` returns undefined and the text renders uncoloured
+ * — but the value is gone, and re-adding the key to the palette will not bring
+ * it back. Retire a colour only with a repair that rewrites the affected nodes
+ * first. This is a constraint on removal; it does not apply to adding.
  *
  * The page gets its colour from the class instead. That is deliberate and it is
  * the same reasoning as the block-level control: `.vf-tc-brand` resolves through
@@ -44,8 +61,23 @@ import { BRAND_TEXT_COLORS } from './richTextColors'
  *
  * Payload marks `TextStateFeature` experimental in 3.85, so its API may move on
  * an upgrade. The exposure is two call sites — this file and the `text` converter
- * in `src/components/RichText/shared.tsx`. Stored content is a bare key, so even
- * a breaking API change cannot corrupt what editors have written.
+ * in `src/components/RichText/shared.tsx`. Stored content is a bare key, so a
+ * breaking API change cannot leave a stale hex behind — but see the retirement
+ * note above before assuming stored keys are safe in general.
+ *
+ * ## The swatch list cannot be made editor-editable
+ *
+ * Asked for, and checked before answering. `state.color` is resolved once inside
+ * `sanitizeConfig` — which is what `getPayload()` awaits — and memoised for the
+ * process lifetime; `initLexicalFeatures` copies `clientFeatureProps` verbatim
+ * per request with no hook, and `toolbarGroups` iterates the record with no
+ * per-item predicate. There is no point at which a database read could reach it,
+ * and the `parse` above would reject any key not compiled in anyway. Pre-declared
+ * empty slots do not rescue it: an unfilled slot still renders as a pickable
+ * swatch whose `var()` resolves to nothing, which is a control that visibly does
+ * nothing — the exact failure invariant 2 exists to prevent, and it cannot be
+ * hidden. The palette is a code-time list by construction. What an editor *can*
+ * change is every colour's VALUE, in Site Settings → Brand colours.
  */
 export const brandTextColorFeature = () =>
   TextStateFeature({

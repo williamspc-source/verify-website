@@ -6,6 +6,20 @@
  * computed style**. That makes this a far sharper gate than a pixel diff: any
  * difference at all is a real bug, not a rendering tolerance to argue about.
  *
+ * ── ONE MEASURED EXCEPTION, and it is not a tolerance ──────────────────────
+ * The sentence above was written when PROPS held colour and shape only. The
+ * layout properties added later are not settled at capture time on every route.
+ * Measured 2026-08-24: capturing a baseline and immediately comparing it against
+ * the SAME unchanged code four times in a row gave 2, 3, 0 and 0 changed nodes.
+ * Every time it was `marginLeft`/`marginRight` (indices 30/31) on a
+ * `SECTION > DIV` on `/about` and on a team profile — an `auto` centring margin
+ * resolving against a parent whose width has not settled.
+ *
+ * So a non-empty diff is not, on its own, evidence. Re-run it two or three times
+ * and look at WHICH property indices moved. 30/31 on those two routes is this.
+ * Index 0 (`color`), or any other node, is real. Do not answer this with a
+ * tolerance — it would blunt the one tool here that catches a reflow.
+ *
  * Nodes are keyed by structural index path rather than class name, because class
  * names are exactly what some phases change.
  *

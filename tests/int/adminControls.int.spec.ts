@@ -850,7 +850,14 @@ const ALLOWED_UNREAD_CONFIG: Record<string, string> = {
 
   // Admin-only ordering and grouping. These drive the admin list view, not the
   // public site, and their descriptions now say so.
-  order: 'admin list ordering (Streams/Offices/Locations); public order is authored per-block',
+  // Keyed by bare field name, so this one entry exempts `order` on all eleven
+  // collections that declare it. Nine of those ARE read (Team, Departments,
+  // Offices, Specialties, SpecialtyCategories, ClaimTypes, Resources, Services,
+  // Testimonials) and do not need exempting; the reason used to name Offices,
+  // whose `order` is read by primaryOffice.ts. The two it actually covers are
+  // Streams and Locations, which now sort their own admin list via `defaultSort`
+  // — a config property, which this file's source scan cannot see as a read.
+  order: 'Streams/Locations only: consumed by `defaultSort` in their own config, which the consumer scan cannot see. Public order is authored per-block.',
   region:
     'Locations admin grouping; the directory filter derives from specialist-denormalised titles',
 

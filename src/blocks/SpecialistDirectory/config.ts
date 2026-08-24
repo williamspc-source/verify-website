@@ -51,12 +51,12 @@ export const SpecialistDirectory: Block = {
           defaultValue: 'order',
           admin: {
             description:
-              'Directory sort order. "Custom" uses the drag-to-reorder order set on the Specialists list.',
+              'Surname and Given name are alphabetical and fill in automatically from each specialist’s full name. Custom is the order you set by dragging rows on the Specialists list — dragging changes nothing here unless this is set to Custom. Note the drag order starts alphabetical by surname, so switching to Custom looks like nothing happened until you actually move someone.',
           },
           options: [
-            { label: 'Custom (admin order)', value: 'order' },
-            { label: 'Surname', value: 'lastName' },
-            { label: 'Given name', value: 'firstName' },
+            { label: 'Custom — the drag order on the Specialists list', value: 'order' },
+            { label: 'Surname (A–Z)', value: 'lastName' },
+            { label: 'Given name (A–Z)', value: 'firstName' },
           ],
         },
       ],

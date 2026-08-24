@@ -1,14 +1,19 @@
 import { expect, test } from '@playwright/test'
 
-/**
- * The palette keys, mirrored from `src/fields/richTextColors.ts`. Mirrored rather
- * than imported because the array is evaluated inside `page.evaluate`, which runs
- * in the browser and cannot reach the Node module graph. `richTextColors.int.spec.ts`
- * is what keeps this list honest — it asserts the same keys against the source.
+import { BRAND_TEXT_COLORS } from '../../src/fields/richTextColors.js'
+
+/*
+ * The palette is IMPORTED, not mirrored. It used to be a hand-copied array of
+ * keys, on the stated grounds that `page.evaluate` runs in the browser and
+ * cannot reach the Node module graph. That reason was wrong twice over: the
+ * array is passed *into* `page.evaluate` as an argument, so it is evaluated here
+ * in Node; and `richTextColors.ts`'s only import is `import type`, so nothing of
+ * Payload comes with it. The comment also claimed `richTextColors.int.spec.ts`
+ * kept the mirror honest by asserting the same keys against the source — it does
+ * not, and never did. No test opens this file. Adding a colour therefore used to
+ * leave it silently unguarded here, which is the one place a dead colour is
+ * visible.
  */
-const BRAND_KEYS = ['brand', 'deep', 'bright', 'muted', 'white', 'heading', 'body']
-/** The two that are equal to the default on a light band, on purpose. */
-const BAND_FOLLOWING = ['heading', 'body']
 
 /**
  * No page renders a rich-text value as `[object Object]`, and no page dies
@@ -126,8 +131,7 @@ test.describe('Rich text reaches the page as words', () => {
  * the whole `.vf-tc-brand` rule fails both cases.
  */
 /**
- * Every colour in the dropdown visibly changes the text — except the two that
- * are documented not to.
+ * Every colour in the palette does something — and does only what it says.
  *
  * This exists because the control was reported broken a second time, after it had
  * been fixed and measured. The report was fair: the editor picked the choice
@@ -138,51 +142,106 @@ test.describe('Rich text reaches the page as words', () => {
  * click that could not do anything where the editor was looking.
  *
  * So the palette is not just checked for having a CSS rule (that is
- * `richTextColors.int.spec.ts`) — it is checked for the rule making a *difference*
- * on a real page. A colour that renders the same as no colour is a control that
- * silently does nothing, whatever the stylesheet says.
+ * `richTextColors.int.spec.ts`) — it is checked for the rule making a
+ * *difference* on a real page.
  *
- * The two `Follows the band` entries are excluded by name, because being equal to
- * the default on a light band is their whole purpose: they flip on a dark one, so
- * an editor can say "keep this readable if the band changes". Excluded here, and
- * asserted to be last in the list by the int spec, so they cannot drift back to
- * the top of the dropdown where they read as broken.
+ * ## Why this measures two bands rather than excusing entries
  *
- * Proven red by pointing `bright` at `--text-dark`: fails naming `bright`, with
- * both colours in the message.
+ * The first version of this test measured a light band only and skipped
+ * `heading`/`body` by name. That does not survive a fixed Charcoal: `charcoal` is
+ * #414042, which on a light band IS the default — but on a dark band it stays
+ * charcoal while the default turns white, so it is a live control that a
+ * one-context test calls dead. An exemption list would have hidden that, and
+ * would have grown by one entry every time the palette did.
+ *
+ * Measuring the same heading in both contexts instead lets every entry be
+ * asserted, and asserts more:
+ *
+ *  · a colour must differ from "no colour" in at least ONE band;
+ *  · the band-following pair and the two that re-point MUST move with the band;
+ *  · **every other entry must NOT** — the browser half of "an explicit pick is
+ *    fixed", which staff asked for when they asked for a black that stays black.
+ *    Nothing else in the repo would notice a `.vf-on-dark .vf-tc-charcoal` rule.
+ *
+ * Proven red, each restored after:
+ *  · point `bright` at `--text-dark` → the "does something" assertion, naming
+ *    `bright`, with all four readings in the message;
+ *  · add `.vf-on-dark .vf-tc-charcoal { color: var(--text-on-dark) !important }`
+ *    → the fixed-colour assertion, naming `charcoal`;
+ *  · delete the `.vf-on-dark .vf-tc-brand` rule → the moves-with-the-band
+ *    assertion, naming `brand` (before this, only a file regex saw that);
+ *  · point `.vf-tc-heading` at `var(--primary)` → same assertion, naming
+ *    `heading`;
+ *  · remove `.vf-on-dark` from the selector list at globals.css:1475 → the
+ *    positive control, which is the one that stops the dark half going vacuous.
  */
-test('every colour in the palette actually changes the text', async ({ page }) => {
+test('every colour in the palette does something, and only what it says', async ({ page }) => {
   await page.goto('/', { waitUntil: 'load' })
 
-  // The key list is passed in: `page.evaluate` runs in the browser and cannot see
-  // a constant from this module's scope.
   const measured = await page.evaluate((keys) => {
-    const el = document.querySelector('.vf-section-header__title')
-    if (!el) return null
-    const base = getComputedStyle(el).color
-    const seen: Record<string, string> = {}
-    for (const key of keys) {
-      el.classList.add(`vf-tc-${key}`)
-      seen[key] = getComputedStyle(el).color
-      el.classList.remove(`vf-tc-${key}`)
+    // A heading that is NOT already inside a dark band, or the "light" half of
+    // this test measures a dark one and every comparison below is against the
+    // wrong default.
+    const el = Array.from(document.querySelectorAll('.vf-section-header__title')).find(
+      (n) => !n.closest('.vf-on-dark, .vf-section--dark, .vf-section--primary, .vf-cta-band'),
+    )
+    if (!el?.parentElement) return null
+
+    const read = () => {
+      const base = getComputedStyle(el).color
+      const seen: Record<string, string> = {}
+      for (const key of keys) {
+        el.classList.add(`vf-tc-${key}`)
+        seen[key] = getComputedStyle(el).color
+        el.classList.remove(`vf-tc-${key}`)
+      }
+      return { base, seen }
     }
-    return { base, seen }
-  }, BRAND_KEYS)
 
-  expect(measured, 'no section heading on the homepage').not.toBeNull()
+    const light = read()
+    // Simulate the band on the PARENT rather than hunting for a dark page:
+    // `.vf-on-dark` re-pointing the tokens is precisely the mechanism under test,
+    // and it is the selector the `.vf-on-dark .vf-tc-*` rules key on.
+    el.parentElement.classList.add('vf-on-dark')
+    const dark = read()
+    el.parentElement.classList.remove('vf-on-dark')
 
-  for (const key of BRAND_KEYS) {
-    if (BAND_FOLLOWING.includes(key)) continue
-    expect(
-      measured!.seen[key],
-      `"${key}" renders ${measured!.seen[key]}, the same as no colour at all — an editor would pick it and see nothing`,
-    ).not.toBe(measured!.base)
-  }
+    return { light, dark }
+  }, BRAND_TEXT_COLORS.map((c) => c.key))
 
-  // A positive control: the exclusions must really be the degenerate ones, or
-  // this test is excusing the wrong entries.
-  for (const key of BAND_FOLLOWING) {
-    expect(measured!.seen[key], `"${key}" no longer follows the band`).toBeDefined()
+  expect(measured, 'no light-band section heading on the homepage').not.toBeNull()
+  const { light, dark } = measured!
+
+  // POSITIVE CONTROL, and the load-bearing one: if `.vf-on-dark` did not change
+  // the default colour then the simulated band never took, and every dark-band
+  // reading below would pass for the wrong reason.
+  expect(
+    dark.base,
+    'adding .vf-on-dark did not change the default text colour — the band did not take, so every dark-band reading here is vacuous',
+  ).not.toBe(light.base)
+
+  for (const { key, followsBand, onDarkToken } of BRAND_TEXT_COLORS) {
+    const l = light.seen[key]
+    const d = dark.seen[key]
+
+    if (!followsBand) {
+      expect(
+        l !== light.base || d !== dark.base,
+        `"${key}" renders ${l} on a light band (default ${light.base}) and ${d} on a dark one (default ${dark.base}) — the same as no colour at all in both, so an editor picks it and sees nothing`,
+      ).toBe(true)
+    }
+
+    if (followsBand || onDarkToken) {
+      expect(
+        l,
+        `"${key}" is meant to move with the band and did not — it renders ${l} on both`,
+      ).not.toBe(d)
+    } else {
+      expect(
+        l,
+        `"${key}" changed from ${l} to ${d} on a dark band. It is a fixed colour: an editor who picks it has said what they want, and nothing may re-point it`,
+      ).toBe(d)
+    }
   }
 })
 

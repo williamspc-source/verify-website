@@ -112,7 +112,7 @@ several look arbitrary until you see what happened without them.
 45. **A guard aimed at a rule that declares nothing passes forever.** Before asserting that rule X beats rule Y, check that Y declares the property at all. <sub>[why](docs/TRAPS.md#i45)</sub>
 46. **Never join or interpolate a copy value.** `.join(' ')` and `` `${x}` `` over rich text print `[object Object]` — no error, no warning, just the wrong words. Guarded by `tests/e2e/richTextRender.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i46)</sub>
 47. **`InlineRichText` adds no wrapper unless you ask for one**, and a heading must render `as={Tag}` rather than wrapping its text in a span. <sub>[why](docs/TRAPS.md#i47)</sub>
-48. **Booting Payload runs a dev schema push, so a deliberately-broken config is applied to the local database.** `pnpm test:e2e` boots it through `tests/helpers/seedUser.ts`; so does any `payload run` script. Repair with `src/migrations/REFERENCE-inline-richtext.sql`, which is idempotent for this reason. <sub>[why](docs/TRAPS.md#i48)</sub>
+48. **Booting Payload runs a dev schema push, so a deliberately-broken config is applied to the local database.** `pnpm test:e2e` boots it through `tests/helpers/seedUser.ts`; so does any `payload run` script. Repair with `src/migrations/REFERENCE-inline-richtext.sql` — or its companion `REFERENCE-processSteps-richtext.sql` for a **body** field, which splits on `\n{2,}` into paragraphs where the inline one keeps one paragraph and emits `linebreak` nodes. Both are idempotent for this reason. <sub>[why](docs/TRAPS.md#i48)</sub>
 49. **A scratch table in the app's own database hangs the dev push.** Drizzle reads an unknown table as one to drop, and waits on the invisible "Accept warnings?" prompt. <sub>[why](docs/TRAPS.md#i49)</sub>
 50. **Don't cache a value that is already stable.** For a `useSyncExternalStore` snapshot, prefer a naturally-stable computation over a module-level memo. <sub>[why](docs/TRAPS.md#i50)</sub>
 
@@ -123,6 +123,8 @@ pnpm dev                  # http://localhost:3000 (admin at /admin), binds 0.0.0
 ./start.sh / ./stop.sh    # same server backgrounded → .dev.log / .dev.pid (LAN-shareable)
 pnpm dev:prod             # clean build + start — needs LOCAL_PROD_REPRO=1 in .env (see Local development)
 pnpm build                # ./stop.sh FIRST — build and dev share .next (see Verifying a change)
+                          #   chains a postbuild step: next-sitemap (see Routing)
+pnpm start                # next start against an existing .next; what dev:prod chains into
 pnpm lint                 # eslint (pnpm lint:fix to autofix)
 pnpm test                 # lint → int → e2e, in that order; stops at the first failure
 pnpm test:int             # vitest, tests/int/**/*.int.spec.ts
@@ -140,6 +142,9 @@ longer exists. Re-run it rather than editing a stale copy.
 
 Single test: `pnpm test:int tests/int/api.int.spec.ts -t "name"` ·
 `pnpm test:e2e tests/e2e/frontend.e2e.spec.ts -g "name"`.
+
+`.claude/skills/payload/` is an in-repo skill (collections, fields, hooks, access control, queries,
+adapters). Reach for it before guessing at a Payload API.
 
 ### What each suite guards
 
@@ -278,6 +283,18 @@ After a `CollectionConfig`/`GlobalConfig` field change, the server sequence is:
   stream (render it unlinked; the old `/in-the-loop/<slug>` fallback 404'd).
 - Draft preview goes through `/next/preview` + `/next/exit-preview`; each collection builds its
   preview URL with `generatePreviewPath`.
+- **Sitemaps come from two systems and only one of them is in git.** The five routes under
+  `(sitemaps)/` are ours, rendered from Payload at request time. On top of that, `pnpm build` runs
+  a `postbuild` hook (`next-sitemap.config.cjs`) that writes `public/robots.txt` and
+  `public/sitemap*.xml` — both **gitignored**, so they exist only on a machine that has built.
+  That config excludes `/*`, so the generated index adds no URLs of its own; its whole job is to
+  point at the five routes above and to disallow `/admin/*`. **Its `siteUrl` falls back to
+  `https://example.com`**, and `next build` waives every environment check
+  (`missingProductionEnv()` returns `[]` under `phase-production-build`), so a build with
+  `NEXT_PUBLIC_SERVER_URL` unset succeeds and bakes `example.com` into both files with no warning.
+- Two unrelated redirect systems share the word. `redirects.ts` at the repo root is a Next config
+  redirect (Trident user-agents → `/ie-incompatible.html`) and is not editable; `PayloadRedirects`
+  is the plugin-backed collection an editor manages from the admin.
 
 ### Block system (the page builder)
 
@@ -337,8 +354,25 @@ both emitting `.vf-tc-*` and both storing a *key* so Site Settings repaints ever
   Separate file from the palette because it imports the server export, and `colorClass` is client code.
 
 Inside a coloured element a `[[bracketed]]` phrase keeps the brand accent; inside a *toolbar* pick it
-does not, because that pick is `.vf-tc--inline` and an explicit selection outranks a bracket. All of
-this is kept in step by `tests/int/richTextColors.int.spec.ts`.
+does not, because that pick is `.vf-tc--inline` and an explicit selection outranks a bracket. Both
+`.vf-tc-* .vf-accent` lists must name every key — a key missing from the **on-dark** one renders its
+bracket at `var(--primary)` on `--band-dark`, measured at **2.12:1**. Guarded, along with everything
+else here, by `tests/int/richTextColors.int.spec.ts`.
+
+**The palette is a code-time list, and cannot be made editor-extensible.** Asked for; checked before
+answering. `TextStateFeature`'s `state.color` is resolved once inside `sanitizeConfig` and memoised
+for the process lifetime, `initLexicalFeatures` copies it verbatim per request, and `toolbarGroups`
+has no per-item predicate — there is no point at which a database read could reach the toolbar.
+Pre-declared empty slots do not rescue it: an unfilled slot still renders as a pickable swatch whose
+`var()` resolves to nothing, which is invariant 2's exact failure and cannot be hidden. What an
+editor *can* change is every colour's value, in Site Settings. **Retiring a key is destructive** —
+`parse` maps an unknown value to `undefined` and lexical's `toJSON` then deletes it, so a colour
+removed from the list is stripped out of stored documents on the next admin save. Adding is free.
+
+**Three of the sixteen are fixed inks** (`black`/`charcoal`/`grey`, tokens `--ink-*`), carrying no
+on-dark re-point on purpose: staff asked for ink that stays the colour it says. They are deliberately
+NOT the `--text-*-base` tokens, which are semantic and flip — sharing them would mean repainting body
+copy also repainted every word coloured Charcoal.
 
 Shared field helpers live in `src/fields/blockFields.ts` (`backgroundField`, `containerWidthField`,
 `spacingFields`, `motionField`, `sectionHeaderFields`, `anchorIdField`, `iconField`,
@@ -360,6 +394,16 @@ Heros reuse the same `blockFields.ts` helpers as blocks. Their spacing fields de
 hero. Leave that sentinel in place.
 
 ### Styling and design tokens
+
+**`globals.css` lives inside `@layer verify` and must stay there.** Everything from just after
+`@theme inline` to the end of the file is wrapped. That wrapper is the only reason the Custom Styles
+global works: an editor's CSS is injected unlayered, and unlayered beats layered at *any*
+specificity. Without it a preset is a single class competing with page-scoped ports at (0,2,0) and
+(0,3,0), so it wins on ordinary pages and silently loses on every page with a bespoke design — which
+is exactly how it shipped. Do not unwrap it, and do not add rules after its closing brace. The
+at-rules above it (`@import`, `@config`, `@theme`, `@utility`, `@custom-variant`, `@plugin`,
+`@source`) cannot live in a layer, and the `:root` token block is left out deliberately so an
+editor's own `:root {}` still ties it and wins on source order.
 
 Three layers, in override order:
 
@@ -386,13 +430,18 @@ values land inside a `<style>` tag, so sanitisation happens there — keep
 
 ### CSS token tooling
 
-`tests/visual/` holds five Node scripts that `pnpm test` does **not** run (the two codemods share
-a bullet):
+`tests/visual/` holds six Node scripts that `pnpm test` does **not** run — five bullets below,
+because the two codemods share one (`ls tests/visual/*.mjs | wc -l`):
 
 - `node tests/visual/computedSnapshot.mjs capture|compare baseline` — computed-style snapshot
   gate against a running `:3000`, keyed by structural index path rather than class name (class
   names are what the migrations change). Token replacements are value-preserving by
-  construction, so the expected diff is empty; any diff is a real bug, not a tolerance.
+  construction, so the expected diff is empty. **A non-empty diff is not by itself evidence,
+  though** — measured 2026-08-24, comparing the same unchanged code against itself four times gave
+  2, 3, 0, 0 changed nodes, always `marginLeft`/`marginRight` on a `SECTION > DIV` on `/about` and on
+  a team profile (an `auto` centring margin resolving before the parent's width settles). Re-run a
+  diff two or three times and check which property *indices* moved: 30/31 on those routes is the
+  known flake; index 0 (`color`) or any other node is real. `README.md` §10.28 has the measurement.
   It measures **39** properties over **21** routes — `width`/`height`/`gridTemplateColumns`/
   `transform` are in that set, which is what makes it catch a reflow and not just a repaint, but
   that is still a subset of the **28** URLs in the pages sitemap, and it never triggers `:hover`.

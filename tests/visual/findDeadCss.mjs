@@ -70,6 +70,12 @@ const LIVE_PREFIXES = [
   'vf-hover-',
   'vf-align-',
   'vf-motion',
+  // The editor's text-colour palette. `colorClass()` builds these with a
+  // template literal (`vf-tc-${key}`), and the block dropdown only ever emits
+  // the value an editor has actually chosen — so a crawl of seeded content
+  // reports every unused colour as dead. Measured by deleting this line:
+  // **14** of the 16 palette classes were reported, each one a live control.
+  'vf-tc-',
 ]
 
 const walk = (dir, out = []) => {

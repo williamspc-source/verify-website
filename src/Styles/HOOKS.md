@@ -27,7 +27,19 @@ wins**:
 | 2 | `<style id="verify-design-tokens">` | **Site Settings** + **Design System** | you, via admin fields |
 | 3 | `<style id="verify-custom-styles">` | **Custom Styles → Global CSS** and presets | you, by writing CSS |
 
-All three are ordinary stylesheets at the same specificity, so plain source order decides.
+**Your CSS wins over the built-in stylesheet outright** — not on a tie, and not only when your
+selector is more specific. `globals.css` lives inside a cascade layer (`@layer verify`), and CSS
+gives *unlayered* rules — which is what both admin `<style>` tags are — priority over layered ones at
+**any** specificity.
+
+> **This is a fix, and it is worth knowing why.** Before it, this section said all three were "at the
+> same specificity, so plain source order decides". That was true of the `:root` token overrides
+> below and false of every class preset, and the difference was invisible: a preset like
+> `.heading-primary { color: … }` is one class, while the design-reference rules ported into
+> `globals.css` are scoped two and three classes deep — `.why-verify--light .why-header
+> .section-title`. Presets therefore worked on ordinary pages and did nothing on exactly the pages
+> with a bespoke design, which read as "Custom CSS is broken sometimes". If you hit a preset that
+> still does nothing, it is now a typo — check the selector matches the class name — not the cascade.
 
 **This means Global CSS can override anything**, including any token set in Site Settings:
 
@@ -101,7 +113,13 @@ Defaults live in `globals.css :root`. Empty admin field = default.
 
 **Extended blues** — the ramp the gradients and decorative panels draw from
 `--secondary` · `--secondary-foreground` + `--accent-foreground` · `--secondary-bright` ·
-`--gradient-start` · `--navy` · `--definition-blue` · `--bg-light-2`
+`--gradient-start` · `--steel` · `--navy` · `--definition-blue` · `--bg-light-2`
+
+**Fixed text colours** — the Black, Charcoal and Mid grey in the text-colour palette
+`--ink-black` · `--ink-charcoal` · `--ink-grey`
+Deliberately separate from Body text / Strong text above. Those two are *semantic* and flip to
+white on a dark band; these three do not flip, which is the whole point of them. Keeping them
+apart means repainting body copy does not also repaint every word someone coloured Charcoal.
 
 **Status & feedback**
 `--success` · `--warning` · `--error` + `--destructive` · `--form-error` ·
@@ -238,6 +256,7 @@ everything listed here as live, and they should not be renamed without updating 
   `.vf-row--alignY-{top|center|bottom|stretch}`, `.vf-col`, `.vf-col--span-{1..4}`
 - Atoms: `.vf-heading--{sm|md|lg|xl|display}`, `.vf-text--{sm|base|lg}`, `.vf-btn--{sm|lg}`,
   `.vf-image--{full|wide|normal|narrow}`, `.vf-image--rounded-{none|sm|md|full}`,
+  `.vf-portrait--{square|portrait|tall}` (profile-page photo shape),
   `.vf-image--shadow-{none|sm|md|lg|xl}`, `.vf-spacer--{xs|sm|md|lg|xl}`,
   `.vf-divider--{line|dots|gradient}`, `.vf-icon--{sm|md|lg}`,
   `.vf-icon--{primary|accent|muted|inherit}`, `.vf-align-{left|center|right}`
@@ -284,10 +303,14 @@ Both offer the same brand palette:
 | --- | --- |
 | **Default (as designed)** | Leave it here unless you have a reason. Nothing changes. |
 | **Brand blue** / **Deep navy** | The two brand blues. Both lighten on a dark band so they stay legible. |
+| **Deep link blue** | The darker blue a link turns on hover. |
 | **Bright blue** | A lighter accent blue. |
+| **Definition blue** / **Sky blue** | Pale blues for text on a dark band or a photograph. On a white background they are very hard to read — Sky blue especially, which is close to invisible. |
 | **Muted grey-blue** | For a line that should sit back from the copy around it. |
+| **Black** / **Charcoal** / **Mid grey** | Plain ink. **These stay the colour they say on every band, including a dark one** — that is what separates them from the two "Follows the band" choices at the bottom. Charcoal is the colour headings already are, so on a light background it looks like Default; the difference shows on a dark band, where Charcoal stays dark and "Follows the band" turns white. |
 | **White** | For text over a photograph or a coloured panel. |
-| **Follows the band — heading** / **— body** | The site's own two text colours. On a normal light background **these look exactly like Default, because they are the colour the text already is.** They earn their place on a dark band, where they turn white and pale — so a card you later switch from light to dark stays readable with no further action. If you are on a light background and want to see a change, pick one of the five above instead. |
+| **Success green** / **Warning amber** / **Error red** | The same three colours the Callout block uses, for a line of copy that has to match a panel beside it. Both green and amber are only comfortable to read at larger sizes. |
+| **Follows the band — heading** / **— body** | The site's own two text colours. On a normal light background **these look exactly like Default, because they are the colour the text already is.** They earn their place on a dark band, where they turn white and pale — so a card you later switch from light to dark stays readable with no further action. If you are on a light background and want to see a change, pick almost anything above instead. |
 
 The colours come from **Site Settings → Brand colours**, so if the brand changes,
 every coloured line on the site changes with it. That is the reason to pick from
@@ -362,6 +385,7 @@ is no help if you are looking for the setting. Each of these is a normal field o
 | Row | **Vertical alignment** | Top, centre, bottom or stretch — how columns of different heights line up |
 | Column | **Column span** | How many of the row's columns this one occupies |
 | Anywhere an icon appears | **the icon picker** | A fixed set of icons. Type to filter; only icons in the set can be chosen, so an icon can never fail to draw |
+| A person's record (Team / Specialists) | **Photo shape on the profile page** | Tall (2:3), Portrait (4:5) or Square. Changes the shape of the frame on **that person's own profile page only** — their card on the listing pages, in directories and on article bylines keeps its fixed shape, so one person cannot make a grid ragged. If the photo is *badly framed* rather than the wrong shape, move the focal point on the image in Media instead |
 
 **Blocks this guide had never mentioned.** They are in the *Add block* list and they work; there was
 simply nowhere describing them, and the one page that displayed them was deleted on 2026-08-20:

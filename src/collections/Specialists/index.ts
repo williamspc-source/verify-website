@@ -4,11 +4,13 @@ import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { revalidateDelete, revalidateSpecialist } from './hooks/revalidateSpecialist'
+import { deriveNames } from './hooks/deriveNames'
 import { revalidateSiteOnChange, revalidateSiteOnDelete } from '@/utilities/revalidateSite'
 import { slugField } from 'payload'
 import { iconField,
   inlineRichTextField,
 } from '@/fields/blockFields'
+import { portraitShapeField } from '@/fields/portraitShape'
 
 import {
   MetaDescriptionField,
@@ -45,7 +47,7 @@ export const Specialists: CollectionConfig<'specialists'> = {
     defaultColumns: ['title', 'position', 'specialty', 'updatedAt'],
     group: 'People',
     description:
-      'The external doctors on your panel. Each gets a profile page at /specialists/profiles/... Save as a draft to hide one from the site.',
+      'The external doctors on your panel. Each gets a profile page at /specialists/profiles/... Save as a draft to hide one from the site. Drag a row by its handle to set the running order — that order only reaches the public site on a Specialist Directory block whose Sort order is set to Custom, and the list shows 10 at a time, so moving someone a long way means dragging across pages.',
   },
   fields: [
     {
@@ -69,6 +71,7 @@ export const Specialists: CollectionConfig<'specialists'> = {
               relationTo: 'media',
               admin: { description: 'Optional. Falls back to an initials avatar on the frontend.' },
             },
+            portraitShapeField,
             {
               name: 'bio',
               type: 'richText',
@@ -230,7 +233,8 @@ export const Specialists: CollectionConfig<'specialists'> = {
       type: 'text',
       admin: {
         position: 'sidebar',
-        description: 'Optional given name used for sorting the directory by first name.',
+        description:
+          'Fills in automatically from the Full name — you only need to touch it if the split is wrong (a middle name, or an unusual title). Used to sort the directory by given name.',
       },
     },
     {
@@ -238,7 +242,8 @@ export const Specialists: CollectionConfig<'specialists'> = {
       type: 'text',
       admin: {
         position: 'sidebar',
-        description: 'Optional surname used for sorting the directory.',
+        description:
+          'Fills in automatically from the Full name, taking everything after the given name — so a two-word surname like "Mar Fan" stays whole. Used to sort the directory by surname.',
       },
     },
     {
@@ -253,7 +258,7 @@ export const Specialists: CollectionConfig<'specialists'> = {
   ],
   hooks: {
     afterChange: [revalidateSpecialist, revalidateSiteOnChange],
-    beforeChange: [populatePublishedAt],
+    beforeChange: [populatePublishedAt, deriveNames],
     afterDelete: [revalidateDelete, revalidateSiteOnDelete],
   },
   versions: {

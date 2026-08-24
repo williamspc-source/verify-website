@@ -1,6 +1,9 @@
 'use client'
 
 import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
+// Honorifics for the initials avatar, shared with `splitPersonName` so the
+// initials and the directory's sort order cannot disagree about what is a title.
+import { TITLE_TOKENS } from '@/utilities/personName'
 import { InlineRichText } from '@/components/RichText/Inline'
 import React, { useState } from 'react'
 import Link from 'next/link'
@@ -40,12 +43,6 @@ const CATEGORY_ICON_FALLBACK: Record<string, string> = {
   'Allied Health': 'handshake',
 }
 
-// Leading honorific/title tokens skipped when building an initials avatar so
-// "Dr Andrew Ryan" → "AR" and "Associate Professor Iulian Nusem" → "IN".
-const TITLE_TOKENS = new Set([
-  'dr', 'mr', 'mrs', 'ms', 'miss', 'prof', 'professor', 'associate', 'assoc',
-  'adjunct', 'adj', 'clinical', 'a/prof', 'sir', 'dame', 'honorary', 'the',
-])
 const initialsOf = (name: string): string => {
   const words = name.replace(/\./g, '').split(/\s+/).filter(Boolean)
   const significant = words.filter((w) => !TITLE_TOKENS.has(w.toLowerCase()))

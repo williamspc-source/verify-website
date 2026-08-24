@@ -40,14 +40,45 @@ import { brandTextColorFeature } from '@/fields/richTextColorFeature'
 
 const CSS = readFileSync(join(process.cwd(), 'src/app/(frontend)/globals.css'), 'utf8')
 
-/** The `:root` block that opens the file, where the brand tokens are declared. */
-const ROOT_BLOCK = CSS.slice(CSS.indexOf(':root'), CSS.indexOf('}', CSS.indexOf('--radius')))
+/**
+ * `globals.css` with every comment blanked out, the same length byte for byte so
+ * nothing else shifts.
+ *
+ * Every structural search in this file reads THIS, not `CSS`. Three separate
+ * measurements here have already been fooled by CSS-shaped text inside a
+ * comment, each of them silently:
+ *
+ *  · the file's first `:root` is in a comment in `@theme`, 29 lines above the
+ *    real one;
+ *  · the first `}` after `--radius` is the one in `body { font-size }`, also in
+ *    a comment, and 57 lines short of where `:root` actually closes. Between
+ *    them those two made `--form-error`, `--callout-success` and
+ *    `--callout-warning` read as "not declared in :root" while sitting plainly
+ *    in it — unnoticed because no palette entry resolved through them until the
+ *    status colours were added;
+ *  · the comment introducing the on-dark re-points quotes
+ *    `.vf-section--primary .vf-accent`, which was enough to make that rule look
+ *    like a second `.vf-tc-* .vf-accent` list and blank out the real one.
+ *
+ * Blanking once, up front, is cheaper than making each regex comment-aware.
+ */
+const CSS_CODE = CSS.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length))
+
+/**
+ * The `:root` block that opens the file, where the brand tokens are declared.
+ * Anchored at a line start, and closed on the first `}` at column 0 — this
+ * file's convention for the end of a top-level rule.
+ */
+const ROOT_BLOCK = (() => {
+  const start = CSS_CODE.search(/^:root\s*\{/m)
+  return CSS_CODE.slice(start, CSS_CODE.indexOf('\n}', start))
+})()
 
 const ruleFor = (key: string): string | null => {
   // The bare class only — `.vf-tc-x {`, never `.vf-on-dark .vf-tc-x {` or
   // `.vf-tc-x .vf-accent {`, both of which would satisfy a substring search
   // while the colour itself went undeclared.
-  const match = CSS.match(new RegExp(`(^|\\n)\\.vf-tc-${key}\\s*\\{([^}]*)\\}`))
+  const match = CSS_CODE.match(new RegExp(`(^|\\n)\\.vf-tc-${key}\\s*\\{([^}]*)\\}`))
   return match ? match[2]! : null
 }
 
@@ -56,6 +87,26 @@ describe('the brand text-colour palette', () => {
     // A positive control: every assertion below iterates the palette, and an
     // empty palette would satisfy all of them vacuously.
     expect(BRAND_TEXT_COLORS.length).toBeGreaterThan(0)
+  })
+
+  it('the :root slice really is the whole :root block', () => {
+    // Standing instruction 1: assume the instrument is lying. Every token
+    // assertion below reads ROOT_BLOCK, so a mis-sliced block produces confident
+    // wrong answers in both directions — a token that IS declared reading as
+    // missing, or a value read from the wrong block entirely.
+    expect(ROOT_BLOCK.startsWith(':root')).toBe(true)
+    expect(ROOT_BLOCK, 'the slice misses the top of :root').toContain('--primary:')
+    expect(ROOT_BLOCK, 'the slice stops short of the bottom of :root').toContain('--vf-text-scale:')
+    expect(ROOT_BLOCK, 'the slice ran past :root into @theme').not.toContain('--breakpoint-sm')
+  })
+
+  it('the band-following flag and the ordering agree', () => {
+    // Two ways of saying the same thing — the flag the renderer and the browser
+    // guard read, and the position this file has always asserted. Kept in step
+    // here so neither can be changed alone.
+    const flagged = BRAND_TEXT_COLORS.filter((c) => c.followsBand).map((c) => c.key)
+    expect(flagged).toEqual(BRAND_TEXT_COLORS.slice(-2).map((c) => c.key))
+    expect(flagged).toEqual(['heading', 'body'])
   })
 
   it('keeps the two band-following colours at the end of the list', () => {
@@ -128,10 +179,62 @@ describe('the brand text-colour palette', () => {
   it.each(
     BRAND_TEXT_COLORS.filter((c) => c.onDarkToken).map((c) => [c.key, c.onDarkToken!] as const),
   )('a colour that would vanish on a dark band re-points: %s', (key, onDarkToken) => {
-    const match = CSS.match(new RegExp(`\\.vf-on-dark \\.vf-tc-${key}[^{]*\\{([^}]*)\\}`))
+    const match = CSS_CODE.match(new RegExp(`\\.vf-on-dark \\.vf-tc-${key}[^{]*\\{([^}]*)\\}`))
     expect(match?.[1], `no \`.vf-on-dark .vf-tc-${key}\` rule`).toBeTruthy()
     expect(match![1]).toContain(`var(${onDarkToken})`)
   })
+
+  /**
+   * The two `.vf-tc-* .vf-accent` selector lists, found by what they DECLARE
+   * plus the presence of `.vf-tc-` — never by looking for one key, which is the
+   * search that would have been satisfied by `.vf-tc--inline .vf-accent` further
+   * down the file while the real list stayed short.
+   *
+   * Why this is guarded at all: a `[[bracketed]]` phrase inside a coloured
+   * element keeps the brand accent, and the on-dark list is what stops that
+   * accent staying brand blue on a dark band. Measured for a key left out of it:
+   * `var(--primary)` #1c75bc on --band-dark #414042 is **2.12:1**. It looks
+   * correct in the admin and is unreadable on the page, which is why no amount
+   * of checking the light list would have found it.
+   */
+  const accentListFor = (colourVar: string): string => {
+    const rules = CSS_CODE.match(/[^{}]*\.vf-accent[^{}]*\{[^}]*\}/g) ?? []
+    const hits = rules.filter(
+      (r) => r.includes('.vf-tc-') && r.includes(`color: var(${colourVar})`),
+    )
+    return hits.length === 1 ? hits[0]! : ''
+  }
+  const ACCENT_LIGHT = accentListFor('--primary')
+  const ACCENT_DARK = accentListFor('--accent-on-dark')
+
+  it('there is exactly one .vf-tc-* accent list per band', () => {
+    // Positive control for the two it.each blocks below: if either lookup found
+    // nothing (or found two rules and gave up), every membership assertion would
+    // fail with a confusing message instead of this clear one.
+    expect(ACCENT_LIGHT, 'no single .vf-tc-* .vf-accent rule declaring var(--primary)').not.toBe('')
+    expect(
+      ACCENT_DARK,
+      'no single .vf-on-dark .vf-tc-* .vf-accent rule declaring var(--accent-on-dark)',
+    ).not.toBe('')
+  })
+
+  it.each(BRAND_TEXT_COLORS.map((c) => c.key))(
+    'a [[bracketed]] phrase inside it keeps the accent on a light band: %s',
+    (key) => {
+      expect(ACCENT_LIGHT, `\`.vf-tc-${key} .vf-accent\` is missing from the light accent list`)
+        .toContain(`.vf-tc-${key} .vf-accent`)
+    },
+  )
+
+  it.each(BRAND_TEXT_COLORS.map((c) => c.key))(
+    'a [[bracketed]] phrase inside it keeps the accent on a dark band: %s',
+    (key) => {
+      expect(
+        ACCENT_DARK,
+        `\`.vf-on-dark .vf-tc-${key} .vf-accent\` is missing — a bracket inside this colour renders brand blue on a dark band, at 2.12:1`,
+      ).toContain(`.vf-on-dark .vf-tc-${key} .vf-accent`)
+    },
+  )
 })
 
 /**

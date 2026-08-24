@@ -21,6 +21,9 @@ export const Streams: CollectionConfig = {
     read: anyone,
     update: authenticated,
   },
+  // Makes the `order` field below actually do something: it had no reader at
+  // all, so the number an editor typed changed nothing anywhere.
+  defaultSort: 'order',
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',

@@ -44,7 +44,7 @@ export const MissionPillars: Block = {
   fields: [
     // Dark blue gradient panel by default — the .mv-mission-panel class supplies
     // its own gradient; this drives the section banding / text treatment.
-    { ...backgroundField, defaultValue: 'dark' } as Field,
+    { ...backgroundField, defaultValue: 'hero' } as Field,
     ...missionHeaderFields,
     {
       name: 'pillars',

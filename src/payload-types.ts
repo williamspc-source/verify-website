@@ -430,7 +430,7 @@ export interface Page {
     /**
      * Section background colour.
      */
-    heroBackground?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+    heroBackground?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
     /**
      * Content width for this section.
      */
@@ -1093,6 +1093,10 @@ export interface Team {
    * Hides the photo on this person’s profile page; they still appear with their Team photo on Meet the Team. This wins over both uploads, so you can hide the photo without deleting it.
    */
   hidePhotoOnProfile?: boolean | null;
+  /**
+   * Changes the shape of the photo frame on this person’s own profile page only — their card on the listing pages, in directories and on article bylines is not affected. If the photo is framed badly rather than the wrong shape, move the focal point on the image in Media instead.
+   */
+  profilePhotoShape?: ('tall' | 'portrait' | 'square') | null;
   bio?: {
     root: {
       type: string;
@@ -1217,7 +1221,7 @@ export interface Department {
   createdAt: string;
 }
 /**
- * The external doctors on your panel. Each gets a profile page at /specialists/profiles/... Save as a draft to hide one from the site.
+ * The external doctors on your panel. Each gets a profile page at /specialists/profiles/... Save as a draft to hide one from the site. Drag a row by its handle to set the running order — that order only reaches the public site on a Specialist Directory block whose Sort order is set to Custom, and the list shows 10 at a time, so moving someone a long way means dragging across pages.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "specialists".
@@ -1251,6 +1255,10 @@ export interface Specialist {
    * Optional. Falls back to an initials avatar on the frontend.
    */
   photo?: (number | null) | Media;
+  /**
+   * Changes the shape of the photo frame on this person’s own profile page only — their card on the listing pages, in directories and on article bylines is not affected. If the photo is framed badly rather than the wrong shape, move the focal point on the image in Media instead.
+   */
+  profilePhotoShape?: ('tall' | 'portrait' | 'square') | null;
   bio?: {
     root: {
       type: string;
@@ -1446,11 +1454,11 @@ export interface Specialist {
   availabilityHighlight?: boolean | null;
   availabilityNote?: string | null;
   /**
-   * Optional given name used for sorting the directory by first name.
+   * Fills in automatically from the Full name — you only need to touch it if the split is wrong (a middle name, or an unusual title). Used to sort the directory by given name.
    */
   firstName?: string | null;
   /**
-   * Optional surname used for sorting the directory.
+   * Fills in automatically from the Full name, taking everything after the given name — so a two-word surname like "Mar Fan" stays whole. Used to sort the directory by surname.
    */
   lastName?: string | null;
   publishedAt?: string | null;
@@ -1480,7 +1488,7 @@ export interface Location {
    */
   region?: string | null;
   /**
-   * Lower numbers appear first in filters.
+   * Lower numbers appear first in this admin list. The public filters are alphabetical and ignore it.
    */
   order?: number | null;
   /**
@@ -2653,7 +2661,7 @@ export interface SectionBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Content width for this section.
    */
@@ -3690,7 +3698,27 @@ export interface FAQBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Lay the questions out in one or two columns, or side by side — heading and intro in a left column with the questions beside them (the services-page treatment).
    */
@@ -3983,11 +4011,31 @@ export interface GatewayCardsBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   columns?: ('2' | '3' | '4') | null;
   cards?:
     | {
@@ -4600,11 +4648,31 @@ export interface FeatureGridBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   columns?: ('1' | '2' | '3' | '4') | null;
   /**
    * “Banded” puts the icon and title on a tinted panel across the top of each card, with the description and details below it. “Soft” is the quieter treatment used for the support cards on Information for Clients — flat white, a softer shadow, and a gentle lift on hover instead of the bolder shift. “Benefit” is the centred treatment used for “Why Join VERIFY” on Join the Expert Panel — no icon tile, just a large plain icon above a centred title, with the description justified.
@@ -5062,11 +5130,31 @@ export interface ProcessStepsBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Layout. "Cards" = numbered card grid. "Two-row process" = connected numbered rows (01–03 blue, 04+ dark) matching the reference Our Process. "Claimant step list" = left intro + a compact numbered list on the right (reference Your Examination Step by Step).
    */
@@ -5526,11 +5614,31 @@ export interface SpecialtyGridBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * Which taxonomy to list.
@@ -6059,15 +6167,37 @@ export interface PeopleGridBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Give the eyebrow/heading/intro their own coloured band above the rest of the block. Leave as "Same as the section" for one continuous band. The colours themselves come from Design System → Section bands.
    */
-  headerBackground?: ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  headerBackground?:
+    | ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero')
+    | null;
   source?: ('specialists' | 'team' | 'manual') | null;
   onlyAdvertised?: boolean | null;
   featuredOnly?: boolean | null;
@@ -6395,11 +6525,31 @@ export interface ServicesGridBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * Optional — limit to one category.
@@ -6892,11 +7042,31 @@ export interface TestimonialsGridBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   source?: ('auto' | 'manual') | null;
   featuredOnly?: boolean | null;
   testimonials?: (number | Testimonial)[] | null;
@@ -7087,11 +7257,31 @@ export interface StatsBandBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   stats?:
     | {
         /**
@@ -7244,11 +7434,31 @@ export interface TabsBlockType {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   tabs?:
     | {
         label: {
@@ -7456,7 +7666,7 @@ export interface AamleEducationBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Small uppercase label above the wordmark.
    */
@@ -8049,11 +8259,31 @@ export interface SplitFeatureBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * “Divided” separates each row with a hairline rule instead of a gap — the Reporting Services treatment.
    */
@@ -9350,7 +9580,27 @@ export interface ContactDetailsBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Pull phone / email / address / hours from the Footer + Site Settings globals.
    */
@@ -9592,7 +9842,27 @@ export interface IconListBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Alignment of the eyebrow, heading and intro above the list.
    */
@@ -9807,7 +10077,27 @@ export interface MapEmbedBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   kind?: ('map' | 'embed') | null;
   /**
    * Optional — pull the address + office info panel from an Office record.
@@ -10304,11 +10594,31 @@ export interface LeadershipSpotlightBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Founder portrait. Falls back to a labelled placeholder when empty.
    */
@@ -11146,7 +11456,27 @@ export interface VideoEmbedBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Where the video is hosted.
    */
@@ -11188,7 +11518,7 @@ export interface VideoEmbedBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
@@ -11268,7 +11598,27 @@ export interface TryBookingBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * The digits from the event’s TryBooking address — e.g. 1525708 for trybooking.com/1525708. Numbers only.
    */
@@ -11298,7 +11648,7 @@ export interface TryBookingBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Optional #id for in-page / nav links, e.g. "file-review" is targeted by a link to #file-review. Lowercase letters, numbers and hyphens only.
    */
@@ -11553,7 +11903,7 @@ export interface ArchiveBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   introContent?: {
     root: {
       type: string;
@@ -12019,17 +12369,37 @@ export interface SpecialistDirectoryBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   enableSearch?: boolean | null;
   enableSpecialty?: boolean | null;
   enableLocation?: boolean | null;
   enableAccreditation?: boolean | null;
   /**
-   * Directory sort order. "Custom" uses the drag-to-reorder order set on the Specialists list.
+   * Surname and Given name are alphabetical and fill in automatically from each specialist’s full name. Custom is the order you set by dragging rows on the Specialists list — dragging changes nothing here unless this is set to Custom. Note the drag order starts alphabetical by surname, so switching to Custom looks like nothing happened until you actually move someone.
    */
   sortBy?: ('order' | 'lastName' | 'firstName') | null;
   searchPlaceholder?: string | null;
@@ -12173,11 +12543,31 @@ export interface SpecialtyDirectoryBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   showFilterBar?: boolean | null;
   /**
    * List each specialty’s specialists inside the accordion.
@@ -12287,11 +12677,31 @@ export interface ResourcesGridBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   source?: ('auto' | 'manual') | null;
   /**
    * "Standard card" or "Resource card" (design-reference In-the-Loop .ni-resource-card — coloured header panel + body).
@@ -12574,7 +12984,27 @@ export interface AppointmentGuideBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Small uppercase label shown above the appointment-type toggle. Defaults to "Select your appointment type".
    */
@@ -13190,7 +13620,7 @@ export interface MissionPillarsBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Small uppercase label above the heading (optional).
    */
@@ -13248,7 +13678,27 @@ export interface MissionPillarsBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Each pillar is auto-numbered 01, 02, 03… in display order.
    */
@@ -13351,11 +13801,31 @@ export interface ValueCardsBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Value cards, rendered in a 3-column grid. Every second card (2nd, 4th, 6th) is tinted light blue automatically.
    */
@@ -13473,7 +13943,27 @@ export interface WhyVerifyBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Each reason renders as a +/− disclosure row: the title is always visible and the body expands on click.
    */
@@ -13724,11 +14214,31 @@ export interface AudiencePathwaysBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Two audience pathway cards shown side by side.
    */
@@ -14426,7 +14936,27 @@ export interface CostGridBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Translucent cards on the dark band (e.g. cost-control tips or inclusions).
    */
@@ -14851,7 +15381,7 @@ export interface FeaturedArticlesBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -14923,7 +15453,27 @@ export interface EventsExplorerBlock {
   /**
    * Colours the heading and subheading above — not the cards or list items below them. To colour those, select the words and use the colour swatch in that field’s own toolbar. Brand colours follow Site Settings, so a rebrand updates them everywhere. A phrase in [[double brackets]] keeps the accent colour. The two “Follows the band” choices are the colours the text already is on a light background — they only differ once the band is dark.
    */
-  textColour?: ('inherit' | 'brand' | 'deep' | 'bright' | 'muted' | 'white' | 'heading' | 'body') | null;
+  textColour?:
+    | (
+        | 'inherit'
+        | 'brand'
+        | 'deep'
+        | 'linkblue'
+        | 'bright'
+        | 'definition'
+        | 'sky'
+        | 'muted'
+        | 'black'
+        | 'charcoal'
+        | 'grey'
+        | 'white'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'heading'
+        | 'body'
+      )
+    | null;
   /**
    * Show upcoming and past, or restrict to one. The split uses the visitor’s current date.
    */
@@ -15048,7 +15598,9 @@ export interface EventsExplorerBlock {
     /**
      * Give the Past group its own full-width coloured band, which is how the design reference separates the two. “Pale blue” is its treatment. The colours come from Design System → Section bands.
      */
-    pastBackground?: ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+    pastBackground?:
+      | ('default' | 'white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero')
+      | null;
   };
   /**
    * Editable UI text for this block — buttons, group headings, the search bar and empty-state messages. Leave a field blank to use its default.
@@ -15110,7 +15662,7 @@ export interface EventsExplorerBlock {
   /**
    * Section background colour.
    */
-  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark') | null;
+  background?: ('white' | 'muted' | 'accent' | 'accent-solid' | 'light' | 'primary' | 'dark' | 'hero') | null;
   /**
    * Pick styles defined in Globals → Custom Styles.
    */
@@ -17728,6 +18280,7 @@ export interface SpecialistsSelect<T extends boolean = true> {
   title?: T;
   position?: T;
   photo?: T;
+  profilePhotoShape?: T;
   bio?: T;
   locations?: T;
   qualifications?:
@@ -17781,6 +18334,7 @@ export interface TeamSelect<T extends boolean = true> {
   photo?: T;
   profilePhoto?: T;
   hidePhotoOnProfile?: T;
+  profilePhotoShape?: T;
   bio?: T;
   qualifications?:
     | T
@@ -20666,6 +21220,18 @@ export interface SiteSetting {
      */
     paleSurface?: string | null;
     /**
+     * Default: #000000. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    inkBlack?: string | null;
+    /**
+     * Default: #414042. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    inkCharcoal?: string | null;
+    /**
+     * Default: #555555. Deliberately darker than the design reference’s greys, which fall below AA contrast on the site’s own grey band. Hex, rgb(a) or any CSS colour. Empty = default.
+     */
+    inkGrey?: string | null;
+    /**
      * Default: oklch(78% 0.08 200deg). Hex, rgb(a) or any CSS colour. Empty = default.
      */
     success?: string | null;
@@ -21414,6 +21980,9 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         navy?: T;
         definitionBlue?: T;
         paleSurface?: T;
+        inkBlack?: T;
+        inkCharcoal?: T;
+        inkGrey?: T;
         success?: T;
         warning?: T;
         error?: T;

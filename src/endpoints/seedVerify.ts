@@ -39,6 +39,7 @@ import { repairJoinBenefits } from './seed/repairJoinBenefits'
 import { repairEventTimeDash } from './seed/repairEventTimeDash'
 import { repairSocialImage } from './seed/repairSocialImage'
 import { repairClaimantProcessImage } from './seed/repairClaimantProcessImage'
+import { repairSpecialistNames } from './seed/repairSpecialistNames'
 import { repairContentImages } from './seed/repairContentImages'
 import { repairHubEmptySections } from './seed/repairHubEmptySections'
 import { repairEventsSeparator } from './seed/repairEventsSeparator'
@@ -1187,6 +1188,7 @@ export const seedVerify = async ({
   await repairEventTimeDash({ payload, req })
   await repairSocialImage({ payload, req })
   await repairClaimantProcessImage({ payload, req })
+  await repairSpecialistNames({ payload, req })
   await repairContentImages({ payload, req })
   await repairHubEmptySections({ payload, req })
   await repairEventsSeparator({ payload, req })

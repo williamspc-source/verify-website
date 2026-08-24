@@ -254,6 +254,25 @@ renamed so the admin matches the site.
 assessment types, claim types, assessment areas, accreditations and locations, and the profile
 assembles itself. The free-text parts are the biography, qualifications and position line.
 
+**Ordering the directory.** The Specialist Directory block has a **Sort order** with three choices:
+
+| Choice | What it does |
+|---|---|
+| **Surname (A–Z)** / **Given name (A–Z)** | Alphabetical. Both read the **Given name** and **Surname** boxes in the sidebar of each specialist, which **fill in automatically from the Full name** — the honorific is stripped and everything after the first word is treated as the surname, so a two-word surname like "Mar Fan" stays whole. Type over either if a name splits wrongly. |
+| **Custom — the drag order on the Specialists list** | The order you set by dragging rows on the Specialists list, using the handle at the left of each row. |
+
+Two things about **Custom** that look like faults and are not. Dragging changes nothing on the site
+unless that block's Sort order is actually set to Custom — it ships set to Surname. And the drag
+order starts out alphabetical by surname, so switching to Custom looks like nothing happened until
+you move someone. The list also shows 10 at a time, so moving a person a long way means dragging
+across pages.
+
+**The photo's shape is per person.** **Photo shape on the profile page** gives you Tall (2:3, the
+default and the same proportion as the founder photograph on the About page), Portrait (4:5) or
+Square. It changes the frame on that specialist's own profile page only — their card in the panel and
+the directories keeps its fixed shape. If the photo is *framed* badly rather than the wrong shape,
+move the focal point on the image under Media instead; that fixes every place it appears at once.
+
 **Qualifications and accreditations are two different things**, and the difference decides how far a
 change reaches. **Qualifications** are typed on the specialist and belong to that one person; each row
 carries its own icon, chosen from the wording if you leave it empty. **Accreditations** are *shared
@@ -307,6 +326,7 @@ different one on their own profile:
 | **Team photo** | Meet the Team, and the byline photo wherever they are credited on an article. Also their profile page, unless the next field is set. |
 | **Profile photo** | Their profile page **only**. Leave it empty to use the Team photo in both places. |
 | **Show no photo on the profile page** | No photo on the profile; they still appear with their Team photo on Meet the Team. This wins over both uploads, so you can hide a photo without deleting it. |
+| **Photo shape on the profile page** | The shape of the frame on their profile page — **Tall (2:3)**, **Portrait (4:5)** or **Square**. Tall matches the founder photograph on the About page and is the default, because most portrait photography is taller than it is wide and a square frame cuts the top and bottom off. Meet the Team and bylines are unaffected. |
 
 With no photo *and* no qualifications, the profile's bio widens to the full page rather than leaving
 a gap where the photo was. For a bad crop, see **Media** below — it is fixed there, once, for every
@@ -454,7 +474,9 @@ on *every* article, event, team profile or specialist profile, rather than on on
 
 **Header** is the main menu and its dropdowns. **Footer** is the link columns, contact details and
 opening hours. **Site Settings** holds the logo, favicon, brand colours, the enquiry-drawer form, and
-the wording of the booking-portal registration email.
+the wording of the booking-portal registration email. Inside **Brand colours**, the group named
+**Fixed text colours** is the Black, Charcoal and Mid grey offered in every text-colour control;
+unlike *Body text* and *Strong text* beside them, those three never flip to white on a dark band.
 
 Two groups inside Site Settings are easy to miss, and both change wording that appears on **every**
 page:
@@ -491,12 +513,16 @@ Three things follow, and they are the ones worth knowing:
   appear — a control that does nothing is worse than one that is absent.
 - **Colour comes from the brand palette, from either of two controls.** A swatch
   in the toolbar colours whatever is selected; a **Text colour** dropdown on the
-  block colours a whole heading and its subheading at once. Both store a palette
-  *key* rather than a colour, so **Site Settings → Brand colours** repaints every
-  coloured word on the site. Two of the choices, *Heading text* and *Body text*,
-  flip automatically on a dark band, so a card switched from light to dark stays
-  readable on its own. `HOOKS.md` §6a is the reference for which control to reach
-  for and what happens when one meets a `[[bracketed]]` phrase.
+  block colours a whole heading and its subheading at once. Both offer the same
+  sixteen colours and both store a palette *key* rather than a colour, so
+  **Site Settings → Brand colours** repaints every coloured word on the site.
+  Two of the choices, *Follows the band — heading* and *— body*, flip
+  automatically on a dark band, so a card switched from light to dark stays
+  readable on its own. **Black, Charcoal and Mid grey deliberately do not flip** —
+  they were added because staff asked for ink that stays the colour it says. The
+  palette is a fixed list: an editor can change what each colour *is*, but not
+  add a sixteenth-and-first. `HOOKS.md` §6a is the reference for which control to
+  reach for and what happens when one meets a `[[bracketed]]` phrase.
 - **Pasting from Word brings its formatting with it.** That has always been true;
   it is more visible now that the field keeps it. If a pasted line looks wrong,
   select it and clear the formatting rather than retyping around it.

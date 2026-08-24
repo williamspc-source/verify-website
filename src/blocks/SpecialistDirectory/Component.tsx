@@ -76,7 +76,17 @@ export const SpecialistDirectoryBlock: React.FC<Props & { bare?: boolean }> = as
 
   const payload = await getPayload({ config: configPromise })
   // 'order' → the admin drag-to-reorder order (collection `orderable: true` → `_order`).
-  const sortKey = sortBy === 'firstName' ? 'firstName' : sortBy === 'lastName' ? 'lastName' : '_order'
+  // The two alphabetical options carry a tie-break, or two people sharing a given
+  // name come back in whatever order the table hands them over: measured, "Andrew
+  // Ryan" sorted ahead of "Andrew Renaut". `firstName`/`lastName` are filled from
+  // the full name by the `deriveNames` hook, so neither column is ever empty —
+  // before that, sorting by `firstName` ordered 26 NULLs and looked broken.
+  const sortKey: string | string[] =
+    sortBy === 'firstName'
+      ? ['firstName', 'lastName']
+      : sortBy === 'lastName'
+        ? ['lastName', 'firstName']
+        : '_order'
   const { docs } = await payload.find({
     collection: 'specialists',
     depth: 1,

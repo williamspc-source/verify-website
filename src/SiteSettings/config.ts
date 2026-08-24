@@ -275,6 +275,33 @@ export const SiteSettings: GlobalConfig = {
         },
         {
           type: 'collapsible',
+          label: 'Fixed text colours',
+          admin: {
+            initCollapsed: true,
+            description:
+              'The Black, Charcoal and Mid grey an editor can pick from the text-colour palette. Unlike “Body text” and “Strong text” above, these do NOT flip to white on a dark band — that is what they are for. Changing one here repaints every word already coloured with it.',
+          },
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                colorField('inkBlack', 'Black', '#000000'),
+                colorField('inkCharcoal', 'Charcoal', '#414042'),
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                colorField('inkGrey', 'Mid grey', '#555555', {
+                  description:
+                    'Default: #555555. Deliberately darker than the design reference’s greys, which fall below AA contrast on the site’s own grey band. Hex, rgb(a) or any CSS colour. Empty = default.',
+                }),
+              ],
+            },
+          ],
+        },
+        {
+          type: 'collapsible',
           label: 'Status & feedback',
           admin: {
             initCollapsed: true,

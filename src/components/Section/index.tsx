@@ -9,6 +9,7 @@ export type SectionBackground =
   | 'light'
   | 'primary'
   | 'dark'
+  | 'hero'
 
 // Background → design section banding (defined in globals.css as `.vf-section--*`).
 // Mirrors the design reference: white, grey, light-blue gradient, dark-blue gradient,
@@ -25,6 +26,7 @@ export const bgClasses: Record<SectionBackground, string> = {
   light: 'vf-section--light',
   primary: 'vf-section--primary vf-on-dark',
   dark: 'vf-section--dark vf-on-dark',
+  hero: 'vf-section--hero vf-on-dark',
 }
 
 export const widthClasses: Record<string, string> = {

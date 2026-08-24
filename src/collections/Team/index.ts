@@ -1,5 +1,6 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 import { inlineRichTextField } from '@/fields/blockFields'
+import { portraitShapeField } from '@/fields/portraitShape'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
@@ -97,6 +98,16 @@ export const Team: CollectionConfig<'team'> = {
                   'Hides the photo on this person’s profile page; they still appear with their Team photo on Meet the Team. This wins over both uploads, so you can hide the photo without deleting it.',
               },
             },
+            {
+              ...portraitShapeField,
+              admin: {
+                ...(portraitShapeField.admin ?? {}),
+                // Hidden for the same reason the upload above is: a shape
+                // control on a profile that shows no photo does nothing.
+                condition: (_: unknown, sibling: { hidePhotoOnProfile?: boolean } = {}) =>
+                  !sibling?.hidePhotoOnProfile,
+              },
+            } as Field,
             {
               name: 'bio',
               type: 'richText',

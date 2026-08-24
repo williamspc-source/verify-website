@@ -30,14 +30,38 @@ export const BACKGROUND_OPTIONS = [
   { label: 'Pale blue', value: 'light' },
   { label: 'Primary (dark blue)', value: 'primary' },
   { label: 'Dark (charcoal)', value: 'dark' },
+  { label: 'Hero gradient', value: 'hero' },
 ]
+
+
+/**
+ * Hide a control on a block that is NESTED inside a Section, Row or Tab.
+ *
+ * `<Section bare>` returns early and never applies `background`, `containerWidth`
+ * or `motion` (src/components/Section/index.tsx) — a nested block inherits the
+ * parent band, width and rhythm by design. But the admin went on showing all
+ * three selects, so an editor set a background on a nested block, saved, and saw
+ * nothing. That is invariant 2's exact failure, and this is invariant 2's own
+ * remedy: if it cannot work here, it must not appear here.
+ *
+ * Nesting is detectable because every child list goes through
+ * `contentBlocksField`, which is always named `content` — Section's own children,
+ * each of Row's columns, and each Tab. A top-level block's path is
+ * `['layout', 2, 'background']` and contains no `content` segment; a nested one's
+ * is `['layout', 2, 'content', 0, 'background']` and does. Payload types `path`
+ * as `(number | string)[]`.
+ */
+const hiddenWhenNested = {
+  condition: (_data: unknown, _sibling: unknown, { path }: { path?: (number | string)[] }) =>
+    !path?.includes('content'),
+}
 
 export const backgroundField: Field = {
   name: 'background',
   type: 'select',
   defaultValue: 'white',
   options: BACKGROUND_OPTIONS,
-  admin: { description: 'Section background colour.' },
+  admin: { description: 'Section background colour.', ...hiddenWhenNested },
 }
 
 /**
@@ -109,7 +133,7 @@ export const motionField: Field = {
   name: 'motion',
   type: 'select',
   defaultValue: 'none',
-  admin: { description: 'Animate the section in as it scrolls into view.' },
+  admin: { description: 'Animate the section in as it scrolls into view.', ...hiddenWhenNested },
   options: [
     { label: 'None', value: 'none' },
     { label: 'Fade up', value: 'fade-up' },
@@ -137,7 +161,7 @@ export const containerWidthField: Field = {
   name: 'containerWidth',
   type: 'select',
   defaultValue: 'normal',
-  admin: { description: 'Content width for this section.' },
+  admin: { description: 'Content width for this section.', ...hiddenWhenNested },
   options: [
     { label: 'Normal', value: 'normal' },
     { label: 'Narrow', value: 'narrow' },

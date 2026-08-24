@@ -60,31 +60,51 @@ export type BrandTextColor = {
   fallback: string
   /** Where it re-points inside `.vf-on-dark`, when it would otherwise disappear. */
   onDarkToken?: string
+  /**
+   * Resolves through a token `.vf-on-dark` re-points, so the band decides the
+   * colour rather than this entry. Guarded to be exactly the last two entries,
+   * so the flag and the ordering cannot drift apart.
+   */
+  followsBand?: true
   /** Shown under the control. */
   description?: string
 }
 
 /**
- * Seven entries, on purpose. This is a brand palette an editor picks from, not a
- * colour wheel: enough to express emphasis, de-emphasis and the two brand blues,
- * few enough that every combination has been looked at on both a light and a
- * dark band.
+ * Sixteen entries, in three groups: the brand blues, a set of fixed inks staff
+ * asked for by name, and the two that follow the band.
+ *
+ * ── Fixed vs band-following ─────────────────────────────────────────────────
+ * Most of this list states a colour and keeps it on every band. `heading` and
+ * `body` do not: they resolve to `--text-dark`/`--text-mid`, which `.vf-on-dark`
+ * re-points, so they flip to white and pale on a dark band. That is the only way
+ * to say "this should stay readable if the band changes".
  *
  * ── Why the band-following pair is LAST ─────────────────────────────────────
- * `heading` and `body` resolve to `--text-dark` and `--text-mid`, which on a
- * light band are the colours the text already is. Measured on the homepage
- * heading: **Default and "Heading text" both compute `rgb(65, 64, 66)`** — the
- * same value, to the byte. They earn their place by flipping on a dark band,
- * where they are the only way to say "this should stay readable if the band
- * changes", but on the light band an editor is usually looking at, choosing one
- * does nothing visible.
+ * On a light band they are the colours the text already is. Measured on the
+ * homepage heading: **Default and "Heading text" both compute `rgb(65, 64, 66)`**
+ * — the same value, to the byte. They used to sit directly under "Default (as
+ * designed)", which is where an editor experimenting clicks first. That
+ * happened: the control was tried, "Heading text" was picked, nothing changed on
+ * the page, and it was reported — correctly — as a colour control that does not
+ * colour. So everything that visibly differs comes first. `followsBand` marks
+ * them and the guard asserts the flagged set is exactly `slice(-2)`.
  *
- * They used to sit directly under "Default (as designed)", which is where an
- * editor experimenting clicks first. That happened: the control was tried,
- * "Heading text" was picked, nothing changed on the page, and it was reported —
- * correctly — as a colour control that does not colour. So the five that visibly
- * differ come first, and the two adaptive ones are labelled with what they are
- * for rather than with the part of the page they are named after.
+ * ── Charcoal is deliberately degenerate on a light band ─────────────────────
+ * `charcoal` is #414042, which is what `heading` computes to on a light band, so
+ * there it also looks like Default. It is NOT the same control: it stays
+ * charcoal on a dark band, where `heading` turns white. Staff asked for black,
+ * charcoal and grey they could set and rely on, so those three carry no on-dark
+ * re-point at all — `richTextRender.e2e.spec.ts` proves that in both directions.
+ *
+ * ── Contrast, measured against white ───────────────────────────────────────
+ * `white` 1.00, `sky` 1.67, `muted` 2.38 and `definition` 2.73 are below AA for
+ * normal text. All four are on-dark colours; their descriptions say so rather
+ * than the palette hiding them, because light blue on a photograph is the right
+ * use. `bright` 3.38, `success` 3.30 and `warning` 3.19 clear AA for large text
+ * only. Everything else clears AA outright, `grey` (#555555, 7.46) included —
+ * it is darker than the reference's own mid-greys, which sit at ~4.4 on the
+ * site's muted band and would fail there.
  */
 export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
   {
@@ -101,7 +121,30 @@ export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
     fallback: '#1a3a5c',
     onDarkToken: '--text-on-dark',
   },
+  {
+    key: 'linkblue',
+    label: 'Deep link blue',
+    token: '--primary-strong',
+    fallback: '#155fa0',
+    description: 'The darker blue a link turns on hover.',
+  },
   { key: 'bright', label: 'Bright blue', token: '--secondary-bright', fallback: '#2d8fe8' },
+  {
+    key: 'definition',
+    label: 'Definition blue',
+    token: '--definition-blue',
+    fallback: '#5ba3d9',
+    description:
+      'For a dark band or a photograph. On white it measures 2.7:1, which is hard to read at normal size.',
+  },
+  {
+    key: 'sky',
+    label: 'Sky blue',
+    token: '--accent-on-dark',
+    fallback: '#93d0f7',
+    description:
+      'The accent colour on dark bands. On white it measures 1.7:1 — close to invisible, so keep it on something dark.',
+  },
   {
     key: 'muted',
     label: 'Muted grey-blue',
@@ -109,12 +152,61 @@ export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
     fallback: '#93abbf',
     description: 'For a line that should sit back from the copy around it.',
   },
+  // ── The fixed inks ────────────────────────────────────────────────────────
+  // No `onDarkToken` on any of the three, on purpose: staff asked to be able to
+  // set black, charcoal or grey and have it stay that colour. See the doc-block.
+  {
+    key: 'black',
+    label: 'Black',
+    token: '--ink-black',
+    fallback: '#000000',
+    description: 'Stays black on every band, including a dark one.',
+  },
+  {
+    key: 'charcoal',
+    label: 'Charcoal',
+    token: '--ink-charcoal',
+    fallback: '#414042',
+    description:
+      'Stays charcoal on every band. On a light background it matches the default text colour, so you will see no change there — the point is that it will not turn white if the band is switched to dark.',
+  },
+  {
+    key: 'grey',
+    label: 'Mid grey',
+    token: '--ink-grey',
+    fallback: '#555555',
+    description: 'For a caption or an aside. Stays grey on every band.',
+  },
   {
     key: 'white',
     label: 'White',
     token: '--text-on-dark',
     fallback: '#ffffff',
     description: 'For text over a photograph or a coloured panel.',
+  },
+  // ── Status colours ────────────────────────────────────────────────────────
+  // The same three the Callout block uses, so a sentence of body copy can match
+  // the panel it sits beside instead of approximating it with a brand blue.
+  {
+    key: 'success',
+    label: 'Success green',
+    token: '--callout-success',
+    fallback: '#16a34a',
+    description: 'Matches a Success callout. Clears AA at large sizes only.',
+  },
+  {
+    key: 'warning',
+    label: 'Warning amber',
+    token: '--callout-warning',
+    fallback: '#d97706',
+    description: 'Matches a Warning callout. Clears AA at large sizes only.',
+  },
+  {
+    key: 'error',
+    label: 'Error red',
+    token: '--form-error',
+    fallback: '#c0392b',
+    description: 'Matches a form error message.',
   },
   // The two below follow the band rather than stating a colour. On a light band
   // they are what the text already is — picking one is a no-op you can see, which
@@ -124,6 +216,7 @@ export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
     label: 'Follows the band — heading',
     token: '--text-dark',
     fallback: '#414042',
+    followsBand: true,
     description: 'Heading grey on a light band, white on a dark one.',
   },
   {
@@ -131,6 +224,7 @@ export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
     label: 'Follows the band — body',
     token: '--text-mid',
     fallback: '#222222',
+    followsBand: true,
     description: 'Body grey on a light band, pale on a dark one.',
   },
 ] as const
@@ -174,6 +268,6 @@ export const textColorField = (
     admin: {
       description:
         overrides.description ??
-        'Colours this block’s heading and subheading — not its cards. To colour anything else, select the words and use the colour swatch in that field’s toolbar. The two “Follows the band” choices look identical to Default on a light background; they exist so text stays readable if the band is switched to dark.',
+        'Colours this block’s heading and subheading — not its cards. To colour anything else, select the words and use the colour swatch in that field’s toolbar. The two “Follows the band” choices — and Charcoal — look identical to Default on a light background. The difference is on a dark band: the first two turn white, Charcoal stays charcoal.',
     },
   }) as Field

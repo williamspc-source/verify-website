@@ -23,6 +23,9 @@ const ALL_COLORS = {
   mutedTextOnDark: '#111111',
   accentOnDark: '#111111',
   borderOnDark: '#111111',
+  inkBlack: '#111111',
+  inkCharcoal: '#111111',
+  inkGrey: '#111111',
 }
 
 // Same for the Design System groups. Cast: this is a field-value fixture, not a

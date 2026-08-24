@@ -103,6 +103,9 @@ type BrandColors =
       navy?: string | null
       definitionBlue?: string | null
       paleSurface?: string | null
+      inkBlack?: string | null
+      inkCharcoal?: string | null
+      inkGrey?: string | null
       // Status & feedback
       success?: string | null
       warning?: string | null
@@ -195,6 +198,13 @@ const addBrandColors = (map: TokenMap, colors: BrandColors): void => {
   map.set('--navy', colors.navy)
   map.set('--definition-blue', colors.definitionBlue)
   map.set('--bg-light-2', colors.paleSurface)
+
+  // The editor text palette's fixed inks. Separate tokens from --text-*-base
+  // on purpose: those are semantic and flip on a dark band, so repainting
+  // "Body text" here would also repaint every word coloured Charcoal.
+  map.set('--ink-black', colors.inkBlack)
+  map.set('--ink-charcoal', colors.inkCharcoal)
+  map.set('--ink-grey', colors.inkGrey)
 
   // Semantic status colours, deliberately independent of the brand palette.
   map.set('--success', colors.success)

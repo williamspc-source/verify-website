@@ -1,4 +1,5 @@
 import { InlineRichText } from '@/components/RichText/Inline'
+import { portraitShapeClass } from '@/fields/portraitShape'
 import { hasRichText, richTextToPlain, type RichTextValue } from '@/utilities/lexicalText'
 import type { Metadata } from 'next'
 
@@ -149,7 +150,10 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
       <section className="profile-hero">
         <div className="container">
           <div className="profile-hero-inner">
-            <div className="profile-avatar">
+            <div className={['profile-avatar', portraitShapeClass(s.profilePhotoShape)]
+              .filter(Boolean)
+              .join(' ')}
+            >
               {photo ? (
                 <Media resource={photo} alt={s.title} size="230px" />
               ) : (

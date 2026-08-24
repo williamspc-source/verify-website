@@ -19,8 +19,15 @@ because there is nothing to obey — only something to check.
 - [Searching, grepping, and reading a tool's output](#searching-grepping-and-reading-a-tools-output)
 - [Driving a browser](#driving-a-browser)
 - [Writing a guard that can actually fail](#writing-a-guard-that-can-actually-fail)
+- [Writing a guard against a stylesheet: CSS-shaped text inside a COMMENT](#writing-a-guard-against-a-stylesheet-css-shaped-text-inside-a-comment)
+- [`computedSnapshot.mjs` is NOT deterministic on `/about`](#computedsnapshotmjs-is-not-deterministic-on-about)
 - [CSS, the design reference, and the diff tools](#css-the-design-reference-and-the-diff-tools)
 - [Content, the seed, and stored data](#content-the-seed-and-stored-data)
+- [Retiring a Lexical `TextStateFeature` value DELETES it from stored documents](#retiring-a-lexical-textstatefeature-value-deletes-it-from-stored-documents)
+- [Adding a `select` option races two concurrent Payload boots](#adding-a-select-option-races-two-concurrent-payload-boots)
+- [A control that "does nothing" may be losing the cascade, not unwired](#a-control-that-does-nothing-may-be-losing-the-cascade-not-unwired)
+- [The HOOKS §6 guard proves a rule exists, not that anything emits it](#the-hooks-6-guard-proves-a-rule-exists-not-that-anything-emits-it)
+- [A `sort:` on a column nothing writes is not an error — it is arbitrary order](#a-sort-on-a-column-nothing-writes-is-not-an-error--it-is-arbitrary-order)
 - [Images](#images)
 
 ---
@@ -245,6 +252,8 @@ Deleting the entire `assessmentType` query from `PeopleGrid/Component.tsx` left 
 **43. An option that renders identically to "no option" is a dead control, even when its CSS rule is perfect**
 
 `heading` and `body` resolve to `--text-dark`/`--text-mid`, which on a light band are the colours the text already is: Default and "Heading text" both computed **`rgb(65, 64, 66)`**, identical to the byte. They sat first in the dropdown, directly under "Default (as designed)" — so the first thing an editor tried was the one thing that could not show a change, and a control that had just been fixed and measured was reported broken a second time. They are last now, labelled *"Follows the band"*, and excused by name in the guard rather than by silence.
+
+**The exemption list was the wrong shape, and the palette outgrew it.** A *fixed* Charcoal (#414042, added because staff asked for ink that stays put) is identical to Default on a light band too — but it is not dead: on a dark band it stays charcoal while Default turns white. A one-context guard calls that a dead control, and the tempting fix is to add it to the exemption list, which would then have grown by one entry every time the palette did. The honest fix is to measure the same heading in **two** contexts and require a colour to differ from Default in *at least one* — which lets every entry be asserted instead of excused, and permits three further assertions the old shape could not make: that the band-following pair and the two on-dark re-points **must** move with the band, and that **every other entry must not**. That last one is the browser half of "an explicit pick is fixed", and nothing else in the repo would have noticed a `.vf-on-dark .vf-tc-charcoal` rule being added. Proven red five ways; the list is in the spec's doc-block.
 
 <a id="i44"></a>
 **44. Payload's own JSX converters read `node.format` and ignore node state entirely**
@@ -605,6 +614,53 @@ A guard that has never failed is not evidence. These are the ways one silently c
   what happened, and gives the checks' real justification (breadth, and foreclosing a *future* JS
   corrector). Run your break; do not narrate it.
 
+## Writing a guard against a stylesheet: CSS-shaped text inside a COMMENT
+
+A guard that reads `globals.css` as text has been fooled three separate times by CSS that is not
+CSS, because it sits inside a `/* … */`. All three were silent, and two of them produced a *false
+green* rather than a false red — the worse direction.
+
+- **`CSS.indexOf(':root')` does not find `:root`.** The file's first `:root` is at **line 48**, inside
+  a comment in the `@theme` block, 29 lines above the real one at 77.
+- **`CSS.indexOf('}', CSS.indexOf('--radius'))` does not find the end of `:root`.** It finds the `}`
+  in `body { font-size }`, in another comment, ~57 lines short of the real close.
+- Between them, `richTextColors.int.spec.ts` sliced lines 48–239 and called it "`:root`". It had
+  been green for months. The cost surfaced only when three palette entries were pointed at
+  `--form-error`, `--callout-success` and `--callout-warning` (lines 287/290/291) and all three
+  reported **"is not declared in `:root`"** while sitting plainly in it. Starting the slice inside
+  `@theme` was the false-green half: an unanchored token search could have resolved a `@theme`
+  declaration in preference to the `:root` one.
+- The same week, the comment introducing the on-dark re-points — which quotes
+  `` `.vf-section--primary .vf-accent` `` — was enough to make an unrelated rule look like a second
+  `.vf-tc-* .vf-accent` selector list, so the matcher found two, gave up, and returned empty. Every
+  membership assertion built on it then failed with a confusing message.
+
+**Blank the comments once, up front, keeping the length so nothing else shifts:**
+
+```js
+const CSS_CODE = CSS.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length))
+```
+
+and do every structural match against that. Cheaper than making each regex comment-aware, and it
+cannot be forgotten in one place. Then **assert the slice itself** — that it starts where you think,
+contains the block's first and last declaration, and does *not* contain something from the block
+next door. That check goes red on the old slicer with no manufactured break, which is its own proof.
+
+## `computedSnapshot.mjs` is NOT deterministic on `/about`
+
+Its header says a diff is "a real bug, not a tolerance". That is true of the colour and token
+properties it was built for, and **not** currently true of the layout properties added later.
+Measured: capturing a baseline and immediately comparing it against the *same unchanged code* four
+times in a row gave **2, then 3, then 0, then 0** changed nodes. The moving values are
+`marginLeft`/`marginRight` on a `SECTION > DIV` on `/about` and on a team profile, flipping between
+`0px` and `130px` — an `auto` centring margin resolving against a parent whose width has not settled
+when the snapshot is taken.
+
+So a non-empty diff is **not** by itself evidence. Before believing one: re-run it two or three
+times, and check *which property indices* actually differ. A diff confined to indices 30/31 on those
+routes is this. A diff on index 0 (`color`), or on any node outside them, is real. Do not "fix" it by
+widening a tolerance — the instrument needs a settle, not a threshold.
+
 ## CSS, the design reference, and the diff tools
 
 The largest group, because this is where a clean report most often means the instrument missed it.
@@ -915,6 +971,102 @@ Content lives in the database, so a code edit alone changes nothing on an existi
   would wipe each block's real fields — name, label, width, required — and leave only the addition.
   Append inside `formOverrides.fields` instead, where you can map over the built blocks without
   restating anything the plugin already defines.
+
+## Retiring a Lexical `TextStateFeature` value DELETES it from stored documents
+
+Adding a colour to `BRAND_TEXT_COLORS` is free — no column, no migration. **Removing one is not**,
+and both halves of the mechanism are in `node_modules`:
+
+- `registerTextStates` (`@payloadcms/richtext-lexical/…/textState/textState.js`) compiles
+  `parse: value => typeof value === 'string' && Object.keys(stateValues).includes(value) ? value : undefined`
+  — so a stored key no longer in the palette parses to `undefined`;
+- `NodeState.toJSON` in `lexical@0.41` then runs
+  `if (stateConfig.isEqual(v, stateConfig.defaultValue)) delete state[stateConfig.key]`, and that
+  default **is** `undefined`.
+
+The next time an editor opens and saves a document containing a retired colour, the key is removed
+from the stored JSON. Rendering degrades gracefully either way — `colorClass()` returns `undefined`
+and the text renders uncoloured — which is exactly why this is invisible: the page looks the same
+whether the value is still there or has just been destroyed, and re-adding the key to the palette
+will not bring it back.
+
+`richTextColors.ts` and `README.md` §19 both used to say stored content was never at risk. That was
+written about a Payload *API* change, where it is true, and it read as a general guarantee, where it
+is not. Retire a colour only with a repair that rewrites the affected nodes first.
+
+## Adding a `select` option races two concurrent Payload boots
+
+`pnpm test:int` boots Payload in more than one test file at once. The first run after adding options
+to a `select` field failed one whole file with Postgres **42710** (`AddEnumLabel`, duplicate object):
+both boots ran the dev schema push and both tried to add the same new enum labels. The second run
+was clean, because by then the labels existed. So: a `42710` on `AddEnumLabel` immediately after a
+field change is this, not a broken migration — re-run once before investigating. It cannot happen on
+the box, where migrations are explicit and serialised.
+
+## A control that "does nothing" may be losing the cascade, not unwired
+
+The Custom Styles global was reported as doing nothing, and every instinct said orphaned field. It
+was not: all 50 blocks that offer a CSS-class picker consume it, `toClassName` is clean, the presets'
+CSS genuinely reaches the page, and the `<style>` tag is injected last in the document — the
+strongest position available. It still lost, on plain specificity, to the ~11,400 lines of
+`globals.css` that were also unlayered, because the ported design-reference rules are scoped two and
+three classes deep while a preset is one.
+
+Two things to take from it:
+
+- **"Works on some pages and not others" is a specificity signature.** A wiring fault fails
+  everywhere. If a control works on generic pages and dies on the ones with a bespoke port, stop
+  looking for the missing `props.x` and compare selector weights.
+- **Unlayered beats layered at ANY specificity**, which is why the fix was to put `globals.css`
+  inside `@layer verify` rather than to add `!important` to anything. The repo had already met this
+  once and cured it for `.vf-tc-*` alone with `!important` — one patient, same disease. Check for a
+  general cure before writing a local one.
+
+Related instrument warning: **CSS hot-reload is not reliable here.** Twice in one session the dev
+server served a stale stylesheet after an edit — once silently failing an e2e colour assertion, once
+returning `DIFF EMPTY` from `computedSnapshot.mjs` for a change that had not reached the browser.
+Before believing any CSS measurement, fetch the served chunk and grep it for the rule you just wrote,
+with a positive control on a rule you did not touch.
+
+## The HOOKS §6 guard proves a rule exists, not that anything emits it
+
+`adminControls.int.spec.ts` → *"every class in HOOKS.md §6 is emitted somewhere in `src/`"*, failing
+with *"documented as a stable hook but nothing emits it"*. Both the name and the message overstate
+it. Its walker takes `` /\.(tsx?|css)$/ ``, and `globals.css` lives under `src/` — so **the CSS rule
+for a class satisfies the check by itself**. A class that is documented, has a rule, and is emitted
+by nothing at all passes.
+
+Measured, not inferred: after adding `.vf-portrait--{square|portrait|tall}` to §6, one entry of the
+class map was changed from the literal `'vf-portrait--tall'` to `` `vf-portrait--${'tall'}` `` — the
+exact defect the guard is supposed to catch — and all **94** cases stayed green. Restored, still 94.
+
+So when adding a documented hook class, do not treat a green suite as proof the class reaches the
+DOM. Check the rendered HTML for it. (`findDeadCss.mjs` is the tool that does care whether the class
+is built literally in source — that reason for spelling class maps out is real, and unchanged.)
+
+## A `sort:` on a column nothing writes is not an error — it is arbitrary order
+
+The specialist directory offered Custom / Surname / Given name. Surname worked, the other two were
+reported as doing nothing, and the obvious suspicion — an orphan control — was wrong. Every option
+had a code branch, the branches were correct, `tsc` was clean and all 286 tests passed. The fault was
+that **`firstName` had never been written by anything**: not the seed, not a hook, not the admin.
+Measured, `count(*) = 26` and `count(first_name) = 0`. `ORDER BY first_name` over an all-NULL column
+is perfectly legal SQL that returns rows in heap order, so the page simply looked unchanged.
+
+The lesson is where to look. For "this sort option does nothing", the first check is
+**`SELECT count(col) FROM table`**, not "does the code handle this option" — code review cannot
+distinguish a column that is empty from one that is full, and neither can a green test suite. The
+same shape applies to any filter or grouping keyed on an optional column.
+
+Two related traps in the same control, both of which made it *look* like more was broken:
+
+- **`_order` was seeded in surname order**, so the Custom option was byte-identical to Surname until
+  someone dragged a row. An option that produces the same output as its neighbour reads as broken —
+  the same illusion as TRAPS #43, in data rather than CSS.
+- **The stored value never reached the page.** Both live directory blocks were saved with
+  `sortBy = 'lastName'`, so dragging in the admin could never have changed `/specialists`. Check what
+  the *documents* hold before concluding the *code* is wrong: `SELECT sort_by FROM
+  pages_blocks_specialist_directory` answered in seconds what reading the block could not.
 
 ## Images
 

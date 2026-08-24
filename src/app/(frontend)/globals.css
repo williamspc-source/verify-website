@@ -135,6 +135,19 @@
   --text-dark: var(--text-dark-base);
   --text-mid: var(--text-mid-base);
 
+  /* Fixed inks for the editor's text palette. Deliberately NOT the --text-*
+     pair above, even though --text-dark-base is already #414042: those are
+     semantic (heading copy / body copy) and they flip on a dark band, so an
+     editor repainting "Body text" in Site Settings would silently repaint every
+     word someone had coloured Charcoal. These three are literals staff asked for
+     by name, and they carry no .vf-on-dark re-point — see the .vf-tc-* block.
+     --ink-grey is #555555 rather than the design reference's #737373 / #6f7378:
+     those measure 4.38:1 and 4.41:1 on --band-muted, so they fail AA on the
+     site's own grey band while passing on white. */
+  --ink-black: #000000;
+  --ink-charcoal: #414042;
+  --ink-grey: #555555; /* 7.46:1 on white, 6.89:1 on --band-muted */
+
   /* Text on dark/coloured bands — editable via Site Settings → Brand colours. */
   --text-on-dark: #ffffff;
   --text-muted-on-dark: rgba(255, 255, 255, 0.82);
@@ -336,6 +349,27 @@
   --color-warning: var(--warning);
   --color-error: var(--error);
 }
+
+/* ── EVERYTHING BELOW LIVES IN A CASCADE LAYER ─────────────────────────────
+   This is what makes the Custom Styles global work. An editor's CSS is injected
+   unlayered and last in the document (src/components/CustomCSS/index.tsx), which
+   is the strongest position CSS offers — and it STILL lost, because ~11,400
+   lines of this file were also unlayered and the ported design-reference rules
+   are page-scoped: `.why-verify--light .why-header .section-title` is (0,3,0)
+   against a preset's (0,1,0). The feature worked on generic pages and did
+   nothing on every page that got a bespoke port, which is the worst possible
+   shape — it looks editable until you try it somewhere specific.
+
+   Unlayered CSS beats layered CSS at ANY specificity. With the stylesheet in a
+   layer, editor CSS wins over all of it permanently, with no `!important` and
+   nothing to maintain per-rule.
+
+   DO NOT remove this wrapper, and do not add rules after its closing brace —
+   either silently returns the editor's CSS to losing. Everything above stays at
+   top level because @import/@config/@theme/@utility/@custom-variant/@plugin/
+   @source cannot live inside a layer, and the :root token block is (0,1,0), which
+   an editor's own `:root {}` already ties and beats on source order. */
+@layer verify {
 
 @layer base {
   * {
@@ -982,6 +1016,12 @@
     color: var(--white);
   }
   /* Solid charcoal band (editable via Design System → bands.dark). */
+  /* The hero gradient as a band. Added so MissionPillars could stop hardcoding
+     it in a page-scoped rule that silently beat the editor's own choice. */
+  .vf-section--hero {
+    background: var(--vf-grad-hero);
+    color: var(--white);
+  }
   .vf-section--dark {
     background: var(--band-dark);
     color: var(--white);
@@ -1350,7 +1390,8 @@
     flex-shrink: 0;
   }
   .vf-section--primary .vf-accent,
-  .vf-section--dark .vf-accent {
+  .vf-section--dark .vf-accent,
+  .vf-on-dark .vf-accent {
     color: var(--accent-sky);
   }
   .vf-section--primary .section-title,
@@ -1477,8 +1518,6 @@
 .vf-section--dark,
 .vf-cta-band,
 .vf-gateway-card--dark,
-.our-values,
-.mv-mission-panel,
 .ni-section.bg-dark,
 .booking-half--dark,
 .portal-opt4,
@@ -5941,8 +5980,9 @@
 
 /* ===== BLOCK: missionPillars ===== */
 /* ── Mission Pillars (about-verify) ─────────────────────── */
+/* Background comes from the block's band control (default `hero`, which is this
+   same gradient) rather than from here — this declaration beat every choice. */
 .mv-mission-panel {
-  background: var(--vf-grad-hero);
   padding: 100px 0;
   position: relative;
   overflow: hidden;
@@ -5957,9 +5997,8 @@
 /* Reference has this eyebrow at color-mix(in srgb, var(--white) 55%, transparent) ≈ 2.9:1, which fails WCAG
    AA. Deliberate deviation — matches what the same page already does for
    .our-values .section-label. */
-.mv-mission-header .section-label { color: var(--accent-on-dark); }
-.mv-mission-header .section-title { color: var(--text-on-dark); }
-.mv-mission-header .section-title span { color: var(--accent-on-dark); }
+.mv-mission-header .section-label { color: var(--primary); }
+.mv-mission-header .section-title { color: var(--text-dark); }
 .mv-mission-statement {
   font-size: 1.1rem;
   color: var(--text-on-dark);
@@ -6003,12 +6042,30 @@
 
 /* ===== BLOCK: valueCards ===== */
 /* ── Our Values (CCARRE) ─────────────────────────────── */
-.our-values { padding: 100px 0; background: var(--text-dark-base); }
-.our-values .section-label { color: var(--accent-on-dark); }
-.our-values .section-title { color: var(--text-on-dark); }
+/* Background comes from the block's own band control, not from here: this rule
+   used to paint it and silently beat every choice an editor made. --band-dark is
+   the same #414042 this used, so the default renders identically. The child
+   colours below are token-driven for the same reason — they have to follow
+   whichever band is chosen rather than assuming a dark one. */
+.our-values { padding: 100px 0; }
+.our-values .section-label { color: var(--primary); }
+.our-values .section-title { color: var(--text-dark); }
 /* Reference has this at color-mix(in srgb, var(--white) 65%, transparent) ≈ 4.0:1 — borderline AA. */
-.our-values .section-subtitle { color: var(--text-muted-on-dark); }
-.our-values .section-title span { color: var(--accent-on-dark); }
+.our-values .section-subtitle { color: var(--text-mid); }
+
+/* The label and the accent word follow the band too. Brand blue measures ~2.1:1
+   on charcoal, so on a dark band both take the on-dark accent.
+   `.vf-on-dark.our-values` is a COMPOUND, not a descendant — the band class and
+   the port class land on the same <section>. At (0,3,0) these beat the
+   light-band defaults above; a general `.vf-on-dark .section-label` was tried
+   first and lost, because it ties with every block-scoped rule in this file and
+   loses on source order. */
+.vf-on-dark.our-values .section-label,
+.vf-on-dark.our-values .section-title span,
+.vf-on-dark .mv-mission-header .section-label,
+.vf-on-dark .mv-mission-header .section-title span {
+  color: var(--accent-on-dark);
+}
 .values-header { text-align: center; margin-bottom: 64px; }
 .values-header .section-subtitle { margin: 0 auto; }
 .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
@@ -11117,7 +11174,27 @@
    frame that `overflow: hidden` then cut to 320. Two crops, and a focal point set
    low in the frame was clipped away after being applied. Same fix and the same
    reason as `.vf-split__media`; see README.md > Deliberate departures. */
-.staff-photo { position: relative; width: 100%; aspect-ratio: 1/1; border-radius: var(--vf-radius-md); overflow: hidden; background: var(--vf-grad-image-tint); box-shadow: 0 8px 32px rgba(0,35,70,0.1); margin-bottom: 24px; }
+/* ── Profile portrait shape ───────────────────────────────────────────────
+   Both profile templates framed every portrait square while the photography is
+   portrait — the founder's photo is 934×1400, and `.leader-img-main` was already
+   moved to 2/3 for exactly that reason (README > Deliberate departures §6). The
+   frame is now per person: Team/Specialists carry `profilePhotoShape`, which
+   emits one of the three classes below onto the wrapper.
+
+   The fallback in `var(--vf-portrait-aspect, 2 / 3)` is what makes a document
+   written before the column existed render like one written after — do not
+   replace it with a bare value. */
+.vf-portrait--tall {
+  --vf-portrait-aspect: 2 / 3;
+}
+.vf-portrait--portrait {
+  --vf-portrait-aspect: 4 / 5;
+}
+.vf-portrait--square {
+  --vf-portrait-aspect: 1 / 1;
+}
+
+.staff-photo { position: relative; width: 100%; aspect-ratio: var(--vf-portrait-aspect, 2 / 3); border-radius: var(--vf-radius-md); overflow: hidden; background: var(--vf-grad-image-tint); box-shadow: 0 8px 32px rgba(0,35,70,0.1); margin-bottom: 24px; }
 .staff-photo img, .staff-photo-img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .staff-sidebar-info { display: flex; flex-direction: column; gap: 12px; }
 .staff-sidebar-item { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: var(--accent); border-radius: var(--vf-radius-card); }
@@ -11143,7 +11220,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 .profile-hero { background: linear-gradient(135deg, var(--accent) 0%, var(--secondary-2) 100%); padding: 52px 0 56px; overflow: hidden; }
 .profile-hero-inner { display: flex; align-items: flex-start; gap: 40px; }
-.profile-avatar { width: 230px; height: 230px; flex-shrink: 0; border-radius: 18px; background: linear-gradient(135deg, #d9edf9 0%, #e8f5fe 100%); display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-size: 2.6rem; font-weight: 800; color: var(--primary); box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 18%, transparent); overflow: hidden; margin-top: 4px; }
+.profile-avatar { width: 230px; aspect-ratio: var(--vf-portrait-aspect, 2 / 3); flex-shrink: 0; border-radius: 18px; background: linear-gradient(135deg, #d9edf9 0%, #e8f5fe 100%); display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-size: 2.6rem; font-weight: 800; color: var(--primary); box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 18%, transparent); overflow: hidden; margin-top: 4px; }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .profile-info { flex: 1; min-width: 0; }
 .profile-name { font-family: var(--font-heading); font-size: clamp(2.1rem, 4vw, 3rem); font-weight: 800; color: var(--primary-deep); line-height: 1.1; margin: 0 0 10px; letter-spacing: -0.02em; }
@@ -11175,7 +11252,7 @@
 .profile-qual-list li { display: flex; align-items: flex-start; gap: 13px; font-size: 0.93rem; color: var(--primary-deep); font-family: var(--font-heading); font-weight: 700; line-height: 1.5; }
 .profile-qual-icon { width: 1.3rem; height: 1.3rem; font-size: 1.3rem; color: var(--primary); flex-shrink: 0; margin-top: 1px; opacity: 0.85; }
 @media (max-width: 960px) { .profile-grid { grid-template-columns: 1fr; } .profile-types { grid-template-columns: 1fr; } .profile-areas-list { grid-template-columns: 1fr; } }
-@media (max-width: 640px) { .profile-hero { padding: 36px 0 40px; } .profile-hero-inner { flex-direction: column; gap: 22px; } .profile-avatar { width: 120px; height: 120px; font-size: 1.9rem; border-radius: var(--vf-radius-tile); } .profile-content { padding: 36px 0 48px; } }
+@media (max-width: 640px) { .profile-hero { padding: 36px 0 40px; } .profile-hero-inner { flex-direction: column; gap: 22px; } .profile-avatar { width: 120px; height: auto; font-size: 1.9rem; border-radius: var(--vf-radius-tile); } .profile-content { padding: 36px 0 48px; } }
 
 /* Contact locations module — equal-height overrides + phosphor icon colour */
 /* Contact locations module — equal-height map column + info panel.
@@ -11363,8 +11440,9 @@
    In-the-Loop featured-article carousel (design-reference .ni-featured/.ni-carousel)
    ═══════════════════════════════════════════════════════════════════════════ */
     /* ── Featured Carousel (.ni-featured / .ni-carousel) ──── */
+    /* Background comes from the block's band control; --band-white is the same
+       #ffffff this used, so the default renders identically. */
     .ni-featured {
-      background: var(--white);
       padding: 64px 0 72px;
     }
     .ni-featured-label {
@@ -12431,6 +12509,40 @@
   color: var(--text-on-dark) !important;
 }
 
+/* ── The fixed inks and the status colours ─────────────────────────────────
+   Not one of these carries a `.vf-on-dark` re-point, and that is the point:
+   staff asked to be able to set black, charcoal or grey and have it stay put on
+   any band. `richTextRender.e2e.spec.ts` asserts each computes the SAME value in
+   a light and a dark context, so adding a re-point below fails the browser
+   guard rather than quietly overriding an editor's explicit choice. */
+.vf-tc-linkblue {
+  color: var(--primary-strong) !important;
+}
+.vf-tc-definition {
+  color: var(--definition-blue) !important;
+}
+.vf-tc-sky {
+  color: var(--accent-on-dark) !important;
+}
+.vf-tc-black {
+  color: var(--ink-black) !important;
+}
+.vf-tc-charcoal {
+  color: var(--ink-charcoal) !important;
+}
+.vf-tc-grey {
+  color: var(--ink-grey) !important;
+}
+.vf-tc-success {
+  color: var(--callout-success) !important;
+}
+.vf-tc-warning {
+  color: var(--callout-warning) !important;
+}
+.vf-tc-error {
+  color: var(--form-error) !important;
+}
+
 /* On a dark band these two would disappear rather than read as a choice: brand
    blue is low-contrast on navy and deep navy is all but invisible. They
    re-point, the same way `.vf-section--primary .vf-accent` already does.
@@ -12458,7 +12570,16 @@
 .vf-tc-deep .vf-accent,
 .vf-tc-bright .vf-accent,
 .vf-tc-muted .vf-accent,
-.vf-tc-white .vf-accent {
+.vf-tc-white .vf-accent,
+.vf-tc-linkblue .vf-accent,
+.vf-tc-definition .vf-accent,
+.vf-tc-sky .vf-accent,
+.vf-tc-black .vf-accent,
+.vf-tc-charcoal .vf-accent,
+.vf-tc-grey .vf-accent,
+.vf-tc-success .vf-accent,
+.vf-tc-warning .vf-accent,
+.vf-tc-error .vf-accent {
   color: var(--primary);
 }
 .vf-on-dark .vf-tc-heading .vf-accent,
@@ -12467,7 +12588,16 @@
 .vf-on-dark .vf-tc-deep .vf-accent,
 .vf-on-dark .vf-tc-bright .vf-accent,
 .vf-on-dark .vf-tc-muted .vf-accent,
-.vf-on-dark .vf-tc-white .vf-accent {
+.vf-on-dark .vf-tc-white .vf-accent,
+.vf-on-dark .vf-tc-linkblue .vf-accent,
+.vf-on-dark .vf-tc-definition .vf-accent,
+.vf-on-dark .vf-tc-sky .vf-accent,
+.vf-on-dark .vf-tc-black .vf-accent,
+.vf-on-dark .vf-tc-charcoal .vf-accent,
+.vf-on-dark .vf-tc-grey .vf-accent,
+.vf-on-dark .vf-tc-success .vf-accent,
+.vf-on-dark .vf-tc-warning .vf-accent,
+.vf-on-dark .vf-tc-error .vf-accent {
   color: var(--accent-on-dark);
 }
 
@@ -12530,4 +12660,6 @@
    silently un-hiding a fallback that has already been satisfied. */
 .vf-trybooking__fallback[hidden] {
   display: none;
+}
+
 }

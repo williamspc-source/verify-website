@@ -320,7 +320,7 @@ zsh tests/int/prove-guards.sh   # re-applies each deliberate break; every case m
 
 | Gate | Result | Count it with |
 |---|---|---|
-| `pnpm test:int` | **215 passed, 13 files** | `pnpm test:int` |
+| `pnpm test:int` | **286 passed, 13 files** | `pnpm test:int` |
 | `pnpm test:e2e` | **61 passed** on a clean run | `pnpm test:e2e` |
 | `zsh tests/int/prove-guards.sh` | **11 cases** | `grep -c '^run_case "' tests/int/prove-guards.sh` |
 | `referenceCssDiff.mjs` | **13 families**, all zero | the `FAMILIES` object in the harness |
@@ -365,7 +365,7 @@ Three habits separate these from the guards that rotted:
 | `tests/int/adminControls.int.spec.ts` | Orphan fields, option values with no CSS rule, the class picker, hardcoded brand assets, placeholders with no upload, `cacheLife` on a tag purge, discarded `appearance`, unguarded draft queries |
 | `tests/int/seedAuthored.int.spec.ts` | That a seed module never decides "has this been written?" by counting blocks — that rule once rewrote 13 of 27 pages from fixtures on every run |
 | `tests/int/proseFields.int.spec.ts` | Every field an editor types words into is rich text, or is named with a reason |
-| `tests/int/richTextColors.int.spec.ts` | The brand palette, its CSS and the toolbar swatches agree — and a Payload API change fails here rather than on a page |
+| `tests/int/richTextColors.int.spec.ts` | The 16-colour brand palette, its CSS and the toolbar swatches agree; every key is in **both** `.vf-accent` lists; the `:root` slice it reads is asserted to be the real one — and a Payload API change fails here rather than on a page |
 | `tests/int/productionEnv.int.spec.ts` | Which variables are required while serving, and that `ALLOW_MISSING_SMTP` waives `SMTP_HOST` **and nothing else** |
 | `tests/int/cssTokens.int.spec.ts` | Sanitisation of editor-supplied token values, which land inside a `<style>` tag |
 | `tests/int/seedWrites.int.spec.ts` | No seed file calls `payload.create`/`update` directly, bypassing the rich-text lift |
@@ -389,14 +389,16 @@ there is now **no `react-hooks/*` disable anywhere in `src/`**.
 
 ### Tools `pnpm test` does not run
 
-`tests/visual/` holds five Node scripts. They are described in full in `CLAUDE.md` → *CSS token
-tooling*; the short version:
+`tests/visual/` holds six Node scripts (`ls tests/visual/*.mjs | wc -l`) — five bullets, because
+the two codemods share one. They are described in full in `CLAUDE.md` → *CSS token tooling*; the
+short version:
 
 - `referenceCssDiff.mjs <family>` — diffs every declaration the design reference makes against
   `globals.css`. **A zero is necessary, not sufficient**: it proves a rule is in the file, not that it
   reached the page. Always confirm with `getComputedStyle`.
 - `computedSnapshot.mjs capture|compare <name>` — computed-style gate. Capture immediately before a
-  change and compare immediately after; any content change invalidates a baseline.
+  change and compare immediately after; any content change invalidates a baseline. **A non-empty diff
+  is not by itself evidence** — see §10.28: it is nondeterministic on `/about`.
 - `findFalseHover.mjs` — hover effects on elements nothing can click. **Candidates, not a verdict.**
 - `findDeadCss.mjs` — unreachable selectors. **Candidates, not a verdict** — it has already produced
   false positives that would each have broken a live page.
@@ -507,7 +509,7 @@ undone. A stale register is worse than none, because people trust it.
 
 | # | Issue | Live today? | Impact | Effort |
 |---|---|---|---|---|
-| 1 | Two e2e specs flake under a loaded dev server | Test-only | `pnpm test` fails intermittently on a healthy machine | ~10 min |
+| 1 | Three e2e specs flake under a loaded dev server | Test-only | `pnpm test` fails intermittently on a healthy machine | ~10 min |
 | 2 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** |
 | 3 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min |
 | 4 | Light-band breadcrumbs are darker and heavier than the reference | Cosmetic, ~25 pages | A slightly heavier trail | ~10 min + re-baseline |
@@ -533,10 +535,16 @@ undone. A stale register is worse than none, because people trust it.
 | 24 | **This deployment runs without email** | Yes, by choice | Enquiries captured but nobody emailed; password reset does not work | ~5 min once SMTP exists |
 | 25 | Nothing exercises the seed | Test-only | Four seed faults shipped under a fully green suite | ~2 h |
 | 26 | `LABEL_SCOPED_FIXES` is not tracked, so a stale key is silent | Latent | A link fix quietly stops applying when copy is reworded | ~2 lines |
+| 27 | The text-colour palette cannot be extended by an editor | Yes, mild | "Add a colour" needs a developer and a deploy; the 16 values are all editable | Not fixable in the toolbar — see below |
+| 28 | `computedSnapshot.mjs` is not deterministic on `/about` | Test-only | A clean change can report a 2–3 node diff, or none, run to run | Unknown — needs a settle, not a tolerance |
+| 29 | Drag-ordering specialists means dragging across pages | Yes, mild | The admin list shows 10 of 26, so moving someone far is awkward | Raise the list `limit`, ~1 line |
 
-### 1. Two e2e specs flake under a loaded dev server
+### 1. Three e2e specs flake under a loaded dev server
 
-`admin.e2e.spec.ts` and `links.e2e.spec.ts` fail intermittently, and **only in a full run**. Measured
+`admin.e2e.spec.ts`, `links.e2e.spec.ts` and `tryBooking.e2e.spec.ts` fail intermittently, and
+**only in a full run**. `tryBooking` was added to this list on 2026-08-24: *"the fallback booking link
+is present and correct when the widget cannot load"* failed once at the end of a full run and passed
+4/4 in isolation immediately after, which is the same signature as the two below. Measured
 across six full runs: *"Admin Panel › can navigate to dashboard"* failed twice; it passes every time
 in isolation. Playwright's serial mode then skips the tests behind it, so the run reports failures for
 tests that never ran.
@@ -747,10 +755,17 @@ checklist tidy.
 `TextStateFeature` is marked *"There may be breaking changes to this API"*. Registered once, in
 `src/fields/richTextColorFeature.ts`.
 
-**Stored content is never at risk:** what is written is the bare palette key
+**Stored content is not at risk from an API change:** what is written is the bare palette key
 (`{"$":{"color":"brand"}}`), never CSS, and the *reading* half is ours (`nodeColorClass` in
 `src/components/RichText/shared.tsx`). Content coloured today keeps rendering even if the editor half
-disappears. After any Payload upgrade, re-read the feature's `.d.ts` and run
+disappears.
+
+**It IS at risk from retiring a colour, which this section used to imply it was not.** Measured in
+`node_modules`: `registerTextStates` parses a value that is no longer in the palette to `undefined`,
+and `lexical@0.41`'s `NodeState.toJSON` deletes a key whose value equals its default — so a colour
+removed from `BRAND_TEXT_COLORS` is **stripped out of stored documents** on the next admin save, and
+re-adding it later will not bring it back. Adding a colour is free; removing one needs a repair that
+rewrites the affected nodes first. `docs/TRAPS.md` has the trace. After any Payload upgrade, re-read the feature's `.d.ts` and run
 `tests/int/richTextColors.int.spec.ts`, which constructs the feature and reads its props back — so an
 API change fails a test rather than a page.
 
@@ -821,6 +836,57 @@ nothing. `seedLinkRepairs.ts` wires it to two tables and **not** to `LABEL_SCOPE
 exactly how the gateway-card link fix stayed broken while carrying two independent faults on one line.
 Its keys are *current* copy that must still be there, so zero matches means drift. Left undone only
 because `matchTracker.report` throws outside production.
+
+### 27. The text-colour palette cannot be extended by an editor
+
+Staff asked whether they could **add a colour**. The 16 entries are all editable — Site Settings →
+Brand colours sets what each one *is*, and changing "Mid grey" repaints every word already using it.
+What cannot be added at runtime is a sixteenth-and-first entry, and the blocker is in Payload, not in
+our wiring:
+
+- `TextStateFeature`'s `state.color` is resolved once inside `sanitizeConfig` — which is what
+  `getPayload()` awaits — and memoised for the process lifetime. `initLexicalFeatures` copies
+  `clientFeatureProps` verbatim per request; there is no hook, and `toolbarGroups` has no per-item
+  predicate.
+- Its compiled `parse` rejects any key not in that list, so a fetched-later colour would not survive
+  a save even if it could be shown.
+
+**Pre-declared empty slots were considered and rejected.** Six spare rows in Site Settings would
+work mechanically, but an unfilled slot still renders as a pickable toolbar swatch whose `var()`
+resolves to nothing — text that visibly does not change. That is the exact failure invariant 2 and
+`TRAPS.md` #43 exist to prevent, it cannot be hidden (the admin does not load the brand tokens at
+all), and it would ship four permanently-dead controls to answer a request for one live one.
+
+The block-level dropdown *alone* could be made dynamic, following the `CssClassSelect` precedent.
+That was not done because it breaks the documented "two controls over one palette" architecture: the
+same colour would exist in the dropdown and not in the toolbar. If it is ever wanted, it is a
+deliberate decision with its own entry here, not a rider on a palette change.
+
+### 28. `computedSnapshot.mjs` is not deterministic on `/about`
+
+The harness's own header says a diff is "a real bug, not a tolerance". Measured: capturing a baseline
+and immediately comparing it against the **same unchanged code** four times gave **2, 3, 0, 0**
+changed nodes. The movement is `marginLeft`/`marginRight` on a `SECTION > DIV` on `/about` and on a
+team profile, flipping between `0px` and `130px` — an `auto` centring margin resolving against a
+parent whose width has not settled when the snapshot is taken.
+
+Left as-is because the fix is a settle, not a threshold, and a tolerance would blunt the one tool
+that catches a reflow. **How to use it meanwhile:** re-run a non-empty diff two or three times, and
+check which property *indices* differ. Confined to 30/31 on those two routes, it is this. Anything on
+index 0 (`color`), or on any other node, is real.
+
+### 29. Drag-ordering specialists means dragging across pages
+
+The Specialist Directory's **Custom** sort reads the drag order set on the Specialists list. That
+works, but the admin list shows **10 rows of 26**, so moving someone from the bottom to the top means
+dragging them up three pages. Raising the collection's list `limit` would fix it in about a line; it
+was left alone because 26 rows on one page is a judgement about the admin UI rather than a defect,
+and nobody has asked for it yet.
+
+Two things about Custom that read as faults and are not, both now said plainly in the control's own
+description: dragging changes nothing on the public site unless that block's Sort order is set to
+Custom (it ships on Surname), and the drag order starts alphabetical by surname, so switching to
+Custom looks like nothing happened until a row is actually moved.
 
 ## 11. Deliberate departures
 
@@ -905,7 +971,13 @@ one block that should show the tile is switched on as *data*, by
 ### 6. The founder photograph is portrait, not square
 
 `.leader-img-main` was `aspect-ratio: 4/4`. The supplied photograph of Wes Lerch is 934×1400 (2:3),
-so a square box cropped away the top and bottom of the frame. Changed to `2/3`. Exactly one
+so a square box cropped away the top and bottom of the frame. Changed to `2/3`.
+
+**Profile pages now share that proportion**, so this is no longer a one-off. Both profile templates
+framed every portrait square — `.staff-photo` at `1/1`, `.profile-avatar` at a fixed 230×230 — and
+were doing the same crop to every photo. They now default to `2/3` and carry a per-person **Photo
+shape on the profile page** control (Tall / Portrait / Square) on the Team and Specialists records.
+Do not "restore" either to a square: the square was the bug this and §6 both fix. Exactly one
 Leadership Spotlight block exists site-wide, on `/about`; `.leader-badge` is absolutely positioned
 against that box and was re-measured rather than assumed.
 

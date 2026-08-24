@@ -16,6 +16,9 @@ export const Locations: CollectionConfig = {
     read: anyone,
     update: authenticated,
   },
+  // Makes the `order` field below actually do something: it had no reader at
+  // all, so the number an editor typed changed nothing anywhere.
+  defaultSort: 'order',
   admin: {
     useAsTitle: 'title',
     group: 'Taxonomy',
@@ -39,7 +42,14 @@ export const Locations: CollectionConfig = {
       name: 'order',
       type: 'number',
       defaultValue: 0,
-      admin: { description: 'Lower numbers appear first in filters.' },
+      admin: {
+        // Was "Lower numbers appear first in filters", which was false: the
+        // directory's location filter is built alphabetically in the browser
+        // (SpecialistDirectory/DirectoryClient.tsx), and nothing read this at
+        // all. `defaultSort` above now makes it order the admin list, which is
+        // what the wording claims and all the value it has.
+        description: 'Lower numbers appear first in this admin list. The public filters are alphabetical and ignore it.',
+      },
     },
     slugField({
       position: undefined,
