@@ -28,6 +28,7 @@ because there is nothing to obey — only something to check.
 - [A control that "does nothing" may be losing the cascade, not unwired](#a-control-that-does-nothing-may-be-losing-the-cascade-not-unwired)
 - [The HOOKS §6 guard proves a rule exists, not that anything emits it](#the-hooks-6-guard-proves-a-rule-exists-not-that-anything-emits-it)
 - [A `sort:` on a column nothing writes is not an error — it is arbitrary order](#a-sort-on-a-column-nothing-writes-is-not-an-error--it-is-arbitrary-order)
+- [A migration that passes locally can be untestable locally](#a-migration-that-passes-locally-can-be-untestable-locally)
 - [Images](#images)
 
 ---
@@ -1067,6 +1068,41 @@ Two related traps in the same control, both of which made it *look* like more wa
   `sortBy = 'lastName'`, so dragging in the admin could never have changed `/specialists`. Check what
   the *documents* hold before concluding the *code* is wrong: `SELECT sort_by FROM
   pages_blocks_specialist_directory` answered in seconds what reading the block could not.
+
+## A migration that passes locally can be untestable locally
+
+The `editor_controls` migration passed here and failed on the box, and the reason is the whole
+lesson: **the local database is schema-pushed, so it already had every enum label the migration was
+supposed to ADD.** Running it locally exercised almost none of its statements. The box had the old
+enums and had to actually alter them.
+
+Two Postgres rules then bit, and Payload gives no way round either:
+
+- `ALTER TYPE ... ADD VALUE` **cannot run inside a transaction block** before PostgreSQL 12, and
+  even on 12+ a label added inside a transaction **cannot be used until that transaction commits**.
+  The generated migration added `'hero'` and then did `SET DEFAULT 'hero'` in the same file.
+- `runMigrationFile` in `@payloadcms/drizzle` **always** wraps `up()` in
+  `initTransaction` → `commitTransaction`. There is no `disableTransaction` flag in Payload 3.85 —
+  the runner was read, not assumed.
+
+Reproduced locally once the fixture was right: `ERROR: unsafe use of new value "hero" of enum type
+enum_pages_blocks_mission_pillars_background`. The fix is two migrations — labels first, through
+`payload.db.pool` so they land outside the wrapping transaction, then everything that uses them in
+the next migration's own transaction.
+
+**How to test a migration honestly.** Never against the dev database; it is already at the new
+schema, which is precisely why it cannot fail. Instead:
+
+```bash
+createdb verify_cms_migtest
+DATABASE_URL=…/verify_cms_migtest pnpm payload migrate        # baseline ONLY → the box's real state
+```
+
+then assert the fixture is genuinely old (`'hero'` absent, `colors_steel` present) **before**
+applying anything, run the new migrations, and finish with `migrate:create` — *"No schema changes
+detected"* is the proof the result matches the config. And prove the fixture can fail: run the
+original statements as one transaction and watch the error appear. A test that cannot reproduce the
+bug cannot demonstrate the fix.
 
 ## Images
 
