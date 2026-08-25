@@ -562,6 +562,52 @@ Playwright will happily measure the wrong thing and report it as a pass.
   *change*; a recovery keyed on exact values is not a bound. `FeaturedArticles` was unaffected — it
   advances with `(c + 1) % count`.
 
+## An inline style defeats every media query, so a responsive rule can be dead
+
+**A `@media` rule that reads correctly, sits in the right file and matches the right selector can
+still never once apply.** globals.css had
+`@media (max-width: 960px) { .audience-gateway-grid { grid-template-columns: 1fr } }` — and the
+homepage rendered **three 98px columns on a 390px phone**, because
+`src/blocks/GatewayCards/Component.tsx` wrote `style={{ gridTemplateColumns: … }}` on the element.
+Inline styles beat every stylesheet declaration, media queries included. Anyone reading the CSS would
+conclude mobile stacking worked; it had never worked, on any phone, since the block shipped.
+
+**The corollary that catches the obvious fix:** an inline *custom property* wins too. Nine blocks set
+`style={{ '--vf-cols': n }}`, so `@media { .x { --vf-cols: 1 } }` cannot override them either. The
+media query has to set `grid-template-columns` **directly**.
+
+**And a third:** those grids are also targeted by `.spec-grid[style*='--vf-cols']` (0,2,0), so a
+plain-class mobile rule (0,1,0) loses to it regardless of order. Match the specificity.
+
+The check is never "is the rule in the file". It is `getComputedStyle` on a real element at a real
+viewport width. Three separate page-scoped workarounds for this same grid family already existed in
+globals.css (10793-10800, 9455-9468) — each one added because the shared rule "didn't work", none
+diagnosing why. Guarded now by `tests/e2e/responsive.e2e.spec.ts`.
+
+## `pnpm dev` and a desktop-only test suite cannot see a responsive fault
+
+`playwright.config.ts` defined exactly one project — `Desktop Chrome`, 1280×720, DPR 1 — so no test
+had ever loaded a page at a phone or tablet width. Four faults shipped green on 2026-08-25: grids that
+never collapsed, a carousel that cropped 37.5% of a photo on mobile against 21.6% on desktop, a
+masthead that overflowed by 167px between 769 and 1024px, and a drawer that flattened 28 links.
+
+Two specific traps inside that:
+
+- **A fixed height plus a viewport-relative width is a crop that changes with the viewport.**
+  `.expert-avatar { height: 200px }` against `.expert-card { flex-basis: 82vw }` meant the photo box
+  grew wider on a phone without growing taller, and `object-fit: cover` ate the difference. An editor's
+  `zoom`, tuned against the desktop framing, then multiplied on top. Use `aspect-ratio` for anything
+  cropping a photograph, and pick the ratio the desktop already renders so the change is a no-op there.
+- **`overflow-x: clip` on `html` hides the evidence.** It was added as a backstop while fixing the
+  masthead, and it made `responsive.e2e.spec.ts` unable to go red on the defect it was written for —
+  proven by reverting the header breakpoint and watching the test still pass. A clipped element is a
+  silently broken layout. It was removed.
+
+Also: `computedSnapshot.mjs` keys nodes by **structural index path**, so inserting one DOM element
+(here, the nav's accordion `<button>`) renumbers every later sibling and reports them all as changed
+with `after: undefined`. That is not a style regression. Check whether any node *outside* the changed
+subtree moved — on this pass, zero did.
+
 ## Writing a guard that can actually fail
 
 **The orphan-field guard is keyed by BARE FIELD NAME across the whole repo, so a dead field hides

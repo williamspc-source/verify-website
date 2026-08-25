@@ -485,8 +485,14 @@ on *every* article, event, team profile or specialist profile, rather than on on
 
 ### Site
 
-**Header** is the main menu and its dropdowns. **Footer** is the link columns, contact details and
-opening hours. **Site Settings** holds the logo, favicon, brand colours, the enquiry-drawer form, and
+**Header** is the main menu and its dropdowns. **On a phone or tablet the menu is grouped**: the
+button opens a list of your top-level items only, and tapping one expands *its* dropdown while the
+others stay shut. Nothing extra to configure — the grouping follows the Dropdown items and
+Sub-dropdown items you have already set, and a parent item's own link still works when you tap its
+label rather than the arrow. Adding a seventh or eighth top-level item is therefore safe on mobile;
+before this it put every link on screen at once. The full bar returns above 1024px.
+
+**Footer** is the link columns, contact details and opening hours. **Site Settings** holds the logo, favicon, brand colours, the enquiry-drawer form, and
 the wording of the booking-portal registration email. Inside **Brand colours**, the group named
 **Fixed text colours** is the Black, Charcoal and Mid grey offered in every text-colour control;
 unlike *Body text* and *Strong text* beside them, those three never flip to white on a dark band.

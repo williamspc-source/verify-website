@@ -571,8 +571,11 @@ Two things worth knowing about that block generally:
 
 - The **"What's Included"** list under a card comes from the *Details* rows on each feature. Each row
   takes an icon, a bold heading and a description; leave the list empty and nothing renders.
-- The **Columns** field is respected on phones now. It used to be written in a way that overrode every
-  screen-size rule, so a two-column grid stayed two-across on a phone no matter what.
+- The **Columns** field sets the *desktop* layout. **Below 600px every card grid is one column**, whatever
+  you pick — four cards across a phone measured 69px wide each, which is not a card. Between 600px and
+  1024px most grids show two. This was only half-true when first written here: the blocks wrote their
+  column count in a way that beat every screen-size rule, so a grid set to 3 or 4 stayed that way at
+  390px. Fixed on 2026-08-25 and now asserted by `tests/e2e/responsive.e2e.spec.ts`.
 
 ### Carousels — what you can change, and what the numbers mean
 

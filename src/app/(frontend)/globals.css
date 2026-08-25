@@ -377,6 +377,14 @@
   }
   html {
     scroll-behavior: smooth;
+    /* NOTE: deliberately NO `overflow-x` guard here. One was added while fixing
+       the 769–1024px masthead overflow (measured: scrollWidth 1191 against a
+       1024 viewport) and then removed, because `clip` hides the symptom without
+       fixing the cause: with it in place `responsive.e2e.spec.ts` could no
+       longer go red on the very defect it was written for — proven by putting
+       the header's collapse breakpoint back to 768 and watching the test still
+       pass. A clipped element is a silently broken layout, which is the failure
+       mode this codebase exists to avoid. Overflow stays visible and guarded. */
     /* Every anchor jump must clear the sticky masthead. `.site-nav` is
        `position: sticky; top: 0` at a 72px `.nav-inner` height, and without this
        the browser scrolls the target's top edge to y=0 — straight under the bar.
@@ -667,8 +675,12 @@
     transition: all var(--transition);
   }
 
-  /* Mobile menu (below md) */
-  @media (max-width: 768px) {
+  /* Mobile menu. 1024, not 768: between 769 and 1024 the full desktop bar
+     (logo + 7 nowrap links + CTA) does not fit `.container`, so the document
+     grew sideways — measured scrollWidth 1191 against a 1024 viewport — and
+     every full-bleed band stopped short of the right edge. Collapsing here also
+     gives touch tablets the dropdowns, which are hover-only above this width. */
+  @media (max-width: 1024px) {
     .nav-links,
     .nav-cta {
       display: none;
@@ -2083,7 +2095,11 @@
 /* Responsive hero */
 @media (max-width: 1024px) {
   .hero-layout { grid-template-columns: 1fr; gap: 48px; }
-  .hero-panel { max-width: 560px; }
+  /* `margin-inline: auto` is load-bearing: `.hero-layout` has just collapsed to
+     one full-width column, so a capped-but-unaligned panel hugs the left and
+     leaves several hundred px of dead space down the right — visible ONLY in
+     this 769–1024px band, which is why it read as "inconsistent". */
+  .hero-panel { max-width: 560px; margin-inline: auto; }
 }
 @media (max-width: 768px) {
   .hero-body { padding: 80px 0 40px; }
@@ -2944,7 +2960,14 @@
   outline-offset: 4px;
 }
 .expert-avatar {
-  height: 200px;
+  /* An ASPECT RATIO, not a fixed height. `.expert-card` goes viewport-relative
+     below 480px (`flex-basis: 82vw`), so a fixed 200px height meant the box got
+     wider on a phone while staying the same height — and `object-fit: cover`
+     then cropped 37.5% of the photo on mobile against 21.6% on desktop. The
+     editor's `zoom` is tuned against the desktop framing and multiplies on top
+     of that. 255/200 is exactly what desktop renders today, so desktop does not
+     move; only mobile stops over-zooming. */
+  aspect-ratio: 255 / 200;
   background: linear-gradient(135deg, var(--accent), var(--accent-light));
   display: flex; align-items: center; justify-content: center;
   font-size: 3rem;
@@ -3676,10 +3699,13 @@
   .aamle-intro { grid-template-columns: 1fr; gap: 32px; padding: 36px 32px; }
   .aamle-offers-grid { grid-template-columns: 1fr; }
 }
-@media (max-width: 768px) {
+/* The header collapses at 1024, not 768 — see the mobile-menu block above. */
+@media (max-width: 1024px) {
   .nav-links { display: none; }
   .nav-cta { display: none; }
   .hamburger { display: block; }
+}
+@media (max-width: 768px) {
   .who-badge-float { bottom: -10px; left: 10px; }
   .why-grid { grid-template-columns: 1fr; }
   .claims-grid { grid-template-columns: 1fr; }
@@ -3736,7 +3762,7 @@
 /* ── Audience Gateway ───────────────────────────────────────── */
 .audience-gateway-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(var(--vf-cols, 3), minmax(0, 1fr));
   gap: 24px;
 }
 /* The reference gives the intro block 52px of air before the cards and zeroes
@@ -4093,8 +4119,12 @@
    existing design tokens above so new pages look native to the redesign.
    ===================================================================== */
 
-/* ── Mobile menu (the original markup had a hamburger with no behaviour) ── */
-@media (max-width: 768px) {
+/* ── Mobile menu (the original markup had a hamburger with no behaviour) ──
+   1024, matching the two blocks above: all three must move together or the
+   header half-collapses. This copy sits directly in `@layer verify` while the
+   first sits in the nested `components` sub-layer, and un-sublayered rules beat
+   sublayered ones, so this one is authoritative per-declaration. */
+@media (max-width: 1024px) {
   nav.nav-open .nav-links {
     display: flex;
     flex-direction: column;
@@ -4118,20 +4148,61 @@
     border-bottom: 1px solid var(--bg-light-2);
     font-weight: 600;
   }
-  /* On mobile, reveal dropdown children inline rather than on hover. */
+  /* ACCORDION, not a flattened list. This block used to reveal `.nav-dropdown`
+     AND `.sub-dropdown` unconditionally, which put all 28 links on screen at
+     once. Children are now laid out inline but stay hidden until their group is
+     opened; the third level rides along with its parent group, since it is
+     already indented under a heading. */
   nav.nav-open .nav-dropdown,
   nav.nav-open .sub-dropdown {
     position: static;
-    display: block;
-    opacity: 1;
-    visibility: visible;
     transform: none;
     box-shadow: none;
     border: none;
-    padding: 0 0 6px 0;
     min-width: 0;
+    padding: 0;
   }
+  nav.nav-open .nav-dropdown {
+    display: none;
+    opacity: 1;
+    visibility: visible;
+    padding: 0 0 6px 0;
+  }
+  nav.nav-open .sub-dropdown {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+  }
+  nav.nav-open li.is-open > .nav-dropdown { display: block; }
   nav.nav-open .nav-dropdown::before { display: none; }
+
+  /* The expander is a sibling of the parent's own link, so the parent page
+     stays reachable. Positioned over the right-hand end of its row. */
+  nav.nav-open .nav-expand {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 56px;
+    height: 46px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  nav.nav-open .nav-expand::after {
+    content: '\25be';
+    display: block;
+    color: var(--primary);
+    font-size: 0.8rem;
+    line-height: 1;
+    transition: transform var(--transition);
+  }
+  nav.nav-open li.is-open > .nav-expand::after { transform: rotate(180deg); }
+  /* The row is the positioning context for the expander. */
+  nav.nav-open .nav-links > li { position: relative; }
+  /* The caret glyph on the link itself would now duplicate the expander's. */
+  nav.nav-open .nav-links > li > a.nav-caret::after { content: none; }
   nav.nav-open .nav-dropdown a,
   nav.nav-open .sub-dropdown a {
     padding: 9px 34px;
@@ -11281,7 +11352,7 @@
 .process-steps,
 .process-bottom-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(var(--vf-cols, 3), minmax(0, 1fr));
   gap: 0;
   position: relative;
 }
@@ -12660,6 +12731,81 @@
    silently un-hiding a fallback that has already been satisfied. */
 .vf-trybooking__fallback[hidden] {
   display: none;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Mobile: card grids collapse to one column (≤600px)
+
+   These grids take their column count from `--vf-cols`, set inline by each
+   block from the editor's "columns" field. That inline custom property CANNOT
+   be overridden from a stylesheet, so this sets `grid-template-columns`
+   directly instead of trying to reset the variable.
+
+   The `[style*='--vf-cols']` forms exist to outrank the (0,2,0) selectors at
+   `.spec-grid[style*='--vf-cols']` / `.specialty-grid[style*='--vf-cols']`,
+   which a plain class in a media query loses to. Same specificity, later in
+   the file, so it wins on source order without `!important`.
+
+   Why this is needed at all: `.services-grid` had a 2-column rule at ≤1024px
+   and nothing below it, and `.audience-gateway-grid`'s ≤960px single-column
+   rule was dead because the block wrote `grid-template-columns` inline. See
+   docs/TRAPS.md.
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .services-grid,
+  .services-grid[style*='--vf-cols'],
+  .spec-grid,
+  .spec-grid[style*='--vf-cols'],
+  .specialty-grid,
+  .specialty-grid[style*='--vf-cols'],
+  .audience-gateway-grid,
+  .testimonials-grid,
+  .vf-icon-list,
+  .vf-process,
+  .process-steps,
+  .process-bottom-row,
+  .vf-faq__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The connector line is drawn between three columns; with one column it
+     would run down nothing. */
+  .process-steps::before,
+  .process-bottom-row::before {
+    display: none;
+  }
+}
+
+/* The FAQ block sets `display: grid` and `--vf-cols: 2` inline for its
+   two-column variant but declares no template, so it needs a consumer. */
+.vf-faq__list {
+  grid-template-columns: repeat(var(--vf-cols, 1), minmax(0, 1fr));
+}
+
+
+/* ── Header: accordion control + keyboard-reachable desktop dropdowns ────── */
+
+/* The expander exists in the markup at every width; only the drawer shows it.
+   Above the collapse breakpoint hover opens a dropdown, so a second control
+   would be redundant AND would sit in the middle of the desktop bar. */
+.nav-expand {
+  display: none;
+}
+
+/* Desktop dropdowns were hover-only, so a keyboard user could tab to a parent
+   link and never reach its 13 children — they were unreachable without a
+   pointer. `:focus-within` opens the same panel on focus. Paired with each
+   existing :hover rule rather than replacing it. */
+.nav-links li:focus-within > .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.has-submenu:focus-within > .sub-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
 }
 
 }

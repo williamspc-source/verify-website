@@ -50,7 +50,10 @@ export const GatewayCardsBlock: React.FC<Props & { bare?: boolean }> = ({
 
       <div
         className="audience-gateway-grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        // `--vf-cols`, not an inline `grid-template-columns`: an inline style
+        // beats every stylesheet rule INCLUDING media queries, which silently
+        // killed the ≤960px single-column rule in globals.css. See TRAPS.md.
+        style={{ '--vf-cols': cols } as React.CSSProperties}
       >
         {cards.map((card, i) => {
           const quickLinks = (card.links || []).filter((l) => l.link?.label)

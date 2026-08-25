@@ -100,7 +100,8 @@ export const ProcessStepsBlock: React.FC<Props & { bare?: boolean }> = (props) =
           <div
             key={r}
             className={r === 0 ? 'process-steps' : 'process-bottom-row'}
-            style={{ gridTemplateColumns: `repeat(${per}, 1fr)` }}
+            // `--vf-cols` so a mobile media query can still win; see GatewayCards.
+            style={{ '--vf-cols': per } as React.CSSProperties}
           >
             {row.map((step, j) => {
               const idx = r * per + j

@@ -519,6 +519,7 @@ undone. A stale register is worse than none, because people trust it.
 
 | # | Issue | Live today? | Impact | Effort |
 |---|---|---|---|---|
+| 0 | Playwright had no mobile project until 2026-08-25 | Fixed | Four responsive faults shipped under a fully green suite | Done — `responsive.e2e.spec.ts` |
 | 1 | Three e2e specs flake under a loaded dev server | Test-only | `pnpm test` fails intermittently on a healthy machine | ~10 min |
 | 2 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** |
 | 3 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min |
@@ -548,6 +549,7 @@ undone. A stale register is worse than none, because people trust it.
 | 27 | The text-colour palette cannot be extended by an editor | Yes, mild | "Add a colour" needs a developer and a deploy; the 16 values are all editable | Not fixable in the toolbar — see below |
 | 28 | `computedSnapshot.mjs` is not deterministic on `/about` | Test-only | A clean change can report a 2–3 node diff, or none, run to run | Unknown — needs a settle, not a tolerance |
 | 29 | Drag-ordering specialists means dragging across pages | Yes, mild | The admin list shows 10 of 26, so moving someone far is awkward | Raise the list `limit`, ~1 line |
+| 31 | Two blocks still render two-across on a phone by design | Yes, mild | `form-row` (two short form fields) stays 2-up below 600px | Deliberate — see below |
 | 30 | An availability edit can take up to an hour to reach the live site | Yes, mild | Editors read a cached page as a lost save and re-enter the slot | See below — needs a box-side reading first |
 
 ### 1. Three e2e specs flake under a loaded dev server
@@ -943,6 +945,23 @@ more frequent rebuilds.
 
 Editors are told about the delay in `docs/ADMIN-GUIDE.md` so that a slow update does not get
 re-entered as a lost save.
+
+### 31. What still sits two-across on a phone
+
+The mobile pass on 2026-08-25 collapsed every **card** grid to one column below 600px. Two things were
+left two-across on purpose, and both were measured at 390px:
+
+- **`form-row`** — two short fields side by side at 160px each. Stacking them makes the enquiry form
+  noticeably longer for no legibility gain; 160px holds a first name.
+- **The checklist rows** (`20px 306px`) — an icon column and a text column, i.e. a list item, not two
+  cards. Collapsing it would put the tick above the text.
+
+Everything else — `.services-grid`, `.spec-grid`, `.specialty-grid`, `.audience-gateway-grid`,
+`.testimonials-grid`, `.vf-icon-list`, `.process-steps` — is a single column below 600px, asserted by
+`tests/e2e/responsive.e2e.spec.ts`.
+
+Note the **columns** control on those blocks now applies only above 600px. That is the intent: an
+editor choosing "4 columns" is choosing a desktop layout, and four 69px cards on a phone was the bug.
 
 ## 11. Deliberate departures
 

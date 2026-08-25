@@ -118,6 +118,9 @@ several look arbitrary until you see what happened without them.
 
 51. **A field on a collection with `access.read: anyone` is public unless field-level `access.read` says otherwise.** Admin placement, a label and a description change nothing about what the API returns. Guarded by `tests/int/availabilityNotes.int.spec.ts`. <sub>[why](docs/TRAPS.md#i51)</sub>
 
+52. **A block must never write `grid-template-columns` (or any responsive property) inline** — inline beats every media query, so the mobile rule silently never applies. Emit `--vf-cols` and let `globals.css` own the breakpoints. An inline *custom property* also beats a stylesheet one, so the mobile rule sets `grid-template-columns` directly rather than resetting the variable. Guarded by `tests/e2e/responsive.e2e.spec.ts`. <sub>[why](docs/TRAPS.md)</sub>
+53. **The header's collapse breakpoint is 1024px and is written in THREE places** — the nested `components` sub-layer, an extracted block, and the drawer block. Changing one leaves the other two and the change appears to do nothing. <sub>[why](docs/TRAPS.md)</sub>
+
 ## Commands
 
 ```bash
@@ -177,6 +180,7 @@ disagreeing numbers for the same suite.
 | `tests/e2e/carousel.e2e.spec.ts` | `SlideCarousel` bounds: rapid next/prev, arrow keys, dot recovery, autoplay wrap. **The guard for the carousel invariant below** — and note it clicks with `{ force: true }`, without which the burst is not rapid. |
 | `tests/e2e/specialistCarousels.e2e.spec.ts` | The three specialist carousels show a real selection, not whoever sorts first: the homepage equals the Featured set, /jme equals the JME-tagged set **as queried from the API** (so it stays true when an editor tags someone new), and Make a Booking equals the advertised set. Every case asserts a **non-zero count before** the membership — see the `return null` invariant. |
 | `tests/e2e/tryBooking.e2e.spec.ts` | The TryBooking block never leaves a visitor looking at an empty box: the fallback link is present, correct and **visible** when the embed cannot load, the failed embed occupies **zero height**, and the link is in the server HTML with `javaScriptEnabled: false`. Note it asserts the *degraded* state deliberately — the embed is refused over http, so the success path is not testable on the dev server and was confirmed by hand over https. |
+| `tests/e2e/responsive.e2e.spec.ts` | The only suite that loads a page at a phone or tablet width — Playwright's single project is Desktop Chrome, which is why four responsive faults shipped green. Covers: no sideways scroll at 390/768/1024/1440, card grids single-column on a phone, the carousel framing photos identically at every width, the drawer opening grouped rather than flattened, and the desktop nav being keyboard-reachable. Every case records the deliberate break that proves it red. |
 | `tests/e2e/admin.e2e.spec.ts` | The admin loads and the Pages create form renders. Seeds its own user, and deletes the autosave draft it creates. |
 | `tests/helpers/` | `seedUser.ts` (deletes and recreates `dev@payloadcms.com`) and `login.ts`. |
 

@@ -63,9 +63,11 @@ export const FAQBlock: React.FC<FAQBlockProps & { id?: string; bare?: boolean }>
   const list = (
       <div
         className="vf-faq__list"
+        // `--vf-cols` rather than an inline grid-template-columns, so the
+        // mobile rule in globals.css can override it; see GatewayCards.
         style={
           columns === '2'
-            ? { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--gap-tight)' }
+            ? ({ display: 'grid', '--vf-cols': 2, gap: 'var(--gap-tight)' } as React.CSSProperties)
             : undefined
         }
       >

@@ -42,7 +42,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, logo }) => {
             <Logo {...(logo ?? {})} loading="eager" priority="high" />
           </Link>
 
-          <HeaderNav data={data} />
+          <HeaderNav data={data} menuOpen={menuOpen} />
 
           {cta?.enabled && cta?.link?.label ? (
             <CMSLink {...cta.link} appearance="inline" className="btn btn-primary nav-cta" />
