@@ -212,3 +212,66 @@
     border: 1px solid var(--theme-elevation-200);
   }
 }
+
+/* ── The Icon Library browser, and the upload preview ─────────────────────────
+   Both reuse `.vf-icon-select__*` for the grid and previews, so the two screens
+   look like one feature. Only what is genuinely different is declared here. */
+.vf-icon-library {
+  &__count {
+    font-size: 0.8rem;
+    color: var(--theme-elevation-500);
+    margin: 0 0 8px;
+  }
+
+  &__chosen {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--theme-elevation-100);
+  }
+}
+
+.vf-icon-preview {
+  &__label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--theme-elevation-500);
+    margin: 0 0 6px;
+  }
+
+  &__swatches {
+    display: flex;
+    gap: 10px;
+  }
+
+  /* Two swatches rather than one: an icon that takes the band's colour cannot be
+     shown on a single background without implying it is always that colour. */
+  &__swatch {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 22px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+
+    &--light {
+      background: #ffffff;
+      color: #1c75bc;
+      border: 1px solid var(--theme-elevation-150);
+    }
+
+    &--dark {
+      background: #122a43;
+      color: #93d0f7;
+    }
+  }
+
+  &__empty,
+  &__note {
+    font-size: 0.75rem;
+    color: var(--theme-elevation-500);
+    margin: 8px 2px 0;
+  }
+}

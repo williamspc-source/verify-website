@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
 import { Icons } from './collections/Icons'
+import { IconLibrary } from './IconLibrary/config'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
@@ -184,6 +185,7 @@ export default buildConfig({
     // Design
     CustomStyles,
     DesignSystem,
+    IconLibrary,
   ],
   plugins,
   secret: process.env.PAYLOAD_SECRET,

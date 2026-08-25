@@ -291,6 +291,28 @@ export const Icon: React.FC<{
   }
 
   const Cmp = iconMap[parsed.key as IconName]
-  if (!Cmp) return null
-  return <Cmp className={cn('size-6', colour, className)} weight={weight} aria-hidden />
+  if (Cmp) return <Cmp className={cn('size-6', colour, className)} weight={weight} aria-hidden />
+
+  // A library icon: one of the ~1,400 Phosphor ships that `iconMap` does not
+  // bundle, added by an admin through the Icon Library global. Rendered the same
+  // way an upload is — an empty <svg> painted by a mask — so it sizes and colours
+  // through the same 66 `svg` rules, and looks identical to a bundled one.
+  //
+  // No prefix distinguishes it: a name is a name, so seeds, `qualificationIcon()`
+  // and every stored value keep working untouched. The cost is that a typo is
+  // indistinguishable from a real name here — which is safe, because a mask URL
+  // that 404s paints NOTHING (measured: 0% coverage, against 24% for a real
+  // icon), exactly as this function's `return null` used to.
+  if (!/^[a-z0-9-]+$/.test(parsed.key)) return null
+  return (
+    <svg
+      aria-hidden
+      className={cn('size-6', 'vf-icon-mask', colour, className)}
+      style={
+        {
+          '--vf-icon-url': `url("/api/icon/phosphor/${encodeURIComponent(parsed.key)}")`,
+        } as React.CSSProperties
+      }
+    />
+  )
 }

@@ -5134,6 +5134,20 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"created_at" timestamp(3) with time zone
   );
   
+  CREATE TABLE "icon_library" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"updated_at" timestamp(3) with time zone,
+  	"created_at" timestamp(3) with time zone
+  );
+  
+  CREATE TABLE "icon_library_texts" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"order" integer NOT NULL,
+  	"parent_id" integer NOT NULL,
+  	"path" varchar NOT NULL,
+  	"text" varchar
+  );
+  
   ALTER TABLE "pages_hero_meta_items" ADD CONSTRAINT "pages_hero_meta_items_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "pages_hero_links" ADD CONSTRAINT "pages_hero_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "pages_blocks_heading" ADD CONSTRAINT "pages_blocks_heading_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
@@ -5596,6 +5610,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "site_settings" ADD CONSTRAINT "site_settings_social_image_id_media_id_fk" FOREIGN KEY ("social_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "site_settings" ADD CONSTRAINT "site_settings_enquiry_form_id_forms_id_fk" FOREIGN KEY ("enquiry_form_id") REFERENCES "public"."forms"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "custom_styles_presets" ADD CONSTRAINT "custom_styles_presets_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."custom_styles"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "icon_library_texts" ADD CONSTRAINT "icon_library_texts_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."icon_library"("id") ON DELETE cascade ON UPDATE no action;
   CREATE INDEX "pages_hero_meta_items_order_idx" ON "pages_hero_meta_items" USING btree ("_order");
   CREATE INDEX "pages_hero_meta_items_parent_id_idx" ON "pages_hero_meta_items" USING btree ("_parent_id");
   CREATE INDEX "pages_hero_links_order_idx" ON "pages_hero_links" USING btree ("_order");
@@ -6600,7 +6615,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "site_settings_social_image_idx" ON "site_settings" USING btree ("social_image_id");
   CREATE INDEX "site_settings_enquiry_form_idx" ON "site_settings" USING btree ("enquiry_form_id");
   CREATE INDEX "custom_styles_presets_order_idx" ON "custom_styles_presets" USING btree ("_order");
-  CREATE INDEX "custom_styles_presets_parent_id_idx" ON "custom_styles_presets" USING btree ("_parent_id");`)
+  CREATE INDEX "custom_styles_presets_parent_id_idx" ON "custom_styles_presets" USING btree ("_parent_id");
+  CREATE INDEX "icon_library_texts_order_parent" ON "icon_library_texts" USING btree ("order","parent_id");`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
@@ -6917,6 +6933,8 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "custom_styles_presets" CASCADE;
   DROP TABLE "custom_styles" CASCADE;
   DROP TABLE "design_system" CASCADE;
+  DROP TABLE "icon_library" CASCADE;
+  DROP TABLE "icon_library_texts" CASCADE;
   DROP TYPE "public"."enum_pages_hero_links_link_type";
   DROP TYPE "public"."enum_pages_hero_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_heading_level";

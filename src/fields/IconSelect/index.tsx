@@ -1,6 +1,6 @@
 'use client'
 import { FieldLabel, useField } from '@payloadcms/ui'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { getClientSideURL } from '@/utilities/getURL'
 import { BRAND_TEXT_COLORS, INHERIT_COLOR } from '@/fields/richTextColors'
@@ -21,8 +21,8 @@ import { formatIconValue, parseIconValue } from '@/components/Icon/value'
  *
  * Not `@/components/Icon`. That module imports 101 Phosphor components at module
  * scope, and this is a client component rendered on every icon field in the
- * admin. The list comes from `/api/icon/builtin` instead, still derived from the
- * same `iconMap`, so it cannot drift and the admin bundle does not grow.
+ * admin. The list comes from `/api/icon/library` instead — which is now an
+ * EDITABLE list (the Icon Library global), so it could not be imported anyway.
  *
  * ## One fetch, not one per field
  *
@@ -33,7 +33,7 @@ import { formatIconValue, parseIconValue } from '@/components/Icon/value'
  */
 
 type IconRecord = { id: string | number; name?: string; colour?: string | null }
-type Choice = { value: string; label: string; kind: 'upload' | 'builtin' }
+type Choice = { value: string; label: string; kind: 'upload' | 'builtin' | 'orphan' }
 
 const UPLOAD = 'upload:'
 
@@ -61,7 +61,7 @@ const loadLists = (force = false): Promise<Lists> => {
       .then((r) => r.json())
       .then((d) => (d?.docs ?? []) as IconRecord[])
       .catch(() => [] as IconRecord[]),
-    fetch(`${getClientSideURL()}/api/icon/builtin`)
+    fetch(`${getClientSideURL()}/api/icon/library`)
       .then((r) => r.json())
       .then((d) => (d?.icons ?? []) as { label: string; value: string }[])
       .catch(() => [] as { label: string; value: string }[]),
@@ -82,7 +82,7 @@ const loadLists = (force = false): Promise<Lists> => {
 const previewUrl = (value: string): string =>
   value.startsWith(UPLOAD)
     ? `${getClientSideURL()}/api/icon/upload/${encodeURIComponent(value.slice(UPLOAD.length))}`
-    : `${getClientSideURL()}/api/icon/builtin/${encodeURIComponent(value)}`
+    : `${getClientSideURL()}/api/icon/phosphor/${encodeURIComponent(value)}`
 
 const Preview: React.FC<{ value: string; size?: number }> = ({ value, size = 26 }) => (
   // A mask rather than an <img>, so the preview takes the admin's own text colour
@@ -111,6 +111,10 @@ export const IconSelect: React.FC<{
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
 
+  const parsed = parseIconValue(value)
+  const currentKey = parsed?.key ?? ''
+  const currentColour = parsed?.colour ?? INHERIT_COLOR
+
   useEffect(() => {
     const update = (l: Lists) => setLists({ ...l })
     subscribers.add(update)
@@ -124,29 +128,45 @@ export const IconSelect: React.FC<{
     }
   }, [])
 
-  const parsed = parseIconValue(value)
-  const currentKey = parsed?.key ?? ''
-  const currentColour = parsed?.colour ?? INHERIT_COLOR
-
-  const choices = useMemo<Choice[]>(
-    () => [
+  // Not `useMemo`. The React compiler refuses to preserve a manual memo whose
+  // dependency it thinks may be mutated later, and reports it as "Existing
+  // memoization could not be preserved" — which disables optimisation for the
+  // WHOLE component rather than just this value. Computing a list of a few
+  // hundred small objects per render is cheaper than that, and the compiler
+  // memoizes it anyway. Invariant 50: do not cache what is already cheap.
+  const choices = ((): Choice[] => {
+    const base: Choice[] = [
       ...lists.uploads.map((u) => ({
         value: `${UPLOAD}${u.id}`,
         label: u.name || `Icon ${u.id}`,
         kind: 'upload' as const,
       })),
       ...lists.builtins.map((o) => ({ value: o.value, label: o.label, kind: 'builtin' as const })),
-    ],
-    [lists],
-  )
+    ]
 
-  const matches = useMemo(() => {
+    // Whatever this document already holds, if neither list knows about it — an
+    // icon since removed from the library, or an upload since deleted. Offered so
+    // the current value is always visible and re-selectable; without it the
+    // control would name a value it could neither display nor restore.
+    //
+    // Built by concatenation rather than `push`: mutating inside a `useMemo`
+    // defeats the React compiler, which reports it as
+    // "Existing memoization could not be preserved" rather than as a bug.
+    const orphan: Choice[] =
+      currentKey && !base.some((c) => c.value === currentKey)
+        ? [{ value: currentKey, label: currentKey.replace(/-/g, ' '), kind: 'orphan' }]
+        : []
+
+    return [...base, ...orphan]
+  })()
+
+  const matches = ((): Choice[] => {
     const q = query.trim().toLowerCase()
     if (!q) return choices
     return choices.filter(
       (c) => c.label.toLowerCase().includes(q) || c.value.toLowerCase().includes(q),
     )
-  }, [choices, query])
+  })()
 
   const selected = choices.find((c) => c.value === currentKey)
   const label = field?.label || 'Icon'
@@ -154,7 +174,13 @@ export const IconSelect: React.FC<{
 
   const groups: { title: string; items: Choice[] }[] = [
     { title: 'Your icons', items: matches.filter((c) => c.kind === 'upload') },
-    { title: 'Built-in icons', items: matches.filter((c) => c.kind === 'builtin') },
+    { title: 'Icon library', items: matches.filter((c) => c.kind === 'builtin') },
+    // An icon this document already uses that the library no longer lists. Shown
+    // so a stored value is never un-reselectable — the rule `CssClassSelect`
+    // applies to an unknown class. Without it, removing an icon from the library
+    // would leave every page using it with a picker that cannot show what is
+    // selected.
+    { title: 'Used here, not in the library', items: matches.filter((c) => c.kind === 'orphan') },
   ]
 
   // An uploaded icon carries its own default colour, so "no choice here" means

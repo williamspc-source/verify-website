@@ -158,6 +158,7 @@ export interface Config {
     'site-settings': SiteSetting;
     'custom-styles': CustomStyle;
     'design-system': DesignSystem;
+    'icon-library': IconLibrary;
   };
   globalsSelect: {
     'article-settings': ArticleSettingsSelect<false> | ArticleSettingsSelect<true>;
@@ -170,6 +171,7 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'custom-styles': CustomStylesSelect<false> | CustomStylesSelect<true>;
     'design-system': DesignSystemSelect<false> | DesignSystemSelect<true>;
+    'icon-library': IconLibrarySelect<false> | IconLibrarySelect<true>;
   };
   locale: null;
   widgets: {
@@ -15075,6 +15077,21 @@ export interface DesignSystem {
   createdAt?: string | null;
 }
 /**
+ * The icons editors can choose from. Browse everything Phosphor offers and add the ones that suit the site. Leave it empty to offer the built-in set.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "icon-library".
+ */
+export interface IconLibrary {
+  id: number;
+  /**
+   * Search all 1,513 Phosphor icons and click to add or remove. Removing one stops it being offered; it never changes a page that already uses it.
+   */
+  icons?: string[] | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "article-settings_select".
  */
@@ -15589,6 +15606,16 @@ export interface DesignSystemSelect<T extends boolean = true> {
         hard?: T;
         transition?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "icon-library_select".
+ */
+export interface IconLibrarySelect<T extends boolean = true> {
+  icons?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

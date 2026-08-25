@@ -33,7 +33,7 @@ wording you edit.
 | **Forms** | Forms, Form Submissions | To read enquiries, or change a form's fields |
 | **Page settings** | Fixed wording on templated pages | Rarely — set once |
 | **Site** | Header, Footer, Site Settings | When the nav, footer or branding changes |
-| **Design** | Custom Styles, Design System | See HOOKS.md |
+| **Design** | Custom Styles, Design System, Icon Library | See HOOKS.md |
 
 **Records vs settings.** *Publishing*, *Reference*, *Taxonomy*, *People*, *Availability*, *Media*
 and *Forms* hold **records** — you add and delete rows. *Page settings*, *Site* and *Design* hold
@@ -430,6 +430,14 @@ blocks, events, articles — are yours alone and are never touched.
 Your own icons, offered in every icon picker alongside the built-in ones. **Media → Icons → Create
 new**, give it a name, and upload a **single-colour SVG**.
 
+**A two-colour file becomes a two-tone one.** The built-in icons are all *duotone* — one shape solid,
+another at 20% — and an upload gets the same treatment: whichever colour is lighter becomes the faint
+tone. If you drew it with a faint shape already, that is kept exactly as you made it.
+
+**What you see on the icon's own screen is what the site will show.** The preview is drawn from the
+processed artwork, on a light band and a dark one, so you can check it before it goes anywhere near a
+page. It will not match the file you uploaded, and that is the point.
+
 **The site paints the icon; the file's own colours are ignored.** That is deliberate, and it is what
 makes an uploaded icon behave like a built-in one — it turns white on the dark navy bands and takes
 the brand colour on a light one, with nothing for you to set. It also means a **two-colour logo will
@@ -446,6 +454,22 @@ change those to a different icon first. This is on purpose: deleting it would le
 that nobody would notice.
 
 Only SVG files are accepted, and an SVG carrying anything other than shapes is rejected at upload.
+
+### Icon Library  *(under Design)*
+
+**Which icons editors can choose from.** Phosphor — the icon set this site uses — ships 1,513, and
+only about a hundred are set up by default. Open **Design → Icon Library**, search the full set, and
+click an icon to add or remove it.
+
+- **Leave the list empty and editors get the built-in hundred.** That is the starting state, and it is
+  also the safety net: emptying the list by accident does not leave anyone with no icons.
+- **Removing an icon never changes a page.** It stops being *offered*; anywhere already using it keeps
+  showing it, and that page's editor still sees it in their picker under *"Used here, not in the
+  library"*.
+- Your own uploads (**Media → Icons**) are always offered and are not affected by this list.
+
+Use it to keep the icon set on-brand — there is no reason for a games controller to be one keystroke
+away from a medico-legal page.
 
 ### Forms, and Form Submissions
 

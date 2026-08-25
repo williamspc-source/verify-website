@@ -1,6 +1,7 @@
 import { test, expect, type APIRequestContext } from '@playwright/test'
 
 import { iconTestUser } from '../helpers/globalSetup'
+import { login } from '../helpers/login'
 
 /**
  * An uploaded icon behaves like a built-in one.
@@ -72,6 +73,12 @@ const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <path d="M16 2 L28 7 V16 C28 23 22 28 16 30 C10 28 4 23 4 16 V7 Z" fill="#ff00ff"/>
 </svg>`
 
+/** Two colours, so the stored markup should come back as two TONES. */
+const TWO_COLOUR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <path d="M16 2 L28 7 V16 C28 23 22 28 16 30 C10 28 4 23 4 16 V7 Z" fill="#1a3a5c"/>
+  <path d="M11 16 l4 4 l7 -8 l-2 -2 l-5 6 l-2 -2 Z" fill="#ff2d95"/>
+</svg>`
+
 /**
  * `/in-the-loop` cards render their stream's icon in `.ni-card-img`, as the
  * fallback for a post with no hero image. Only the stream that HAS posts appears,
@@ -83,17 +90,17 @@ type Ctx = { api: APIRequestContext; token: string }
 
 const authed = (t: string) => ({ Authorization: `JWT ${t}`, 'Content-Type': 'application/json' })
 
-const login = async (api: APIRequestContext): Promise<string> => {
+const login2 = async (api: APIRequestContext): Promise<string> => {
   const res = await api.post(`${SERVER}/api/users/login`, { data: iconUser })
   expect(res.ok(), 'could not log in to place a test icon').toBeTruthy()
   return (await res.json()).token as string
 }
 
-const uploadIcon = async ({ api, token }: Ctx, colour: string): Promise<number> => {
+const uploadIcon = async ({ api, token }: Ctx, colour: string, svg = SVG): Promise<number> => {
   const res = await api.post(`${SERVER}/api/icons`, {
     headers: { Authorization: `JWT ${token}` },
     multipart: {
-      file: { name: 'e2e-icon.svg', mimeType: 'image/svg+xml', buffer: Buffer.from(SVG) },
+      file: { name: 'e2e-icon.svg', mimeType: 'image/svg+xml', buffer: Buffer.from(svg) },
       _payload: JSON.stringify({ name: 'E2E test icon', colour }),
     },
   })
@@ -138,7 +145,7 @@ test.describe('an uploaded icon behaves like a built-in one', () => {
     page,
     request,
   }) => {
-    const token = await login(request)
+    const token = await login2(request)
     const ctx: Ctx = { api: request, token }
 
     // The stream that actually has posts — it is the only one whose icon appears
@@ -228,6 +235,135 @@ test.describe('an uploaded icon behaves like a built-in one', () => {
       ).toBe('rgb(255, 255, 255)')
     } finally {
       await setIcon(originalIcon)
+      await request.delete(`${SERVER}/api/icons/${iconId}`, { headers: authed(token) })
+    }
+  })
+})
+
+test.describe('the icon library', () => {
+  /**
+   * An icon an admin adds is indistinguishable from one the site bundles.
+   *
+   * `iconMap` holds 101 of Phosphor's 1,513. The other ~1,400 render as an empty
+   * `<svg>` painted through `mask-image` rather than as a React component, so the
+   * claim that they look the same is a claim about two different elements — which
+   * only a browser can settle. Measured while building it: `acorn` came back at
+   * the same 36×36 and the same `color(srgb 0.109804 0.458824 0.737255 / 0.35)`
+   * as the bundled icon it replaced.
+   *
+   * Proven red by removing the third branch from `Icon` → "the library icon did
+   * not render at all".
+   */
+  test('an icon outside the bundled 101 renders like one inside it', async ({ page, request }) => {
+    const token = await login2(request)
+
+    const posts = await (
+      await request.get(`${SERVER}/api/posts?limit=1&depth=1&sort=-publishedAt`, {
+        headers: authed(token),
+      })
+    ).json()
+    const stream = posts?.docs?.[0]?.stream
+    expect(stream?.id, 'no published post with a stream').toBeTruthy()
+    const originalIcon = stream.icon ?? null
+
+    const setIcon = async (value: string | null) => {
+      const res = await request.patch(`${SERVER}/api/streams/${stream.id}`, {
+        headers: authed(token),
+        data: { icon: value },
+      })
+      expect(res.ok()).toBeTruthy()
+    }
+
+    // The bundled icon's rendering, taken before anything changes — the number
+    // the library icon has to reproduce.
+    const bundled = await readIcon(page)
+    expect(bundled.tier, 'no stream icon to compare against').toBe('builtin')
+
+    try {
+      // `acorn` is deliberately NOT in iconMap: an icon that happened to be
+      // bundled would prove nothing about the library path.
+      await setIcon('acorn')
+      const library = await readIcon(page)
+
+      expect(library.tier, 'the library icon did not render at all').toBe('upload')
+      expect(library.maskImage, 'not served from the Phosphor route').toContain(
+        '/api/icon/phosphor/acorn',
+      )
+      expect(
+        library.painted,
+        `library icon paints ${library.painted}, the bundled one it replaced painted ${bundled.painted}`,
+      ).toBe(bundled.painted)
+      expect(
+        library.size,
+        `library icon is ${library.size?.join('×')}, the bundled one was ${bundled.size?.join('×')}`,
+      ).toEqual(bundled.size)
+    } finally {
+      await setIcon(originalIcon)
+    }
+  })
+})
+
+test.describe('the icon upload screen', () => {
+  /**
+   * The admin must show what the SITE renders, not the file that was uploaded.
+   *
+   * This is the bug that prompted the whole pass: Payload previews the uploaded
+   * bytes, while a page renders markup `normaliseSvgIcon` rebuilt from them with
+   * the colours stripped. Measured on a two-colour test file — the admin showed
+   * navy and hot pink, the page showed one flat shape.
+   *
+   * Proven red by pointing `IconPreview` at `/api/icons/file/${filename}` → "the
+   * preview is showing the uploaded file, not what the site renders".
+   */
+  test('previews the normalised icon on both bands, not the uploaded file', async ({
+    page,
+    request,
+  }) => {
+    const token = await login2(request)
+    const iconId = await uploadIcon({ api: request, token }, 'inherit', TWO_COLOUR_SVG)
+
+    try {
+      // The stored markup is the other half of the claim: two colours in, two
+      // TONES out, which is what makes it a duotone icon rather than a blob.
+      const doc = await (
+        await request.get(`${SERVER}/api/icons/${iconId}?depth=0`, { headers: authed(token) })
+      ).json()
+      expect(doc.markup, 'a two-colour upload did not become duotone').toContain('opacity="0.2"')
+      expect(doc.markup, 'the file\u2019s own colours survived').not.toContain('#1a3a5c')
+
+      await login({ page, user: iconTestUser })
+      await page.goto(`${SERVER}/admin/collections/icons/${iconId}`, { waitUntil: 'load' })
+      await page.locator('.vf-icon-preview__swatch').first().waitFor({ timeout: 60_000 })
+
+      const swatches = await page.evaluate(() =>
+        [...document.querySelectorAll('.vf-icon-preview__swatch')].map((s) => {
+          const el = s.querySelector<HTMLElement>('.vf-icon-select__preview')
+          return {
+            band: getComputedStyle(s).backgroundColor,
+            painted: el ? getComputedStyle(el).backgroundColor : null,
+            mask: el ? getComputedStyle(el).maskImage : '',
+          }
+        }),
+      )
+
+      // Positive control first: two swatches, or the comparison below is vacuous.
+      expect(swatches.length, 'the preview rendered no swatches').toBe(2)
+
+      for (const s of swatches) {
+        expect(
+          s.mask,
+          'the preview is showing the uploaded file, not what the site renders',
+        ).toContain(`/api/icon/upload/${iconId}`)
+        expect(s.mask).not.toContain('/api/icons/file/')
+      }
+
+      // The point of two swatches: the icon takes the band, so the two must
+      // differ. One swatch could show any colour and prove nothing.
+      expect(
+        swatches[0]!.painted,
+        `both swatches painted ${swatches[0]!.painted} — the preview is not showing the band's colour`,
+      ).not.toBe(swatches[1]!.painted)
+    } finally {
       await request.delete(`${SERVER}/api/icons/${iconId}`, { headers: authed(token) })
     }
   })

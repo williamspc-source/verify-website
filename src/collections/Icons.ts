@@ -98,6 +98,14 @@ export const Icons: CollectionConfig = {
       ],
     },
     {
+      // Payload's upload preview shows the FILE; the site renders the
+      // reconstructed markup. This shows the second, which is the only one that
+      // matters — see src/fields/IconPreview.
+      name: 'preview',
+      type: 'ui',
+      admin: { components: { Field: '@/fields/IconPreview#IconPreview' } },
+    },
+    {
       name: 'viewBox',
       type: 'text',
       admin: {

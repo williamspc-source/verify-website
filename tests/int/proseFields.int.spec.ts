@@ -53,6 +53,7 @@ const PLAIN_BY_NAME: Record<string, string> = {
   defaultIcon: 'icon key, resolved by <Icon>',
   badgeIcon: 'icon key, resolved by <Icon>',
   viewBox: 'derived from an uploaded SVG, read-only',
+  icons: 'icon keys the Icon Library offers; chosen from a grid of pictures, never typed',
   markup: 'shape data rebuilt from an uploaded SVG, read-only',
 
   // ── Identifiers and routing ──

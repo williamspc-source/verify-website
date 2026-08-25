@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import type { Payload } from 'payload'
 
 import { iconFieldPaths, iconUsage } from '@/utilities/iconUsage'
+import { effectiveIconList } from '@/utilities/getIconLibrary'
 import { iconMap } from '@/components/Icon'
 
 /**
@@ -297,5 +298,41 @@ describe('the curated set still resolves', () => {
       expect(Cmp, `iconMap['${name}'] is not a component`).toBeTruthy()
     }
     expect(Object.keys(iconMap).length).toBeGreaterThan(100)
+  })
+})
+
+describe('the icon library never empties a picker', () => {
+  /**
+   * The library decides what is OFFERED. Two things must stay true whatever an
+   * admin does to it, because both failures are silent:
+   *
+   *  · an empty list means the built-in set, not "no icons". A global nobody has
+   *    opened, or one emptied by accident, must leave editors where they were.
+   *  · removing an icon must not strand a page that uses it. `Icon` renders any
+   *    valid name regardless of the library, and `IconSelect` adds the current
+   *    value back as its own group — measured in the admin: with a library of two
+   *    icons and a document holding a third, the picker showed
+   *    "USED HERE, NOT IN THE LIBRARY (1)".
+   *
+   * Proven red by making `effectiveIconList` return `names` unconditionally.
+   */
+  it('falls back to the built-in set when the library is empty', () => {
+    const builtIn = effectiveIconList([]).length
+
+    // Positive control: the fallback has to be a real list, not an empty one that
+    // happens to equal the input.
+    expect(builtIn, 'the fallback is empty — every picker would offer nothing').toBeGreaterThan(50)
+
+    expect(effectiveIconList(null)).toHaveLength(builtIn)
+    expect(effectiveIconList(undefined)).toHaveLength(builtIn)
+    // A list of blanks is an empty list. Payload's array UI leaves these behind.
+    expect(effectiveIconList(['', '   ', null])).toHaveLength(builtIn)
+  })
+
+  it('uses the library exactly as given once it has anything in it', () => {
+    expect(effectiveIconList(['brain', 'gavel'])).toEqual(['brain', 'gavel'])
+    // Including an icon `iconMap` does not bundle — the whole point of the
+    // feature is that an admin can add one without a deploy.
+    expect(effectiveIconList(['acorn'])).toEqual(['acorn'])
   })
 })

@@ -82,6 +82,41 @@ export type NormalisedIcon = {
 
 export class SvgIconError extends Error {}
 
+/**
+ * The `fill` an element declares, lowercased — read BEFORE it is dropped.
+ *
+ * `fill` is deliberately not in `ALLOWED_ATTRIBUTES` and must never be: the site
+ * paints an icon, the artwork does not. But which shapes were *different colours*
+ * from each other is the only signal a two-colour file gives about which part is
+ * the faint one, so it is read here and thrown away immediately after.
+ */
+const declaredFill = (raw: string): string | null => {
+  const m = raw.match(/\bfill\s*=\s*"([^"]*)"/i)
+  if (!m) return null
+  const v = m[1]!.trim().toLowerCase()
+  // Not colours for this purpose: `none` paints nothing, and `currentColor` is
+  // already what every kept shape resolves to.
+  if (!v || v === 'none' || v === 'transparent' || v === 'currentcolor') return null
+  return v
+}
+
+/** Relative luminance, 0 (black) to 1 (white). Named CSS colours are not resolved. */
+const luminance = (colour: string): number => {
+  let r: number, g: number, b: number
+  const hex = colour.replace(/^#/, '')
+  if (/^[0-9a-f]{3}$/.test(hex)) {
+    ;[r, g, b] = [...hex].map((c) => parseInt(c + c, 16)) as [number, number, number]
+  } else if (/^[0-9a-f]{6}$/.test(hex)) {
+    ;[r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16)) as [number, number, number]
+  } else {
+    const rgb = colour.match(/rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i)
+    if (!rgb) return 0.5 // unknown notation: neither darkest nor lightest
+    ;[r, g, b] = [1, 2, 3].map((i) => Number(rgb[i])) as [number, number, number]
+  }
+  // Rec. 709, which is close enough to rank two flat fills.
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
+}
+
 /** `<path d="…" opacity="0.2"/>` → the attributes we keep, in a fixed order. */
 const keptAttributes = (raw: string): string => {
   const out: string[] = []
@@ -98,6 +133,54 @@ const keptAttributes = (raw: string): string => {
     out.push(`${name}="${value}"`)
   }
   return out.join(' ')
+}
+
+/** Phosphor's own faint tone: a duotone icon is one solid path plus one at this. */
+const DUOTONE_OPACITY = '0.2'
+
+type KeptShape = { tag: string; attributes: string; fill: string | null; hasOpacity: boolean }
+
+/**
+ * Turn shapes that differed by COLOUR into shapes that differ by TONE.
+ *
+ * ## Why
+ *
+ * The site paints an icon through `mask-image`, which reads alpha and discards
+ * colour — so a navy shield with a pink tick arrives as one flat shape, while
+ * every built-in Phosphor icon beside it is duotone. Phosphor builds duotone as
+ * a solid path plus one at `opacity="0.2"`, and a mask reproduces that exactly,
+ * so the artwork only has to say which shape is the faint one.
+ *
+ * A two-colour file already says it, just in the wrong units. This converts:
+ * rank the distinct fills by luminance, keep the darkest solid, and give every
+ * other one 20%.
+ *
+ * ## When it does nothing, which is most of the time
+ *
+ * - **Any shape already carries `opacity` or `fill-opacity`** — the artist has
+ *   said what they meant, in the units that survive, and guessing over the top of
+ *   that would be worse than useless.
+ * - **Fewer than two distinct fills** — nothing to rank.
+ *
+ * ## What it cannot see
+ *
+ * A `fill` inherited from a `<g>`: the `<g>` is dropped and its children are
+ * matched independently, so a file that colours a whole group at once looks
+ * fill-less here and is left flat. And three or more colours collapse to two
+ * tones, because that is what duotone is.
+ *
+ * The result is visible on the icon's own admin screen before it reaches a page,
+ * which is what makes a heuristic acceptable here at all.
+ */
+const toneOf = (shapes: KeptShape[]) => {
+  const fills = [...new Set(shapes.map((s) => s.fill).filter((f): f is string => Boolean(f)))]
+  const alreadyToned = shapes.some((s) => s.hasOpacity)
+  const solid = alreadyToned || fills.length < 2 ? null : fills.reduce((a, b) => (luminance(a) <= luminance(b) ? a : b))
+
+  return (shape: KeptShape): string => {
+    const faint = solid !== null && shape.fill !== null && shape.fill !== solid
+    return `<${shape.tag} ${shape.attributes}${faint ? ` opacity="${DUOTONE_OPACITY}"` : ''}/>`
+  }
 }
 
 /**
@@ -145,17 +228,23 @@ export const normaliseSvgIcon = (source: string): NormalisedIcon => {
     '',
   )
 
-  const kept: string[] = []
+  const kept: { tag: string; attributes: string; fill: string | null; hasOpacity: boolean }[] = []
   // Self-closing and paired forms both, since design tools emit both.
   for (const match of drawable.matchAll(/<([a-zA-Z][a-zA-Z0-9-]*)\b([^>]*?)\/?>/g)) {
     const tag = match[1]!.toLowerCase()
     if (!ALLOWED_ELEMENTS.has(tag)) continue
-    const attributes = keptAttributes(match[2] ?? '')
+    const raw = match[2] ?? ''
+    const attributes = keptAttributes(raw)
     // A `<g>` carrying nothing we keep contributes nothing; its children are
     // matched independently by this same loop, so dropping it never loses them.
     if (tag === 'g') continue
     if (!attributes) continue
-    kept.push(`<${tag} ${attributes}/>`)
+    kept.push({
+      tag,
+      attributes,
+      fill: declaredFill(raw),
+      hasOpacity: /\b(fill-)?opacity\s*=/i.test(raw),
+    })
   }
 
   if (!kept.length) {
@@ -164,7 +253,7 @@ export const normaliseSvgIcon = (source: string): NormalisedIcon => {
     )
   }
 
-  return { viewBox, markup: kept.join('') }
+  return { viewBox, markup: kept.map(toneOf(kept)).join('') }
 }
 
 /** The full document to serve for a stored icon. */

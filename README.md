@@ -268,21 +268,32 @@ pnpm build
 ```
 
 **The schema is frozen behind a single baseline migration.** `src/migrations/` holds one
-`20260825_113153_fresh_baseline`, generated on 2026-08-25 against an empty scratch database and
-verified against the dev-pushed schema: **312 `CREATE TABLE`, 542 `CREATE TYPE`, 981 `CREATE INDEX`,
-zero drops and zero type conversions**, with a whitespace-insensitive column-level checksum of both
-catalogues matching exactly (3,632 columns each).
+`20260825_130820_fresh_baseline`, generated on 2026-08-25 against an empty scratch database and
+verified against the dev-pushed schema: **314 `CREATE TABLE`, 542 `CREATE TYPE`, zero drops and zero
+type conversions**, with a whitespace-insensitive column-level checksum of both catalogues matching
+exactly (3,640 columns each).
 
-It supersedes `20260825_082446_fresh_baseline`, which was deleted **with its `.json` snapshot** —
+It supersedes two same-day baselines, each deleted **with its `.json` snapshot** —
 `migrate:create` diffs against that file, so leaving it produces an incremental that looks like a
-baseline. The type count fell by 111 because the **112 icon enums are gone**: icon fields are
-`varchar` now, plus one new `enum_icons_colour`. The table count rose by one for `icons`.
+baseline. The type count fell by 111 against the first because the **112 icon enums are gone**: icon
+fields are `varchar` now, plus one new `enum_icons_colour`. The table count rose by three — `icons`,
+and `icon_library` with its `icon_library_texts` list.
 
 It replaces the previous `20260823_130006_baseline` and the two `editor_controls` migrations, which
 were deleted: the box is being wiped and reseeded, so it creates the final shape directly rather than
 replaying an `ALTER TYPE` sequence. Two changes that were pending as separate migrations are now baked
 into the baseline — `availability_sessions` has no `location` column, and `specialists.profile_photo_shape`
 defaults to `'square'` (Team stays `'tall'`).
+
+**The icon set became editor-managed on 2026-08-25.** **Design → Icon Library** decides which of
+Phosphor's 1,513 icons a picker offers; an empty list falls back to the 101 the app bundles, so the
+global can be added, emptied or ignored without changing what editors see. Anything outside those 101
+renders as an `<svg>` masked from `/api/icon/phosphor/<name>` rather than as a bundled component —
+measured to be indistinguishable: same colour, same 36×36 box, on the same band.
+
+**That route imports the whole Phosphor set, and the cost is measured rather than assumed: the compile
+step went 5.4s → 6.4s.** It is a route handler, so none of it reaches a browser as JavaScript. The
+first attempt at this feature reached for the same import and was never built at all.
 
 **Icon uploads landed on 2026-08-25**, and with them the last of the icon enums. `iconField`
 (`src/fields/blockFields.ts`) and the link icon (`src/fields/link.ts`) are `text` rather than
@@ -368,14 +379,14 @@ zsh tests/int/prove-guards.sh   # re-applies each deliberate break; every case m
 
 | Gate | Result | Count it with |
 |---|---|---|
-| `pnpm test:int` | **324 passed, 17 files** | `pnpm test:int` |
-| `pnpm test:e2e` | **69 passed** on a clean run | `pnpm test:e2e` |
+| `pnpm test:int` | **334 passed, 17 files** | `pnpm test:int` |
+| `pnpm test:e2e` | **71 passed** on a clean run | `pnpm test:e2e` |
 | `zsh tests/int/prove-guards.sh` | **11 cases** | `grep -c '^run_case "' tests/int/prove-guards.sh` |
 | `referenceCssDiff.mjs` | **13 families**, all zero | the `FAMILIES` object in the harness |
 | `computedSnapshot.mjs` | **21 routes, 39 properties** | the `ROUTES` and `PROPS` arrays |
 
 The e2e count **cannot be derived from source** — `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
-each parameterise one test per route, so 42 `test(` declarations expand to far more. Run it.
+each parameterise one test per route, so 44 `test(` declarations expand to far more. Run it.
 
 **A red e2e run is not automatically a regression.** Taking these very readings, a second full run
 against an already-hammered dev server gave `2 failed, 2 did not run, 57 passed` — the two failures

@@ -176,7 +176,7 @@ disagreeing numbers for the same suite.
 | `tests/int/iconLibrary.int.spec.ts` | Where an icon can be chosen (a config walk, so a block nested four deep is covered), that `iconUsage` FINDS things rather than merely says no, and — the load-bearing one — that **no icon field is a `select`**, which is the 10-minute hang reduced to a test. |
 | `tests/int/iconValue.int.spec.ts` | `parseIconValue`/`formatIconValue` — the one place an icon field's stored value is interpreted. Its important case is the silent direction: an unknown `@suffix` must NOT be cut off the key. |
 | `tests/int/svgIcon.int.spec.ts` | `normaliseSvgIcon` — what survives an upload and what does not. Payload 3.85 also refuses hostile SVGs at the upload layer, so this is defence in depth, not the only defence. |
-| `tests/e2e/uploadedIcons.e2e.spec.ts` | An uploaded icon is painted the same colour a built-in one is on the same band, measured rather than written down, and a placement colour beats the icon's own default. Seeds its own user via `globalSetup` and puts the borrowed field back in `finally`. |
+| `tests/e2e/uploadedIcons.e2e.spec.ts` | An uploaded icon is painted the same colour a built-in one is on the same band, measured rather than written down; a placement colour beats the icon's own default; a **library** icon outside the bundled 101 renders identically to one inside it; and the upload screen previews the **stored** markup rather than the file. Seeds its own user via `globalSetup` and restores everything in `finally`. |
 | `tests/int/qualificationIcon.int.spec.ts` | Re-derives every qualification→icon pair from the design reference and asserts `qualificationIcon()` reproduces it, returns only icons in `iconMap`, and falls back. |
 | `tests/int/api.int.spec.ts` | **One boot smoke test** (`fetches users`). The name promises a suite; it is not one. |
 | `tests/int/productionEnv.int.spec.ts` | The boot gate: which environment variables are required while serving, that `next build` waives them all, and that `ALLOW_MISSING_SMTP` waives `SMTP_HOST` **and nothing else**. The negative assertion is the point — a test of only the happy branch cannot tell a targeted opt-out from a waiver of everything. |
@@ -509,30 +509,52 @@ because the two codemods share one (`ls tests/visual/*.mjs | wc -l`):
 
 ### Icons
 
-Two tiers, one **string** column. `iconField` (`src/fields/blockFields.ts`) and the link icon
+Three tiers, one **string** column. `iconField` (`src/fields/blockFields.ts`) and the link icon
 (`src/fields/link.ts`) are both `text` with the `IconSelect` picker — **not** `select`, because a
 select is a Postgres enum and an enum cannot hold a value an editor creates. See invariants 57-59.
 
 | Stored | Renders |
 |---|---|
-| `brain` | one of the curated Phosphor components in `src/components/Icon`, unchanged |
-| `brain@deep` | the same, forced to a brand palette colour |
+| `brain` | one of the **101** Phosphor components bundled in `src/components/Icon`, as a real component |
+| `acorn` | any of the other ~1,400, as an `<svg>` masked from `/api/icon/phosphor/<name>` |
 | `upload:12` | an SVG in the **Icons** collection, in that icon's own default colour |
-| `upload:12@white` | the same upload, forced to White |
+| `brain@deep`, `upload:12@white` | either, forced to a brand palette colour |
+
+**Which icons a picker OFFERS is the `icon-library` global's decision, not the code's.** An admin
+browses all 1,513 and chooses; `effectiveIconList` (`src/utilities/getIconLibrary.ts`) falls back to
+the bundled 101 when that list is empty, so an unsaved or accidentally-emptied global leaves editors
+exactly where they were rather than with nothing. Removing an icon stops it being *offered* and never
+touches a page that uses it — `IconSelect` still shows a value the current document holds, under
+*"Used here, not in the library"*.
+
+The barrel import in `/api/icon/phosphor/[name]` is the price of serving all 1,513. **Measured: the
+compile step went 5.4s → 6.4s.** It is a route handler, so nothing reaches a browser as JavaScript.
 
 `src/components/Icon/value.ts` is the **only** place that shape is interpreted. The colour rides in
 the value rather than in a second column because `iconField` has 38 call sites and 45 `<Icon>` render
 sites: a separate field would be 110 new columns and 83 edits, and one forgotten render site is a
 control that silently does nothing — the `textColour` failure in invariant 33.
 
+**A two-COLOUR upload becomes a two-TONE one.** Phosphor duotone is a solid path plus one at
+`opacity="0.2"`, and a mask reproduces that exactly — but a mask discards colour, so a navy shield
+with a pink tick would otherwise arrive flat beside icons that are all duotone. `normaliseSvgIcon`
+ranks the distinct fills by luminance, keeps the darkest solid and gives the rest 20%. Artwork that
+already carries `opacity` is left alone, because the artist has said what they meant in the units
+that survive.
+
+**The admin previews the STORED markup, never the uploaded file** (`src/fields/IconPreview`). Payload
+shows the bytes that were uploaded; the site renders what was rebuilt from them. On a two-colour test
+file those were navy-and-pink against one flat shape — so the icon's own screen now draws it the way
+a page will, on a light band and a dark one.
+
 **Nothing an editor uploads is ever served back.** `normaliseSvgIcon` (`src/utilities/svgIcon.ts`)
 keeps recognised geometry and **reconstructs** the SVG, so the output is markup this codebase wrote;
 anything unrecognised is absent by construction rather than by having been matched and removed.
 Colours are dropped deliberately — an upload is painted by the site through `mask-image`.
 
-Three routes serve the artwork, and **none imports the Phosphor barrel**: `/api/icon/builtin`
-(the curated list, so the client picker never pulls the 101 components into the admin bundle),
-`/api/icon/builtin/[name]` and `/api/icon/upload/[id]`.
+Four routes serve the artwork: `/api/icon/library` (what a picker should offer — an editable list,
+so the client picker cannot import it), `/api/icon/phosphor` (all 1,513 names, for the library's
+browse screen), `/api/icon/phosphor/[name]` and `/api/icon/upload/[id]`.
 
 Each uploaded icon carries a **default colour**, published once per page by the layout as
 `[data-vf-icon="12"]{color:…}` (`iconDefaultCss`, from `getCachedIconDefaults`), so changing it

@@ -16,6 +16,8 @@ because there is nothing to obey — only something to check.
 
 - [Why each invariant exists](#why-each-invariant-exists) — the evidence behind the numbered rules in `CLAUDE.md`
 - [The dev server and the build](#the-dev-server-and-the-build)
+- [An admin preview can show something the site never renders](#an-admin-preview-can-show-something-the-site-never-renders)
+- [`useMemo` can disable the React compiler for a whole component](#usememo-can-disable-the-react-compiler-for-a-whole-component)
 - [Running the e2e suite](#running-the-e2e-suite)
 - [Searching, grepping, and reading a tool's output](#searching-grepping-and-reading-a-tools-output)
 - [Driving a browser](#driving-a-browser)
@@ -527,6 +529,39 @@ Nearly every "my edit did nothing" in this repo was a stale build before it was 
   script written as `export default async function ({ payload })` runs zero lines, prints nothing and
   exits 0. Do the work at the top level with `getPayload({ config })`.
 
+## An admin preview can show something the site never renders
+
+**Payload's upload preview shows the FILE. That is not always what the page shows.** An uploaded icon
+is normalised on save — recognised geometry kept, the SVG rebuilt, colours dropped so the band can
+supply them — and the site renders *that*, from `/api/icon/upload/[id]`. The admin was still showing
+`/api/icons/file/<name>.svg`, the original bytes.
+
+Measured on a deliberately garish test file: the admin showed a navy shield with a hot-pink tick; the
+page showed one flat shape. Nothing was broken, nothing errored, and an editor had no way to find out
+until the icon was on a page. The icon's own screen now renders the stored markup on a light swatch
+and a dark one (`src/fields/IconPreview`).
+
+Two things that cost time building it:
+
+- **A document's id is not a form field.** `useFormFields(([f]) => f.id.value)` is always `undefined`,
+  so the preview rendered its "save this first" state on a saved icon. The id comes from
+  `useDocumentInfo()`. The markup does come from the form, deliberately — reading the saved document
+  would show the *previous* upload until a reload.
+- **A re-upload keeps the same id**, so the icon's URL does not change and a cached preview shows the
+  old artwork. The URL carries `?v=<markup length>`, which changes when the artwork does.
+
+## `useMemo` can disable the React compiler for a whole component
+
+`pnpm lint` reports `Compilation Skipped: Existing memoization could not be preserved` as an **error**,
+not a warning — and the consequence is not that one value goes unmemoised, it is that the component is
+skipped entirely. Two ways to trigger it, both hit here: mutating an array inside the memo (`push`),
+and depending on a value the compiler thinks may be mutated later. Neither is a bug in the code; both
+are the compiler refusing to reason.
+
+The fix is usually to delete the `useMemo`. A list of a few hundred small objects is cheaper to
+rebuild than a whole component is to leave unoptimised, and the compiler memoises it anyway —
+invariant 50, from the other direction.
+
 ## Running the e2e suite
 
 - **Playwright runs spec FILES in parallel locally** (`workers: undefined`), and two spec files that
@@ -605,6 +640,22 @@ Every one of these produced a confident, wrong answer that was acted on.
   live in one file and look alike by design.
 
 ## Driving a browser
+
+- **An unresolvable `mask-image` paints NOTHING, not the element's box.** Worth knowing before
+  designing around it: `.vf-icon-mask` is `background-color: currentColor` masked by an icon's alpha,
+  so a 404 could plausibly have left the background unmasked and painted a solid coloured square where
+  an icon should be. Measured instead of assumed — screenshot each case and count pixels, because
+  `getComputedStyle` reports the same `background-color` and the same `mask-image` either way:
+
+  | mask URL | red pixels | white |
+  |---|---|---|
+  | a real icon | 24% | 41% (plus 35% antialiasing and the 20% duotone tone) |
+  | a 404 | **0%** | **100%** |
+
+  So an icon name that does not resolve degrades to invisible. Two things needed for that measurement
+  to work at all: `javaScriptEnabled: false`, because React re-renders and wipes anything
+  `setContent` put on the page; and navigating to an HTML page first, since `setContent` throws
+  `Only HTML documents support open()` on an SVG response.
 
 Playwright will happily measure the wrong thing and report it as a pass.
 
