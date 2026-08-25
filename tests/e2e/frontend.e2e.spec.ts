@@ -523,6 +523,123 @@ test.describe('Frontend', () => {
     //    leaves implicit.
     expect(bands.grid, `the team grid band is ${bands.grid}`).toContain(toRgb(gridDeclared!))
   })
+
+  /**
+   * A Booking Chooser with ONE panel fills its band, and does not slide.
+   *
+   * ── Why ──
+   * The block is the full-bleed 50/50 pair on Make a Booking, and `.booking-half`
+   * takes a fixed share of it: `flex: 0 1 50%`. The same block with a single half
+   * is the "Specialist Availability" signpost under the hero on /specialists and
+   * /specialists/specialist-panel — where that share had nothing to share with.
+   * Measured before the fix, at 1440x900:
+   *
+   *   - the panel was 720px of a 1440px band, the other 720px being the section's
+   *     own white;
+   *   - hovering it slid the panel edge to 835px (58%) and back;
+   *   - at 390px, where the split turns column, the panel was 379px of a 520px
+   *     band, leaving a 141px white strip beneath it.
+   *
+   * The fix is one declaration — `.booking-split--solo .booking-half { flex-grow: 1 }`
+   * — and the reason it also stops the slide is worth keeping: a single growing
+   * item absorbs ALL free space, so as the hover rule animates the basis 50% -> 58%
+   * the free space shrinks by exactly as much and the USED width stays 100%. That
+   * is an inference about the flexbox algorithm, so this test samples through the
+   * whole 0.6s transition rather than reading the width once at each end.
+   *
+   * ── The second control ──
+   * Case 3 asserts Make a Booking STILL slides. Without it, deleting the two
+   * `.booking-split:hover` rules outright would make cases 1-2 pass while removing
+   * the effect from the page it belongs on.
+   *
+   * ── Proven red by (invariant 17) ──
+   *  1. delete `.booking-split--solo .booking-half { flex-grow: 1 }` from globals.css
+   *     -> "/specialists: the lone panel is 720px of a 1440px band"
+   *  2. delete the two `.booking-split:hover` rules -> case 3:
+   *     "/make-a-booking: hovering a half of a two-half chooser moved it 0px"
+   *
+   * Break 2 was first attempted as "widen the fix to `.booking-split .booking-half`"
+   * and the suite stayed GREEN, which is the useful half of the exercise: with two
+   * halves the bases already sum to 100%, so there is no free space for `flex-grow`
+   * to absorb and the slide survives untouched. The rule is safe to widen; it is
+   * scoped anyway, because scoping is what makes the intent readable.
+   *
+   * Both breaks were confirmed against the CSS the browser had actually received
+   * (`curl` the `_next/static/chunks/*.css` chunk and read the rule), because the
+   * dev server took ~20s to recompile the stylesheet here and one earlier run of
+   * break 2 reported a false PASS against the pre-break CSS.
+   */
+  test('a chooser with one panel fills its band and does not resize on hover', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+
+    for (const route of ['/specialists', '/specialists/specialist-panel']) {
+      await page.goto(route, { waitUntil: 'load' })
+
+      const split = page.locator('.booking-split').first()
+      const half = split.locator('.booking-half').first()
+
+      // Positive control. Every assertion below is satisfied by a page that
+      // rendered no chooser at all — 0 === 0 (invariant 41).
+      await expect(split, `${route} renders no .booking-split`).toBeVisible()
+      const boxes = await split.evaluate((el) => ({
+        split: el.getBoundingClientRect().width,
+        halves: [...el.querySelectorAll(':scope > .booking-half')].map(
+          (h) => h.getBoundingClientRect().width,
+        ),
+      }))
+      expect(boxes.split, `${route}: the chooser band has no width`).toBeGreaterThan(0)
+      expect(
+        boxes.halves.length,
+        `${route}: this guard is about a ONE-panel chooser; found ${boxes.halves.length}`,
+      ).toBe(1)
+
+      // 1. The lone panel fills the band.
+      expect(
+        Math.abs(boxes.halves[0] - boxes.split),
+        `${route}: the lone panel is ${Math.round(boxes.halves[0])}px of a ${Math.round(
+          boxes.split,
+        )}px band`,
+      ).toBeLessThanOrEqual(1)
+
+      // 2. And keeps filling it under the pointer. Sampled ACROSS the 0.6s
+      //    flex-basis transition, not just at the ends: a slide that starts and
+      //    finishes at the same width is exactly what a two-reading test misses.
+      await half.hover()
+      const widths: number[] = []
+      for (let i = 0; i < 6; i++) {
+        await page.waitForTimeout(120)
+        widths.push(await half.evaluate((el) => el.getBoundingClientRect().width))
+      }
+      const drift = Math.max(...widths.map((w) => Math.abs(w - boxes.halves[0])))
+      expect(
+        drift,
+        `${route}: the panel moved ${Math.round(drift)}px while hovered — widths ${widths
+          .map(Math.round)
+          .join(', ')}`,
+      ).toBeLessThanOrEqual(1)
+    }
+
+    // 3. The control: two halves still slide, which is the effect the design has
+    //    on the page it was built for.
+    await page.goto('/make-a-booking', { waitUntil: 'load' })
+    const halves = page.locator('.booking-split .booking-half')
+    expect(
+      await halves.count(),
+      '/make-a-booking should carry the two-half chooser this case controls for',
+    ).toBe(2)
+
+    const first = halves.first()
+    const resting = await first.evaluate((el) => el.getBoundingClientRect().width)
+    await first.hover()
+    await page.waitForTimeout(900)
+    const hovered = await first.evaluate((el) => el.getBoundingClientRect().width)
+    expect(
+      hovered - resting,
+      `/make-a-booking: hovering a half of a two-half chooser moved it ${Math.round(
+        hovered - resting,
+      )}px`,
+    ).toBeGreaterThan(50)
+  })
 })
 
 /**

@@ -6707,6 +6707,22 @@
 .booking-split:hover .booking-half { flex-basis: 42%; }
 .booking-split:hover .booking-half:hover { flex-basis: 58%; }
 
+/* A LONE panel fills the band. `flex: 0 1 50%` above is a share of a split that
+   only has one side, so the rest of the band rendered as the section's own
+   background — measured 720px of a 1440px band on /specialists and
+   /specialists/specialist-panel, and 379px of a 520px band at 390px, where the
+   split turns column and the compact `min-height` still sizes the band.
+
+   `flex-grow`, not `flex-basis: 100%`, for two measured reasons:
+     - a single growing item absorbs ALL the free space, so the hover pair above
+       (basis 50% → 58%) leaves the USED width at 100% throughout and the slide
+       stops without a second rule fighting the first on specificity;
+     - in the mobile column direction `flex-basis` is a HEIGHT, so `100%` there
+       would resolve against the band rather than filling it.
+   The two-half chooser on Make a Booking has no free space to absorb and is
+   untouched. The watermark tilt and icon lift are deliberately left alone. */
+.booking-split--solo .booking-half { flex-grow: 1; }
+
 .booking-half-icon { font-size: 3rem; line-height: 1; transition: transform var(--transition); }
 .booking-half-icon svg { width: 3rem; height: 3rem; display: block; }
 .booking-half:hover .booking-half-icon { transform: translateY(-5px); }

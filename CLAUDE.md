@@ -123,6 +123,7 @@ several look arbitrary until you see what happened without them.
 
 54. **`selfSpaced` membership is decided by MEASURING a block's own computed padding, not by reading its source.** A block's padding may come from a page-scoped rule or an editor-chosen `cssClass`, so removing its `.my-16` wrapper can strip spacing on another page. And `grep '<Section'` matches `<SectionHeader` and comments. <sub>[why](docs/TRAPS.md)</sub>
 55. **Colour a Phosphor icon through `color` on its container, never `stroke`.** They are duotone and filled; a `stroke` rule applies and paints nothing. Use the same token as the adjacent text so the two cannot drift. <sub>[why](docs/TRAPS.md)</sub>
+56. **A layout that divides a band by a fixed share must say what ONE child means.** `flex: 0 1 50%` on a chooser with a single panel is not half a design, it is half a band and half a void — measured 720px of 1440, and 379px of a 520px band on a phone. Decide the count BEFORE the markup (a child filtered out inside the `.map` is invisible to the container's class), and prefer `flex-grow` to `flex-basis: 100%`: it absorbs the free space a hover rule frees up, so the slide stops without a specificity fight, and it is not a *height* when the row turns column. Guarded by `frontend.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i56)</sub>
 
 ## Commands
 
@@ -171,7 +172,7 @@ disagreeing numbers for the same suite.
 | `tests/int/qualificationIcon.int.spec.ts` | Re-derives every qualification→icon pair from the design reference and asserts `qualificationIcon()` reproduces it, returns only icons in `iconMap`, and falls back. |
 | `tests/int/api.int.spec.ts` | **One boot smoke test** (`fetches users`). The name promises a suite; it is not one. |
 | `tests/int/productionEnv.int.spec.ts` | The boot gate: which environment variables are required while serving, that `next build` waives them all, and that `ALLOW_MISSING_SMTP` waives `SMTP_HOST` **and nothing else**. The negative assertion is the point — a test of only the happy branch cannot tell a targeted opt-out from a waiver of everything. |
-| `tests/e2e/frontend.e2e.spec.ts` | The largest e2e file: skip link (both states), centred-heading wrap, hero weight, testimonial hover. Most of the browser traps below are its assertions. |
+| `tests/e2e/frontend.e2e.spec.ts` | The largest e2e file: skip link (both states), centred-heading wrap, hero weight, testimonial hover, and that a one-panel Booking Chooser fills its band without sliding. Most of the browser traps below are its assertions. |
 | `tests/e2e/links.e2e.spec.ts` | Every `#fragment` link has a target, plus the behavioural Videolink assertion — the "an anchor link is two halves" invariant. |
 | `tests/e2e/images.e2e.spec.ts` | Images are served at the size they render, per route. **The guard for the four image invariants below** (`sizes`, width-only derivatives, the no-derivative majority case, `object-fit` without `fill`). |
 | `tests/int/proseFields.int.spec.ts` | Every field an editor types words into is rich text, or is named with a reason. Walks the sanitised config, so it sees fields nested in arrays, groups, tabs and rows. |

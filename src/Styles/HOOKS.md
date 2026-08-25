@@ -824,9 +824,12 @@ The **Booking Chooser (split)** block is the full-bleed pair on *Make a Booking*
 "Specialist Availability" side and the dark "Client Portal" side. Two things about it are worth
 knowing:
 
-- **It accepts one half, not just two.** Delete a half and the remaining panel keeps the same
-  treatment. That is how the "See this month's availability" signpost under the hero on
-  *Specialist Panel* and *Specialists* is built — it is the same block, not a bespoke band.
+- **It accepts one half, not just two, and one half fills the whole band.** Delete a half and the
+  remaining panel keeps its colour treatment, spreads across the full width, centres its copy, and
+  stops sliding sideways under the pointer — the slide is how the two-panel version says "pick one",
+  and with one panel there is nothing to pick. That is how the "See this month's availability"
+  signpost under the hero on *Specialist Panel* and *Specialists* is built — it is the same block,
+  not a bespoke band. Nothing you set does this; the block reads how many panels you left it.
 - **Panel height** sets how tall the band is. **Default** is the full-height band on Make a Booking,
   which sizes itself to the browser window. **Compact** fixes it at about the height of a page hero,
   which is what you want when the chooser is a signpost sitting under a hero rather than the main

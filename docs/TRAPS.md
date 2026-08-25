@@ -14,7 +14,7 @@ because there is nothing to obey — only something to check.
 
 ## Contents
 
-- [Why each invariant exists](#why-each-invariant-exists) — the evidence behind the 50 rules in `CLAUDE.md`
+- [Why each invariant exists](#why-each-invariant-exists) — the evidence behind the numbered rules in `CLAUDE.md`
 - [The dev server and the build](#the-dev-server-and-the-build)
 - [Searching, grepping, and reading a tool's output](#searching-grepping-and-reading-a-tools-output)
 - [Driving a browser](#driving-a-browser)
@@ -296,6 +296,18 @@ A `shape_cols` helper table left in `verify_cms` hung `getPayload()` for ten min
 
 AvailabilitySessions is `access.read: anyone`, so its `notes` field — a staff note — was served to unauthenticated callers on `/api/availability-sessions`. Measured: an anonymous `curl` returned the `notes` key, and returned real values for the collection's other optional fields (`location` came back as "Brisbane CBD"), so the exposure was live rather than theoretical. Moving a field to the sidebar, labelling it "Internal note" and writing "staff only" in its description change nothing — only field-level `access.read` removes it from the response. Guarded by `tests/int/availabilityNotes.int.spec.ts`, whose second assertion is the positive control: without it the test passes just as happily against a field that is empty, misspelled or deleted.
 
+<a id="i56"></a>
+**56. A layout that divides a band by a fixed share must say what ONE child means**
+
+`bookingChooser` is the full-bleed 50/50 pair on Make a Booking, and `.booking-half` takes its share as `flex: 0 1 50%`. The block accepts a single half, and the same block with one half is the "Specialist Availability" signpost under the hero on `/specialists` and `/specialists/specialist-panel` — where a 50% share had nothing to share with. Measured at 1440×900 before the fix: the panel was **720px of a 1440px band**, the other 720px being the section's own white; hovering it slid the edge to **835px** (58%) and back; and at 390px, where the split turns column, the panel was **379px of a 520px band**, leaving a 141px white strip beneath it. Nothing was broken in the sense of throwing — the block rendered exactly what it was told, which was "take half".
+
+Two things this cost, both worth keeping:
+
+- **The count has to be decided BEFORE the markup.** The component filtered contentless halves from *inside* its `.map`, returning `null` per item, so at the point the container class was written nothing knew how many panels would appear. And the emptiness test was `half.eyebrow || half.title || half.description` — every one of those a converted rich-text field, every one of them a **truthy object when empty** (invariant 30), so a blank half counted. Both had to move for the fix to be expressible at all.
+- **`flex-grow`, not `flex-basis: 100%`.** The fix is one declaration, `.booking-split--solo .booking-half { flex-grow: 1 }`, and it stops the hover slide as a side effect rather than by fighting it: a single growing item absorbs **all** the free space, so as the hover rule animates the basis 50% → 58% the free space shrinks by exactly as much and the used width stays 100% throughout — sampled six times across the 0.6s transition to confirm the algebra in a real browser rather than on paper. `flex-basis: 100%` would have needed a second rule to win the specificity contest against `.booking-split:hover .booking-half:hover`, and would have been a **height** of 100% in the mobile column direction.
+
+Guarded by `tests/e2e/frontend.e2e.spec.ts` → *"a chooser with one panel fills its band and does not resize on hover"*, whose third case asserts Make a Booking **still slides** — otherwise deleting the two `.booking-split:hover` rules outright would satisfy the first two cases while stripping the effect from the page it was designed for.
+
 ---
 
 # Traps that are not rules
@@ -304,6 +316,28 @@ There is nothing to obey in this section — only something to check. They are g
 are doing when each one bites.
 
 ## The dev server and the build
+
+**Two ways this repo's dev server has faked a reading, both this week.**
+
+*The one on port 3000 may not be a dev server at all.* `./start.sh prod` serves a **prebuilt** `.next`
+under `LOCAL_PROD_REPRO`, and nothing about the page says so. A CSS and component change made against
+it measured as having no effect whatsoever — the class was simply absent from the DOM — which reads
+exactly like a broken selector. `tail .dev.log` names the mode in a boxed banner; check it before
+concluding a change did nothing.
+
+*And its stylesheet lags the file by ~20 seconds.* A `sleep 3` after editing `globals.css` was not
+enough, and a Playwright break-proof run against the stale chunk reported a confident **PASS** for a
+guard that was in fact red — the failure mode invariant 17 exists to prevent, arriving through the
+tooling instead of the test. Confirm the browser has the edit before believing any run that depends
+on it:
+
+```bash
+curl -s http://localhost:3000/make-a-booking | grep -o '/_next/static/[^"]*\.css' | head -1
+curl -s "http://localhost:3000<that path>" | tr '}' '}\n' | grep '<your selector>'
+```
+
+Note `grep -c` on that chunk is useless as a presence test — the CSS is one long line, so it answers
+0 or 1 no matter how many rules match. Split on `}` first, as above.
 
 **`pnpm dev` cannot reproduce a staleness bug, so "works locally" is not evidence against one.** The
 frontend routes are ISR: `src/app/(frontend)/[...slug]/page.tsx` sets `export const revalidate = 3600`,

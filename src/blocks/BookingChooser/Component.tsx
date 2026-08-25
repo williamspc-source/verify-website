@@ -7,6 +7,7 @@ import { CMSLink } from '@/components/Link'
 import { Icon } from '@/components/Icon'
 import { Section } from '@/components/Section'
 import { cn } from '@/utilities/ui'
+import { hasRichText } from '@/utilities/lexicalText'
 import { toClassName } from '@/utilities/cssClass'
 import {
   applyRegistrationHref,
@@ -29,10 +30,30 @@ export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = async (
 }) => {
   if (!Array.isArray(halves) || halves.length === 0) return null
 
+  // Which halves will ACTUALLY render, settled once and BEFORE the markup, because
+  // the count decides the layout: one panel fills the band (`booking-split--solo`),
+  // two share it. Filtering inside the map — which is where this used to happen —
+  // makes that count unknowable at the point it is needed.
+  //
+  // `hasRichText`, not truthiness: an empty rich text is a truthy OBJECT, so
+  // `half.eyebrow || half.title || …` counted a panel with nothing typed in it
+  // (invariant 30). Same shape as LeadershipSpotlight's own emptiness check.
+  const panels = halves.filter(
+    (half) =>
+      Boolean(half?.icon) ||
+      hasRichText(half?.eyebrow) ||
+      hasRichText(half?.title) ||
+      hasRichText(half?.description) ||
+      (Array.isArray(half?.links) && half.links.length > 0),
+  )
+
+  // Every half is blank — render nothing rather than an empty coloured band.
+  if (panels.length === 0) return null
+
   // Read once for the whole block, then applied per panel below: awaiting inside
   // the halves map would hand React an array of promises. Skipped entirely when
   // no panel uses a registration link.
-  const registrationHref = halves.some((half) => hasRegistrationLink(half?.links))
+  const registrationHref = panels.some((half) => hasRegistrationLink(half?.links))
     ? await getRegistrationEnquiryHref()
     : null
 
@@ -43,16 +64,13 @@ export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = async (
       className={cn('booking-section', density === 'compact' && 'booking-section--compact', toClassName(cssClass))}
       bare={bare}
     >
-      <div className="booking-split">
-        {halves.map((half, i) => {
+      <div className={cn('booking-split', panels.length === 1 && 'booking-split--solo')}>
+        {panels.map((half, i) => {
           const modifier = accentClass[half?.accent || 'blue'] || accentClass.blue
           const links = applyRegistrationHref(
             Array.isArray(half?.links) ? half.links : [],
             registrationHref,
           )
-          const hasContent =
-            half?.icon || half?.eyebrow || half?.title || half?.description || links.length > 0
-          if (!hasContent) return null
 
           return (
             <div key={i} className={cn('booking-half', modifier)}>

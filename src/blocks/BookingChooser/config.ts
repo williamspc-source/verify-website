@@ -28,7 +28,7 @@ export const BookingChooser: Block = {
       maxRows: 2,
       admin: {
         description:
-          'Full-bleed 50/50 chooser — add two halves (typically one light-blue and one dark-navy side).',
+          'Full-bleed chooser. Two halves split the band 50/50 (typically one light-blue and one dark-navy side); a single half fills the whole band and does not slide under the pointer.',
       },
       // Seeds the exact design-reference chooser so a freshly inserted block
       // renders faithfully; every value stays editable.

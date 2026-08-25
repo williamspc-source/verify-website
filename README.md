@@ -351,14 +351,14 @@ zsh tests/int/prove-guards.sh   # re-applies each deliberate break; every case m
 
 | Gate | Result | Count it with |
 |---|---|---|
-| `pnpm test:int` | **286 passed, 13 files** | `pnpm test:int` |
-| `pnpm test:e2e` | **61 passed** on a clean run | `pnpm test:e2e` |
+| `pnpm test:int` | **289 passed, 14 files** | `pnpm test:int` |
+| `pnpm test:e2e` | **68 passed** on a clean run | `pnpm test:e2e` |
 | `zsh tests/int/prove-guards.sh` | **11 cases** | `grep -c '^run_case "' tests/int/prove-guards.sh` |
 | `referenceCssDiff.mjs` | **13 families**, all zero | the `FAMILIES` object in the harness |
 | `computedSnapshot.mjs` | **21 routes, 39 properties** | the `ROUTES` and `PROPS` arrays |
 
 The e2e count **cannot be derived from source** — `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
-each parameterise one test per route, so 27 `test(` declarations expand to far more. Run it.
+each parameterise one test per route, so 41 `test(` declarations expand to far more. Run it.
 
 **A red e2e run is not automatically a regression.** Taking these very readings, a second full run
 against an already-hammered dev server gave `2 failed, 2 did not run, 57 passed` — the two failures
@@ -401,7 +401,7 @@ Three habits separate these from the guards that rotted:
 | `tests/int/cssTokens.int.spec.ts` | Sanitisation of editor-supplied token values, which land inside a `<style>` tag |
 | `tests/int/seedWrites.int.spec.ts` | No seed file calls `payload.create`/`update` directly, bypassing the rich-text lift |
 | `tests/int/{eventTiming,headingId,qualificationIcon,lexicalText,inlineRichText}` | The unit halves of event timing, anchor ids, qualification icons, and rich-text reading/rendering |
-| `tests/e2e/frontend.e2e.spec.ts` | Skip link (both states), centred-heading wrap, hero weight, testimonial hover, and that nothing unclickable reacts to the pointer |
+| `tests/e2e/frontend.e2e.spec.ts` | Skip link (both states), centred-heading wrap, hero weight, testimonial hover, a one-panel Booking Chooser filling its band, and that nothing unclickable reacts to the pointer |
 | `tests/e2e/links.e2e.spec.ts` | Every internal link and every `#fragment` has a target |
 | `tests/e2e/images.e2e.spec.ts` | Images are served at the size they render |
 | `tests/e2e/carousel.e2e.spec.ts` | The carousel cannot be clicked past its own end. **Note it clicks with `{ force: true }`** — Playwright's normal click waits for stability, so a "rapid" burst is not rapid and the test passes against the broken component |
