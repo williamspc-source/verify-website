@@ -29,6 +29,11 @@ export const Events: CollectionConfig<'events'> = {
   defaultPopulate: {
     title: true,
     slug: true,
+    // `defaultPopulate` selects FIELDS, not depth — Payload's type here is
+    // `true` only. Whether this arrives populated or as a bare id depends on the
+    // caller's `depth`, so `eventTypeLabel` degrades to '' rather than printing
+    // an id or "[object Object]". The two `find()` calls that render a badge
+    // both pass depth: 1.
     eventType: true,
     date: true,
     timeLabel: true,
@@ -245,28 +250,14 @@ export const Events: CollectionConfig<'events'> = {
     },
     {
       name: 'eventType',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'event-types',
       required: true,
-      admin: { position: 'sidebar' },
-      options: [
-        { label: 'Networking Event', value: 'networking' },
-        { label: 'Client Training', value: 'client-training' },
-        { label: 'Industry Briefing', value: 'industry-briefing' },
-        { label: 'Workshop', value: 'workshop' },
-        { label: 'Webinar', value: 'webinar' },
-        { label: 'Breakfast Seminar', value: 'breakfast-seminar' },
-        { label: 'Masterclass', value: 'masterclass' },
-        { label: 'Specialist Seminar', value: 'specialist-seminar' },
-        // Added 2026-08-20 with the real event history. Conferences VERIFY
-        // exhibits at, events it sponsors, and its client/staff social events
-        // had no honest type — everything was landing on 'networking', which
-        // put a Christmas party and an industry briefing in the same filter.
-        // Adding enum values is the safe direction: it is NARROWING one that
-        // has taken the local site down (see CLAUDE.md).
-        { label: 'Conference', value: 'conference' },
-        { label: 'Sponsorship', value: 'sponsorship' },
-        { label: 'Social Event', value: 'social' },
-      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'Manage the list under Taxonomy → Event Types. Adding one there makes it selectable here immediately.',
+      },
     },
     {
       name: 'presenters',

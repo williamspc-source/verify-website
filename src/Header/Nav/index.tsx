@@ -5,6 +5,7 @@ import React from 'react'
 import type { Header as HeaderType } from '@/payload-types'
 
 import { cn } from '@/utilities/ui'
+import { richTextToPlain } from '@/utilities/lexicalText'
 import { CMSLink } from '@/components/Link'
 
 type NavItem = NonNullable<HeaderType['navItems']>[number]
@@ -73,7 +74,13 @@ export const HeaderNav: React.FC<{ data: HeaderType; menuOpen?: boolean }> = ({
                   className="nav-expand"
                   aria-expanded={isOpen}
                   aria-controls={panelId}
-                  aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${item.link?.label ?? 'menu'}`}
+                  // `richTextToPlain`, not interpolation: a link's `label` is an
+                  // inlineRichTextField, so `${item.link.label}` renders the
+                  // literal "[object Object]" — inaudibly wrong, since this only
+                  // ever reaches a screen reader. Invariant 46.
+                  aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${
+                    richTextToPlain(item.link?.label) || 'menu'
+                  }`}
                   onClick={() => setOpenIndex((cur) => (cur === i ? null : i))}
                 />
                 <div className="nav-dropdown" id={panelId}>

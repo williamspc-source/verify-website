@@ -605,10 +605,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_posts_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum__posts_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_events_host" AS ENUM('aamle', 'verify');
-  CREATE TYPE "public"."enum_events_event_type" AS ENUM('networking', 'client-training', 'industry-briefing', 'workshop', 'webinar', 'breakfast-seminar', 'masterclass', 'specialist-seminar', 'conference', 'sponsorship', 'social');
   CREATE TYPE "public"."enum_events_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum__events_v_version_host" AS ENUM('aamle', 'verify');
-  CREATE TYPE "public"."enum__events_v_version_event_type" AS ENUM('networking', 'client-training', 'industry-briefing', 'workshop', 'webinar', 'breakfast-seminar', 'masterclass', 'specialist-seminar', 'conference', 'sponsorship', 'social');
   CREATE TYPE "public"."enum__events_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_services_category" AS ENUM('medico-legal', 'administrative', 'educational');
   CREATE TYPE "public"."enum_services_service_group" AS ENUM('examination', 'reporting', 'administrative', 'education');
@@ -3855,7 +3853,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"meta_title" varchar,
   	"meta_image_id" integer,
   	"meta_description" varchar,
-  	"event_type" "enum_events_event_type",
+  	"event_type_id" integer,
   	"generate_slug" boolean DEFAULT true,
   	"slug" varchar,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -3924,7 +3922,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"version_meta_title" varchar,
   	"version_meta_image_id" integer,
   	"version_meta_description" varchar,
-  	"version_event_type" "enum__events_v_version_event_type",
+  	"version_event_type_id" integer,
   	"version_generate_slug" boolean DEFAULT true,
   	"version_slug" varchar,
   	"version_updated_at" timestamp(3) with time zone,
@@ -4084,6 +4082,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
   	"description" jsonb,
+  	"generate_slug" boolean DEFAULT true,
+  	"slug" varchar NOT NULL,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE "event_types" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"title" varchar NOT NULL,
   	"generate_slug" boolean DEFAULT true,
   	"slug" varchar NOT NULL,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -4749,6 +4756,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"specialty_categories_id" integer,
   	"claim_types_id" integer,
   	"assessment_types_id" integer,
+  	"event_types_id" integer,
   	"areas_of_expertise_id" integer,
   	"accreditations_id" integer,
   	"locations_id" integer,
@@ -5517,6 +5525,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "events" ADD CONSTRAINT "events_location_ref_id_locations_id_fk" FOREIGN KEY ("location_ref_id") REFERENCES "public"."locations"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "events" ADD CONSTRAINT "events_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "events" ADD CONSTRAINT "events_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "events" ADD CONSTRAINT "events_event_type_id_event_types_id_fk" FOREIGN KEY ("event_type_id") REFERENCES "public"."event_types"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "events_rels" ADD CONSTRAINT "events_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "events_rels" ADD CONSTRAINT "events_rels_specialists_fk" FOREIGN KEY ("specialists_id") REFERENCES "public"."specialists"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "events_rels" ADD CONSTRAINT "events_rels_team_fk" FOREIGN KEY ("team_id") REFERENCES "public"."team"("id") ON DELETE cascade ON UPDATE no action;
@@ -5529,6 +5538,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_events_v" ADD CONSTRAINT "_events_v_version_location_ref_id_locations_id_fk" FOREIGN KEY ("version_location_ref_id") REFERENCES "public"."locations"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_events_v" ADD CONSTRAINT "_events_v_version_image_id_media_id_fk" FOREIGN KEY ("version_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_events_v" ADD CONSTRAINT "_events_v_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_events_v" ADD CONSTRAINT "_events_v_version_event_type_id_event_types_id_fk" FOREIGN KEY ("version_event_type_id") REFERENCES "public"."event_types"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_events_v_rels" ADD CONSTRAINT "_events_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_events_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_events_v_rels" ADD CONSTRAINT "_events_v_rels_specialists_fk" FOREIGN KEY ("specialists_id") REFERENCES "public"."specialists"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_events_v_rels" ADD CONSTRAINT "_events_v_rels_team_fk" FOREIGN KEY ("team_id") REFERENCES "public"."team"("id") ON DELETE cascade ON UPDATE no action;
@@ -5622,6 +5632,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_specialty_categories_fk" FOREIGN KEY ("specialty_categories_id") REFERENCES "public"."specialty_categories"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_claim_types_fk" FOREIGN KEY ("claim_types_id") REFERENCES "public"."claim_types"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_assessment_types_fk" FOREIGN KEY ("assessment_types_id") REFERENCES "public"."assessment_types"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_event_types_fk" FOREIGN KEY ("event_types_id") REFERENCES "public"."event_types"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_areas_of_expertise_fk" FOREIGN KEY ("areas_of_expertise_id") REFERENCES "public"."areas_of_expertise"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_accreditations_fk" FOREIGN KEY ("accreditations_id") REFERENCES "public"."accreditations"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_locations_fk" FOREIGN KEY ("locations_id") REFERENCES "public"."locations"("id") ON DELETE cascade ON UPDATE no action;
@@ -6312,6 +6323,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "events_location_ref_idx" ON "events" USING btree ("location_ref_id");
   CREATE INDEX "events_image_idx" ON "events" USING btree ("image_id");
   CREATE INDEX "events_meta_meta_image_idx" ON "events" USING btree ("meta_image_id");
+  CREATE INDEX "events_event_type_idx" ON "events" USING btree ("event_type_id");
   CREATE UNIQUE INDEX "events_slug_idx" ON "events" USING btree ("slug");
   CREATE INDEX "events_updated_at_idx" ON "events" USING btree ("updated_at");
   CREATE INDEX "events_created_at_idx" ON "events" USING btree ("created_at");
@@ -6333,6 +6345,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "_events_v_version_version_location_ref_idx" ON "_events_v" USING btree ("version_location_ref_id");
   CREATE INDEX "_events_v_version_version_image_idx" ON "_events_v" USING btree ("version_image_id");
   CREATE INDEX "_events_v_version_meta_version_meta_image_idx" ON "_events_v" USING btree ("version_meta_image_id");
+  CREATE INDEX "_events_v_version_version_event_type_idx" ON "_events_v" USING btree ("version_event_type_id");
   CREATE INDEX "_events_v_version_version_slug_idx" ON "_events_v" USING btree ("version_slug");
   CREATE INDEX "_events_v_version_version_updated_at_idx" ON "_events_v" USING btree ("version_updated_at");
   CREATE INDEX "_events_v_version_version_created_at_idx" ON "_events_v" USING btree ("version_created_at");
@@ -6380,6 +6393,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE UNIQUE INDEX "assessment_types_slug_idx" ON "assessment_types" USING btree ("slug");
   CREATE INDEX "assessment_types_updated_at_idx" ON "assessment_types" USING btree ("updated_at");
   CREATE INDEX "assessment_types_created_at_idx" ON "assessment_types" USING btree ("created_at");
+  CREATE UNIQUE INDEX "event_types_slug_idx" ON "event_types" USING btree ("slug");
+  CREATE INDEX "event_types_updated_at_idx" ON "event_types" USING btree ("updated_at");
+  CREATE INDEX "event_types_created_at_idx" ON "event_types" USING btree ("created_at");
   CREATE UNIQUE INDEX "areas_of_expertise_slug_idx" ON "areas_of_expertise" USING btree ("slug");
   CREATE INDEX "areas_of_expertise_updated_at_idx" ON "areas_of_expertise" USING btree ("updated_at");
   CREATE INDEX "areas_of_expertise_created_at_idx" ON "areas_of_expertise" USING btree ("created_at");
@@ -6593,6 +6609,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_specialty_categories_id_idx" ON "payload_locked_documents_rels" USING btree ("specialty_categories_id");
   CREATE INDEX "payload_locked_documents_rels_claim_types_id_idx" ON "payload_locked_documents_rels" USING btree ("claim_types_id");
   CREATE INDEX "payload_locked_documents_rels_assessment_types_id_idx" ON "payload_locked_documents_rels" USING btree ("assessment_types_id");
+  CREATE INDEX "payload_locked_documents_rels_event_types_id_idx" ON "payload_locked_documents_rels" USING btree ("event_types_id");
   CREATE INDEX "payload_locked_documents_rels_areas_of_expertise_id_idx" ON "payload_locked_documents_rels" USING btree ("areas_of_expertise_id");
   CREATE INDEX "payload_locked_documents_rels_accreditations_id_idx" ON "payload_locked_documents_rels" USING btree ("accreditations_id");
   CREATE INDEX "payload_locked_documents_rels_locations_id_idx" ON "payload_locked_documents_rels" USING btree ("locations_id");
@@ -6906,6 +6923,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "specialty_categories" CASCADE;
   DROP TABLE "claim_types" CASCADE;
   DROP TABLE "assessment_types" CASCADE;
+  DROP TABLE "event_types" CASCADE;
   DROP TABLE "areas_of_expertise" CASCADE;
   DROP TABLE "accreditations" CASCADE;
   DROP TABLE "locations" CASCADE;
@@ -7587,10 +7605,8 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_posts_status";
   DROP TYPE "public"."enum__posts_v_version_status";
   DROP TYPE "public"."enum_events_host";
-  DROP TYPE "public"."enum_events_event_type";
   DROP TYPE "public"."enum_events_status";
   DROP TYPE "public"."enum__events_v_version_host";
-  DROP TYPE "public"."enum__events_v_version_event_type";
   DROP TYPE "public"."enum__events_v_version_status";
   DROP TYPE "public"."enum_services_category";
   DROP TYPE "public"."enum_services_service_group";

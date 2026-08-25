@@ -23,7 +23,7 @@ import { bgClasses, type SectionBackground } from '@/components/Section'
 import { toClassName } from '@/utilities/cssClass'
 import { postPath, eventPath, IN_THE_LOOP_PATH } from '@/utilities/routes'
 import { getCachedGlobal } from '@/utilities/getGlobals'
-import { EVENT_TYPE_LABELS } from '@/utilities/eventTypeLabels'
+import { eventTypeLabel } from '@/utilities/eventTypeLabels'
 import { archiveQuery, archiveSelectedDocs, type ArchiveSource } from './query'
 
 const MONTHS_SHORT = [
@@ -291,7 +291,11 @@ const EventCard: React.FC<{
 }> = ({ event, isPast, compact, factLabels }) => {
   if (!event) return null
 
-  const typeLabel = event.eventType ? EVENT_TYPE_LABELS[event.eventType] || event.eventType : null
+  // NOT `|| event.eventType`: that fallback used to hand React the raw value,
+  // which is now a relationship OBJECT — "Objects are not valid as a React
+  // child", a hard crash on every page carrying an events archive. An unlabelled
+  // badge is simply not rendered.
+  const typeLabel = eventTypeLabel(event.eventType) || null
 
   if (compact) return <EventHubCard event={event} typeLabel={typeLabel} factLabels={factLabels} />
 

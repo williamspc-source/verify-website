@@ -1,32 +1,24 @@
-/**
- * The one map from an Event's `eventType` to the label a visitor reads.
- *
- * There were three byte-identical copies of this — in `ArchiveBlock`, in
- * `EventsExplorer`, and on the event detail page — each carrying a comment
- * telling the reader to keep it in step with the other two. Adding three new
- * types on 2026-08-20 meant editing all three or shipping a blank badge on
- * whichever was missed, which is precisely how the collection→prefix map in
- * `routes.ts` came to disagree with itself (see CLAUDE.md). Hence one module.
- *
- * Keep in step with the `eventType` options in `src/collections/Events/index.ts`.
- * A value with no entry here falls back to the raw slug rather than rendering
- * empty, so a future option that is added there and forgotten here shows up as
- * visibly wrong text instead of a silently missing badge.
- */
-export const EVENT_TYPE_LABELS: Record<string, string> = {
-  networking: 'Networking Event',
-  'client-training': 'Client Training',
-  'industry-briefing': 'Industry Briefing',
-  workshop: 'Workshop',
-  webinar: 'Webinar',
-  'breakfast-seminar': 'Breakfast Seminar',
-  masterclass: 'Masterclass',
-  'specialist-seminar': 'Specialist Seminar',
-  conference: 'Conference',
-  sponsorship: 'Sponsorship',
-  social: 'Social Event',
-}
+import type { Event, EventType } from '@/payload-types'
 
-/** Label for an event type, falling back to the raw value. */
-export const eventTypeLabel = (value?: string | null): string =>
-  (value && EVENT_TYPE_LABELS[value]) || value || ''
+/**
+ * The label a visitor reads for an Event's type.
+ *
+ * ── What this used to be ──
+ * A hardcoded `Record<slug, label>` mirroring the `eventType` select's eleven
+ * options, with a header comment telling the reader to keep the two in step by
+ * hand. Before that there were three byte-identical copies of the same map. The
+ * type is now the `event-types` collection, so the label lives on the row and
+ * there is nothing left to keep in step.
+ *
+ * ── Why a helper at all ──
+ * `eventType` is a relationship, so it arrives as a populated object at depth
+ * >= 1 and as a bare id when something forgot to populate it. Reading `.title`
+ * inline at four call sites would mean four different guesses about that. This
+ * returns the title when it has one, and an empty string when it does not —
+ * never the id, and never `[object Object]`, both of which have shipped here as
+ * visible text before.
+ */
+export const eventTypeLabel = (value?: Event['eventType'] | null): string => {
+  if (!value || typeof value !== 'object') return ''
+  return (value as EventType).title ?? ''
+}

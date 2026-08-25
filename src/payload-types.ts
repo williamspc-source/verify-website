@@ -78,6 +78,7 @@ export interface Config {
     'specialty-categories': SpecialtyCategory;
     'claim-types': ClaimType;
     'assessment-types': AssessmentType;
+    'event-types': EventType;
     'areas-of-expertise': AreasOfExpertise;
     accreditations: Accreditation;
     locations: Location;
@@ -117,6 +118,7 @@ export interface Config {
     'specialty-categories': SpecialtyCategoriesSelect<false> | SpecialtyCategoriesSelect<true>;
     'claim-types': ClaimTypesSelect<false> | ClaimTypesSelect<true>;
     'assessment-types': AssessmentTypesSelect<false> | AssessmentTypesSelect<true>;
+    'event-types': EventTypesSelect<false> | EventTypesSelect<true>;
     'areas-of-expertise': AreasOfExpertiseSelect<false> | AreasOfExpertiseSelect<true>;
     accreditations: AccreditationsSelect<false> | AccreditationsSelect<true>;
     locations: LocationsSelect<false> | LocationsSelect<true>;
@@ -2578,18 +2580,10 @@ export interface Event {
     image?: (number | null) | Media;
     description?: string | null;
   };
-  eventType:
-    | 'networking'
-    | 'client-training'
-    | 'industry-briefing'
-    | 'workshop'
-    | 'webinar'
-    | 'breakfast-seminar'
-    | 'masterclass'
-    | 'specialist-seminar'
-    | 'conference'
-    | 'sponsorship'
-    | 'social';
+  /**
+   * Manage the list under Taxonomy → Event Types. Adding one there makes it selectable here immediately.
+   */
+  eventType: number | EventType;
   /**
    * Presenters who are on the panel or the team. They render as linked cards on the event page. For an outside speaker, use “Guest presenters” below instead.
    */
@@ -2652,6 +2646,26 @@ export interface Event {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * The kinds of event you run. Add one here and it is immediately selectable on every event; the name you give it is the badge a visitor sees.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-types".
+ */
+export interface EventType {
+  id: number;
+  /**
+   * e.g. "Breakfast Seminar", "Webinar". Shown as the badge on an event card.
+   */
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -15956,6 +15970,10 @@ export interface PayloadLockedDocument {
         value: number | AssessmentType;
       } | null)
     | ({
+        relationTo: 'event-types';
+        value: number | EventType;
+      } | null)
+    | ({
         relationTo: 'areas-of-expertise';
         value: number | AreasOfExpertise;
       } | null)
@@ -18166,6 +18184,17 @@ export interface ClaimTypesSelect<T extends boolean = true> {
 export interface AssessmentTypesSelect<T extends boolean = true> {
   title?: T;
   description?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-types_select".
+ */
+export interface EventTypesSelect<T extends boolean = true> {
+  title?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;

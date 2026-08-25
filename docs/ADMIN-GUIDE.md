@@ -25,7 +25,7 @@ wording you edit.
 |---|---|---|
 | **Publishing** | Pages, Articles, Events | Constantly — this is the site's content |
 | **Reference** | Services, Resources, Offices, Testimonials | Occasionally — records that feed sections of pages |
-| **Taxonomy** | Ten lists that classify specialists, articles and staff | Rarely — set up once, extended now and then |
+| **Taxonomy** | Eleven lists that classify specialists, articles, events and staff | Rarely — set up once, extended now and then |
 | **People** | Specialists, Team Members | When someone joins, leaves or changes role |
 | **Availability** | Availability Sessions | Regularly, if you advertise appointment slots |
 | **Media** | Every uploaded image and file | Whenever you add a photo |
@@ -118,13 +118,13 @@ most common way to lose an article.
 the whole of the day it is held, not until its start time. Registration is controlled separately by
 **Registration closes at**, so an event can be running and still taking expressions of interest.
 
-**Event type** is the badge on the card and the filter visitors sort by, so it decides where an
-event turns up as much as how it reads. The list is Networking, Industry Briefing, Workshop, Webinar,
-Breakfast Seminar, Masterclass, Specialist Seminar, and — added 2026-08-20 — **Conference**,
-**Sponsorship** and **Social Event**. Those last three exist because everything that was not a
-seminar was landing on *Networking*, which put a Christmas party and an industry briefing in the same
-filter. Pick the one a visitor would expect; a conference VERIFY exhibits at is a Conference, an
-event it puts its name to is a Sponsorship.
+**Event type** is the badge on the card, and it is what a visitor's search matches when they type
+"webinar" into the events search box — so it decides where an event turns up as much as how it reads.
+
+**The list is yours to manage.** It lives at **Taxonomy → Event Types**; add, rename or remove a type
+there and every event picker updates immediately, no developer and no deploy. Until 2026-08-25 it was
+eleven options fixed in code. Pick the one a visitor would expect: a conference VERIFY exhibits at is
+a Conference, an event it puts its name to is a Sponsorship.
 
 **Event photo** is worth setting. It is shown on the two listing pages and on the `/events` hub
 cards. Leave it empty and the event falls back to a date calendar showing the day and month — so a
@@ -192,7 +192,7 @@ this — if you change the number here and the footer still shows the old one, c
 
 ## 5. Taxonomy
 
-Ten lists that classify things. You will rarely add to them, and you should think before deleting
+Eleven lists that classify things. You will rarely add to them, and you should think before deleting
 from them — other records point at these.
 
 | List | What it classifies | Where a visitor sees it |
@@ -207,6 +207,17 @@ from them — other records point at these.
 | **Streams** | Articles | **Nothing** — it is the folder in the web address |
 | **Topics** | Articles | The coloured chips on article cards, and "Topics" on an article |
 | **Departments** | Team members | The group headings on Meet the Team, in the order you set |
+| **Event Types** | Events | The badge on an event card, and what the events search matches |
+
+### Adding an event type
+
+**Taxonomy → Event Types → Create new.** Give it a name — that name *is* the badge a visitor sees —
+and it is immediately selectable on every event. The list shows alphabetically everywhere.
+
+**You cannot delete a type that events still use.** The admin refuses and tells you how many events
+depend on it, because the alternative is worse: Event type is a required field, so removing it would
+leave those events with no type at all, their badge gone from the site, while their records still say
+Published. Move them to another type first, then delete.
 
 ### Adding a new team
 

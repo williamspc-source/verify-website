@@ -268,16 +268,29 @@ pnpm build
 ```
 
 **The schema is frozen behind a single baseline migration.** `src/migrations/` holds one
-`20260825_072728_fresh_baseline`, generated on 2026-08-25 against an empty scratch database and
-verified against the dev-pushed schema: **310 `CREATE TABLE`, 655 `CREATE TYPE`, 973 `CREATE INDEX`,
+`20260825_082446_fresh_baseline`, generated on 2026-08-25 against an empty scratch database and
+verified against the dev-pushed schema: **311 `CREATE TABLE`, 653 `CREATE TYPE`, 978 `CREATE INDEX`,
 zero drops and zero type conversions**, with a whitespace-insensitive column-level checksum of both
-catalogues matching exactly (3,625 columns each, 655 enums, 310 tables).
+catalogues matching exactly (3,632 columns each).
 
 It replaces the previous `20260823_130006_baseline` and the two `editor_controls` migrations, which
 were deleted: the box is being wiped and reseeded, so it creates the final shape directly rather than
 replaying an `ALTER TYPE` sequence. Two changes that were pending as separate migrations are now baked
 into the baseline — `availability_sessions` has no `location` column, and `specialists.profile_photo_shape`
 defaults to `'square'` (Team stays `'tall'`).
+
+**Event Types became a collection on 2026-08-25**, so `events.event_type` (a Postgres enum) is now
+`events.event_type_id`, an FK to `event_types`, and the two enums are gone. On a wiped box the baseline
+creates the final shape and the seed writes the links. **On a box that is migrated rather than
+reseeded**, the data has to be carried across before the old column is dropped:
+
+```sql
+UPDATE events        SET event_type_id         = et.id FROM event_types et WHERE et.slug = events.event_type::text;
+UPDATE _events_v     SET version_event_type_id = et.id FROM event_types et WHERE et.slug = _events_v.version_event_type::text;
+```
+
+The `_events_v` half is easy to miss and matters: old autosave versions can carry types no live row
+uses.
 
 **Regenerating a baseline: delete the `.json` snapshots too.** `migrate:create` diffs the config
 against the previous migration's `.json`, not against the database. Leaving them behind produced a

@@ -33153,10 +33153,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "event_type": {
-          "name": "event_type",
-          "type": "enum_events_event_type",
-          "typeSchema": "public",
+        "event_type_id": {
+          "name": "event_type_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -33232,6 +33231,21 @@
           "columns": [
             {
               "expression": "meta_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "events_event_type_idx": {
+          "name": "events_event_type_idx",
+          "columns": [
+            {
+              "expression": "event_type_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -33336,6 +33350,19 @@
           "tableTo": "media",
           "columnsFrom": [
             "meta_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "events_event_type_id_event_types_id_fk": {
+          "name": "events_event_type_id_event_types_id_fk",
+          "tableFrom": "events",
+          "tableTo": "event_types",
+          "columnsFrom": [
+            "event_type_id"
           ],
           "columnsTo": [
             "id"
@@ -34004,10 +34031,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "version_event_type": {
-          "name": "version_event_type",
-          "type": "enum__events_v_version_event_type",
-          "typeSchema": "public",
+        "version_event_type_id": {
+          "name": "version_event_type_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -34122,6 +34148,21 @@
           "columns": [
             {
               "expression": "version_meta_image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "_events_v_version_version_event_type_idx": {
+          "name": "_events_v_version_version_event_type_idx",
+          "columns": [
+            {
+              "expression": "version_event_type_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -34299,6 +34340,19 @@
           "tableTo": "media",
           "columnsFrom": [
             "version_meta_image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "_events_v_version_event_type_id_event_types_id_fk": {
+          "name": "_events_v_version_event_type_id_event_types_id_fk",
+          "tableFrom": "_events_v",
+          "tableTo": "event_types",
+          "columnsFrom": [
+            "version_event_type_id"
           ],
           "columnsTo": [
             "id"
@@ -35930,6 +35984,104 @@
         },
         "assessment_types_created_at_idx": {
           "name": "assessment_types_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.event_types": {
+      "name": "event_types",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "generate_slug": {
+          "name": "generate_slug",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "event_types_slug_idx": {
+          "name": "event_types_slug_idx",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "event_types_updated_at_idx": {
+          "name": "event_types_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "event_types_created_at_idx": {
+          "name": "event_types_created_at_idx",
           "columns": [
             {
               "expression": "created_at",
@@ -43754,6 +43906,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "event_types_id": {
+          "name": "event_types_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "areas_of_expertise_id": {
           "name": "areas_of_expertise_id",
           "type": "integer",
@@ -44052,6 +44210,21 @@
           "columns": [
             {
               "expression": "assessment_types_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "payload_locked_documents_rels_event_types_id_idx": {
+          "name": "payload_locked_documents_rels_event_types_id_idx",
+          "columns": [
+            {
+              "expression": "event_types_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -44453,6 +44626,19 @@
           "tableTo": "assessment_types",
           "columnsFrom": [
             "assessment_types_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payload_locked_documents_rels_event_types_fk": {
+          "name": "payload_locked_documents_rels_event_types_fk",
+          "tableFrom": "payload_locked_documents_rels",
+          "tableTo": "event_types",
+          "columnsFrom": [
+            "event_types_id"
           ],
           "columnsTo": [
             "id"
@@ -64525,23 +64711,6 @@
         "verify"
       ]
     },
-    "public.enum_events_event_type": {
-      "name": "enum_events_event_type",
-      "schema": "public",
-      "values": [
-        "networking",
-        "client-training",
-        "industry-briefing",
-        "workshop",
-        "webinar",
-        "breakfast-seminar",
-        "masterclass",
-        "specialist-seminar",
-        "conference",
-        "sponsorship",
-        "social"
-      ]
-    },
     "public.enum_events_status": {
       "name": "enum_events_status",
       "schema": "public",
@@ -64556,23 +64725,6 @@
       "values": [
         "aamle",
         "verify"
-      ]
-    },
-    "public.enum__events_v_version_event_type": {
-      "name": "enum__events_v_version_event_type",
-      "schema": "public",
-      "values": [
-        "networking",
-        "client-training",
-        "industry-briefing",
-        "workshop",
-        "webinar",
-        "breakfast-seminar",
-        "masterclass",
-        "specialist-seminar",
-        "conference",
-        "sponsorship",
-        "social"
       ]
     },
     "public.enum__events_v_version_status": {
@@ -66776,6 +66928,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "2f7d991f-3658-42da-ac2b-3a07dc98b4ed",
+  "id": "7d493a80-78a2-44cd-b909-aaca70db5a39",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

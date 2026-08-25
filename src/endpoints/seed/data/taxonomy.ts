@@ -4,6 +4,26 @@
 
 export type Term = { title: string; slug: string }
 
+// The kinds of event VERIFY runs. Was a hardcoded `select` on Events plus a
+// second label map that had to be kept in step by hand; both are gone, and this
+// is now just the starting contents of an editable Taxonomy collection — staff
+// add, rename and remove types themselves. Slugs are the stable keys the event
+// fixtures below reference, so keep them if you re-seed.
+export const EVENT_TYPES: Term[] = [
+  { title: 'Networking Event', slug: 'networking' },
+  { title: 'Client Training', slug: 'client-training' },
+  { title: 'Industry Briefing', slug: 'industry-briefing' },
+  { title: 'Workshop', slug: 'workshop' },
+  { title: 'Webinar', slug: 'webinar' },
+  { title: 'Seminar', slug: 'seminar' },
+  { title: 'Breakfast Seminar', slug: 'breakfast-seminar' },
+  { title: 'Masterclass', slug: 'masterclass' },
+  { title: 'Specialist Seminar', slug: 'specialist-seminar' },
+  { title: 'Conference', slug: 'conference' },
+  { title: 'Sponsorship', slug: 'sponsorship' },
+  { title: 'Social Event', slug: 'social' },
+]
+
 // Specialties carry a category (→ specialty-categories taxonomy) + key areas +
 // a description + display order, driving the grouped, expandable Specialty List
 // directory. The 16 specialties + copy are ported verbatim from the design

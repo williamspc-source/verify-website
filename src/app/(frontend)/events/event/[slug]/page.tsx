@@ -24,7 +24,7 @@ import { eventTiming } from '@/utilities/eventTiming'
 import { headingIdAt, headingLabel, type TextishNode } from '@/utilities/headingId'
 
 import type { Event, EventsSetting } from '@/payload-types'
-import { EVENT_TYPE_LABELS } from '@/utilities/eventTypeLabels'
+import { eventTypeLabel } from '@/utilities/eventTypeLabels'
 
 type Args = { params: Promise<{ slug?: string }> }
 
@@ -103,15 +103,22 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   // above bounds how stale they can get.
   const { isPast, registrationOpen } = eventTiming(event)
 
-  const typeLabel = EVENT_TYPE_LABELS[event.eventType ?? ''] || 'Event'
+  const typeLabel = eventTypeLabel(event.eventType) || 'Event'
   const crumbSettings = await getCrumbSettings()
   const crumbs = eventCrumbs(event, {
     home: crumbSettings.homeLabel,
     section: labels.breadcrumbSectionLabel,
   })
-  const metaParts = [formatDate(event.date), event.timeLabel, event.location].filter(
-    (p): p is string => Boolean(p),
-  )
+  // `richTextToPlain` on the two converted fields before joining. `timeLabel`
+  // and `location` are inlineRichTextFields, and the old `.filter((p): p is
+  // string => Boolean(p))` was a LYING type predicate: an empty rich text is a
+  // truthy object, so it passed the filter, satisfied TypeScript, and printed
+  // "12 September 2024 · [object Object]" in the hero of every event. Invariant 46.
+  const metaParts = [
+    formatDate(event.date),
+    richTextToPlain(event.timeLabel),
+    richTextToPlain(event.location),
+  ].filter((p): p is string => Boolean(p))
 
   const hasDescription = !isRichTextEmpty(event.description)
   const hasRecap = !isRichTextEmpty(event.recap)

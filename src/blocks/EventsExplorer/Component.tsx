@@ -20,7 +20,7 @@ import type {
 } from './EventsExplorerClient'
 import type { EventsExplorerSeparator } from './separator'
 import { pastBandClass } from './separator'
-import { EVENT_TYPE_LABELS } from '@/utilities/eventTypeLabels'
+import { eventTypeLabel } from '@/utilities/eventTypeLabels'
 
 
 
@@ -68,8 +68,11 @@ const serialise = (e: Event, photoWidth: number): EventItem => ({
   // silently. The search box would simply stop finding events.
   timeLabel: richTextToPlain(e.timeLabel),
   location: richTextToPlain(e.location),
-  eventType: e.eventType ?? '',
-  typeLabel: EVENT_TYPE_LABELS[e.eventType ?? ''] || 'Event',
+  // `eventType` is a relationship now, so the slug is on the populated row.
+  // Kept on the DTO because the client type declares it — and because the
+  // orphan-field guard needs a real `x.eventType` read outside the config.
+  eventType: typeof e.eventType === 'object' && e.eventType ? (e.eventType.slug ?? '') : '',
+  typeLabel: eventTypeLabel(e.eventType) || 'Event',
   cpdEligible: Boolean(e.cpdEligible),
   cost: richTextToPlain(e.cost),
   excerpt: e.excerpt ?? '',

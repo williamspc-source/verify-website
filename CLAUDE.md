@@ -503,8 +503,8 @@ because the two codemods share one (`ls tests/visual/*.mjs | wc -l`):
 `payload.config.ts` registers taxonomy lookups before the content that references them. The
 specialist data layer is a 4-axis taxonomy — `specialties` (+ `specialty-categories`),
 `claim-types`, `assessment-types`, `areas-of-expertise` — with `accreditations`, `locations`,
-`departments` (the teams staff are grouped into, replacing a four-value select) and
-`streams` alongside. Content collections: Pages, Posts, Media, Categories, Users, Specialists,
+`departments` (the teams staff are grouped into, replacing a four-value select), `event-types`
+(likewise, replacing an eleven-option select on Events) and `streams` alongside. Content collections: Pages, Posts, Media, Categories, Users, Specialists,
 Team, Events, AvailabilitySessions, Services, Resources, Offices, Testimonials. Directory blocks
 (`SpecialistDirectory`, `SpecialtyDirectory`, `EventsExplorer`) filter on those taxonomies, so new
 filter axes are added as collections, not as hardcoded option lists.

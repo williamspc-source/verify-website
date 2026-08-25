@@ -3,7 +3,14 @@ import type { CollectionSlug, Payload, PayloadRequest } from 'payload'
 import { ACCREDITATION_ICON, qualificationIcon } from '@/utilities/qualificationIcon'
 import path from 'path'
 
-import { AREAS_OF_EXPERTISE, ASSESSMENT_TYPES, CLAIM_TYPES, SPECIALTIES, type Term } from './data/taxonomy'
+import {
+  AREAS_OF_EXPERTISE,
+  ASSESSMENT_TYPES,
+  CLAIM_TYPES,
+  EVENT_TYPES,
+  SPECIALTIES,
+  type Term,
+} from './data/taxonomy'
 import { SPECIALISTS } from './data/specialists'
 import { TEAM } from './data/team'
 import { DEPARTMENTS } from './data/departments'
@@ -233,6 +240,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
   const claimMap = await upsertTerms(ctx, 'claim-types', CLAIM_TYPES)
   const assessmentMap = await upsertTerms(ctx, 'assessment-types', ASSESSMENT_TYPES)
   const areaMap = await upsertTerms(ctx, 'areas-of-expertise', AREAS_OF_EXPERTISE)
+  const eventTypeMap = await upsertTerms(ctx, 'event-types', EVENT_TYPES)
   const locationMap = await upsertLocations(
     ctx,
     Array.from(new Set(SPECIALISTS.flatMap((s) => s.locations))),
@@ -427,7 +435,7 @@ export const seedDataLayer = async (ctx: Ctx): Promise<void> => {
     const created = await createIfNew(ctx, 'events', e.slug, {
       title: e.title,
       slug: e.slug,
-      eventType: e.eventType,
+      eventType: eventTypeMap.get(e.eventType),
       date: new Date(e.date).toISOString(),
       timeLabel: e.timeLabel,
       location: e.location,

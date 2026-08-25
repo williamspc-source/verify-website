@@ -646,6 +646,30 @@ code comments**. That false positive put two blocks on a fix list they did not b
 control that caught it was noticing `gatewayCards` — which IS in `selfSpaced` — being reported as
 missing.
 
+## Taxonomy-before-content in `payload.config.ts` is a convention, not a requirement
+
+Invariant 12 carries two rules in one array: the admin sidebar's group order comes from array order,
+**and** "taxonomy lookups [must be] ahead of the content referencing them". The second half reads like
+a schema constraint and is not one.
+
+Measured 2026-08-25: `Events` is registered at line 138, and already relates to `locations` (:151),
+`media` (:163), `specialists` (:159) and `team` (:160) — four collections registered *after* it — with
+no ill effect. Adding `event-types` at :149, also after `Events`, produced **zero** FK drop/recreate
+churn on boot (`grep -icE 'drop constraint|recreat' .dev.log` → 0).
+
+So order the array for the sidebar, and do not contort it to put a lookup ahead of its consumer. The
+constraint that IS real is the identifier-length one (invariant 39).
+
+## A hook that throws a plain `Error` tells the editor nothing
+
+Payload turns `throw new Error('…')` in a `beforeDelete` into a 500 whose body is the generic
+**"Something went wrong."** — measured against `/api/event-types/:id`. The guard works and the delete
+is refused, but the editor is told only that it failed, not that four events depend on this type or
+what to do next, and the real message reaches the server log where nobody is looking.
+
+Throw `APIError(message, 400)` instead; the text then reaches the admin. `Departments.ts` still uses
+the plain form and has the same weakness.
+
 ## Writing a guard that can actually fail
 
 **The orphan-field guard is keyed by BARE FIELD NAME across the whole repo, so a dead field hides

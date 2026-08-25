@@ -13,6 +13,7 @@ import { Users } from './collections/Users'
 import { Specialties } from './collections/Specialties'
 import { ClaimTypes } from './collections/ClaimTypes'
 import { AssessmentTypes } from './collections/AssessmentTypes'
+import { EventTypes } from './collections/EventTypes'
 import { AreasOfExpertise } from './collections/AreasOfExpertise'
 import { Accreditations } from './collections/Accreditations'
 import { SpecialtyCategories } from './collections/SpecialtyCategories'
@@ -146,6 +147,7 @@ export default buildConfig({
     SpecialtyCategories,
     ClaimTypes,
     AssessmentTypes,
+    EventTypes,
     AreasOfExpertise,
     Accreditations,
     Locations,
