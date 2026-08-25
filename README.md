@@ -10,12 +10,17 @@ knowingly imperfect. It assumes you can run a Node app and nothing else about th
 | Work out why a measurement looks wrong | [`docs/TRAPS.md`](docs/TRAPS.md) — every reading that has already misled someone here |
 | Know what something in the admin sidebar is | [`docs/ADMIN-GUIDE.md`](docs/ADMIN-GUIDE.md) — written for a non-technical editor |
 | Change a colour, font, spacing or corner radius | [`src/Styles/HOOKS.md`](src/Styles/HOOKS.md) — ditto |
+| Find your way around the codebase for the first time | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — the map, not the rules |
 
-**This file and those four are the whole record set** — five documents, where there were ten. A
+**This file and those five are the whole record set** — six documents, where there were ten. A
 change lands in every one it touches, in the same pass; a stale record is worse than none, because a
 reader cannot tell which one is lying. The set shrank because that rule could not be held at ten:
 one day after a full sync pass, three documents gave three different counts for the same shell
 script. The history lives in `git log`.
+
+`docs/ARCHITECTURE.md` was added last, on the condition that it carries **no counts, no invariant
+text and no schema figures** — only structure. That is what keeps it from becoming a seventh thing
+that can disagree with the rest.
 
 **In this file:**
 [1. What this is](#1-what-this-is) ·

@@ -27,7 +27,7 @@ already happened here.
 4. **Ask before assuming.** Where the request is ambiguous and the readings disagree, say so rather
    than picking the interpretation that is easiest to build.
 
-## The five records, and the rule for all of them
+## The six records, and the rule for all of them
 
 **A change lands in every document it touches, in the same pass** — or the set starts lying, and a
 reader cannot tell which one is stale.
@@ -39,12 +39,18 @@ reader cannot tell which one is stale.
 | `docs/TRAPS.md` | Why each invariant exists, and every measurement that has already misled someone | ditto, when a reading looks wrong |
 | `docs/ADMIN-GUIDE.md` | What every item in the admin sidebar **is**, and what feeds off it | The non-technical editor |
 | `src/Styles/HOOKS.md` | Every editable control and where it lives | ditto, for appearance |
+| `docs/ARCHITECTURE.md` | The **map**: which subsystems exist, what each owns, how a request becomes a page | Whoever is seeing the codebase for the first time |
+
+**`docs/ARCHITECTURE.md` restates nothing that can go stale** — no counts, no invariant text, no
+schema figures — and that restriction is the only reason a sixth file is safe. It describes shape and
+points here for rules and at `README.md` for numbers. If it ever disagrees with one of the five, the
+five are right. Added 2026-08-26, on request, with that constraint written into its own opening.
 
 This set was **ten** documents and 9,554 lines. It collapsed to five because the rule above could not
 be held at that size: on 2026-08-24, one day after a full "update every document" pass, three
 documents gave three different counts for the same shell script, and the status file still described
 a deploy that had already happened. Four files were deleted as history (`git log` holds them), one
-was merged, and the trap log moved out of this file.
+was merged, and the trap log moved out of this file. **Read that before adding a seventh.**
 
 `docs/ADMIN-GUIDE.md` and `src/Styles/HOOKS.md` share a reader and must not share content. HOOKS.md
 owns *"how do I change how this looks"*; ADMIN-GUIDE.md owns *"what is this thing and what feeds off
