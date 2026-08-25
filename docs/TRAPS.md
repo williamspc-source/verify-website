@@ -291,6 +291,11 @@ A `shape_cols` helper table left in `verify_cms` hung `getPayload()` for ten min
 
 `startOfDay(Date.now())` already returns the same number all day. Memoising it in a module variable froze "today" for the life of the JS bundle — which outlives a page, since client-side navigation doesn't re-evaluate modules — so a tab open overnight never re-bucketed events.
 
+<a id="i51"></a>
+**51. A field on a publicly-readable collection is public, wherever it sits in the admin**
+
+AvailabilitySessions is `access.read: anyone`, so its `notes` field — a staff note — was served to unauthenticated callers on `/api/availability-sessions`. Measured: an anonymous `curl` returned the `notes` key, and returned real values for the collection's other optional fields (`location` came back as "Brisbane CBD"), so the exposure was live rather than theoretical. Moving a field to the sidebar, labelling it "Internal note" and writing "staff only" in its description change nothing — only field-level `access.read` removes it from the response. Guarded by `tests/int/availabilityNotes.int.spec.ts`, whose second assertion is the positive control: without it the test passes just as happily against a field that is empty, misspelled or deleted.
+
 ---
 
 # Traps that are not rules
@@ -299,6 +304,28 @@ There is nothing to obey in this section — only something to check. They are g
 are doing when each one bites.
 
 ## The dev server and the build
+
+**`pnpm dev` cannot reproduce a staleness bug, so "works locally" is not evidence against one.** The
+frontend routes are ISR: `src/app/(frontend)/[...slug]/page.tsx` sets `export const revalidate = 3600`,
+and `.next/prerender-manifest.json` confirms `/make-a-booking` and
+`/specialists/specialist-availability` prerender with a 3600s window. In production an edit therefore
+appears only when `revalidatePath` succeeds, or up to an hour later. `pnpm dev` re-renders every
+request and shows the change instantly.
+
+Reported 2026-08-25 as "the availability chip tooltip never renders even with a note saved". It was
+reproduced locally in two seconds — save, then `title="…"` in the served HTML — which proved the code
+correct and the *report* correct at the same time. The difference was entirely the cache. Before
+concluding a feature is broken, reproduce on the environment the report came from; and when you
+cannot, check `prerender-manifest.json` and the box's log, because `safeRevalidatePath` never throws —
+it logs `Revalidation skipped (path /make-a-booking): …` and carries on, which is invisible unless
+somebody reads the log. That line is real: it appears in a full `pnpm test:e2e` run as
+`Invariant: static generation store missing in revalidatePath /`.
+
+Two further instruments lied during the same investigation, both listed elsewhere here: the on-disk
+`.next` was a stale mixed build whose server chunks disagreed with what the running server served, and
+a positive control (`grep -c startTime`) returned 0 against it, which is what exposed the file as the
+wrong instrument rather than the code as broken.
+
 
 Nearly every "my edit did nothing" in this repo was a stale build before it was a bad edit.
 
@@ -525,6 +552,23 @@ Playwright will happily measure the wrong thing and report it as a pass.
   advances with `(c + 1) % count`.
 
 ## Writing a guard that can actually fail
+
+**The orphan-field guard is keyed by BARE FIELD NAME across the whole repo, so a dead field hides
+behind any same-named live one.** `readsField` in `adminControls.int.spec.ts` runs one regex over a
+single concatenated blob of `src/{app,components,blocks,heros,utilities,search,Footer,Header,plugins,
+collections,hooks}`. A match *anywhere* satisfies the field for *every* collection at once.
+`AvailabilitySessions.location` was read by nothing and the guard was green throughout, because
+`event.location` (ArchiveBlock, EventsExplorer), the PeopleGrid `location` filter and plain
+`window.location` all match the same pattern. The field shipped as an editable rich-text control that
+reached no page, on a collection an editor uses weekly.
+
+The same keying makes an `ALLOWED_UNREAD_CONFIG` exemption blunt: one entry silences that name on
+every collection. Before adding one, check how many configs declare the name — `notes` is declared
+only on AvailabilitySessions, so its entry is precise, whereas an entry for `location` would have
+blinded Events and PeopleGrid too. The honest fix when a name is shared is to delete the dead field
+rather than exempt it. Verified 2026-08-25 by grepping the haystack for each of the four `readsField`
+shapes with a positive control (`startTime`, which must hit).
+
 
 A guard that has never failed is not evidence. These are the ways one silently cannot.
 

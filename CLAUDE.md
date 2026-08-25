@@ -116,6 +116,8 @@ several look arbitrary until you see what happened without them.
 49. **A scratch table in the app's own database hangs the dev push.** Drizzle reads an unknown table as one to drop, and waits on the invisible "Accept warnings?" prompt. <sub>[why](docs/TRAPS.md#i49)</sub>
 50. **Don't cache a value that is already stable.** For a `useSyncExternalStore` snapshot, prefer a naturally-stable computation over a module-level memo. <sub>[why](docs/TRAPS.md#i50)</sub>
 
+51. **A field on a collection with `access.read: anyone` is public unless field-level `access.read` says otherwise.** Admin placement, a label and a description change nothing about what the API returns. Guarded by `tests/int/availabilityNotes.int.spec.ts`. <sub>[why](docs/TRAPS.md#i51)</sub>
+
 ## Commands
 
 ```bash

@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { inlineRichTextField } from '@/fields/blockFields'
 
 import { anyone } from '../../access/anyone'
 import { authenticated } from '../../access/authenticated'
@@ -47,7 +46,6 @@ export const AvailabilitySessions: CollectionConfig<'availability-sessions'> = {
     startTime: true,
     endTime: true,
     mode: true,
-    location: true,
     status: true,
     expiresAt: true,
   },
@@ -90,32 +88,31 @@ export const AvailabilitySessions: CollectionConfig<'availability-sessions'> = {
       ],
     },
     {
-      type: 'row',
-      fields: [
-        {
-          name: 'mode',
-          type: 'select',
-          required: true,
-          defaultValue: 'either',
-          admin: { width: '50%' },
-          options: [
-            { label: 'In-person', value: 'in-person' },
-            { label: 'Telehealth', value: 'telehealth' },
-            { label: 'Either (in-person or telehealth)', value: 'either' },
-          ],
-        },
-        inlineRichTextField('location', { admin: {
-            width: '50%',
-            description: 'Optional — for in-person sessions, e.g. "Brisbane CBD".',
-          } }),
+      name: 'mode',
+      type: 'select',
+      required: true,
+      defaultValue: 'either',
+      options: [
+        { label: 'In-person', value: 'in-person' },
+        { label: 'Telehealth', value: 'telehealth' },
+        { label: 'Either (in-person or telehealth)', value: 'either' },
       ],
     },
+    // Staff-only. `access.read` is what makes it internal: this collection is
+    // `read: anyone`, so without it the note is served to unauthenticated
+    // callers on /api/availability-sessions regardless of where it sits in the
+    // admin. Nothing renders it — see ALLOWED_UNREAD_CONFIG in
+    // tests/int/adminControls.int.spec.ts.
     {
       name: 'notes',
       type: 'textarea',
+      label: 'Internal note',
+      access: {
+        read: ({ req }) => Boolean(req.user),
+      },
       admin: {
-        description:
-          'Optional note about this slot. Shown as the tooltip when a visitor hovers the time chip, and read out by screen readers with the time — so keep it short and visitor-facing, not internal.',
+        position: 'sidebar',
+        description: 'Staff only. Never shown on the website and never sent in the enquiry email.',
       },
     },
     // ── Sidebar: lifecycle ──

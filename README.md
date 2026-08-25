@@ -288,6 +288,14 @@ Multiple config changes in one push can share a single `migrate:create`.
 accident — choosing *rename* moves an unrelated column's data into the new field. **If a generated
 migration drops a column, stop and find out why.**
 
+**One deliberate exception is pending: `availability_sessions.location`.** The field was removed on
+2026-08-25 because nothing read it — an editable rich-text control on every session that reached no
+page. The generated migration should contain exactly one statement,
+`ALTER TABLE availability_sessions DROP COLUMN location`, and nothing else; if it contains anything
+more, the rule above applies and you should stop. The data lost is four seeded demo values
+("Brisbane CBD", "Gold Coast"). **Apply the pending `editor_controls` migrations before running
+`migrate:create` for it** — creating it against an un-migrated box folds their schema changes into it.
+
 **Budget the column name before adding a relationship field to a block.** Postgres truncates
 identifiers at 63 characters and Drizzle builds foreign-key names from the table, column and
 referenced table; overrun it and Drizzle recreates the constraint on every boot, which surfaces as an
@@ -538,6 +546,7 @@ undone. A stale register is worse than none, because people trust it.
 | 27 | The text-colour palette cannot be extended by an editor | Yes, mild | "Add a colour" needs a developer and a deploy; the 16 values are all editable | Not fixable in the toolbar — see below |
 | 28 | `computedSnapshot.mjs` is not deterministic on `/about` | Test-only | A clean change can report a 2–3 node diff, or none, run to run | Unknown — needs a settle, not a tolerance |
 | 29 | Drag-ordering specialists means dragging across pages | Yes, mild | The admin list shows 10 of 26, so moving someone far is awkward | Raise the list `limit`, ~1 line |
+| 30 | An availability edit can take up to an hour to reach the live site | Yes, mild | Editors read a cached page as a lost save and re-enter the slot | See below — needs a box-side reading first |
 
 ### 1. Three e2e specs flake under a loaded dev server
 
@@ -887,6 +896,36 @@ Two things about Custom that read as faults and are not, both now said plainly i
 description: dragging changes nothing on the public site unless that block's Sort order is set to
 Custom (it ships on Surname), and the drag order starts alphabetical by surname, so switching to
 Custom looks like nothing happened until a row is actually moved.
+
+### 30. An availability edit can take up to an hour to reach the live site
+
+Reported on 2026-08-25 as *"the availability chip tooltip never renders even with a note saved"*. The
+code was correct: writing the note locally and reloading showed `title="…"` in the served HTML within
+two seconds. The report was also correct — on the box, nothing appeared. **The difference is the
+cache, not the code**, which is why this reads as a lost save to an editor.
+
+`src/app/(frontend)/[...slug]/page.tsx` sets `export const revalidate = 3600`, and
+`.next/prerender-manifest.json` confirms `/make-a-booking` and `/specialists/specialist-availability`
+prerender with that window. `revalidateAvailabilitySession` is supposed to purge both the moment a
+session changes, and locally it does. If it fails on the box, the page simply waits out the hour.
+
+**This is not diagnosed on the box, and should be before anything is changed.** `safeRevalidatePath`
+deliberately never throws — losing the write is worse than serving a stale page — so a failure is
+visible *only* in the server log, as:
+
+```
+Revalidation skipped (path /make-a-booking): … The write itself succeeded; affected pages may serve stale content until the next change.
+```
+
+That line is real and reachable: a full `pnpm test:e2e` run produces it as
+`Invariant: static generation store missing in revalidatePath /`. Grep the box's log for
+`Revalidation skipped` after saving a session. If it appears, the purge is failing and the fix belongs
+in the hook's calling context; if it does not, the purge is working and the hour is simply the ISR
+window doing its job. **Do not "fix" this by lowering `revalidate` before taking that reading** — it
+would mask a broken purge behind more frequent rebuilds.
+
+Editors are told about the delay in `docs/ADMIN-GUIDE.md` so that a slow update does not get
+re-entered as a lost save.
 
 ## 11. Deliberate departures
 

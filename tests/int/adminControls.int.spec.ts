@@ -861,6 +861,16 @@ const ALLOWED_UNREAD_CONFIG: Record<string, string> = {
   region:
     'Locations admin grouping; the directory filter derives from specialist-denormalised titles',
 
+  // Deliberately never rendered. `notes` on AvailabilitySessions is a staff-only
+  // note; it used to feed the availability chip's `title`/`aria-label`, and that
+  // rendering was removed on purpose so staff can write candid notes. What keeps
+  // it internal is field-level `access.read` in the collection config, not this
+  // entry — the collection is `read: anyone`, so without that the value is served
+  // to unauthenticated callers. Guarded by tests/int/availabilityNotes.int.spec.ts.
+  // Safe as a bare-name key: `notes` is declared on no other collection or global
+  // (unlike `location`, which Events and PeopleGrid also declare).
+  notes: 'AvailabilitySessions internal staff note — never rendered by design; kept off the public API by field-level access.read',
+
   // Deprecated, hidden from the admin, column retained pending a drop migration.
   availabilityHighlight: 'deprecated, admin.hidden — superseded by `advertise`',
   availabilityNote: 'deprecated, admin.hidden — superseded by `advertise`',

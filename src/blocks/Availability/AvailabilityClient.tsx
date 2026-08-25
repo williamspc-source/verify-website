@@ -14,7 +14,6 @@ export type AvailabilityChip = {
   type: string
   modeClass: string
   /** AvailabilitySessions → Notes. Surfaced as the slot's tooltip/label. */
-  note?: string | null
 }
 
 export type AvailabilityRow = {
@@ -172,18 +171,12 @@ export const AvailabilityClient: React.FC<{
                           key={chip.id}
                           className={cn('sa-chip', chip.modeClass, isSel && 'is-selected')}
                           aria-pressed={isSel}
-                          // AvailabilitySessions → Notes. The field's description
-                          // promised it was "shown with the slot" and nothing
-                          // rendered it, so an editor could write a note that
-                          // reached no one. Both attributes on purpose: `title`
-                          // for the hover tooltip, `aria-label` so a screen reader
-                          // gets the note instead of just the time range.
-                          title={chip.note || undefined}
-                          aria-label={
-                            chip.note
-                              ? `${chip.time} – ${chip.end}, ${chip.type}. ${chip.note}`
-                              : undefined
-                          }
+                          // The visible text is only the time range, so the mode
+                          // (In-person / Telehealth / Either) would otherwise be
+                          // conveyed by chip colour alone — which a screen reader
+                          // cannot report. AvailabilitySessions → Internal note is
+                          // deliberately NOT here: it is staff-only.
+                          aria-label={`${chip.time} – ${chip.end}, ${chip.type}`}
                           onClick={() => toggle(chip, row.name, d.date)}
                         >
                           {chip.time} – {chip.end}

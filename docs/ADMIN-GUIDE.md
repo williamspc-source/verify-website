@@ -349,7 +349,20 @@ old slots disappear on their own rather than needing tidying.
 else to switch on. The separate **Feature in availability carousel** toggle, on the specialist
 record, controls only the carousel *above* the list.
 
-**Draft or instant:** instant.
+**Internal note** (in the sidebar) is **staff only**. It is never shown on the website, never read
+out to a screen reader and never included in the enquiry email — it is not returned to the public
+website at all, so it is the right place for anything you would not want a visitor to read. Use the
+slot's own fields for anything a visitor *should* see.
+
+There is no longer a **Location** field on a session. It never appeared anywhere on the site, and a
+visitor learns the location from the specialist's own record instead. Removed 2026-08-25.
+
+**Draft or instant:** instant — but see the note below.
+
+**A change can take up to an hour to appear on the live site.** The pages that show availability are
+cached and normally refresh the moment you save. If a slot you have just added or edited is not
+showing, that is the cache, not a lost save: your change is stored. Reload after a few minutes before
+re-entering it, and tell whoever maintains the site if it is consistently slow.
 
 ---
 

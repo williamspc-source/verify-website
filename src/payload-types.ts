@@ -15688,25 +15688,7 @@ export interface AvailabilitySession {
   endTime: string;
   mode: 'in-person' | 'telehealth' | 'either';
   /**
-   * Optional — for in-person sessions, e.g. "Brisbane CBD".
-   */
-  location?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Optional note about this slot. Shown as the tooltip when a visitor hovers the time chip, and read out by screen readers with the time — so keep it short and visitor-facing, not internal.
+   * Staff only. Never shown on the website and never sent in the enquiry email.
    */
   notes?: string | null;
   /**
@@ -18375,7 +18357,6 @@ export interface AvailabilitySessionsSelect<T extends boolean = true> {
   startTime?: T;
   endTime?: T;
   mode?: T;
-  location?: T;
   notes?: T;
   status?: T;
   expiresAt?: T;

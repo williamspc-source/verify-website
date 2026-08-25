@@ -137,7 +137,7 @@ const PLAIN_BY_NAME: Record<string, string> = {
   selectionHint: 'availability picker; status line',
   clearLabel: 'availability picker; button label',
   sendEnquiryLabel: 'availability picker; button label',
-  notes: 'availability chip title= attribute',
+  notes: 'AvailabilitySessions internal staff note — staff-only, never rendered, so it is not visitor copy',
   cardCtaLabel: 'specialist directory renders client-side; button label',
   secondaryCtaLabel: 'specialist directory; button label',
   resetLabel: 'specialist directory; button label',

@@ -40,24 +40,24 @@ const ADVERTISED: { slug: string; highlight: boolean }[] = [
 ]
 
 // Sample sessions, keyed by specialist slug. dr-jason-beer is intentionally absent.
-const SESSIONS: Record<string, { offset: number; start: string; end: string; mode: Mode; location?: string }[]> = {
+const SESSIONS: Record<string, { offset: number; start: string; end: string; mode: Mode }[]> = {
   'dr-james-reidy': [
-    { offset: 3, start: '08:30', end: '09:30', mode: 'in-person', location: 'Brisbane CBD' },
+    { offset: 3, start: '08:30', end: '09:30', mode: 'in-person' },
     { offset: 3, start: '11:30', end: '12:30', mode: 'either' },
-    { offset: 5, start: '10:00', end: '11:00', mode: 'in-person', location: 'Brisbane CBD' },
+    { offset: 5, start: '10:00', end: '11:00', mode: 'in-person' },
     { offset: 7, start: '09:15', end: '10:15', mode: 'telehealth' },
   ],
   'dr-ashwani-garg': [
     { offset: 4, start: '08:30', end: '10:00', mode: 'either' },
     { offset: 4, start: '11:30', end: '13:00', mode: 'either' },
-    { offset: 6, start: '14:30', end: '16:00', mode: 'in-person', location: 'Gold Coast' },
+    { offset: 6, start: '14:30', end: '16:00', mode: 'in-person' },
   ],
   'dr-lucas-murphy': [
     { offset: 8, start: '09:00', end: '10:30', mode: 'telehealth' },
     { offset: 10, start: '13:00', end: '14:30', mode: 'either' },
   ],
   'dr-simon-perkins': [
-    { offset: 5, start: '08:00', end: '09:00', mode: 'in-person', location: 'Brisbane CBD' },
+    { offset: 5, start: '08:00', end: '09:00', mode: 'in-person' },
     { offset: 12, start: '10:30', end: '11:30', mode: 'either' },
   ],
   'adjunct-professor-anna-lenardon': [
@@ -138,7 +138,6 @@ export const seedAvailability = async ({
           startTime: slot.start,
           endTime: slot.end,
           mode: slot.mode,
-          location: slot.location,
           status: 'available',
           expiresAt,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

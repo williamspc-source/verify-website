@@ -171,7 +171,6 @@ export const AvailabilityBlock: React.FC<Props & { bare?: boolean }> = async (pr
           end: sess.endTime || '',
           type: meta.label,
           modeClass: meta.cls,
-          note: sess.notes || null,
         })
       }
       const photo = mediaFocal(sp.photo, 150) // .sa-photo-img, measured 150px
