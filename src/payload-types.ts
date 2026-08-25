@@ -15077,7 +15077,7 @@ export interface DesignSystem {
   createdAt?: string | null;
 }
 /**
- * The icons editors can choose from. Browse everything Phosphor offers and add the ones that suit the site. Leave it empty to offer the built-in set.
+ * Every icon this site can use, in one place: the 1,513 Phosphor ships plus any SVG you upload. Tick the ones editors may choose.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "icon-library".
@@ -15085,7 +15085,7 @@ export interface DesignSystem {
 export interface IconLibrary {
   id: number;
   /**
-   * Search all 1,513 Phosphor icons and click to add or remove. Removing one stops it being offered; it never changes a page that already uses it.
+   * Tick an icon to offer it to editors. Upload your own with the button above. Unticking one stops it being offered; it never changes a page that already uses it.
    */
   icons?: string[] | null;
   updatedAt?: string | null;

@@ -1,6 +1,8 @@
 import { createElement } from 'react'
 import * as Phosphor from '@phosphor-icons/react/ssr'
 
+import { iconMap, type IconName } from '@/components/Icon'
+
 /**
  * Any Phosphor icon, as an SVG file.
  *
@@ -42,10 +44,18 @@ export const GET = async (
   // table, which is not a place to pass arbitrary strings.
   if (!/^[a-z0-9-]+$/.test(name)) return new Response('Not found', { status: 404 })
 
+  // `iconMap` FIRST, because ten of its keys are ALIASES that Phosphor does not
+  // export under that name: `activity` is Pulse, `mail` is Envelope, `search` is
+  // MagnifyingGlass, `home` is House. Going straight to the barrel 404s every one
+  // of them — which is what happened when this route was renamed from
+  // `/api/icon/builtin`, silently blanking their previews in the picker and their
+  // tiles in the library while they still rendered perfectly on the site.
+  //
   // Not `typeof === 'function'`: Phosphor's icons are `forwardRef` components,
   // which are OBJECTS. That check 404s every icon that exists, which reads
   // exactly like a name the library does not have.
-  const Cmp = (Phosphor as unknown as Record<string, unknown>)[pascal(name)]
+  const Cmp =
+    iconMap[name as IconName] ?? (Phosphor as unknown as Record<string, unknown>)[pascal(name)]
   if (!Cmp || (typeof Cmp !== 'function' && typeof Cmp !== 'object')) {
     // A 404 is safe to leave visible here. Measured: an unresolvable mask URL
     // paints NOTHING — 0% coverage against white, against 24% for a real icon —

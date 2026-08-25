@@ -285,9 +285,11 @@ replaying an `ALTER TYPE` sequence. Two changes that were pending as separate mi
 into the baseline — `availability_sessions` has no `location` column, and `specialists.profile_photo_shape`
 defaults to `'square'` (Team stays `'tall'`).
 
-**The icon set became editor-managed on 2026-08-25.** **Design → Icon Library** decides which of
-Phosphor's 1,513 icons a picker offers; an empty list falls back to the 101 the app bundles, so the
-global can be added, emptied or ignored without changing what editors see. Anything outside those 101
+**The icon set became editor-managed on 2026-08-25.** **Design → Icon Library** is the one place
+icons are managed: every icon visible at once with a tick box, uploading, renaming, recolouring and
+deleting on the tile, and `Icons` hidden from the sidebar so there is nothing else to find. An empty
+list falls back to the 101 the app bundles, so the global can be emptied or ignored without changing
+what editors see — and the ticks show that effective list, not the stored one. Anything outside those 101
 renders as an `<svg>` masked from `/api/icon/phosphor/<name>` rather than as a bundled component —
 measured to be indistinguishable: same colour, same 36×36 box, on the same band.
 
@@ -380,13 +382,13 @@ zsh tests/int/prove-guards.sh   # re-applies each deliberate break; every case m
 | Gate | Result | Count it with |
 |---|---|---|
 | `pnpm test:int` | **334 passed, 17 files** | `pnpm test:int` |
-| `pnpm test:e2e` | **71 passed** on a clean run | `pnpm test:e2e` |
+| `pnpm test:e2e` | **72 passed** on a clean run | `pnpm test:e2e` |
 | `zsh tests/int/prove-guards.sh` | **11 cases** | `grep -c '^run_case "' tests/int/prove-guards.sh` |
 | `referenceCssDiff.mjs` | **13 families**, all zero | the `FAMILIES` object in the harness |
 | `computedSnapshot.mjs` | **21 routes, 39 properties** | the `ROUTES` and `PROPS` arrays |
 
 The e2e count **cannot be derived from source** — `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
-each parameterise one test per route, so 44 `test(` declarations expand to far more. Run it.
+each parameterise one test per route, so 45 `test(` declarations expand to far more. Run it.
 
 **A red e2e run is not automatically a regression.** Taking these very readings, a second full run
 against an already-hammered dev server gave `2 failed, 2 did not run, 57 passed` — the two failures

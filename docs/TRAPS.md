@@ -538,11 +538,15 @@ supply them — and the site renders *that*, from `/api/icon/upload/[id]`. The a
 
 Measured on a deliberately garish test file: the admin showed a navy shield with a hot-pink tick; the
 page showed one flat shape. Nothing was broken, nothing errored, and an editor had no way to find out
-until the icon was on a page. The icon's own screen now renders the stored markup on a light swatch
-and a dark one (`src/fields/IconPreview`).
+until the icon was on a page. The library tile now renders the stored markup, with light and dark
+swatches behind its Edit control (`src/fields/IconLibraryPicker`).
 
-Two things that cost time building it:
+Three things that cost time building it:
 
+- **`admin.hidden` 404s a collection's ROUTES, not just its nav entry.** Hiding `Icons` so there was
+  one destination therefore broke the preview screen it had been built on, and would have made every
+  "Edit" link on a tile a 404. Measured, both `/admin/collections/icons` and `…/create`. The controls
+  moved onto the tile.
 - **A document's id is not a form field.** `useFormFields(([f]) => f.id.value)` is always `undefined`,
   so the preview rendered its "save this first" state on a saved icon. The id comes from
   `useDocumentInfo()`. The markup does come from the form, deliberately — reading the saved document

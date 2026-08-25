@@ -26,13 +26,12 @@ import { formatIconValue, parseIconValue } from '@/components/Icon/value'
  *
  * ## One fetch, not one per field
  *
- * A big page carries dozens of icon fields. Both lists are therefore cached at
+ * A big page carries dozens of icon fields. The list is therefore cached at
  * module scope behind a single in-flight promise, so mounting 38 pickers issues
- * two requests rather than 76 — and the refresh on window focus (an icon
- * uploaded in another tab should appear here) is shared too.
+ * ONE request rather than 38 — and the refresh on window focus (an icon added to
+ * the library in another tab should appear here) is shared too.
  */
 
-type IconRecord = { id: string | number; name?: string; colour?: string | null }
 type Choice = { value: string; label: string; kind: 'upload' | 'builtin' | 'orphan' }
 
 const UPLOAD = 'upload:'
@@ -44,33 +43,28 @@ const VISIBLE_LIMIT = 300
 // `load()` returns the in-flight promise when one is already running, so N
 // simultaneously-mounting pickers share one request each.
 
-type Lists = { uploads: IconRecord[]; builtins: { label: string; value: string }[] }
+type Entry = { value: string; label: string }
+type Lists = { library: Entry[] }
 
-let cache: Lists = { uploads: [], builtins: [] }
+let cache: Lists = { library: [] }
 let inFlight: Promise<Lists> | null = null
 const subscribers = new Set<(l: Lists) => void>()
 
 const loadLists = (force = false): Promise<Lists> => {
   if (inFlight) return inFlight
-  if (!force && (cache.uploads.length || cache.builtins.length)) return Promise.resolve(cache)
+  if (!force && cache.library.length) return Promise.resolve(cache)
 
-  inFlight = Promise.all([
-    fetch(`${getClientSideURL()}/api/icons?depth=0&limit=500&sort=name`, {
-      credentials: 'include',
-    })
-      .then((r) => r.json())
-      .then((d) => (d?.docs ?? []) as IconRecord[])
-      .catch(() => [] as IconRecord[]),
-    fetch(`${getClientSideURL()}/api/icon/library`)
-      .then((r) => r.json())
-      .then((d) => (d?.icons ?? []) as { label: string; value: string }[])
-      .catch(() => [] as { label: string; value: string }[]),
-  ])
-    .then(([uploads, builtins]) => {
-      cache = { uploads, builtins }
+  // ONE request. Uploads and Phosphor icons are one library — Design → Icon
+  // Library decides what is in it — so there is nothing to fetch separately and
+  // nothing to merge here.
+  inFlight = fetch(`${getClientSideURL()}/api/icon/library`)
+    .then((r) => r.json())
+    .then((d) => {
+      cache = { library: (d?.icons ?? []) as Entry[] }
       subscribers.forEach((fn) => fn(cache))
       return cache
     })
+    .catch(() => cache)
     .finally(() => {
       inFlight = null
     })
@@ -135,14 +129,11 @@ export const IconSelect: React.FC<{
   // hundred small objects per render is cheaper than that, and the compiler
   // memoizes it anyway. Invariant 50: do not cache what is already cheap.
   const choices = ((): Choice[] => {
-    const base: Choice[] = [
-      ...lists.uploads.map((u) => ({
-        value: `${UPLOAD}${u.id}`,
-        label: u.name || `Icon ${u.id}`,
-        kind: 'upload' as const,
-      })),
-      ...lists.builtins.map((o) => ({ value: o.value, label: o.label, kind: 'builtin' as const })),
-    ]
+    const base: Choice[] = lists.library.map((o) => ({
+      value: o.value,
+      label: o.label,
+      kind: o.value.startsWith(UPLOAD) ? ('upload' as const) : ('builtin' as const),
+    }))
 
     // Whatever this document already holds, if neither list knows about it — an
     // icon since removed from the library, or an upload since deleted. Offered so

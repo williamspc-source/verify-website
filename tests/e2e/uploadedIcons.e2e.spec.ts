@@ -305,26 +305,34 @@ test.describe('the icon library', () => {
 
 test.describe('the icon upload screen', () => {
   /**
-   * The admin must show what the SITE renders, not the file that was uploaded.
+   * The library must show what the SITE renders, not the file that was uploaded.
    *
-   * This is the bug that prompted the whole pass: Payload previews the uploaded
-   * bytes, while a page renders markup `normaliseSvgIcon` rebuilt from them with
-   * the colours stripped. Measured on a two-colour test file — the admin showed
-   * navy and hot pink, the page showed one flat shape.
+   * This is the bug that prompted the pass: Payload previews the uploaded bytes,
+   * while a page renders markup `normaliseSvgIcon` rebuilt from them with the
+   * colours stripped. Measured on a two-colour file — navy and hot pink in the
+   * admin, one flat shape on the page.
    *
-   * Proven red by pointing `IconPreview` at `/api/icons/file/${filename}` → "the
-   * preview is showing the uploaded file, not what the site renders".
+   * It lives on the library tile rather than on the icon's own record, because
+   * `admin.hidden` makes Payload 404 that record's routes outright. One screen,
+   * and the preview is on it.
+   *
+   * Proven red by pointing the swatches at `/api/icons/file/...` → "the preview
+   * is showing the uploaded file, not what the site renders".
    */
   test('previews the normalised icon on both bands, not the uploaded file', async ({
     page,
     request,
   }) => {
+    // An upload, a browser login and an admin screen holding 1,500 tiles do not
+    // fit the 30s default — and the symptom when they do not is a `finally`
+    // reporting "browser has been closed", which reads like a teardown bug.
+    test.setTimeout(120_000)
     const token = await login2(request)
     const iconId = await uploadIcon({ api: request, token }, 'inherit', TWO_COLOUR_SVG)
 
     try {
-      // The stored markup is the other half of the claim: two colours in, two
-      // TONES out, which is what makes it a duotone icon rather than a blob.
+      // Half the claim, and the cheap half: two colours in, two TONES out, which
+      // is what makes it a duotone icon rather than a flat blob.
       const doc = await (
         await request.get(`${SERVER}/api/icons/${iconId}?depth=0`, { headers: authed(token) })
       ).json()
@@ -332,33 +340,38 @@ test.describe('the icon upload screen', () => {
       expect(doc.markup, 'the file\u2019s own colours survived').not.toContain('#1a3a5c')
 
       await login({ page, user: iconTestUser })
-      await page.goto(`${SERVER}/admin/collections/icons/${iconId}`, { waitUntil: 'load' })
-      await page.locator('.vf-icon-preview__swatch').first().waitFor({ timeout: 60_000 })
+      await page.goto(`${SERVER}/admin/globals/icon-library`, { waitUntil: 'load' })
+      await page.locator('.vf-icon-library__tile').first().waitFor({ timeout: 90_000 })
+
+      // The uploaded icon sorts first, and only uploads carry an Edit control.
+      const edit = page.locator('.vf-icon-library__edit').first()
+      await expect(edit, 'no uploaded tile on the library screen').toBeVisible()
+      await edit.click()
 
       const swatches = await page.evaluate(() =>
-        [...document.querySelectorAll('.vf-icon-preview__swatch')].map((s) => {
-          const el = s.querySelector<HTMLElement>('.vf-icon-select__preview')
-          return {
-            band: getComputedStyle(s).backgroundColor,
-            painted: el ? getComputedStyle(el).backgroundColor : null,
-            mask: el ? getComputedStyle(el).maskImage : '',
-          }
-        }),
+        [...document.querySelectorAll('.vf-icon-library__panel .vf-icon-preview__swatch')].map(
+          (s) => {
+            const el = s.querySelector<HTMLElement>('.vf-icon-select__preview')
+            return {
+              painted: el ? getComputedStyle(el).backgroundColor : null,
+              mask: el ? getComputedStyle(el).maskImage : '',
+            }
+          },
+        ),
       )
 
-      // Positive control first: two swatches, or the comparison below is vacuous.
+      // Positive control: two swatches, or the comparison below is vacuous.
       expect(swatches.length, 'the preview rendered no swatches').toBe(2)
 
-      for (const s of swatches) {
+      for (const sw of swatches) {
         expect(
-          s.mask,
+          sw.mask,
           'the preview is showing the uploaded file, not what the site renders',
         ).toContain(`/api/icon/upload/${iconId}`)
-        expect(s.mask).not.toContain('/api/icons/file/')
+        expect(sw.mask).not.toContain('/api/icons/file/')
       }
 
-      // The point of two swatches: the icon takes the band, so the two must
-      // differ. One swatch could show any colour and prove nothing.
+      // The point of two swatches: the icon takes the band, so they must differ.
       expect(
         swatches[0]!.painted,
         `both swatches painted ${swatches[0]!.painted} — the preview is not showing the band's colour`,
@@ -367,4 +380,105 @@ test.describe('the icon upload screen', () => {
       await request.delete(`${SERVER}/api/icons/${iconId}`, { headers: authed(token) })
     }
   })
+})
+
+test.describe('the icon library screen', () => {
+  /**
+   * One screen, everything on it, and the current set already ticked.
+   *
+   * It was neither. Uploads lived in Media → Icons while the Phosphor choice
+   * lived in a second place behind a search box that rendered nothing until you
+   * typed — and the icons the site was already offering showed as **zero ticked**,
+   * because the list was empty and the fallback happened invisibly.
+   *
+   * ## Proven red by (invariant 17)
+   *
+   *  1. require a search term before rendering tiles → "the library rendered 0
+   *     tiles before anything was typed"
+   *  2. tick from the stored value instead of the effective one → "0 of the icons
+   *     on offer are ticked"
+   *  3. drop the `iconMap` lookup from `/api/icon/phosphor/[name]` → "mail (an
+   *     alias) is not servable: 404"
+   */
+  test('shows every icon without searching, with the offered set already ticked', async ({
+    page,
+    request,
+  }) => {
+    // 1,500+ tiles, four route checks and an admin login.
+    test.setTimeout(120_000)
+    // ── The aliases, first, because they are cheap and they regressed ──
+    // Ten of the bundled icons are named for what they mean rather than for the
+    // Phosphor component behind them — `mail` is Envelope, `search` is
+    // MagnifyingGlass. Renaming this route to read the Phosphor barrel 404'd
+    // every one, blanking them in the picker while they still rendered on pages.
+    const offered = await (await request.get(`${SERVER}/api/icon/library`)).json()
+    const values = (offered?.icons ?? []).map((i: { value: string }) => i.value)
+
+    // Positive control: an empty list would satisfy the loop below trivially.
+    expect(values.length, 'the library offers nothing at all').toBeGreaterThan(50)
+
+    for (const name of ['mail', 'search', 'home', 'activity']) {
+      expect(values, `${name} should be one of the bundled icons`).toContain(name)
+      const res = await request.get(`${SERVER}/api/icon/phosphor/${name}`)
+      expect(res.status(), `${name} (an alias) is not servable: ${res.status()}`).toBe(200)
+    }
+
+    // ── The screen ──
+    await login({ page, user: iconTestUser })
+    await page.goto(`${SERVER}/admin/globals/icon-library`, { waitUntil: 'load' })
+    await page.locator('.vf-icon-library__tile').first().waitFor({ timeout: 90_000 })
+
+    const state = await page.evaluate(() => ({
+      tiles: document.querySelectorAll('.vf-icon-library__tile').length,
+      ticked: document.querySelectorAll('.vf-icon-library__check input:checked').length,
+      hasUpload: Boolean(document.querySelector('.vf-icon-library__upload input[type=file]')),
+      hasSearch: Boolean(document.querySelector('.vf-icon-select__search')),
+    }))
+
+    // Everything, on arrival, with nothing typed.
+    expect(
+      state.tiles,
+      `the library rendered ${state.tiles} tiles before anything was typed`,
+    ).toBeGreaterThan(1_400)
+
+    // And every icon the site currently offers is ticked. Compared against the
+    // API rather than a written-down number, so it stays true when the set moves.
+    expect(
+      state.ticked,
+      `${state.ticked} of the ${values.length} icons on offer are ticked`,
+    ).toBe(values.length)
+
+    // Uploading happens HERE. Its absence is what made this two screens.
+    expect(state.hasUpload, 'no upload control on the library screen').toBe(true)
+    expect(state.hasSearch, 'no search on the library screen').toBe(true)
+
+    // ── And there is nothing else in the sidebar to find ──
+    // Checked in the SAME test rather than a second one: each admin login and
+    // page load is a real cost, and two spec files loading the admin in parallel
+    // is what makes this suite flake (README §10.1).
+    await page.goto(`${SERVER}/admin`, { waitUntil: 'load' })
+    await page.locator('nav a[href="/admin/collections/pages"]').first().waitFor({ timeout: 60_000 })
+
+    // Positive control: the nav rendered, so a zero below means "hidden" rather
+    // than "nothing loaded".
+    expect(
+      await page.locator('nav a[href^="/admin/collections/"]').count(),
+      'the admin nav rendered no collection links',
+    ).toBeGreaterThan(5)
+
+    expect(
+      await page.locator('nav a[href="/admin/collections/icons"]').count(),
+      'Media → Icons is back in the sidebar — there should be one place to manage icons',
+    ).toBe(0)
+
+    // `admin.hidden` does not merely drop a collection from the nav — Payload
+    // 404s its routes outright. Asserted, because it is why renaming, colour and
+    // deletion had to move onto the library tile instead of being a link.
+    const res = await page.goto(`${SERVER}/admin/collections/icons`, { waitUntil: 'load' })
+    expect(
+      res?.status(),
+      'the icons collection route is reachable again — a tile linking to it would be sensible after all',
+    ).toBe(404)
+  })
+
 })

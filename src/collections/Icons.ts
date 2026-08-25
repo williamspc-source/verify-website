@@ -47,6 +47,13 @@ export const Icons: CollectionConfig = {
   slug: 'icons',
   admin: {
     group: 'Media',
+    // Hidden from the sidebar ON PURPOSE. Uploading, ticking and searching all
+    // happen on ONE screen — Design → Icon Library — and two destinations for one
+    // job is what this replaced. The collection still exists: Payload needs one
+    // to store a file, the delete guard hangs off it, and each uploaded tile
+    // links straight here for renaming, colour and deletion. Hiding affects the
+    // nav only; every route still works.
+    hidden: true,
     useAsTitle: 'name',
     description:
       'Your own icons, offered in every icon picker alongside the built-in ones. Upload a single-colour SVG — its own colours are ignored, because the site paints it to match whatever it sits on.',
@@ -96,14 +103,6 @@ export const Icons: CollectionConfig = {
           },
         },
       ],
-    },
-    {
-      // Payload's upload preview shows the FILE; the site renders the
-      // reconstructed markup. This shows the second, which is the only one that
-      // matters — see src/fields/IconPreview.
-      name: 'preview',
-      type: 'ui',
-      admin: { components: { Field: '@/fields/IconPreview#IconPreview' } },
     },
     {
       name: 'viewBox',

@@ -520,12 +520,25 @@ select is a Postgres enum and an enum cannot hold a value an editor creates. See
 | `upload:12` | an SVG in the **Icons** collection, in that icon's own default colour |
 | `brain@deep`, `upload:12@white` | either, forced to a brand palette colour |
 
-**Which icons a picker OFFERS is the `icon-library` global's decision, not the code's.** An admin
-browses all 1,513 and chooses; `effectiveIconList` (`src/utilities/getIconLibrary.ts`) falls back to
-the bundled 101 when that list is empty, so an unsaved or accidentally-emptied global leaves editors
-exactly where they were rather than with nothing. Removing an icon stops it being *offered* and never
-touches a page that uses it — `IconSelect` still shows a value the current document holds, under
-*"Used here, not in the library"*.
+**Icons are managed in ONE place: the `icon-library` global.** It renders every icon at once — all
+1,513 Phosphor ships plus every upload — each with a tick box, no search required to see them, with
+uploading, renaming, recolouring and deleting on the tile. It was briefly two screens plus a
+search-gated grid, which is what a user is looking at when they ask why there are two icon libraries.
+
+`Icons` is `admin.hidden` so there is nothing else in the sidebar to find. **That 404s the
+collection's routes outright, not just its nav entry** (measured), which is why the edit controls and
+the light/dark preview are on the tile rather than behind a link.
+
+The ticks show the **effective** list, not the stored one: an empty global still offers the bundled
+101, so the screen ticks those and the first change writes the whole set out explicitly.
+`effectiveIconList` (`src/utilities/getIconLibrary.ts`) is the backstop. Unticking an icon stops it
+being *offered* and never touches a page that uses it — `IconSelect` still shows a value the current
+document holds, under *"Used here, not in the library"*.
+
+**Ten `iconMap` keys are ALIASES** — `activity` is Pulse, `mail` is Envelope, `search` is
+MagnifyingGlass — so they are absent from Phosphor's export list. `/api/icon/phosphor/[name]` checks
+`iconMap` first for exactly this reason; reading the barrel alone 404s all ten, blanking them in the
+picker while they still render on pages.
 
 The barrel import in `/api/icon/phosphor/[name]` is the price of serving all 1,513. **Measured: the
 compile step went 5.4s → 6.4s.** It is a route handler, so nothing reaches a browser as JavaScript.
@@ -542,10 +555,10 @@ ranks the distinct fills by luminance, keeps the darkest solid and gives the res
 already carries `opacity` is left alone, because the artist has said what they meant in the units
 that survive.
 
-**The admin previews the STORED markup, never the uploaded file** (`src/fields/IconPreview`). Payload
-shows the bytes that were uploaded; the site renders what was rebuilt from them. On a two-colour test
-file those were navy-and-pink against one flat shape — so the icon's own screen now draws it the way
-a page will, on a light band and a dark one.
+**The admin previews the STORED markup, never the uploaded file.** Payload shows the bytes that were
+uploaded; the site renders what was rebuilt from them. On a two-colour test file those were
+navy-and-pink against one flat shape — so the library tile, and the light/dark swatches behind its
+Edit control, draw it the way a page will.
 
 **Nothing an editor uploads is ever served back.** `normaliseSvgIcon` (`src/utilities/svgIcon.ts`)
 keeps recognised geometry and **reconstructs** the SVG, so the output is markup this codebase wrote;

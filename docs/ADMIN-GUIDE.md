@@ -28,7 +28,7 @@ wording you edit.
 | **Taxonomy** | Eleven lists that classify specialists, articles, events and staff | Rarely — set up once, extended now and then |
 | **People** | Specialists, Team Members | When someone joins, leaves or changes role |
 | **Availability** | Availability Sessions | Regularly, if you advertise appointment slots |
-| **Media** | Every uploaded image and file, and your own **Icons** | Whenever you add a photo, or a new icon |
+| **Media** | Every uploaded image and file | Whenever you add a photo |
 | **System** | Users, Redirects, Search Results | Rarely |
 | **Forms** | Forms, Form Submissions | To read enquiries, or change a form's fields |
 | **Page settings** | Fixed wording on templated pages | Rarely — set once |
@@ -425,18 +425,19 @@ hand the photo over to the admin permanently. Ask whoever maintains the site; th
 are in README.md under *Photos that have to survive a rebuild*. Everyone else's images — page
 blocks, events, articles — are yours alone and are never touched.
 
-### Icons
+### Your own icons
 
-Your own icons, offered in every icon picker alongside the built-in ones. **Media → Icons → Create
-new**, give it a name, and upload a **single-colour SVG**.
+Uploaded from **Design → Icon Library** — the same screen that decides which icons editors can choose.
+There is no separate place for them. Use the **Upload SVG** button, and pick a **single-colour SVG**
+(or a two-colour one; see below).
 
 **A two-colour file becomes a two-tone one.** The built-in icons are all *duotone* — one shape solid,
 another at 20% — and an upload gets the same treatment: whichever colour is lighter becomes the faint
 tone. If you drew it with a faint shape already, that is kept exactly as you made it.
 
-**What you see on the icon's own screen is what the site will show.** The preview is drawn from the
-processed artwork, on a light band and a dark one, so you can check it before it goes anywhere near a
-page. It will not match the file you uploaded, and that is the point.
+**What you see in the library is what the site will show.** The tile, and the bigger preview behind
+**Edit**, are drawn from the processed artwork — on a light band and a dark one — so you can check it
+before it goes anywhere near a page. It will not match the file you uploaded, and that is the point.
 
 **The site paints the icon; the file's own colours are ignored.** That is deliberate, and it is what
 makes an uploaded icon behave like a built-in one — it turns white on the dark navy bands and takes
@@ -457,18 +458,23 @@ Only SVG files are accepted, and an SVG carrying anything other than shapes is r
 
 ### Icon Library  *(under Design)*
 
-**Which icons editors can choose from.** Phosphor — the icon set this site uses — ships 1,513, and
-only about a hundred are set up by default. Open **Design → Icon Library**, search the full set, and
-click an icon to add or remove it.
+**Everything to do with icons is on this one screen.** Open **Design → Icon Library** and you see all
+1,523 of them at once — the 1,513 Phosphor ships, plus any SVG you have uploaded — with the ones
+editors can currently choose already ticked.
 
-- **Leave the list empty and editors get the built-in hundred.** That is the starting state, and it is
-  also the safety net: emptying the list by accident does not leave anyone with no icons.
-- **Removing an icon never changes a page.** It stops being *offered*; anywhere already using it keeps
+- **Tick or untick to decide what editors are offered.** No searching required to see them; search
+  only narrows the list. **Only ticked** hides everything else.
+- **Upload your own** with the button at the top. It appears in the grid immediately, already ticked,
+  because you uploaded it in order to use it.
+- **Click Edit on one of your uploads** to rename it, set its default colour, or delete it — and to
+  see it drawn the way the site will draw it, on a light band and a dark one.
+- **Unticking never changes a page.** The icon stops being *offered*; anywhere already using it keeps
   showing it, and that page's editor still sees it in their picker under *"Used here, not in the
   library"*.
-- Your own uploads (**Media → Icons**) are always offered and are not affected by this list.
+- **Unticking everything does not leave editors with none** — they fall back to the set the site
+  ships with. The screen says so when that happens.
 
-Use it to keep the icon set on-brand — there is no reason for a games controller to be one keystroke
+Use it to keep the icon set on-brand; there is no reason for a games controller to be one keystroke
 away from a medico-legal page.
 
 ### Forms, and Form Submissions

@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 
+import { iconMap } from '@/components/Icon'
 import { revalidateIconLibrary } from './hooks/revalidateIconLibrary'
 
 /**
@@ -15,9 +16,10 @@ import { revalidateIconLibrary } from './hooks/revalidateIconLibrary'
  *
  * ## Two rules that keep it from ever emptying a page
  *
- * 1. **An empty list means the built-in set**, not "no icons". A global nobody
- *    has opened yet, or one saved empty by accident, behaves exactly as the site
- *    did before it existed. See `effectiveIconList`.
+ * 1. **The bundled set is the default, and an empty list still means it.** The
+ *    `defaultValue` is what an admin sees ticked; `effectiveIconList` is the
+ *    backstop for a list emptied afterwards. A picker that offers nothing is
+ *    never an outcome.
  * 2. **Removing an icon never un-picks it.** The list decides what is OFFERED;
  *    every stored value keeps rendering, and the picker still shows an icon a
  *    document already uses even when the library no longer lists it — the rule
@@ -32,7 +34,7 @@ export const IconLibrary: GlobalConfig = {
   admin: {
     group: 'Design',
     description:
-      'The icons editors can choose from. Browse everything Phosphor offers and add the ones that suit the site. Leave it empty to offer the built-in set.',
+      'Every icon this site can use, in one place: the 1,513 Phosphor ships plus any SVG you upload. Tick the ones editors may choose.',
   },
   access: { read: () => true },
   fields: [
@@ -41,10 +43,15 @@ export const IconLibrary: GlobalConfig = {
       type: 'text',
       hasMany: true,
       label: 'Icons editors can choose',
+      // The set the site already uses, TICKED, rather than an empty list that
+      // silently falls back to it. An admin opening this screen has to see what
+      // is actually on offer — an empty grid beside a working picker is the kind
+      // of disagreement nobody can debug.
+      defaultValue: () => Object.keys(iconMap),
       admin: {
         components: { Field: '@/fields/IconLibraryPicker#IconLibraryPicker' },
         description:
-          'Search all 1,513 Phosphor icons and click to add or remove. Removing one stops it being offered; it never changes a page that already uses it.',
+          'Tick an icon to offer it to editors. Upload your own with the button above. Unticking one stops it being offered; it never changes a page that already uses it.',
       },
     },
   ],

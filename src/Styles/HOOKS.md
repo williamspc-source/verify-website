@@ -841,12 +841,12 @@ knowing:
 Every icon field is now a **picker that shows the icons**, not a list of their names — open it, and
 search. Two things it offers that the old dropdown could not:
 
-- **Your own icons.** Anything under **Media → Icons** appears at the top of the picker, above the
-  library. See `docs/ADMIN-GUIDE.md` for how to add one.
-- **A library you control.** What the picker offers comes from **Design → Icon Library**, where an
-  admin can add any of Phosphor's 1,513 icons without a developer. If an icon you used is later taken
-  out of the library, your page keeps it and your picker still shows it, under *"Used here, not in
-  the library"*.
+- **One library, and you control it.** What the picker offers comes from **Design → Icon Library** —
+  all 1,513 Phosphor icons and your own uploaded SVGs on one screen, each with a tick box. An admin
+  can add any of them, or upload a new one, without a developer.
+- **Your own icons** appear at the top of the picker, above the rest.
+- If an icon you used is later unticked, your page keeps it and your picker still shows it, under
+  *"Used here, not in the library"*.
 - **A colour, per placement.** Under the chosen icon there is a **Colour** control offering the same
   brand palette as the text colours. Leave it alone and nothing changes: a built-in icon keeps taking
   the colour of the text beside it, and an uploaded one keeps its own default. Choose a colour and it
