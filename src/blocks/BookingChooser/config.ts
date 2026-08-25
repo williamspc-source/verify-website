@@ -131,6 +131,20 @@ export const BookingChooser: Block = {
         }),
       ],
     },
+    {
+      name: 'density',
+      type: 'select',
+      label: 'Panel height',
+      defaultValue: 'default',
+      options: [
+        { label: 'Default — full-height band', value: 'default' },
+        { label: 'Compact — matches a page hero', value: 'compact' },
+      ],
+      admin: {
+        description:
+          'Compact trims the panel padding and the watermark so the band sits at about the height of a page hero. Use it where the chooser is a signpost under a hero rather than the main event.',
+      },
+    },
     cssClassField,
   ],
 }

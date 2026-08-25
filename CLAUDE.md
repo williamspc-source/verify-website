@@ -121,6 +121,9 @@ several look arbitrary until you see what happened without them.
 52. **A block must never write `grid-template-columns` (or any responsive property) inline** — inline beats every media query, so the mobile rule silently never applies. Emit `--vf-cols` and let `globals.css` own the breakpoints. An inline *custom property* also beats a stylesheet one, so the mobile rule sets `grid-template-columns` directly rather than resetting the variable. Guarded by `tests/e2e/responsive.e2e.spec.ts`. <sub>[why](docs/TRAPS.md)</sub>
 53. **The header's collapse breakpoint is 1024px and is written in THREE places** — the nested `components` sub-layer, an extracted block, and the drawer block. Changing one leaves the other two and the change appears to do nothing. <sub>[why](docs/TRAPS.md)</sub>
 
+54. **`selfSpaced` membership is decided by MEASURING a block's own computed padding, not by reading its source.** A block's padding may come from a page-scoped rule or an editor-chosen `cssClass`, so removing its `.my-16` wrapper can strip spacing on another page. And `grep '<Section'` matches `<SectionHeader` and comments. <sub>[why](docs/TRAPS.md)</sub>
+55. **Colour a Phosphor icon through `color` on its container, never `stroke`.** They are duotone and filled; a `stroke` rule applies and paints nothing. Use the same token as the adjacent text so the two cannot drift. <sub>[why](docs/TRAPS.md)</sub>
+
 ## Commands
 
 ```bash

@@ -12866,6 +12866,14 @@
           "primaryKey": false,
           "notNull": false
         },
+        "density": {
+          "name": "density",
+          "type": "enum_bkchooser_density",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'default'"
+        },
         "block_name": {
           "name": "block_name",
           "type": "varchar",
@@ -28458,6 +28466,14 @@
           "primaryKey": false,
           "notNull": false
         },
+        "density": {
+          "name": "density",
+          "type": "enum__bkchooser_v_density",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'default'"
+        },
         "_uuid": {
           "name": "_uuid",
           "type": "varchar",
@@ -36969,7 +36985,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
-          "default": "'tall'"
+          "default": "'square'"
         },
         "bio": {
           "name": "bio",
@@ -37822,7 +37838,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
-          "default": "'tall'"
+          "default": "'square'"
         },
         "version_bio": {
           "name": "version_bio",
@@ -39689,12 +39705,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'either'"
-        },
-        "location": {
-          "name": "location",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
         },
         "notes": {
           "name": "notes",
@@ -56213,6 +56223,14 @@
         "dark"
       ]
     },
+    "public.enum_bkchooser_density": {
+      "name": "enum_bkchooser_density",
+      "schema": "public",
+      "values": [
+        "default",
+        "compact"
+      ]
+    },
     "public.enum_pages_blocks_cost_grid_cards_icon": {
       "name": "enum_pages_blocks_cost_grid_cards_icon",
       "schema": "public",
@@ -64134,6 +64152,14 @@
         "dark"
       ]
     },
+    "public.enum__bkchooser_v_density": {
+      "name": "enum__bkchooser_v_density",
+      "schema": "public",
+      "values": [
+        "default",
+        "compact"
+      ]
+    },
     "public.enum__pages_v_blocks_cost_grid_cards_icon": {
       "name": "enum__pages_v_blocks_cost_grid_cards_icon",
       "schema": "public",
@@ -66750,6 +66776,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "80611e1d-6d76-49f8-9586-5f3ec6b72ef9",
+  "id": "2f7d991f-3658-42da-ac2b-3a07dc98b4ed",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

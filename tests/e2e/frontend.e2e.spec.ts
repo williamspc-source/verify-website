@@ -442,7 +442,18 @@ test.describe('Frontend', () => {
    * Stays green on `/` and `/jme`, whose People Grids keep the sentinel and must
    * render exactly one band.
    */
-  test('the Meet the Team intro sits on its own band, as the reference has it', async ({
+  /**
+   * UPDATED 2026-08-25. This test used to assert that the "Our People" intro band
+   * and the team grid sat on two DIFFERENT bands, mirroring the reference's
+   * `.team-intro` / `.team-grid-section` pair. That intro band was removed on
+   * request — Meet the Team now runs straight from the hero into the staff grid —
+   * so the two-band comparison has no subject any more.
+   *
+   * What survives is the half that still has one: the grid band must be the
+   * colour the reference gives `.team-grid-section`. The removal itself is
+   * asserted too, so this cannot quietly pass if the intro band comes back.
+   */
+  test('the Meet the Team grid sits on the reference band, with no intro band above it', async ({
     page,
   }) => {
     const { readFileSync } = await import('node:fs')
@@ -495,28 +506,21 @@ test.describe('Frontend', () => {
       return { intro: read(intro), grid: read(grid) }
     })
 
-    // Control: the page must actually contain both, or every comparison below is
-    // comparing null to null.
-    expect(bands.intro, 'no section on the page carries the "Our People" eyebrow').toBeTruthy()
+    // Control: the grid must actually be on the page, or the colour assertion
+    // below is comparing null to null (invariant 41).
     expect(bands.grid, 'no section on the page carries the team grid').toBeTruthy()
 
-    // 1. The intro band is the colour the reference gives `.team-intro`. Compare
-    //    on the colour stops, since the browser normalises hex to rgb() and adds
-    //    an explicit 100% stop the reference leaves implicit.
-    for (const stop of introDeclared!.match(/#[0-9a-f]{6}/gi) ?? []) {
-      expect(
-        bands.intro,
-        `the "Our People" band is ${bands.intro}; the reference declares ${introDeclared}`,
-      ).toContain(toRgb(stop))
-    }
-
-    // 2. …and the grid band is NOT that colour. Without this, one section painted
-    //    entirely blue passes — which is the wrong design, and the shortcut this
-    //    work exists to avoid.
+    // 1. The intro band is gone on purpose. Asserted rather than assumed, so the
+    //    page cannot silently regain it.
     expect(
-      bands.grid,
-      `the team grid shares the intro's band (${bands.grid}); the reference gives it ${gridDeclared}`,
-    ).not.toBe(bands.intro)
+      bands.intro,
+      'an "Our People" band is back above the team grid; Meet the Team should run hero → grid',
+    ).toBeNull()
+
+    // 2. The grid band is still the colour the reference gives
+    //    `.team-grid-section`. Compare on the colour stops, since the browser
+    //    normalises hex to rgb() and adds an explicit 100% stop the reference
+    //    leaves implicit.
     expect(bands.grid, `the team grid band is ${bands.grid}`).toContain(toRgb(gridDeclared!))
   })
 })

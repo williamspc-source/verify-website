@@ -3806,8 +3806,24 @@
 .card-accent-1 .audience-card-label { color: var(--text-on-dark); }
 .card-accent-1 .audience-card-subtitle { color: var(--text-muted-on-dark); }
 .card-accent-1 .audience-card-hook { color: var(--text-muted-on-dark); }
-.card-accent-1 .audience-card-icon { background: color-mix(in srgb, var(--white) 18%, transparent); }
-.card-accent-1 .audience-card-icon svg { stroke: var(--white); }
+/* Icon colour lives on the TILE, not on the svg, and uses the same token as the
+   heading above it, so the two can never drift.
+
+   These are Phosphor DUOTONE icons: `<svg fill="currentColor">` with two filled
+   paths and no stroke geometry, so the `svg { stroke: … }` this replaced painted
+   nothing — measured computed stroke rgb(255,255,255) while the icon still
+   rendered rgb(65,64,66), i.e. 2.92:1 on the blue tile and 2.02:1 on the grey
+   ones, both under WCAG 1.4.11's 3:1 for graphics.
+
+   The reference declares both halves — `svg { stroke: #fff }` AND `i { color:
+   #fff }` — because it draws webfont glyphs; only the `color` half maps onto our
+   renderer. Same reasoning, and the same fix, as `.ct-info-item-icon`. */
+.card-accent-1 .audience-card-icon { background: color-mix(in srgb, var(--white) 18%, transparent); color: var(--text-on-dark); }
+/* `color`, NOT `stroke`. These are Phosphor icons rendered with
+   `fill="currentColor"`, so a stroke declaration is applied and has no visual
+   effect whatsoever — measured: computed stroke was rgb(255,255,255) while the
+   icon still painted rgb(65,64,66). All three accents asked for the right
+   colour and none of them got it. */
 .card-accent-1 .btn-gateway-cta { background: var(--primary-strong); border-color: var(--primary-strong); }
 .card-accent-1 .btn-gateway-cta:hover { background: #0f4a80; border-color: #0f4a80; }
 
@@ -3816,8 +3832,7 @@
 .card-accent-2 .audience-card-label { color: var(--text-dark); }
 .card-accent-2 .audience-card-subtitle { color: var(--text-mid); }
 .card-accent-2 .audience-card-hook { color: var(--text-mid); }
-.card-accent-2 .audience-card-icon { background: color-mix(in srgb, var(--primary) 12%, transparent); }
-.card-accent-2 .audience-card-icon svg { stroke: var(--primary); }
+.card-accent-2 .audience-card-icon { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
 .card-accent-2 .btn-gateway-cta { background: var(--bg-light-1); border-color: var(--bg-light-1); color: var(--primary); }
 .card-accent-2 .btn-gateway-cta:hover { background: #b3d8f5; border-color: #b3d8f5; color: var(--primary); }
 
@@ -3826,8 +3841,7 @@
 .card-accent-3 .audience-card-label { color: var(--text-on-dark); }
 .card-accent-3 .audience-card-subtitle { color: var(--text-muted-on-dark); }
 .card-accent-3 .audience-card-hook { color: var(--text-muted-on-dark); }
-.card-accent-3 .audience-card-icon { background: color-mix(in srgb, var(--white) 12%, transparent); }
-.card-accent-3 .audience-card-icon svg { stroke: var(--white); }
+.card-accent-3 .audience-card-icon { background: color-mix(in srgb, var(--white) 12%, transparent); color: var(--text-on-dark); }
 .card-accent-3 .btn-gateway-cta { background: #5a5a5a; border-color: #5a5a5a; }
 .card-accent-3 .btn-gateway-cta:hover { background: #444; border-color: #444; }
 
@@ -6095,7 +6109,10 @@
   font-family: var(--font-heading);
   font-size: 2.8rem;
   font-weight: 900;
-  color: var(--primary);
+  /* Dark grey, not `--primary`: `.mv-pillar` is a pale-blue card on a blue
+     band, so brand blue on brand blue read as barely-there. The label beside it
+     (`.mv-pillar-text`) stays `--text-dark`. */
+  color: var(--ink-charcoal);
   line-height: 1;
 }
 .mv-pillar-text {
@@ -6616,6 +6633,23 @@
   overflow: hidden;
   container-type: inline-size;   /* cqw = 1% of the card width */
 }
+
+/* Compact chooser (BookingChooser → Panel height). Trims the panel padding and
+   the watermark so a single-half chooser used as a signpost under a hero sits at
+   roughly hero height rather than the full 740px band. Measured: the default
+   panel is 740px and the hero on /specialists/specialist-panel is 541px.
+   Scoped to the modifier so the two-half chooser on Make a Booking is untouched
+   — the field defaults to `default`, so adding it moved nothing. */
+.booking-section--compact .booking-split {
+  /* The real lever: the default band is `min-height: calc(100vh - 160px)`, i.e.
+     viewport-driven, so trimming padding alone changed nothing (measured 840px
+     at a 1000px viewport). A signpost under a hero wants a fixed, predictable
+     height instead — px rather than rem, because the Design System's
+     `--vf-text-scale` moves rem and would drag the band with it. */
+  min-height: 520px;
+}
+.booking-section--compact .booking-half { padding: 48px 0; }
+.booking-section--compact .booking-half-watermark svg { width: 11rem; height: 11rem; }
 
 .booking-half {
   flex: 0 1 50%;
@@ -8090,6 +8124,32 @@
    `.ni-section` band, so consecutive coloured bands sit flush (no white gaps). */
 .my-16:has(> .ni-section) { margin-top: 0; margin-bottom: 0; }
 
+/* ── The other two `.my-16` collapses ─────────────────────────────────────────
+   `RenderBlocks` wraps every block that is not in `selfSpaced` in `.my-16`
+   (64px top and bottom). That is correct for a block with no banding of its
+   own, and doubles up on one that bands itself. Three cases now exist; they are
+   deliberately NOT merged into one selector, because the EventsExplorer one
+   (search `events-explorer--band-to-edge`) zeroes only the BOTTOM margin.
+
+   Note these blocks cannot simply be added to `selfSpaced`: their padding is
+   conditional. `.vf-faq` has no base padding at all — /jme's top-level FAQ
+   measures 0 and depends on this wrapper — and `.ni-section`'s padding arrives
+   through an editor-chosen `cssClass`. Removing the wrapper would strip the
+   spacing from both. Measured before/after, see docs/TRAPS.md. */
+
+/* A block that rendered NOTHING is not a spacer. /in-the-loop seeds six Archive
+   blocks and five match no posts, each still emitting `<div class="my-16">` with
+   64px margins — measured 174px of dead white above the first heading, 110px
+   after this rule. */
+.my-16:empty { margin-block: 0; }
+
+/* The IME claim-types FAQ is a full-bleed band supplying its own 72/80 padding,
+   so the wrapper's 64px was pure surplus: 152px of white above the next
+   section's heading, 88px after — which is that section's own padding and
+   nothing more. Scoped to this band because the plain `.vf-faq` needs its
+   wrapper (see above). */
+.my-16:has(> .ime-claim-faq) { margin-block: 0; }
+
 /* =====================================================================
    DESIGN-REFERENCE PARITY FIXES (2026-07 pass)
    New-class styles collected here to match the reference page-by-page.
@@ -9450,7 +9510,13 @@
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.7;
-  text-align: justify;
+  /* Left, not justify and not the card's inherited `center`. Justified body copy
+     opens rivers of white space at this measure; the centring comes from
+     `.services-grid.vf-cards--center .service-card` (a deliberate tile variant
+     shared with the homepage), so it is overridden here on the description only
+     — the icon and title stay centred. `.vf-card--soft` is used on exactly one
+     page, /information-centre/for-clients. */
+  text-align: left;
 }
 
 /* ── Card style: "Benefit" ───────────────────────────────────────────────────

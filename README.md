@@ -268,9 +268,20 @@ pnpm build
 ```
 
 **The schema is frozen behind a single baseline migration.** `src/migrations/` holds one
-`20260823_130006_baseline`, generated on 2026-08-23 and verified against an empty scratch database:
-310 `CREATE TABLE`, 995 `CREATE INDEX`, no drops and no type conversions, with a column-level diff
-against the working database returning zero differences either way.
+`20260825_072728_fresh_baseline`, generated on 2026-08-25 against an empty scratch database and
+verified against the dev-pushed schema: **310 `CREATE TABLE`, 655 `CREATE TYPE`, 973 `CREATE INDEX`,
+zero drops and zero type conversions**, with a whitespace-insensitive column-level checksum of both
+catalogues matching exactly (3,625 columns each, 655 enums, 310 tables).
+
+It replaces the previous `20260823_130006_baseline` and the two `editor_controls` migrations, which
+were deleted: the box is being wiped and reseeded, so it creates the final shape directly rather than
+replaying an `ALTER TYPE` sequence. Two changes that were pending as separate migrations are now baked
+into the baseline — `availability_sessions` has no `location` column, and `specialists.profile_photo_shape`
+defaults to `'square'` (Team stays `'tall'`).
+
+**Regenerating a baseline: delete the `.json` snapshots too.** `migrate:create` diffs the config
+against the previous migration's `.json`, not against the database. Leaving them behind produced a
+7-statement incremental (5 `ALTER TABLE`, 1 `DROP COLUMN`) that looked like a baseline and was not.
 
 Only a **code** change that adds or alters a collection, global or block *field* needs a migration:
 
@@ -288,20 +299,12 @@ Multiple config changes in one push can share a single `migrate:create`.
 accident — choosing *rename* moves an unrelated column's data into the new field. **If a generated
 migration drops a column, stop and find out why.**
 
-**One deliberate exception is pending: `availability_sessions.location`.** The field was removed on
-2026-08-25 because nothing read it — an editable rich-text control on every session that reached no
-page. The generated migration should contain exactly one statement,
-`ALTER TABLE availability_sessions DROP COLUMN location`, and nothing else; if it contains anything
-more, the rule above applies and you should stop. The data lost is four seeded demo values
-("Brisbane CBD", "Gold Coast"). A second, harmless change rides along in the same pass: the
-Specialists `profilePhotoShape` default moves from `tall` to `square`, which generates an
-`ALTER COLUMN … SET DEFAULT` and touches no data. The existing 26 rows are moved by
-`repairSpecialistPortraitShape`, run from the seed — **so this deploy needs the seed as well as the
-migration**, or the specialists keep the tall frame they shipped with.
-Verified 2026-08-25 that the box is up to date with `main` before
-this commit — the `editor_controls` migration applied (its `colors.inkBlack` / `inkCharcoal` /
-`inkGrey` fields are live on `/api/globals/site-settings`) — so this drop is the only outstanding
-schema change.
+**Both changes that were pending as separate migrations are now in the baseline**, so there is no
+outstanding `DROP COLUMN` to approve: `availability_sessions.location` (removed 2026-08-25 because
+nothing read it) simply never gets created, and `specialists.profilePhotoShape` is created with
+`DEFAULT 'square'`. On a wiped box the seed writes `square` from the start, so
+`repairSpecialistPortraitShape` finds nothing to move and logs "already done" — it exists for a box
+that is migrated rather than reseeded.
 
 **Budget the column name before adding a relationship field to a block.** Postgres truncates
 identifiers at 63 characters and Drizzle builds foreign-key names from the table, column and
@@ -539,7 +542,7 @@ undone. A stale register is worse than none, because people trust it.
 | 12 | Twelve of the twenty image placeholders have no photograph | Yes | Twelve pale-blue placeholders where a photo belongs | Per photo: drop the file in and map it |
 | 13 | `public/media/` accumulates orphaned uploads across reseeds | Local only | None — disk on the dev machine | ~5 min |
 | 14 | `.events-summary-section` is a faithful port nothing can reach | No | None — dead CSS | ~5 min |
-| 15 | Two self-sectioning blocks are missing from `selfSpaced` | Yes | A stray 64px above and below two blocks | ~5 min + re-baseline |
+| 15 | Two self-sectioning blocks are missing from `selfSpaced` | Partly fixed | A stray 64px; the two reported symptoms are gone, see below | ~5 min + re-baseline |
 | 16 | An article is bylined to someone who is not on the team | Yes | A byline that does not link, where others do | ~5 min + a reseed |
 | 17 | The reference-diff exceptions rest on ageing measurements | No | The tool's exceptions cannot be trusted until re-taken | ~45 min |
 | 18 | Five blocks are on no page, so nothing reviews them | No | A regression in them would ship unseen | ~30 min |
@@ -743,7 +746,22 @@ padding**. Two lines in `RenderBlocks.tsx` — held back because it moves four p
 complained about. Do it behind a `computedSnapshot` capture and expect a diff.
 
 *(An audit initially reported three blocks, including `ArchiveBlock` — a false positive, because its
-match was a comment.)*
+match was a comment. A second audit on 2026-08-25 walked into the identical trap, and a third block,
+`FAQ`, matched only because `grep '<Section'` also matches `<SectionHeader`. See docs/TRAPS.md.)*
+
+**Updated 2026-08-25.** The two symptoms anyone had actually complained about are fixed, without
+touching `selfSpaced`:
+
+- `/services/medico-legal/ime` — 152px of white above *Assessment Formats*, now **88px** (the next
+  section's own padding, and nothing more).
+- `/in-the-loop` — 174px above the first heading, now **110px**. The cause there was six Archive
+  blocks that match no posts and still emit `<div class="my-16"></div>`.
+
+Two rules do it: `.my-16:empty` and a collapse for the IME band, joining the two `:has()` collapses
+already in the file. `selfSpaced` was left alone deliberately — `.vf-faq` has no base padding, so
+/jme's top-level FAQ (measured 0) depends on its wrapper, and `.ni-section`'s padding arrives through
+an editor `cssClass`. `EventsExplorer` and `FeaturedArticles` genuinely do self-section and remain the
+honest two-line fix described above.
 
 ### 16. An article is bylined to someone who is not on the team
 

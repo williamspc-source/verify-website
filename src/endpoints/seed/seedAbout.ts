@@ -74,7 +74,7 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
             imagePlaceholder: true,
             placeholderLabel: 'COMPANY PHOTO PLACEHOLDER',
             body: plainTextToLexical(
-              'VERIFY Medico-Legal Solutions (VERIFY) is an Australian-owned medico-legal reporting provider founded in 2021 by Wesley Lerch. We specialise in delivering independent, high-quality medico-legal assessments and coordinating expert examinations for law firms, insurers, and government agencies.\n\nAt VERIFY, we recognise that every report shapes real world decisions. Accuracy, objectivity, and integrity are built into every stage of our process, from initial referral to final report delivery. Our systems and workflows ensure consistency, reliability, and efficiency, giving clients confidence in clear and defensible expert opinions, even in complex matters.',
+              'VERIFY Medico-Legal Solutions (VERIFY) is an Australian-owned medico-legal reporting provider founded in 2021 by Wes Lerch. We specialise in delivering independent, high-quality medico-legal assessments and coordinating expert examinations for law firms, insurers, and government agencies.\n\nAt VERIFY, we recognise that every report shapes real world decisions. Accuracy, objectivity, and integrity are built into every stage of our process, from initial referral to final report delivery. Our systems and workflows ensure consistency, reliability, and efficiency, giving clients confidence in clear and defensible expert opinions, even in complex matters.',
             ),
           },
         ],
@@ -154,16 +154,6 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
             body: 'Legal proceedings are time-critical. VERIFY is committed to delivering accurate, thorough reports within agreed timeframes, helping your team meet court-imposed deadlines, respond to urgent instructions, and keep complex matters progressing without unnecessary delay.',
           },
           {
-            icon: 'star',
-            title: 'Client-Centred Service',
-            body: 'Every engagement is tailored to the specific requirements of each client, whether you are a litigation firm, insurer, self-insurer, or government body. From dedicated account management to bespoke referral workflows, VERIFY ensures seamless coordination and responsive communication at every stage of your matter.',
-          },
-          {
-            icon: 'lock-simple',
-            title: 'Confidential & Compliant',
-            body: 'All matters are handled under strict confidentiality protocols and in full compliance with Australian privacy legislation, professional standards, and applicable jurisdictional requirements. This protects the integrity of every engagement from referral through to report delivery.',
-          },
-          {
             icon: 'chart-bar',
             title: 'End-to-End Operation',
             body: 'Every referral placed with VERIFY is our responsibility, from booking through to report delivery. We take our obligations seriously, aligning our service delivery to your needs with precision, accountability, and care so that nothing falls through the cracks.',
@@ -197,7 +187,7 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
         eyebrow: 'Get Started',
         heading: 'Ready to Refer Your [[Next Matter to VERIFY?]]',
         text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
-        links: [enquiry('Make an Enquiry'), custom('/specialists/specialist-panel', 'View Specialist Panel')],
+        links: [custom('/specialists/specialist-panel', 'View Specialist Panel'), enquiry('Make an Enquiry')],
       },
     ],
   )
@@ -219,10 +209,10 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
     [
       {
         blockType: 'peopleGrid',
-        eyebrow: 'Our People',
-        heading: 'Experienced, Dedicated & [[Client-Focused]]',
-        subheading:
-          'At VERIFY, our team is our greatest strength. Every member plays a vital role in delivering the accuracy, care, and responsiveness our clients and claimants deserve. We are proud of the talented, dedicated individuals who make this possible every day.',
+        // No eyebrow/heading/subheading on purpose: Meet the Team runs straight
+        // from its hero into the staff grid. `SectionHeader` returns null when
+        // all three are empty, and PeopleGrid guards on `hasHeader`, so nothing
+        // renders rather than an empty band.
         source: 'team',
         groupByDepartment: true,
         linkProfiles: true,
@@ -238,7 +228,7 @@ export const seedAbout = async (ctx: Ctx): Promise<void> => {
         eyebrow: 'Get Started',
         heading: 'Ready to Refer Your [[Next Matter to VERIFY?]]',
         text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
-        links: [enquiry('Make an Enquiry'), custom('/specialists/specialist-panel', 'View Specialist Panel')],
+        links: [custom('/specialists/specialist-panel', 'View Specialist Panel'), enquiry('Make an Enquiry')],
       },
     ],
   )

@@ -430,7 +430,7 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
             title: 'Specialist Availability',
             description:
               'Browse our specialists with current appointment sessions and select the times that suit you.',
-            links: [custom('#availability', 'View availability below', { icon: 'arrow-down' })],
+            links: [custom('#availability', 'View availability below')],
           },
           {
             icon: 'user-circle',
@@ -441,7 +441,6 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
               'Access your account to book appointments, manage referrals, and track your matters.',
             links: [
               custom('https://vmls.kawaconn.com/', 'Log In to Portal', {
-                icon: 'arrow-right',
                 newTab: true,
               }),
               {
@@ -462,8 +461,8 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         heading: 'Ready to Book Your [[Next Appointment with VERIFY?]]',
         text: 'Whether you have a specific session in mind or need guidance on the right specialist and format, our team is here to make booking simple, efficient, and responsive from the very start.',
         links: [
-          enquiry('Make an Enquiry'),
           custom('/specialists/specialist-panel', 'View Specialist Panel'),
+          enquiry('Make an Enquiry'),
         ],
       },
     ],
@@ -786,8 +785,8 @@ export const seedInfoBooking = async (ctx: Ctx): Promise<void> => {
         heading: 'Ready to Refer Your [[Next Matter to VERIFY?]]',
         text: 'Whether you have a specific referral or need guidance on the most suitable service, we are here to make the process simple, efficient, and responsive from the very start.',
         links: [
-          enquiry('Make an Enquiry'),
           custom('/specialists/specialist-panel', 'View Specialist Panel'),
+          enquiry('Make an Enquiry'),
         ],
       },
     ],

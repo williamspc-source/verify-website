@@ -818,6 +818,21 @@ email**. It needs no URL — the address and wording come from Site Settings. Th
 Button blocks and the Make a Booking chooser panels, which are the two that know how to build the
 email; it is deliberately absent elsewhere rather than offered and silently doing nothing.
 
+### The Booking Chooser can be a single, shorter panel
+
+The **Booking Chooser (split)** block is the full-bleed pair on *Make a Booking* — the pale-blue
+"Specialist Availability" side and the dark "Client Portal" side. Two things about it are worth
+knowing:
+
+- **It accepts one half, not just two.** Delete a half and the remaining panel keeps the same
+  treatment. That is how the "See this month's availability" signpost under the hero on
+  *Specialist Panel* and *Specialists* is built — it is the same block, not a bespoke band.
+- **Panel height** sets how tall the band is. **Default** is the full-height band on Make a Booking,
+  which sizes itself to the browser window. **Compact** fixes it at about the height of a page hero,
+  which is what you want when the chooser is a signpost sitting under a hero rather than the main
+  event on the page. Default is what the block has always rendered, so switching an existing block to
+  Compact is the only thing that moves it.
+
 ### Two-column rows that are not 50/50
 
 **Pages → the page → the Row block → Column ratio.** Leave it unset for equal columns. The other

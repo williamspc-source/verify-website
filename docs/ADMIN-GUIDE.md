@@ -486,6 +486,18 @@ on *every* article, event, team profile or specialist profile, rather than on on
 | **Specialist Profile** | The section headings on every specialist profile, and the booking-portal band |
 | **Specialist Availability** | Wording on the availability grid, and the enquiry email its Send button opens |
 
+### Recent changes to shared content
+
+Three pieces of copy appear on many pages at once, so a change to one changes them all. Recorded here
+because "why did this move on twelve pages?" is otherwise a hard question to answer.
+
+- **The "Ready to Refer Your Next Matter" band** now shows **View Specialist Panel** on the left and
+  **Make an Enquiry** on the right. It appears on ten pages and they all follow the same source.
+- **The Online Booking Portal band** no longer carries the phone number beside *Send Enquiry*. That
+  band appears on Specialist Panel, Specialists and Specialty List, so it went from all three.
+- **Meet the Team** runs straight from its hero into the staff grid; the "Our People" heading that sat
+  between them has been removed.
+
 ### Site
 
 **Header** is the main menu and its dropdowns. **On a phone or tablet the menu is grouped**: the

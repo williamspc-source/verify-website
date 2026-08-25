@@ -608,6 +608,44 @@ Also: `computedSnapshot.mjs` keys nodes by **structural index path**, so inserti
 with `after: undefined`. That is not a style regression. Check whether any node *outside* the changed
 subtree moved — on this pass, zero did.
 
+## `stroke` on a filled icon, and other rules that read correctly and do nothing
+
+**A Phosphor icon in this repo is DUOTONE and filled** — `<svg fill="currentColor">` with two paths
+and no stroke geometry. A `stroke:` declaration on it is applied and paints nothing. The gateway cards
+carried `.card-accent-{1,2,3} .audience-card-icon svg { stroke: … }` for three accents; all three were
+dead, so every icon inherited `#414042` from `body` and sat at **2.92:1** on the blue tile and
+**2.02:1** on the grey ones, under WCAG 1.4.11's 3:1 for graphics. The reference declares BOTH halves
+(`svg { stroke }` for its inline SVGs *and* `i { color }` for its webfont glyphs); only the `color`
+half maps onto our renderer, and the port kept the wrong one.
+
+Colour the **container**, with the same token the neighbouring text already uses, so the two cannot
+drift. `.ct-info-item-icon` had already solved this and said so in a comment — the gateway rules were
+the one place contradicting it.
+
+## The `.my-16` wrapper: two ways it costs 64px
+
+`RenderBlocks` wraps every block NOT in `selfSpaced` in `.my-16` (64px top and bottom). That is right
+for a block with no banding of its own and doubles up on one that bands itself.
+
+- **A block that renders `null` still gets the wrapper.** `/in-the-loop` seeds six Archive blocks and
+  five match no posts, each emitting `<div class="my-16"></div>` — 174px of dead white above the first
+  heading, 110px once `.my-16:empty` collapses them.
+- **A band that supplies its own padding gets both.** The IME claim-types FAQ has 72/80 of its own plus
+  the wrapper's 64/64: 152px of white above the next section's heading, 88px after — which is that
+  section's own padding and nothing more.
+
+**`selfSpaced` is NOT a safe blanket fix, and this is the trap.** A block's padding may be conditional:
+`.vf-faq` has **no base padding at all** — IME's comes from the page-scoped `.ime-claim-faq`, while
+**/jme's top-level FAQ measures 0 and depends on the wrapper** — and `.ni-section`'s padding arrives
+through an editor-chosen `cssClass`. Adding either to `selfSpaced` strips their spacing elsewhere.
+Decide membership by **measuring the block's own computed padding on a real page**, never by reading
+its source.
+
+Which is the third lesson here: `grep '<Section' Component.tsx` **also matches `<SectionHeader` and
+code comments**. That false positive put two blocks on a fix list they did not belong on; the positive
+control that caught it was noticing `gatewayCards` — which IS in `selfSpaced` — being reported as
+missing.
+
 ## Writing a guard that can actually fail
 
 **The orphan-field guard is keyed by BARE FIELD NAME across the whole repo, so a dead field hides

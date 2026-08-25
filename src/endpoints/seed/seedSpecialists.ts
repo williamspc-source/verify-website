@@ -60,7 +60,32 @@ const portalCtaBlock = () => ({
       'mailto:admin@vmls.com.au?subject=VERIFY%20Booking%20Portal%20Access%20Request&body=Hi%20VERIFY%20Team%2C%0A%0AI%20would%20like%20to%20request%20access%20to%20the%20Online%20Booking%20Portal.%0A%0AFull%20Name%3A%0ACompany%2FOrganisation%3A%0AContact%20Number%3A%0AEmail%3A%0A%0AThank%20you.',
       'Send Enquiry',
     ),
-    custom('tel:0733560469', '07 3356 0469'),
+  ],
+})
+
+// Signpost to this month's availability, sitting directly under the hero on the
+// panel and the specialists landing page. It is the SAME block as the left half
+// of the Make a Booking chooser — `bookingChooser` accepts a single half — so the
+// treatment stays in one place rather than being rebuilt as a bespoke band.
+//
+// `density: 'compact'` because the full-height panel is 740px against a 541px
+// hero on both pages; the field defaults to 'default', so Make a Booking is
+// untouched. The link is cross-page to the availability grid's own anchor —
+// `id="availability"` is rendered by the Availability block on /make-a-booking,
+// and tests/e2e/links.e2e.spec.ts guards that every #fragment has a target.
+const availabilitySignpost = () => ({
+  blockType: 'bookingChooser',
+  density: 'compact',
+  halves: [
+    {
+      icon: 'calendar-check',
+      accent: 'blue',
+      eyebrow: "See What's Available",
+      title: 'Specialist Availability',
+      description:
+        'Browse our specialists with current appointment sessions and select the times that suit you.',
+      links: [custom('/make-a-booking#availability', "See this month's availability")],
+    },
   ],
 })
 
@@ -91,6 +116,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
         'At VERIFY, we work with a variety of medical specialists to provide a service uniquely catered to our clients. Our specialists are highly skilled professionals committed to the highest standards of professionalism, accuracy, and impartiality.',
     },
     [
+      availabilitySignpost(),
       {
         blockType: 'specialistDirectory',
         eyebrow: 'Find a specialist',
@@ -412,6 +438,7 @@ export const seedSpecialists = async (ctx: Ctx): Promise<void> => {
     },
     // The reference Specialists page IS the searchable directory (not a hub).
     [
+      availabilitySignpost(),
       {
         blockType: 'specialistDirectory',
         eyebrow: 'Find a specialist',

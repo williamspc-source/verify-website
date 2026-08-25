@@ -24,6 +24,7 @@ export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = async (
   anchorId,
   halves,
   cssClass,
+  density,
   bare,
 }) => {
   if (!Array.isArray(halves) || halves.length === 0) return null
@@ -39,7 +40,7 @@ export const BookingChooserBlock: React.FC<Props & { bare?: boolean }> = async (
     <Section
       container={false}
       id={anchorId || undefined}
-      className={cn('booking-section', toClassName(cssClass))}
+      className={cn('booking-section', density === 'compact' && 'booking-section--compact', toClassName(cssClass))}
       bare={bare}
     >
       <div className="booking-split">

@@ -14870,6 +14870,10 @@ export interface BookingChooserBlock {
       }[]
     | null;
   /**
+   * Compact trims the panel padding and the watermark so the band sits at about the height of a page hero. Use it where the chooser is a signpost under a hero rather than the main event.
+   */
+  density?: ('default' | 'compact') | null;
+  /**
    * Pick styles defined in Globals → Custom Styles.
    */
   cssClass?: string[] | null;
@@ -17755,6 +17759,7 @@ export interface BookingChooserBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  density?: T;
   cssClass?: T;
   id?: T;
   blockName?: T;
