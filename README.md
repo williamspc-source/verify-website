@@ -293,8 +293,10 @@ migration drops a column, stop and find out why.**
 page. The generated migration should contain exactly one statement,
 `ALTER TABLE availability_sessions DROP COLUMN location`, and nothing else; if it contains anything
 more, the rule above applies and you should stop. The data lost is four seeded demo values
-("Brisbane CBD", "Gold Coast"). **Apply the pending `editor_controls` migrations before running
-`migrate:create` for it** — creating it against an un-migrated box folds their schema changes into it.
+("Brisbane CBD", "Gold Coast"). Verified 2026-08-25 that the box is up to date with `main` before
+this commit — the `editor_controls` migration applied (its `colors.inkBlack` / `inkCharcoal` /
+`inkGrey` fields are live on `/api/globals/site-settings`) — so this drop is the only outstanding
+schema change.
 
 **Budget the column name before adding a relationship field to a block.** Postgres truncates
 identifiers at 63 characters and Drizzle builds foreign-key names from the table, column and
@@ -900,29 +902,44 @@ Custom looks like nothing happened until a row is actually moved.
 ### 30. An availability edit can take up to an hour to reach the live site
 
 Reported on 2026-08-25 as *"the availability chip tooltip never renders even with a note saved"*. The
-code was correct: writing the note locally and reloading showed `title="…"` in the served HTML within
-two seconds. The report was also correct — on the box, nothing appeared. **The difference is the
-cache, not the code**, which is why this reads as a lost save to an editor.
+code is correct and **is deployed**: `https://pl.wxn.au/make-a-booking` serves all 12 chips with a
+`note` key in its payload, so the box has the wiring. Locally, saving a note put `title="…"` in the
+served HTML within two seconds.
 
-`src/app/(frontend)/[...slug]/page.tsx` sets `export const revalidate = 3600`, and
-`.next/prerender-manifest.json` confirms `/make-a-booking` and `/specialists/specialist-availability`
-prerender with that window. `revalidateAvailabilitySession` is supposed to purge both the moment a
-session changes, and locally it does. If it fails on the box, the page simply waits out the hour.
+**What is measured, and what is not.** The caching is real:
 
-**This is not diagnosed on the box, and should be before anything is changed.** `safeRevalidatePath`
-deliberately never throws — losing the write is worse than serving a stale page — so a failure is
-visible *only* in the server log, as:
+```
+$ curl -sD- -o/dev/null https://pl.wxn.au/make-a-booking
+cache-control: s-maxage=3600, stale-while-revalidate=31532400
+x-nextjs-cache: HIT
+```
+
+`x-nextjs-cache: HIT` means the page is served without re-rendering, and the
+`stale-while-revalidate` window is **roughly a year** — so once the 3600s freshness lapses, a visitor
+is served the *stale* page while the refresh happens behind them, and only the reload *after* that
+shows the change. An editor saving a slot and reloading can therefore see the old page well past the
+hour. That is the "appears to work when it doesn't" shape, and it applies to every availability edit,
+not just the note.
+
+**Not confirmed:** whether the reported note ever reached the box's database. There are **zero**
+sessions with a note there now, so it was either never saved or removed after the test, and the two
+cannot be told apart after the fact. Do not record the cache as the proven cause of *that* report —
+record it as a measured fault that would produce exactly that symptom.
+
+**Take this reading before changing anything.** `safeRevalidatePath` deliberately never throws —
+losing the write is worse than serving a stale page — so a failed purge is visible *only* in the
+server log:
 
 ```
 Revalidation skipped (path /make-a-booking): … The write itself succeeded; affected pages may serve stale content until the next change.
 ```
 
 That line is real and reachable: a full `pnpm test:e2e` run produces it as
-`Invariant: static generation store missing in revalidatePath /`. Grep the box's log for
-`Revalidation skipped` after saving a session. If it appears, the purge is failing and the fix belongs
-in the hook's calling context; if it does not, the purge is working and the hour is simply the ISR
-window doing its job. **Do not "fix" this by lowering `revalidate` before taking that reading** — it
-would mask a broken purge behind more frequent rebuilds.
+`Invariant: static generation store missing in revalidatePath /`. Save a session on the box, then grep
+its log for `Revalidation skipped`. If it appears, the purge is failing and the fix belongs in the
+hook's calling context. If it does not, the purge works and the delay is the SWR window. **Do not
+"fix" this by lowering `revalidate` before taking that reading** — it would mask a broken purge behind
+more frequent rebuilds.
 
 Editors are told about the delay in `docs/ADMIN-GUIDE.md` so that a slow update does not get
 re-entered as a lost save.

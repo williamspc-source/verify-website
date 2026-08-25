@@ -313,13 +313,24 @@ appears only when `revalidatePath` succeeds, or up to an hour later. `pnpm dev` 
 request and shows the change instantly.
 
 Reported 2026-08-25 as "the availability chip tooltip never renders even with a note saved". It was
-reproduced locally in two seconds — save, then `title="…"` in the served HTML — which proved the code
-correct and the *report* correct at the same time. The difference was entirely the cache. Before
-concluding a feature is broken, reproduce on the environment the report came from; and when you
-cannot, check `prerender-manifest.json` and the box's log, because `safeRevalidatePath` never throws —
-it logs `Revalidation skipped (path /make-a-booking): …` and carries on, which is invisible unless
-somebody reads the log. That line is real: it appears in a full `pnpm test:e2e` run as
-`Invariant: static generation store missing in revalidatePath /`.
+reproduced locally in two seconds — save, then `title="…"` in the served HTML — proving the code
+correct. The deployed box has the wiring too (its payload carries a `note` key per chip), and its
+caching is measured: `cache-control: s-maxage=3600, stale-while-revalidate=31532400` with
+`x-nextjs-cache: HIT`, so a **year-long** SWR window serves the stale page while refreshing behind the
+visitor. An editor can therefore see the old page well past the hour.
+
+**Two lessons, and keep them separate.** The first is the rule above: dev cannot reproduce this class
+at all. The second is about how far a measurement licenses you to go — the cache was written up as the
+*proven cause* of that report before anyone checked whether the note had reached the box's database.
+It had not: zero sessions there carry a note, which is equally consistent with "never saved" and
+"removed after testing", and the two cannot be separated after the fact. A measured fault that would
+produce the reported symptom is not the same as the confirmed cause of it, and saying so cost nothing
+here only because the field was being deleted anyway.
+
+When you cannot reproduce on the reporting environment, check `prerender-manifest.json` and the box's
+log, because `safeRevalidatePath` never throws — it logs `Revalidation skipped (path …): …` and
+carries on, invisible unless somebody reads the log. That line is real: it appears in a full
+`pnpm test:e2e` run as `Invariant: static generation store missing in revalidatePath /`.
 
 Two further instruments lied during the same investigation, both listed elsewhere here: the on-disk
 `.next` was a stale mixed build whose server chunks disagreed with what the running server served, and
