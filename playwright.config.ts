@@ -11,6 +11,11 @@ import 'dotenv/config'
  */
 export default defineConfig({
   testDir: './tests/e2e',
+  /* One Payload boot before any worker starts, to seed the user
+     `uploadedIcons.e2e.spec.ts` logs in as. See the file for why this is not a
+     `beforeAll`: two spec files each booting Payload against the dev server's own
+     database raced, and a different one timed out each run. */
+  globalSetup: './tests/helpers/globalSetup.ts',
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */

@@ -1,5 +1,7 @@
 import type { DesignSystem } from '@/payload-types'
 
+import { BRAND_TEXT_COLORS, ON_DARK_SELECTORS } from '@/fields/richTextColors'
+
 /**
  * Builds the `:root { … }` CSS text that carries every CMS-editable design token
  * (Site Settings → Brand colours, Design System → everything else).
@@ -322,4 +324,46 @@ export const __tokenNames = (colors: BrandColors, tokens?: DesignSystem | null) 
   const design = new TokenMap()
   addDesignTokens(design, tokens)
   return { brand: brand.names, design: design.names }
+}
+
+/**
+ * `[data-vf-icon="12"]{color:…}` for every uploaded icon that names a default
+ * colour.
+ *
+ * Emitted alongside the brand tokens in the frontend layout, so an uploaded icon
+ * carries the colour it was given wherever it is placed — and changing that
+ * colour later repaints every placement, which storing it into the value at pick
+ * time would not.
+ *
+ * A per-placement `.vf-tc-*` beats this on `!important`, which is the intended
+ * order: the record supplies a default, the placement overrides it.
+ *
+ * The id comes from the database and the colour resolves through the palette
+ * rather than through anything an editor typed, so neither can carry markup —
+ * but the id is still pattern-checked and the whole string still goes through
+ * `stripStyleClose`, because this lands inside a `<style>` tag.
+ */
+export const iconDefaultCss = (icons: { id: string | number; colour?: string | null }[]): string => {
+  const rules: string[] = []
+  for (const icon of icons ?? []) {
+    const id = String(icon?.id ?? '')
+    if (!/^[A-Za-z0-9_-]+$/.test(id)) continue
+    const entry = BRAND_TEXT_COLORS.find((c) => c.key === icon?.colour)
+    if (!entry) continue
+
+    const sel = `[data-vf-icon="${id}"]`
+    rules.push(`${sel}{color:var(${entry.token}, ${entry.fallback})}`)
+
+    // The dark re-point, from the SAME palette entry `.vf-tc-*` uses. Without it
+    // an icon defaulting to Brand blue keeps painting #1c75bc on the navy portal
+    // band while the built-in beside it turns pale — measured, before this was
+    // added. `followsBand` entries need no rule: their token is one `.vf-on-dark`
+    // already re-points.
+    if (entry.onDarkToken) {
+      rules.push(
+        `${ON_DARK_SELECTORS.map((s) => `${s} ${sel}`).join(',')}{color:var(${entry.onDarkToken})}`,
+      )
+    }
+  }
+  return stripStyleClose(rules.join('\n'))
 }

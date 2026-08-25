@@ -16,6 +16,7 @@ because there is nothing to obey — only something to check.
 
 - [Why each invariant exists](#why-each-invariant-exists) — the evidence behind the numbered rules in `CLAUDE.md`
 - [The dev server and the build](#the-dev-server-and-the-build)
+- [Running the e2e suite](#running-the-e2e-suite)
 - [Searching, grepping, and reading a tool's output](#searching-grepping-and-reading-a-tools-output)
 - [Driving a browser](#driving-a-browser)
 - [Writing a guard that can actually fail](#writing-a-guard-that-can-actually-fail)
@@ -308,6 +309,75 @@ Two things this cost, both worth keeping:
 
 Guarded by `tests/e2e/frontend.e2e.spec.ts` → *"a chooser with one panel fills its band and does not resize on hover"*, whose third case asserts Make a Booking **still slides** — otherwise deleting the two `.booking-split:hover` rules outright would satisfy the first two cases while stripping the effect from the page it was designed for.
 
+<a id="i57"></a>
+**57. A Payload `select` is a Postgres ENUM, so anything an editor can CREATE must be `text`**
+
+<a id="i58"></a>
+**58. A field declared by more than one helper must be changed in ALL of them**
+
+<a id="i59"></a>
+**59. An uploaded icon is an empty `<svg>` painted by `mask-image`**
+
+These three come from one afternoon. Icon uploads were built on 2026-08-23 and reverted the same day
+after the local site hung on every request; the work survived in `git stash` and was rebuilt on
+2026-08-25. What follows is why it hung, established by reproducing it rather than by reading the
+code.
+
+**The field was a `select`, which is one enum type PER COLUMN.** Measured two ways that agreed:
+`SELECT count(*) FROM pg_type WHERE … enumlabel='brain'` returned **112**, and the committed baseline
+migration contained **112** matching `CREATE TYPE` statements — 64 live columns and 48 `_v` version
+shadows. An enum can only hold labels that existed when the schema was built, so `upload:12` can
+never go in one. Converting them to `text` means dropping 112 types, which is destructive.
+
+**What the destructive push actually does is worse than the "Accept warnings?" prompt already
+recorded here.** Reproduced deliberately: with the config changed to `text` and the database still
+holding the enums, `curl` returned **000** and the log ended in
+
+```
+Is enum_icons_colour enum created or renamed from another enum?
+❯ + enum_icons_colour                                          create enum
+  ~ enum__appt_guide_v_types_icon › enum_icons_colour           rename enum
+  … 111 more
+```
+
+— drizzle-kit's **rename-resolution** prompt: a 113-option arrow-key menu, written to a backgrounded
+log, waiting on input nobody can give. It appears because 112 enums vanish while one new one
+(`enum_icons_colour`, the uploaded icon's default colour) appears, so every disappearance is offered
+as a possible rename. `getPayload()` never settles and every request queues behind it. Grep the log
+for *"rename enum"* as well as *"Accept warnings"*.
+
+**And the first attempt made it permanent by missing a file.** `iconField` is declared in
+`src/fields/blockFields.ts` — 65 columns — and again, independently, in `src/fields/link.ts` for
+every link's icon: 45 more (`link_icon` 42, `view_all_link_link_icon` 2, `cta_link_icon` 1). The
+repair SQL matched *any enum containing the label `brain`* and so converted all 112, including the 45
+the config still called enums. That is drift the push can never settle: it rebuilds those enums on
+every boot. Unlike the one-off prompt, `rm -rf .next` does not clear it. **Grep the field name, not
+the helper** — `iconOptions` would have found both; `iconField` finds one.
+
+**The fix was not to convert anything.** The box was being rebuilt from scratch anyway, so the local
+database was dropped and recreated with the config already saying `text`: every statement is a
+`CREATE`, there is nothing destructive to prompt about, and the boot was clean first time. Verified
+afterwards — 0 icon enum types, 112 `character varying` icon columns, and all **1,033** stored icon
+values present after reseeding. `REFERENCE-icon-enum-to-text.sql` is kept for a box that cannot be
+wiped; its header said "45 columns", which was true on the day and stale by 2.5× two days later.
+
+**The `<span>` that could not be styled.** With the schema sorted, an uploaded icon rendered as a
+`<span>` painted with `background-color: currentColor` and masked by the artwork's alpha. It looked
+right in isolation and wrong on every real page: measured `rgb(65,64,66)` at 24px where the built-in
+it replaced was a tinted blue at 36px. The cause is that `globals.css` sizes and colours icons
+through **66** rules that select `svg` — `.ni-card-img svg { width: 36px }`, `.img-qa svg { color: … }`,
+`.audience-card-icon svg`, and so on — and a `<span>` matches none of them. Widening 66 selectors was
+the obvious fix; the better one was to make the element an **empty `<svg>`**, which matches all of
+them and is still painted entirely by the mask. One word, no CSS churn.
+
+**A default colour published as CSS still has to re-point on dark bands.** The uploaded icon's own
+colour is emitted by the layout as `[data-vf-icon="12"]{color:var(--primary)}`. That first version
+used the raw token, so on the navy portal band the upload painted `rgb(28,117,188)` beside a built-in
+painting `rgb(147,208,247)` — the exact contrast failure the palette exists to prevent. `.vf-tc-*`
+gets its dark behaviour from hand-written rules in `globals.css` that a `[data-vf-icon]` rule cannot
+inherit, so the re-point is generated from the same `BRAND_TEXT_COLORS` entry (`onDarkToken`) and the
+selector list lives once in `ON_DARK_SELECTORS`, tied to the stylesheet by a test.
+
 ---
 
 # Traps that are not rules
@@ -456,6 +526,23 @@ Nearly every "my edit did nothing" in this repo was a stale build before it was 
   One specific cause: `payload run` **imports** the module, it does not call a default export — a
   script written as `export default async function ({ payload })` runs zero lines, prints nothing and
   exits 0. Do the work at the top level with `getPayload({ config })`.
+
+## Running the e2e suite
+
+- **Playwright runs spec FILES in parallel locally** (`workers: undefined`), and two spec files that
+  each boot Payload in a `beforeAll` start two schema pulls against the database the dev server is
+  already using. The run fills with *"Pulling schema from database…"* and one of them times out — a
+  different file each time, which is the shape of the flake README §10.1 records for
+  `admin.e2e.spec.ts`. `tests/helpers/globalSetup.ts` now does that seeding once, in the main
+  process, before any worker exists.
+- **`tests/helpers/seedUser.ts` DELETES and recreates `dev@payloadcms.com`.** A second spec sharing
+  it deletes the account the first is logged in as: both passed alone, both failed together. A spec
+  that needs its own credentials gets its own user.
+- **A red full run is not automatically a regression, and the *timing* is the tell.** `admin.e2e.spec.ts`
+  failed twice immediately after a full suite (47-51s per run) and then passed **three times in a row**
+  alone (22-24s). Its failure mode is a tab whose button reads `[active]` while the pane still shows the
+  previous tab's fields — a desync the spec's own comment documents at length. Re-run it on a rested
+  server before believing it.
 
 ## Searching, grepping, and reading a tool's output
 

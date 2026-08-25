@@ -19,7 +19,8 @@ import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 import { getCachedGlobal } from '@/utilities/getGlobals'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { buildTokenCss } from '@/utilities/cssTokens'
+import { buildTokenCss, iconDefaultCss } from '@/utilities/cssTokens'
+import { getCachedIconDefaults } from '@/utilities/getIconDefaults'
 import { getEnquiryFormId } from '@/utilities/enquiryForm'
 
 // ── Typefaces ───────────────────────────────────────────────────────────────
@@ -113,6 +114,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     shield?.url ? getMediaUrl(shield.url, shield.updatedAt) : null,
   )
 
+  // Each uploaded icon's own default colour, as `[data-vf-icon="12"]{color:…}`.
+  // It rides in the same <style> tag because it belongs to the same layer: a
+  // value an editor set, resolving through a brand token. See getIconDefaults.ts
+  // for why this is published rather than read at render time.
+  const iconCss = iconDefaultCss(await getCachedIconDefaults())
+
   // Site Settings → Enquiry drawer form, with a logged server-side fallback when
   // the pointer is empty. See src/utilities/enquiryForm.ts.
   const enquiryFormId = await getEnquiryFormId()
@@ -141,8 +148,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Order is load-bearing: CMS token values first, then Custom Styles,
             so an editor's Global CSS can override any token. Both sit above any
             painted element, so neither causes a flash of unstyled content. */}
-        {tokenCss ? (
-          <style id="verify-design-tokens" dangerouslySetInnerHTML={{ __html: tokenCss }} />
+        {tokenCss || iconCss ? (
+          <style
+            id="verify-design-tokens"
+            dangerouslySetInnerHTML={{ __html: [tokenCss, iconCss].filter(Boolean).join('\n') }}
+          />
         ) : null}
         <CustomCSS />
         <MotionObserver />

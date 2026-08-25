@@ -28,7 +28,7 @@ wording you edit.
 | **Taxonomy** | Eleven lists that classify specialists, articles, events and staff | Rarely — set up once, extended now and then |
 | **People** | Specialists, Team Members | When someone joins, leaves or changes role |
 | **Availability** | Availability Sessions | Regularly, if you advertise appointment slots |
-| **Media** | Every uploaded image and file | Whenever you add a photo |
+| **Media** | Every uploaded image and file, and your own **Icons** | Whenever you add a photo, or a new icon |
 | **System** | Users, Redirects, Search Results | Rarely |
 | **Forms** | Forms, Form Submissions | To read enquiries, or change a form's fields |
 | **Page settings** | Fixed wording on templated pages | Rarely — set once |
@@ -424,6 +424,28 @@ headshot here and it reverts, that is why: the repository file has to be replace
 hand the photo over to the admin permanently. Ask whoever maintains the site; the folders and naming
 are in README.md under *Photos that have to survive a rebuild*. Everyone else's images — page
 blocks, events, articles — are yours alone and are never touched.
+
+### Icons
+
+Your own icons, offered in every icon picker alongside the built-in ones. **Media → Icons → Create
+new**, give it a name, and upload a **single-colour SVG**.
+
+**The site paints the icon; the file's own colours are ignored.** That is deliberate, and it is what
+makes an uploaded icon behave like a built-in one — it turns white on the dark navy bands and takes
+the brand colour on a light one, with nothing for you to set. It also means a **two-colour logo will
+not survive**: it comes out as one flat shape. Put a multi-colour mark on the page as an image
+instead.
+
+**Default colour** is the colour that icon should be wherever it is used. Leave it on *"Follows the
+band"* and it behaves exactly like the built-in icons. Choose one and it applies everywhere that icon
+appears — and if you change it later, every place it is used changes with it. Any single placement
+can still override it: see *"Choosing an icon, and its colour"* in `src/Styles/HOOKS.md`.
+
+**Deleting an icon that is still in use is refused**, and the message names the documents using it —
+change those to a different icon first. This is on purpose: deleting it would leave a gap on a page
+that nobody would notice.
+
+Only SVG files are accepted, and an SVG carrying anything other than shapes is rejected at upload.
 
 ### Forms, and Form Submissions
 

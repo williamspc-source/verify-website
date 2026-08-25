@@ -6,7 +6,6 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { iconOptions } from '@/components/Icon'
 import { textColorField } from './richTextColors'
 
 // Shared admin field helpers so blocks stay consistent and DRY. Everything a
@@ -384,14 +383,58 @@ export const hideWhenEmptyField: Field = {
   },
 }
 
-export const iconField = (overrides: Partial<Field> = {}): Field =>
-  ({
+/**
+ * An icon chooser.
+ *
+ * ## Why `text` and not `select`
+ *
+ * A Payload `select` becomes a Postgres **enum**, one type per column, and an
+ * enum can only hold values that existed when the schema was built. An uploaded
+ * icon is *data* — created after the fact — so an enum column can never store
+ * one. That is the whole reason this field is `text`.
+ *
+ * It is also why the first attempt at this feature took the local site down for
+ * an afternoon: converting the columns in place meant DROPPING 112 enum types,
+ * which stops the dev push on a prompt nobody can see. See `docs/TRAPS.md`.
+ *
+ * ## What is stored
+ *
+ * A string: `brain`, `brain@deep`, `upload:12`, `upload:12@white`. Every value
+ * that existed before this change is the first form and renders unchanged.
+ * `src/components/Icon/value.ts` is the only place that shape is interpreted.
+ *
+ * The cost of `text` is that Postgres no longer rejects a nonsense value. That
+ * is covered where it matters instead: the picker only offers real icons, and
+ * `Icon` renders nothing for a name it cannot resolve rather than throwing.
+ *
+ * **The same field is declared in `src/fields/link.ts` for link icons.** Both must
+ * move together — converting one and not the other is what made the first
+ * attempt's damage permanent, and `adminControls.int.spec.ts` now fails if either
+ * regresses to a `select`.
+ */
+export const iconField = (overrides: Partial<Field> = {}): Field => {
+  // `admin` is MERGED, not replaced. Spreading `...overrides` over a whole
+  // `admin` object looked right and silently unwired the picker on every call
+  // site that passes a width or a description — which is most of them: measured,
+  // the Streams form rendered `field-icon` as a plain text input, with no error
+  // anywhere. `components` is applied last because the picker IS the field; a
+  // call site overriding it would be asking for a control that cannot choose an
+  // icon.
+  const { admin: adminOverrides, ...rest } = overrides as Partial<Field> & {
+    admin?: Record<string, unknown>
+  }
+
+  return {
     name: 'icon',
-    type: 'select',
-    options: iconOptions,
-    admin: { description: 'Icon shown with this item.' },
-    ...overrides,
-  }) as Field
+    type: 'text',
+    ...rest,
+    admin: {
+      description: 'Icon shown with this item.',
+      ...(adminOverrides ?? {}),
+      components: { Field: '@/fields/IconSelect#IconSelect' },
+    },
+  } as Field
+}
 
 // Strict preset picker — applies class names defined in the Custom Styles global.
 // Editors choose from defined presets only (no free text); stored as a string[].

@@ -91,6 +91,9 @@ import {
   Wind,
 } from '@phosphor-icons/react/ssr'
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
+
+import { colorClass } from '@/fields/richTextColors'
+import { parseIconValue } from './value'
 import { cn } from '@/utilities/ui'
 import React from 'react'
 
@@ -220,13 +223,74 @@ export const iconOptions = (Object.keys(iconMap) as IconName[])
     value,
   }))
 
+/**
+ * Renders whatever an icon field stores — a curated Phosphor icon, or one an
+ * editor uploaded — and applies the colour carried in the value.
+ *
+ * ## Why an upload is a MASK rather than an `<img>`
+ *
+ * The curated icons are Phosphor components whose paths fill from `currentColor`,
+ * so they turn white on a dark band and take the brand colour on a light one with
+ * no editor action (invariant 55). An `<img>` cannot do that — it paints its own
+ * pixels — and inlining the markup would ship it into the client components that
+ * render icons.
+ *
+ * `mask-image` gives both: the browser fetches the artwork while the element
+ * paints `currentColor` through its alpha channel. It also reproduces duotone
+ * rather than approximating it — duotone is a solid path plus one at
+ * `opacity: 0.2`, and mask alpha times `currentColor` is exactly those two tones.
+ * And because a mask reads alpha only, an uploaded icon's own colours are
+ * irrelevant, which is what makes "uploads match the site" true without anyone
+ * editing the artwork.
+ *
+ * ## Colour
+ *
+ * `parseIconValue` splits an optional `@key` suffix off the value, and
+ * `colorClass` turns it into the same `.vf-tc-*` class the text palette uses —
+ * already `!important`, already re-pointed on `.vf-on-dark`. Applied here rather
+ * than at each of the 45 render sites, so none of them can forget it.
+ *
+ * With no suffix, an upload falls back to its own default colour, published as a
+ * `[data-vf-icon]` rule by the layout (see `iconDefaultCss`). A curated icon with
+ * no suffix inherits, exactly as it always has.
+ */
 export const Icon: React.FC<{
   name?: IconName | string | null
   className?: string
   weight?: 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
 }> = ({ name, className, weight = 'duotone' }) => {
   if (!name) return null
-  const Cmp = iconMap[name as IconName]
+
+  const parsed = parseIconValue(name)
+  if (!parsed) return null
+  const colour = colorClass(parsed.colour)
+
+  if (parsed.uploadId) {
+    return (
+      // An EMPTY <svg>, not a <span>. globals.css sizes and colours icons through
+      // 66 rules that select `svg` — `.ni-card-img svg { width: 36px }`,
+      // `.img-qa svg { color: … }`, `.audience-card-icon svg`, and so on — and a
+      // <span> matches none of them, so an upload rendered at the wrong size in
+      // the wrong colour everywhere. Measured: rgb(65,64,66) at 24px where the
+      // built-in it replaced was a tinted blue at 36px.
+      //
+      // The element has no children; it is painted entirely by
+      // `background-color: currentColor` masked by the artwork's alpha, so every
+      // one of those rules reaches it exactly as it reaches a real Phosphor icon.
+      <svg
+        aria-hidden
+        data-vf-icon={parsed.uploadId}
+        className={cn('size-6', 'vf-icon-mask', colour, className)}
+        style={
+          {
+            '--vf-icon-url': `url("/api/icon/upload/${encodeURIComponent(parsed.uploadId)}")`,
+          } as React.CSSProperties
+        }
+      />
+    )
+  }
+
+  const Cmp = iconMap[parsed.key as IconName]
   if (!Cmp) return null
-  return <Cmp className={cn('size-6', className)} weight={weight} aria-hidden />
+  return <Cmp className={cn('size-6', colour, className)} weight={weight} aria-hidden />
 }

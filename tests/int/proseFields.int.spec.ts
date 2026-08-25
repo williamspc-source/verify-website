@@ -41,6 +41,20 @@ import config from '@/payload.config'
  * of value, not of one location: a URL is a URL on every block that has one.
  */
 const PLAIN_BY_NAME: Record<string, string> = {
+  // ── Icon keys ──
+  // These were `select` fields, and so invisible to this guard, until uploads
+  // made an enum impossible (an enum cannot hold a value created after the
+  // schema was built) and `iconField` became `text`. They are keys a machine
+  // resolves — `brain`, `upload:4`, `brain@deep` — chosen from a picker that
+  // draws the icons, never words an editor types. Formatting one would be markup
+  // inside a lookup key.
+  icon: 'icon key, resolved by <Icon>; chosen from the icon picker, never typed',
+  placeholderIcon: 'icon key, resolved by <Icon>',
+  defaultIcon: 'icon key, resolved by <Icon>',
+  badgeIcon: 'icon key, resolved by <Icon>',
+  viewBox: 'derived from an uploaded SVG, read-only',
+  markup: 'shape data rebuilt from an uploaded SVG, read-only',
+
   // ── Identifiers and routing ──
   slug: 'URL segment; slugField() and routes.ts read it',
   slugLock: 'slugField() internal',

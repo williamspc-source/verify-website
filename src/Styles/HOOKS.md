@@ -836,6 +836,25 @@ knowing:
   event on the page. Default is what the block has always rendered, so switching an existing block to
   Compact is the only thing that moves it.
 
+### Choosing an icon, and its colour
+
+Every icon field is now a **picker that shows the icons**, not a list of their names — open it, and
+search. Two things it offers that the old dropdown could not:
+
+- **Your own icons.** Anything under **Media → Icons** appears at the top of the picker, above the
+  built-in set. See `docs/ADMIN-GUIDE.md` for how to add one.
+- **A colour, per placement.** Under the chosen icon there is a **Colour** control offering the same
+  brand palette as the text colours. Leave it alone and nothing changes: a built-in icon keeps taking
+  the colour of the text beside it, and an uploaded one keeps its own default. Choose a colour and it
+  applies to that one placement only.
+
+The colour is stored as a brand *name*, not a fixed shade — so if the brand blue is changed in
+**Site Settings → Brand colours**, every icon coloured with it changes too. And a colour that would
+disappear on a dark navy band re-points automatically there, exactly as coloured text does.
+
+> **A two-colour logo will not work as an icon.** Icons are drawn in one colour so they can take the
+> colour of whatever they sit on. Use an Image block for a multi-colour mark.
+
 ### Two-column rows that are not 50/50
 
 **Pages → the page → the Row block → Column ratio.** Leave it unset for equal columns. The other

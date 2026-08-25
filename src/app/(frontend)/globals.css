@@ -12610,6 +12610,48 @@
   letter-spacing: normal;
 }
 
+/* ── Uploaded icons ───────────────────────────────────────────────────────────
+   An icon an editor uploaded is PAINTED here rather than drawn as an element.
+   `background: currentColor` supplies the colour; the artwork supplies only its
+   alpha channel, through `mask-image`.
+
+   That is what makes an upload behave like one of the built-in Phosphor icons:
+   it turns white on `.vf-on-dark`, takes the brand colour on a light band, and
+   follows a `.vf-tc-*` choice — without the editor doing anything, and whatever
+   colours the SVG was drawn in, since a mask discards them.
+
+   It also reproduces Phosphor duotone rather than flattening it: duotone is a
+   solid path plus one at `opacity: 0.2`, and mask alpha × `currentColor` gives
+   exactly those two tones.
+
+   The URL arrives as `--vf-icon-url` from the `Icon` component. `-webkit-` first
+   for Safari, which still needs the prefix for mask-image. */
+.vf-icon-mask {
+  display: inline-block;
+  background-color: currentColor;
+  -webkit-mask-image: var(--vf-icon-url);
+  mask-image: var(--vf-icon-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+/* An unset custom property leaves `mask-image: none`, which paints the element's
+   whole box — a solid block of colour where an icon should be, which is far worse
+   than nothing. `Icon` already returns null when it cannot build a URL; this is
+   the second line of defence.
+
+   It is a SEPARATE rule on purpose. A second `background-color` inside the block
+   above would resolve to the same colour and silently make the first one
+   untestable — which is exactly what happened the first time: deleting
+   `background-color: currentColor` left the guard green, because a redundant
+   `color-mix(… currentColor 100% …)` further down was still painting it. */
+.vf-icon-mask:not([style*='--vf-icon-url']) {
+  display: none;
+}
+
 /* ── Editor-chosen text colour (`textColour` → `vf-tc-*`) ─────────────────────
    Generated from ONE list: `src/fields/richTextColors.ts`. The select stores a
    key, never a colour, so every one of these resolves through a design token

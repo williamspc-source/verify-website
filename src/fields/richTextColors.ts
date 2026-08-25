@@ -230,6 +230,22 @@ export const BRAND_TEXT_COLORS: readonly BrandTextColor[] = [
 ] as const
 
 /** The value meaning "leave it as the design intends" — emits no class at all. */
+/**
+ * The ancestors that mean "this is a dark band", in the order globals.css writes
+ * them for `.vf-tc-*`.
+ *
+ * Exported because a SECOND thing now needs the same re-point: the per-icon
+ * default colours the layout publishes (`iconDefaultCss`), which are keyed by id
+ * rather than by class and so cannot inherit `.vf-tc-*`'s own dark rules.
+ *
+ * Two lists that must name the same selectors is the drift this repo keeps
+ * recording, so there is one list, here, and `richTextColors.int.spec.ts` asserts
+ * globals.css uses exactly these for `.vf-tc-*`. Measured before adding it: an
+ * uploaded icon defaulting to Brand blue painted `rgb(28,117,188)` on the navy
+ * portal band, beside a built-in painting `rgb(147,208,247)`.
+ */
+export const ON_DARK_SELECTORS = ['.vf-on-dark', '.vf-section--primary', '.vf-section--dark'] as const
+
 export const INHERIT_COLOR = 'inherit'
 
 /**

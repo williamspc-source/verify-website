@@ -2,9 +2,7 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   CREATE TYPE "public"."enum_pages_hero_meta_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_pages_hero_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_hero_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
+   CREATE TYPE "public"."enum_pages_hero_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
   CREATE TYPE "public"."enum_pages_hero_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_heading_level" AS ENUM('h1', 'h2', 'h3', 'h4');
   CREATE TYPE "public"."enum_pages_blocks_heading_size" AS ENUM('sm', 'md', 'lg', 'xl', 'display');
@@ -12,7 +10,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_text_size" AS ENUM('sm', 'base', 'lg');
   CREATE TYPE "public"."enum_pages_blocks_text_align" AS ENUM('left', 'center', 'right');
   CREATE TYPE "public"."enum_pages_blocks_button_links_link_type" AS ENUM('reference', 'custom', 'enquiry', 'portalEnquiry');
-  CREATE TYPE "public"."enum_pages_blocks_button_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_button_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_button_size" AS ENUM('sm', 'md', 'lg');
   CREATE TYPE "public"."enum_pages_blocks_button_align" AS ENUM('left', 'center', 'right');
@@ -24,18 +21,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_divider_style" AS ENUM('line', 'dots', 'gradient');
   CREATE TYPE "public"."enum_pages_blocks_divider_width" AS ENUM('full', 'narrow');
   CREATE TYPE "public"."enum_pages_blocks_divider_align" AS ENUM('left', 'center', 'right');
-  CREATE TYPE "public"."enum_pages_blocks_icon_block_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_icon_block_size" AS ENUM('sm', 'md', 'lg');
   CREATE TYPE "public"."enum_pages_blocks_icon_block_color" AS ENUM('primary', 'accent', 'muted', 'inherit');
   CREATE TYPE "public"."enum_pages_blocks_icon_block_align" AS ENUM('left', 'center', 'right');
   CREATE TYPE "public"."enum_pages_blocks_content_columns_size" AS ENUM('oneThird', 'half', 'twoThirds', 'full');
   CREATE TYPE "public"."enum_pages_blocks_content_columns_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_content_columns_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_content_columns_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_cta_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_cta_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_cta_links_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "public"."enum_pages_blocks_faq_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_faq_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_faq_columns" AS ENUM('1', '2', 'split');
   CREATE TYPE "public"."enum_pages_blocks_faq_item_style" AS ENUM('card', 'divided');
@@ -45,12 +38,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_faq_container_width" AS ENUM('narrow', 'normal', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_faq_rule_style" AS ENUM('light', 'grey', 'brand');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_accent" AS ENUM('blue', 'steel', 'charcoal');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_theme" AS ENUM('light', 'dark');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_cards_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -59,8 +49,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum_pages_blocks_gateway_cards_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum_pages_blocks_feature_grid_items_details_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_pages_blocks_feature_grid_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_feature_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_feature_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_feature_grid_columns" AS ENUM('1', '2', '3', '4');
@@ -70,34 +58,28 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_feature_grid_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_feature_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum_pages_blocks_feature_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum_pages_blocks_process_steps_steps_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_steps_badge_style" AS ENUM('plain', 'accent');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_variant" AS ENUM('cards', 'two-row', 'claimant', 'edu-panels');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_number_style" AS ENUM('padded', 'plain');
-  CREATE TYPE "public"."enum_pages_blocks_process_steps_placeholder_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_columns" AS ENUM('1', '2', '3', '4', '5');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum_pages_blocks_process_steps_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum_pages_blocks_specialty_grid_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_items_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_specialty_grid_items_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_source" AS ENUM('auto', 'manual');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_taxonomy" AS ENUM('specialties', 'claim-types', 'areas-of-expertise', 'assessment-types');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_variant" AS ENUM('cards', 'checklist');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_columns" AS ENUM('2', '3', '4');
-  CREATE TYPE "public"."enum_pages_blocks_specialty_grid_default_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum_pages_blocks_specialty_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
   CREATE TYPE "public"."enum_pages_blocks_people_grid_footer_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_people_grid_footer_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_people_grid_footer_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_people_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_people_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -111,7 +93,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_people_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum_pages_blocks_people_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
   CREATE TYPE "public"."enum_pages_blocks_services_grid_footer_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_services_grid_footer_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_services_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_services_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_services_grid_source" AS ENUM('auto', 'manual');
@@ -137,19 +118,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_stats_band_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_stats_band_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_stats_band_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum_pages_blocks_aamle_education_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_aamle_education_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
-  CREATE TYPE "public"."enum_pages_blocks_aamle_education_badge_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_aamle_education_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_aamle_education_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_aamle_education_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_aamle_education_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum_pages_blocks_split_feature_rows_bullets_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_pages_blocks_split_feature_rows_placeholder_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_split_feature_rows_image_side" AS ENUM('auto', 'left', 'right');
-  CREATE TYPE "public"."enum_pages_blocks_split_feature_rows_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_split_feature_rows_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_split_feature_rows_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_split_feature_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_split_feature_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_split_feature_row_style" AS ENUM('spaced', 'divided');
@@ -159,33 +133,26 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_split_feature_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_split_feature_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_cta_band_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_cta_band_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_cta_band_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_cta_band_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_cta_band_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum_pages_blocks_tabs_tabs_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_tabs_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_tabs_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_tabs_tab_style" AS ENUM('pills', 'underline');
   CREATE TYPE "public"."enum_pages_blocks_tabs_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_tabs_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_callout_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_callout_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_callout_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_callout_style" AS ENUM('info', 'note', 'good-to-know', 'reassurance', 'success', 'warning');
-  CREATE TYPE "public"."enum_pages_blocks_callout_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_pages_blocks_contact_details_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_contact_details_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_contact_details_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_contact_details_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum_pages_blocks_icon_list_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_icon_list_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_icon_list_heading_align" AS ENUM('center', 'left');
   CREATE TYPE "public"."enum_pages_blocks_icon_list_columns" AS ENUM('1', '2', '3');
   CREATE TYPE "public"."enum_pages_blocks_icon_list_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_icon_list_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_map_embed_actions_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_map_embed_actions_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_map_embed_actions_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum_pages_blocks_map_embed_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_map_embed_kind" AS ENUM('map', 'embed');
@@ -194,14 +161,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_map_embed_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_leadership_spotlight_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_leadership_spotlight_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
-  CREATE TYPE "public"."enum_pages_blocks_leadership_spotlight_placeholder_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_leadership_spotlight_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_leadership_spotlight_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_leadership_spotlight_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_leadership_spotlight_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum_pages_blocks_portal_cta_tiles_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_portal_cta_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_portal_cta_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_video_embed_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_video_embed_provider" AS ENUM('youtube', 'vimeo', 'url');
   CREATE TYPE "public"."enum_pages_blocks_video_embed_aspect" AS ENUM('16:9', '4:3');
@@ -233,7 +196,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_archive_event_style" AS ENUM('card', 'compact');
   CREATE TYPE "public"."enum_pages_blocks_archive_columns" AS ENUM('2', '3', '4');
   CREATE TYPE "public"."enum_pages_blocks_archive_view_all_link_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_archive_view_all_link_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_slide_carousel_slides_accent" AS ENUM('seminars', 'insights', 'networking', 'sponsorships');
   CREATE TYPE "public"."enum_pages_blocks_specialist_directory_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_specialist_directory_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -251,11 +213,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_resources_grid_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_resources_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum_pages_blocks_resources_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum_appt_guide_types_tabs_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_hcards_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_appt_guide_types_tabs_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_appt_guide_types_tabs_callout_style" AS ENUM('info', 'note', 'warning');
-  CREATE TYPE "public"."enum_appt_guide_types_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_appt_guide_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_mission_pillars_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_mission_pillars_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
@@ -265,23 +223,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_blocks_value_cards_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_value_cards_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_value_cards_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum_pages_blocks_why_verify_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_why_verify_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_why_verify_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_why_verify_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_pages_blocks_audience_pathways_pathways_variant" AS ENUM('client', 'claimant');
   CREATE TYPE "public"."enum_pages_blocks_audience_pathways_pathways_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_pages_blocks_audience_pathways_pathways_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_audience_pathways_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_audience_pathways_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum_pages_blocks_audience_pathways_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum_pages_blocks_audience_pathways_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum_bkchooser_halves_links_link_type" AS ENUM('reference', 'custom', 'enquiry', 'portalEnquiry');
-  CREATE TYPE "public"."enum_bkchooser_halves_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_bkchooser_halves_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_bkchooser_halves_accent" AS ENUM('blue', 'dark');
   CREATE TYPE "public"."enum_bkchooser_density" AS ENUM('default', 'compact');
-  CREATE TYPE "public"."enum_pages_blocks_cost_grid_cards_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_pages_blocks_cost_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_pages_blocks_featured_articles_source" AS ENUM('auto', 'manual');
   CREATE TYPE "public"."enum_pages_blocks_featured_articles_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -302,9 +255,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum_pages_hero_definition_definition_style" AS ENUM('glow', 'frame');
   CREATE TYPE "public"."enum_pages_hero_definition_interaction" AS ENUM('full', 'subtle', 'off');
   CREATE TYPE "public"."enum_pages_status" AS ENUM('draft', 'published');
-  CREATE TYPE "public"."enum__pages_v_version_hero_meta_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_version_hero_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_version_hero_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_version_hero_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_heading_level" AS ENUM('h1', 'h2', 'h3', 'h4');
   CREATE TYPE "public"."enum__pages_v_blocks_heading_size" AS ENUM('sm', 'md', 'lg', 'xl', 'display');
@@ -312,7 +263,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_text_size" AS ENUM('sm', 'base', 'lg');
   CREATE TYPE "public"."enum__pages_v_blocks_text_align" AS ENUM('left', 'center', 'right');
   CREATE TYPE "public"."enum__pages_v_blocks_button_links_link_type" AS ENUM('reference', 'custom', 'enquiry', 'portalEnquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_button_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_button_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_button_size" AS ENUM('sm', 'md', 'lg');
   CREATE TYPE "public"."enum__pages_v_blocks_button_align" AS ENUM('left', 'center', 'right');
@@ -324,18 +274,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_divider_style" AS ENUM('line', 'dots', 'gradient');
   CREATE TYPE "public"."enum__pages_v_blocks_divider_width" AS ENUM('full', 'narrow');
   CREATE TYPE "public"."enum__pages_v_blocks_divider_align" AS ENUM('left', 'center', 'right');
-  CREATE TYPE "public"."enum__pages_v_blocks_icon_block_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_block_size" AS ENUM('sm', 'md', 'lg');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_block_color" AS ENUM('primary', 'accent', 'muted', 'inherit');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_block_align" AS ENUM('left', 'center', 'right');
   CREATE TYPE "public"."enum__pages_v_blocks_content_columns_size" AS ENUM('oneThird', 'half', 'twoThirds', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_content_columns_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_content_columns_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_content_columns_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_cta_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_cta_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_cta_links_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "public"."enum__pages_v_blocks_faq_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_faq_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_faq_columns" AS ENUM('1', '2', 'split');
   CREATE TYPE "public"."enum__pages_v_blocks_faq_item_style" AS ENUM('card', 'divided');
@@ -345,12 +291,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_faq_container_width" AS ENUM('narrow', 'normal', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_faq_rule_style" AS ENUM('light', 'grey', 'brand');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_accent" AS ENUM('blue', 'steel', 'charcoal');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_theme" AS ENUM('light', 'dark');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -359,8 +302,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum__pages_v_blocks_gateway_cards_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_items_details_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_columns" AS ENUM('1', '2', '3', '4');
@@ -370,34 +311,28 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum__pages_v_blocks_feature_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum__pages_v_blocks_process_steps_steps_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_steps_badge_style" AS ENUM('plain', 'accent');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_variant" AS ENUM('cards', 'two-row', 'claimant', 'edu-panels');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_number_style" AS ENUM('padded', 'plain');
-  CREATE TYPE "public"."enum__pages_v_blocks_process_steps_placeholder_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_columns" AS ENUM('1', '2', '3', '4', '5');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum__pages_v_blocks_process_steps_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_items_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_items_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_source" AS ENUM('auto', 'manual');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_taxonomy" AS ENUM('specialties', 'claim-types', 'areas-of-expertise', 'assessment-types');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_variant" AS ENUM('cards', 'checklist');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_columns" AS ENUM('2', '3', '4');
-  CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_default_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum__pages_v_blocks_specialty_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
   CREATE TYPE "public"."enum__pages_v_blocks_people_grid_footer_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_people_grid_footer_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_people_grid_footer_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_people_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_people_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -411,7 +346,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_people_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum__pages_v_blocks_people_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
   CREATE TYPE "public"."enum__pages_v_blocks_services_grid_footer_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_services_grid_footer_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_services_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_services_grid_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_services_grid_source" AS ENUM('auto', 'manual');
@@ -437,19 +371,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_stats_band_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_stats_band_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_stats_band_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum__pages_v_blocks_aamle_education_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_aamle_education_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
-  CREATE TYPE "public"."enum__pages_v_blocks_aamle_education_badge_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_aamle_education_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_aamle_education_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_aamle_education_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_aamle_education_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum__pages_v_blocks_split_feature_rows_bullets_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum__pages_v_blocks_split_feature_rows_placeholder_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_split_feature_rows_image_side" AS ENUM('auto', 'left', 'right');
-  CREATE TYPE "public"."enum__pages_v_blocks_split_feature_rows_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_split_feature_rows_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_split_feature_rows_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_split_feature_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_split_feature_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_split_feature_row_style" AS ENUM('spaced', 'divided');
@@ -459,33 +386,26 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_split_feature_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_split_feature_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_cta_band_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_cta_band_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_cta_band_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_cta_band_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_cta_band_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum__pages_v_blocks_tabs_tabs_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_tabs_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_tabs_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_tabs_tab_style" AS ENUM('pills', 'underline');
   CREATE TYPE "public"."enum__pages_v_blocks_tabs_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_tabs_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_callout_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_callout_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_callout_links_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_callout_style" AS ENUM('info', 'note', 'good-to-know', 'reassurance', 'success', 'warning');
-  CREATE TYPE "public"."enum__pages_v_blocks_callout_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum__pages_v_blocks_contact_details_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_contact_details_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_contact_details_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_contact_details_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum__pages_v_blocks_icon_list_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_list_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_list_heading_align" AS ENUM('center', 'left');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_list_columns" AS ENUM('1', '2', '3');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_list_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_icon_list_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_map_embed_actions_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_map_embed_actions_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_map_embed_actions_link_appearance" AS ENUM('default', 'outline');
   CREATE TYPE "public"."enum__pages_v_blocks_map_embed_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_map_embed_kind" AS ENUM('map', 'embed');
@@ -494,14 +414,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_map_embed_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_leadership_spotlight_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_leadership_spotlight_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
-  CREATE TYPE "public"."enum__pages_v_blocks_leadership_spotlight_placeholder_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_leadership_spotlight_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_leadership_spotlight_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_leadership_spotlight_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_leadership_spotlight_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum__pages_v_blocks_portal_cta_tiles_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_portal_cta_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_portal_cta_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_video_embed_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_video_embed_provider" AS ENUM('youtube', 'vimeo', 'url');
   CREATE TYPE "public"."enum__pages_v_blocks_video_embed_aspect" AS ENUM('16:9', '4:3');
@@ -533,7 +449,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_archive_event_style" AS ENUM('card', 'compact');
   CREATE TYPE "public"."enum__pages_v_blocks_archive_columns" AS ENUM('2', '3', '4');
   CREATE TYPE "public"."enum__pages_v_blocks_archive_view_all_link_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_archive_view_all_link_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_slide_carousel_slides_accent" AS ENUM('seminars', 'insights', 'networking', 'sponsorships');
   CREATE TYPE "public"."enum__pages_v_blocks_specialist_directory_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_specialist_directory_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -551,11 +466,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_resources_grid_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_resources_grid_hover_effect" AS ENUM('none', 'lift', 'glow', 'zoom', 'accent-bar');
   CREATE TYPE "public"."enum__pages_v_blocks_resources_grid_shadow" AS ENUM('default', 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'glow', 'glow-strong');
-  CREATE TYPE "public"."enum__appt_guide_v_types_tabs_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum__hcards_v_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum__appt_guide_v_types_tabs_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__appt_guide_v_types_tabs_callout_style" AS ENUM('info', 'note', 'warning');
-  CREATE TYPE "public"."enum__appt_guide_v_types_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__appt_guide_v_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_mission_pillars_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_mission_pillars_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
@@ -565,23 +476,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_blocks_value_cards_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_value_cards_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_value_cards_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
-  CREATE TYPE "public"."enum__pages_v_blocks_why_verify_items_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_why_verify_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_why_verify_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_why_verify_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__pages_v_blocks_audience_pathways_pathways_variant" AS ENUM('client', 'claimant');
   CREATE TYPE "public"."enum__pages_v_blocks_audience_pathways_pathways_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum__pages_v_blocks_audience_pathways_pathways_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_audience_pathways_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_audience_pathways_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
   CREATE TYPE "public"."enum__pages_v_blocks_audience_pathways_container_width" AS ENUM('normal', 'narrow', 'wide', 'full');
   CREATE TYPE "public"."enum__pages_v_blocks_audience_pathways_motion" AS ENUM('none', 'fade-up', 'fade-in', 'zoom-in');
   CREATE TYPE "public"."enum__bkchooser_v_halves_links_link_type" AS ENUM('reference', 'custom', 'enquiry', 'portalEnquiry');
-  CREATE TYPE "public"."enum__bkchooser_v_halves_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum__bkchooser_v_halves_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__bkchooser_v_halves_accent" AS ENUM('blue', 'dark');
   CREATE TYPE "public"."enum__bkchooser_v_density" AS ENUM('default', 'compact');
-  CREATE TYPE "public"."enum__pages_v_blocks_cost_grid_cards_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__pages_v_blocks_cost_grid_text_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum__pages_v_blocks_featured_articles_source" AS ENUM('auto', 'manual');
   CREATE TYPE "public"."enum__pages_v_blocks_featured_articles_background" AS ENUM('white', 'muted', 'accent', 'accent-solid', 'light', 'primary', 'dark', 'hero');
@@ -610,19 +516,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__events_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_services_category" AS ENUM('medico-legal', 'administrative', 'educational');
   CREATE TYPE "public"."enum_services_service_group" AS ENUM('examination', 'reporting', 'administrative', 'education');
-  CREATE TYPE "public"."enum_services_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_resources_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_resources_resource_type" AS ENUM('checklist', 'guide', 'template', 'fact-sheet');
   CREATE TYPE "public"."enum_resources_audience" AS ENUM('clients', 'claimants', 'all');
-  CREATE TYPE "public"."enum_specialties_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_specialty_categories_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_accreditations_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_streams_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_categories_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_specialists_qualifications_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_specialists_profile_photo_shape" AS ENUM('tall', 'portrait', 'square');
   CREATE TYPE "public"."enum_specialists_status" AS ENUM('draft', 'published');
-  CREATE TYPE "public"."enum__specialists_v_version_qualifications_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum__specialists_v_version_profile_photo_shape" AS ENUM('tall', 'portrait', 'square');
   CREATE TYPE "public"."enum__specialists_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_team_profile_photo_shape" AS ENUM('tall', 'portrait', 'square');
@@ -631,35 +528,27 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__team_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_availability_sessions_mode" AS ENUM('in-person', 'telehealth', 'either');
   CREATE TYPE "public"."enum_availability_sessions_status" AS ENUM('available', 'booked');
+  CREATE TYPE "public"."enum_icons_colour" AS ENUM('inherit', 'brand', 'deep', 'linkblue', 'bright', 'definition', 'sky', 'muted', 'black', 'charcoal', 'grey', 'white', 'success', 'warning', 'error', 'heading', 'body');
   CREATE TYPE "public"."enum_redirects_to_type" AS ENUM('reference', 'custom');
   CREATE TYPE "public"."enum_forms_confirmation_type" AS ENUM('message', 'redirect');
   CREATE TYPE "public"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'schedulePublish');
   CREATE TYPE "public"."enum_payload_jobs_log_state" AS ENUM('failed', 'succeeded');
   CREATE TYPE "public"."enum_payload_jobs_task_slug" AS ENUM('inline', 'schedulePublish');
   CREATE TYPE "public"."enum_payload_folders_folder_type" AS ENUM('media');
-  CREATE TYPE "public"."enum_article_settings_sidebar_cards_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_article_settings_sidebar_cards_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_article_settings_sidebar_cards_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
-  CREATE TYPE "public"."enum_specialist_profile_portal_cta_tiles_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_header_nav_items_sub_items_sub_sub_items_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_header_nav_items_sub_items_sub_sub_items_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_header_nav_items_sub_items_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_header_nav_items_sub_items_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_header_nav_items_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_header_nav_items_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_header_cta_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_header_cta_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_footer_columns_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_footer_columns_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_footer_social_platform" AS ENUM('linkedin', 'facebook', 'instagram', 'x');
   CREATE TYPE "public"."enum_footer_legal_links_link_type" AS ENUM('reference', 'custom', 'enquiry');
-  CREATE TYPE "public"."enum_footer_legal_links_link_icon" AS ENUM('activity', 'arrow-down', 'arrow-right', 'arrows-out', 'award', 'bag-simple', 'bell-ringing', 'bone', 'book-open', 'brain', 'briefcase', 'building', 'bus', 'calendar', 'calendar-blank', 'calendar-check', 'car', 'caret-left', 'caret-right', 'cell-signal-full', 'certificate', 'chart-bar', 'chat', 'chat-circle-text', 'chats', 'chats-circle', 'check', 'check-circle', 'check-square', 'clipboard-check', 'clipboard-text', 'clock', 'currency-dollar', 'desktop', 'download', 'download-simple', 'envelope', 'envelope-simple', 'file-magnifying-glass', 'file-plus', 'file-text', 'files', 'first-aid', 'gavel', 'globe', 'graduation-cap', 'handshake', 'headset', 'heart-pulse', 'heartbeat', 'home', 'house', 'identification-card', 'image', 'info', 'link', 'list', 'lock', 'lock-simple', 'magnifying-glass', 'mail', 'map-pin', 'medal', 'message', 'monitor', 'navigation-arrow', 'paper-plane-tilt', 'person-arms-spread', 'phone', 'question', 'scale', 'scales', 'seal-check', 'search', 'send', 'shield', 'shield-check', 'sign-in', 'sliders', 'sort-ascending', 'squares-four', 'star', 'stethoscope', 't-shirt', 'target', 'translate', 'upload', 'upload-simple', 'user', 'user-check', 'user-circle', 'user-plus', 'users', 'users-three', 'video', 'video-camera', 'warning', 'warning-circle', 'wheelchair', 'wifi-high', 'wind');
   CREATE TYPE "public"."enum_design_system_typography_text_scale" AS ENUM('0.9', '0.95', '1', '1.05', '1.1', '1.15', '1.25');
   CREATE TABLE "pages_hero_meta_items" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_hero_meta_items_icon",
+  	"icon" varchar,
   	"text" jsonb,
   	"href" varchar
   );
@@ -673,7 +562,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_hero_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_hero_links_link_appearance" DEFAULT 'default'
   );
   
@@ -709,7 +598,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_button_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_button_links_link_appearance" DEFAULT 'default'
   );
   
@@ -762,7 +651,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL,
   	"_path" text NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_icon_block_icon",
+  	"icon" varchar,
   	"size" "enum_pages_blocks_icon_block_size" DEFAULT 'md',
   	"color" "enum_pages_blocks_icon_block_color" DEFAULT 'primary',
   	"align" "enum_pages_blocks_icon_block_align" DEFAULT 'left',
@@ -781,7 +670,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_content_columns_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_content_columns_link_appearance" DEFAULT 'default'
   );
   
@@ -811,7 +700,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_cta_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_cta_links_link_appearance" DEFAULT 'default'
   );
   
@@ -829,7 +718,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"question" jsonb,
-  	"icon" "enum_pages_blocks_faq_items_icon",
+  	"icon" varchar,
   	"image_id" integer,
   	"answer" jsonb,
   	"anchor_id" varchar
@@ -870,14 +759,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_gateway_cards_cards_links_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "pages_blocks_gateway_cards_cards" (
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_gateway_cards_cards_icon",
+  	"icon" varchar,
   	"eyebrow" jsonb,
   	"subtitle" jsonb,
   	"title" jsonb,
@@ -889,7 +778,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_gateway_cards_cards_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_gateway_cards_cards_link_appearance" DEFAULT 'default'
   );
   
@@ -922,7 +811,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_feature_grid_items_details_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"description" jsonb
   );
@@ -931,7 +820,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_feature_grid_items_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"title_suffix" jsonb,
   	"description" jsonb,
@@ -969,7 +858,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_process_steps_steps_icon",
+  	"icon" varchar,
   	"badge" jsonb,
   	"badge_style" "enum_pages_blocks_process_steps_steps_badge_style" DEFAULT 'plain',
   	"title" jsonb,
@@ -992,7 +881,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"image_id" integer,
   	"image_placeholder" boolean DEFAULT false,
   	"placeholder_label" jsonb,
-  	"placeholder_icon" "enum_pages_blocks_process_steps_placeholder_icon",
+  	"placeholder_icon" varchar,
   	"columns" "enum_pages_blocks_process_steps_columns" DEFAULT '3',
   	"anchor_id" varchar,
   	"container_width" "enum_pages_blocks_process_steps_container_width" DEFAULT 'normal',
@@ -1006,14 +895,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_specialty_grid_items_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"link_type" "enum_pages_blocks_specialty_grid_items_link_type" DEFAULT 'reference',
   	"link_new_tab" boolean,
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_specialty_grid_items_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "pages_blocks_specialty_grid" (
@@ -1030,7 +919,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"taxonomy" "enum_pages_blocks_specialty_grid_taxonomy" DEFAULT 'specialties',
   	"variant" "enum_pages_blocks_specialty_grid_variant" DEFAULT 'cards',
   	"columns" "enum_pages_blocks_specialty_grid_columns" DEFAULT '4',
-  	"default_icon" "enum_pages_blocks_specialty_grid_default_icon" DEFAULT 'stethoscope',
+  	"default_icon" varchar DEFAULT 'stethoscope',
   	"link_to_directory" boolean,
   	"directory_path" varchar DEFAULT '/specialists/specialist-panel',
   	"cta_label" jsonb,
@@ -1050,7 +939,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_people_grid_footer_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_people_grid_footer_links_link_appearance" DEFAULT 'default'
   );
   
@@ -1096,7 +985,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_services_grid_footer_links_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "pages_blocks_services_grid" (
@@ -1181,7 +1070,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_aamle_education_items_icon",
+  	"icon" varchar,
   	"label" jsonb
   );
   
@@ -1194,7 +1083,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"eyebrow" jsonb,
   	"wordmark" jsonb,
   	"subheading" jsonb,
-  	"badge_icon" "enum_pages_blocks_aamle_education_badge_icon" DEFAULT 'graduation-cap',
+  	"badge_icon" varchar DEFAULT 'graduation-cap',
   	"badge_text" jsonb,
   	"description" jsonb,
   	"link_type" "enum_pages_blocks_aamle_education_link_type" DEFAULT 'reference',
@@ -1202,7 +1091,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_aamle_education_link_icon",
+  	"link_icon" varchar,
   	"image_id" integer,
   	"image_placeholder" boolean DEFAULT true,
   	"placeholder_label" jsonb,
@@ -1217,7 +1106,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"text" jsonb,
-  	"icon" "enum_pages_blocks_split_feature_rows_bullets_icon"
+  	"icon" varchar
   );
   
   CREATE TABLE "pages_blocks_split_feature_rows" (
@@ -1227,10 +1116,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"image_id" integer,
   	"image_placeholder" boolean,
   	"placeholder_label" jsonb,
-  	"placeholder_icon" "enum_pages_blocks_split_feature_rows_placeholder_icon",
+  	"placeholder_icon" varchar,
   	"image_side" "enum_pages_blocks_split_feature_rows_image_side" DEFAULT 'auto',
   	"eyebrow" jsonb,
-  	"icon" "enum_pages_blocks_split_feature_rows_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"body" jsonb,
   	"bullets_label" jsonb,
@@ -1239,7 +1128,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_split_feature_rows_link_icon",
+  	"link_icon" varchar,
   	"anchor_id" varchar
   );
   
@@ -1271,7 +1160,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_cta_band_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_cta_band_links_link_appearance" DEFAULT 'default'
   );
   
@@ -1293,7 +1182,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"label" jsonb,
-  	"icon" "enum_pages_blocks_tabs_tabs_icon"
+  	"icon" varchar
   );
   
   CREATE TABLE "pages_blocks_tabs" (
@@ -1323,7 +1212,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_callout_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_callout_links_link_appearance" DEFAULT 'default'
   );
   
@@ -1333,7 +1222,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_path" text NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"style" "enum_pages_blocks_callout_style" DEFAULT 'info',
-  	"icon" "enum_pages_blocks_callout_icon",
+  	"icon" varchar,
   	"tag" jsonb,
   	"heading" jsonb,
   	"body" jsonb,
@@ -1344,7 +1233,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_contact_details_items_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"value" jsonb,
   	"href" varchar,
@@ -1370,7 +1259,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_icon_list_items_icon",
+  	"icon" varchar,
   	"text" jsonb,
   	"link_url" varchar
   );
@@ -1400,7 +1289,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_map_embed_actions_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum_pages_blocks_map_embed_actions_link_appearance" DEFAULT 'default'
   );
   
@@ -1445,7 +1334,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"text_colour" "enum_pages_blocks_leadership_spotlight_text_colour" DEFAULT 'inherit',
   	"background" "enum_pages_blocks_leadership_spotlight_background" DEFAULT 'muted',
   	"photo_id" integer,
-  	"placeholder_icon" "enum_pages_blocks_leadership_spotlight_placeholder_icon" DEFAULT 'user-circle',
+  	"placeholder_icon" varchar DEFAULT 'user-circle',
   	"name" jsonb,
   	"role" jsonb,
   	"badge" jsonb,
@@ -1456,7 +1345,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_leadership_spotlight_link_icon",
+  	"link_icon" varchar,
   	"container_width" "enum_pages_blocks_leadership_spotlight_container_width" DEFAULT 'normal',
   	"motion" "enum_pages_blocks_leadership_spotlight_motion" DEFAULT 'none',
   	"anchor_id" varchar,
@@ -1467,7 +1356,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_portal_cta_tiles_icon",
+  	"icon" varchar,
   	"label" jsonb
   );
   
@@ -1480,7 +1369,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_portal_cta_links_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "pages_blocks_portal_cta" (
@@ -1605,7 +1494,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"view_all_link_link_url" varchar,
   	"view_all_link_link_label" jsonb,
   	"view_all_link_link_anchor" varchar,
-  	"view_all_link_link_icon" "enum_pages_blocks_archive_view_all_link_link_icon",
+  	"view_all_link_link_icon" varchar,
   	"anchor_id" varchar,
   	"hide_when_empty" boolean DEFAULT false,
   	"block_name" varchar
@@ -1733,7 +1622,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_appt_guide_types_tabs_items_icon",
+  	"icon" varchar,
   	"heading" jsonb,
   	"body" jsonb
   );
@@ -1749,7 +1638,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_hcards_icon",
+  	"icon" varchar,
   	"title" jsonb
   );
   
@@ -1757,7 +1646,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_appt_guide_types_tabs_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"callout_style" "enum_appt_guide_types_tabs_callout_style" DEFAULT 'info',
   	"callout_text" jsonb
@@ -1767,7 +1656,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_appt_guide_types_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"sublabel" jsonb,
   	"anchor_id" varchar
@@ -1837,7 +1726,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_why_verify_items_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"body" jsonb
   );
@@ -1880,7 +1769,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_pages_blocks_audience_pathways_pathways_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "pages_blocks_audience_pathways" (
@@ -1908,14 +1797,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum_bkchooser_halves_links_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "bkchooser_halves" (
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_bkchooser_halves_icon",
+  	"icon" varchar,
   	"accent" "enum_bkchooser_halves_accent" DEFAULT 'blue',
   	"eyebrow" jsonb,
   	"title" jsonb,
@@ -1936,7 +1825,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" varchar NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_pages_blocks_cost_grid_cards_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"description" jsonb
   );
@@ -2125,7 +2014,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_version_hero_meta_items_icon",
+  	"icon" varchar,
   	"text" jsonb,
   	"href" varchar,
   	"_uuid" varchar
@@ -2140,7 +2029,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_version_hero_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_version_hero_links_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2179,7 +2068,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_button_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_button_links_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2237,7 +2126,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL,
   	"_path" text NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_icon_block_icon",
+  	"icon" varchar,
   	"size" "enum__pages_v_blocks_icon_block_size" DEFAULT 'md',
   	"color" "enum__pages_v_blocks_icon_block_color" DEFAULT 'primary',
   	"align" "enum__pages_v_blocks_icon_block_align" DEFAULT 'left',
@@ -2257,7 +2146,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_content_columns_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_content_columns_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2290,7 +2179,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_cta_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_cta_links_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2310,7 +2199,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
   	"question" jsonb,
-  	"icon" "enum__pages_v_blocks_faq_items_icon",
+  	"icon" varchar,
   	"image_id" integer,
   	"answer" jsonb,
   	"anchor_id" varchar,
@@ -2353,7 +2242,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_gateway_cards_cards_links_link_icon",
+  	"link_icon" varchar,
   	"_uuid" varchar
   );
   
@@ -2361,7 +2250,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_gateway_cards_cards_icon",
+  	"icon" varchar,
   	"eyebrow" jsonb,
   	"subtitle" jsonb,
   	"title" jsonb,
@@ -2373,7 +2262,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_gateway_cards_cards_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_gateway_cards_cards_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2409,7 +2298,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_feature_grid_items_details_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"description" jsonb,
   	"_uuid" varchar
@@ -2419,7 +2308,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_feature_grid_items_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"title_suffix" jsonb,
   	"description" jsonb,
@@ -2460,7 +2349,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_process_steps_steps_icon",
+  	"icon" varchar,
   	"badge" jsonb,
   	"badge_style" "enum__pages_v_blocks_process_steps_steps_badge_style" DEFAULT 'plain',
   	"title" jsonb,
@@ -2484,7 +2373,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"image_id" integer,
   	"image_placeholder" boolean DEFAULT false,
   	"placeholder_label" jsonb,
-  	"placeholder_icon" "enum__pages_v_blocks_process_steps_placeholder_icon",
+  	"placeholder_icon" varchar,
   	"columns" "enum__pages_v_blocks_process_steps_columns" DEFAULT '3',
   	"anchor_id" varchar,
   	"container_width" "enum__pages_v_blocks_process_steps_container_width" DEFAULT 'normal',
@@ -2499,14 +2388,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_specialty_grid_items_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"link_type" "enum__pages_v_blocks_specialty_grid_items_link_type" DEFAULT 'reference',
   	"link_new_tab" boolean,
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_specialty_grid_items_link_icon",
+  	"link_icon" varchar,
   	"_uuid" varchar
   );
   
@@ -2524,7 +2413,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"taxonomy" "enum__pages_v_blocks_specialty_grid_taxonomy" DEFAULT 'specialties',
   	"variant" "enum__pages_v_blocks_specialty_grid_variant" DEFAULT 'cards',
   	"columns" "enum__pages_v_blocks_specialty_grid_columns" DEFAULT '4',
-  	"default_icon" "enum__pages_v_blocks_specialty_grid_default_icon" DEFAULT 'stethoscope',
+  	"default_icon" varchar DEFAULT 'stethoscope',
   	"link_to_directory" boolean,
   	"directory_path" varchar DEFAULT '/specialists/specialist-panel',
   	"cta_label" jsonb,
@@ -2545,7 +2434,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_people_grid_footer_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_people_grid_footer_links_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2593,7 +2482,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_services_grid_footer_links_link_icon",
+  	"link_icon" varchar,
   	"_uuid" varchar
   );
   
@@ -2683,7 +2572,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_aamle_education_items_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"_uuid" varchar
   );
@@ -2697,7 +2586,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"eyebrow" jsonb,
   	"wordmark" jsonb,
   	"subheading" jsonb,
-  	"badge_icon" "enum__pages_v_blocks_aamle_education_badge_icon" DEFAULT 'graduation-cap',
+  	"badge_icon" varchar DEFAULT 'graduation-cap',
   	"badge_text" jsonb,
   	"description" jsonb,
   	"link_type" "enum__pages_v_blocks_aamle_education_link_type" DEFAULT 'reference',
@@ -2705,7 +2594,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_aamle_education_link_icon",
+  	"link_icon" varchar,
   	"image_id" integer,
   	"image_placeholder" boolean DEFAULT true,
   	"placeholder_label" jsonb,
@@ -2721,7 +2610,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
   	"text" jsonb,
-  	"icon" "enum__pages_v_blocks_split_feature_rows_bullets_icon",
+  	"icon" varchar,
   	"_uuid" varchar
   );
   
@@ -2732,10 +2621,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"image_id" integer,
   	"image_placeholder" boolean,
   	"placeholder_label" jsonb,
-  	"placeholder_icon" "enum__pages_v_blocks_split_feature_rows_placeholder_icon",
+  	"placeholder_icon" varchar,
   	"image_side" "enum__pages_v_blocks_split_feature_rows_image_side" DEFAULT 'auto',
   	"eyebrow" jsonb,
-  	"icon" "enum__pages_v_blocks_split_feature_rows_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"body" jsonb,
   	"bullets_label" jsonb,
@@ -2744,7 +2633,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_split_feature_rows_link_icon",
+  	"link_icon" varchar,
   	"anchor_id" varchar,
   	"_uuid" varchar
   );
@@ -2778,7 +2667,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_cta_band_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_cta_band_links_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2802,7 +2691,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
   	"label" jsonb,
-  	"icon" "enum__pages_v_blocks_tabs_tabs_icon",
+  	"icon" varchar,
   	"_uuid" varchar
   );
   
@@ -2834,7 +2723,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_callout_links_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_callout_links_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2845,7 +2734,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_path" text NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
   	"style" "enum__pages_v_blocks_callout_style" DEFAULT 'info',
-  	"icon" "enum__pages_v_blocks_callout_icon",
+  	"icon" varchar,
   	"tag" jsonb,
   	"heading" jsonb,
   	"body" jsonb,
@@ -2857,7 +2746,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_contact_details_items_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"value" jsonb,
   	"href" varchar,
@@ -2885,7 +2774,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_icon_list_items_icon",
+  	"icon" varchar,
   	"text" jsonb,
   	"link_url" varchar,
   	"_uuid" varchar
@@ -2917,7 +2806,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_map_embed_actions_link_icon",
+  	"link_icon" varchar,
   	"link_appearance" "enum__pages_v_blocks_map_embed_actions_link_appearance" DEFAULT 'default',
   	"_uuid" varchar
   );
@@ -2965,7 +2854,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"text_colour" "enum__pages_v_blocks_leadership_spotlight_text_colour" DEFAULT 'inherit',
   	"background" "enum__pages_v_blocks_leadership_spotlight_background" DEFAULT 'muted',
   	"photo_id" integer,
-  	"placeholder_icon" "enum__pages_v_blocks_leadership_spotlight_placeholder_icon" DEFAULT 'user-circle',
+  	"placeholder_icon" varchar DEFAULT 'user-circle',
   	"name" jsonb,
   	"role" jsonb,
   	"badge" jsonb,
@@ -2976,7 +2865,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_leadership_spotlight_link_icon",
+  	"link_icon" varchar,
   	"container_width" "enum__pages_v_blocks_leadership_spotlight_container_width" DEFAULT 'normal',
   	"motion" "enum__pages_v_blocks_leadership_spotlight_motion" DEFAULT 'none',
   	"anchor_id" varchar,
@@ -2988,7 +2877,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_portal_cta_tiles_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"_uuid" varchar
   );
@@ -3002,7 +2891,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_portal_cta_links_link_icon",
+  	"link_icon" varchar,
   	"_uuid" varchar
   );
   
@@ -3135,7 +3024,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"view_all_link_link_url" varchar,
   	"view_all_link_link_label" jsonb,
   	"view_all_link_link_anchor" varchar,
-  	"view_all_link_link_icon" "enum__pages_v_blocks_archive_view_all_link_link_icon",
+  	"view_all_link_link_icon" varchar,
   	"anchor_id" varchar,
   	"hide_when_empty" boolean DEFAULT false,
   	"_uuid" varchar,
@@ -3271,7 +3160,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__appt_guide_v_types_tabs_items_icon",
+  	"icon" varchar,
   	"heading" jsonb,
   	"body" jsonb,
   	"_uuid" varchar
@@ -3289,7 +3178,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__hcards_v_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"_uuid" varchar
   );
@@ -3298,7 +3187,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__appt_guide_v_types_tabs_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"callout_style" "enum__appt_guide_v_types_tabs_callout_style" DEFAULT 'info',
   	"callout_text" jsonb,
@@ -3309,7 +3198,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__appt_guide_v_types_icon",
+  	"icon" varchar,
   	"label" jsonb,
   	"sublabel" jsonb,
   	"anchor_id" varchar,
@@ -3385,7 +3274,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_why_verify_items_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"body" jsonb,
   	"_uuid" varchar
@@ -3431,7 +3320,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__pages_v_blocks_audience_pathways_pathways_link_icon",
+  	"link_icon" varchar,
   	"_uuid" varchar
   );
   
@@ -3461,7 +3350,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb,
   	"link_anchor" varchar,
-  	"link_icon" "enum__bkchooser_v_halves_links_link_icon",
+  	"link_icon" varchar,
   	"_uuid" varchar
   );
   
@@ -3469,7 +3358,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__bkchooser_v_halves_icon",
+  	"icon" varchar,
   	"accent" "enum__bkchooser_v_halves_accent" DEFAULT 'blue',
   	"eyebrow" jsonb,
   	"title" jsonb,
@@ -3492,7 +3381,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
-  	"icon" "enum__pages_v_blocks_cost_grid_cards_icon",
+  	"icon" varchar,
   	"title" jsonb,
   	"description" jsonb,
   	"_uuid" varchar
@@ -3948,7 +3837,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"title" varchar NOT NULL,
   	"category" "enum_services_category" DEFAULT 'medico-legal' NOT NULL,
   	"service_group" "enum_services_service_group",
-  	"icon" "enum_services_icon",
+  	"icon" varchar,
   	"photo_id" integer,
   	"link_override" varchar,
   	"short_description" jsonb,
@@ -3964,7 +3853,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "resources" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
-  	"icon" "enum_resources_icon",
+  	"icon" varchar,
   	"resource_type" "enum_resources_resource_type" DEFAULT 'guide',
   	"audience" "enum_resources_audience" DEFAULT 'clients',
   	"description" jsonb,
@@ -4046,7 +3935,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "specialties" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
-  	"icon" "enum_specialties_icon",
+  	"icon" varchar,
   	"category_id" integer,
   	"description" jsonb,
   	"order" numeric,
@@ -4059,7 +3948,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "specialty_categories" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
-  	"icon" "enum_specialty_categories_icon",
+  	"icon" varchar,
   	"order" numeric DEFAULT 0,
   	"generate_slug" boolean DEFAULT true,
   	"slug" varchar NOT NULL,
@@ -4110,7 +3999,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "accreditations" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
-  	"icon" "enum_accreditations_icon",
+  	"icon" varchar,
   	"description" jsonb,
   	"generate_slug" boolean DEFAULT true,
   	"slug" varchar NOT NULL,
@@ -4132,7 +4021,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "streams" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
-  	"icon" "enum_streams_icon",
+  	"icon" varchar,
   	"description" jsonb,
   	"order" numeric DEFAULT 0,
   	"generate_slug" boolean DEFAULT true,
@@ -4153,7 +4042,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TABLE "categories" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar NOT NULL,
-  	"icon" "enum_categories_icon",
+  	"icon" varchar,
   	"color" varchar,
   	"description" jsonb,
   	"generate_slug" boolean DEFAULT true,
@@ -4178,7 +4067,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
   	"qualification" jsonb,
-  	"icon" "enum_specialists_qualifications_icon"
+  	"icon" varchar
   );
   
   CREATE TABLE "specialists_languages" (
@@ -4234,7 +4123,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_parent_id" integer NOT NULL,
   	"id" serial PRIMARY KEY NOT NULL,
   	"qualification" jsonb,
-  	"icon" "enum__specialists_v_version_qualifications_icon",
+  	"icon" varchar,
   	"_uuid" varchar
   );
   
@@ -4447,6 +4336,25 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"sizes_og_mime_type" varchar,
   	"sizes_og_filesize" numeric,
   	"sizes_og_filename" varchar
+  );
+  
+  CREATE TABLE "icons" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar NOT NULL,
+  	"colour" "enum_icons_colour" DEFAULT 'inherit',
+  	"view_box" varchar,
+  	"markup" varchar,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"url" varchar,
+  	"thumbnail_u_r_l" varchar,
+  	"filename" varchar,
+  	"mime_type" varchar,
+  	"filesize" numeric,
+  	"width" numeric,
+  	"height" numeric,
+  	"focal_x" numeric,
+  	"focal_y" numeric
   );
   
   CREATE TABLE "users_sessions" (
@@ -4767,6 +4675,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"team_id" integer,
   	"availability_sessions_id" integer,
   	"media_id" integer,
+  	"icons_id" integer,
   	"users_id" integer,
   	"redirects_id" integer,
   	"forms_id" integer,
@@ -4803,7 +4712,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_article_settings_sidebar_cards_icon",
+  	"icon" varchar,
   	"heading" jsonb NOT NULL,
   	"body" jsonb,
   	"link_type" "enum_article_settings_sidebar_cards_link_type" DEFAULT 'reference',
@@ -4811,7 +4720,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb NOT NULL,
   	"link_anchor" varchar,
-  	"link_icon" "enum_article_settings_sidebar_cards_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "article_settings" (
@@ -4891,7 +4800,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"icon" "enum_specialist_profile_portal_cta_tiles_icon",
+  	"icon" varchar,
   	"label" jsonb NOT NULL
   );
   
@@ -4956,7 +4865,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb NOT NULL,
   	"link_anchor" varchar,
-  	"link_icon" "enum_header_nav_items_sub_items_sub_sub_items_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "header_nav_items_sub_items" (
@@ -4968,7 +4877,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb NOT NULL,
   	"link_anchor" varchar,
-  	"link_icon" "enum_header_nav_items_sub_items_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "header_nav_items" (
@@ -4980,7 +4889,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb NOT NULL,
   	"link_anchor" varchar,
-  	"link_icon" "enum_header_nav_items_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "header" (
@@ -4991,7 +4900,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"cta_link_url" varchar,
   	"cta_link_label" jsonb NOT NULL,
   	"cta_link_anchor" varchar,
-  	"cta_link_icon" "enum_header_cta_link_icon",
+  	"cta_link_icon" varchar,
   	"updated_at" timestamp(3) with time zone,
   	"created_at" timestamp(3) with time zone
   );
@@ -5017,7 +4926,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb NOT NULL,
   	"link_anchor" varchar,
-  	"link_icon" "enum_footer_columns_links_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "footer_columns" (
@@ -5052,7 +4961,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"link_url" varchar,
   	"link_label" jsonb NOT NULL,
   	"link_anchor" varchar,
-  	"link_icon" "enum_footer_legal_links_link_icon"
+  	"link_icon" varchar
   );
   
   CREATE TABLE "footer" (
@@ -5643,6 +5552,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_team_fk" FOREIGN KEY ("team_id") REFERENCES "public"."team"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_availability_sessions_fk" FOREIGN KEY ("availability_sessions_id") REFERENCES "public"."availability_sessions"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_media_fk" FOREIGN KEY ("media_id") REFERENCES "public"."media"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_icons_fk" FOREIGN KEY ("icons_id") REFERENCES "public"."icons"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_redirects_fk" FOREIGN KEY ("redirects_id") REFERENCES "public"."redirects"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_forms_fk" FOREIGN KEY ("forms_id") REFERENCES "public"."forms"("id") ON DELETE cascade ON UPDATE no action;
@@ -6510,6 +6420,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "media_sizes_large_sizes_large_filename_idx" ON "media" USING btree ("sizes_large_filename");
   CREATE INDEX "media_sizes_xlarge_sizes_xlarge_filename_idx" ON "media" USING btree ("sizes_xlarge_filename");
   CREATE INDEX "media_sizes_og_sizes_og_filename_idx" ON "media" USING btree ("sizes_og_filename");
+  CREATE INDEX "icons_updated_at_idx" ON "icons" USING btree ("updated_at");
+  CREATE INDEX "icons_created_at_idx" ON "icons" USING btree ("created_at");
+  CREATE UNIQUE INDEX "icons_filename_idx" ON "icons" USING btree ("filename");
   CREATE INDEX "users_sessions_order_idx" ON "users_sessions" USING btree ("_order");
   CREATE INDEX "users_sessions_parent_id_idx" ON "users_sessions" USING btree ("_parent_id");
   CREATE INDEX "users_updated_at_idx" ON "users" USING btree ("updated_at");
@@ -6620,6 +6533,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_team_id_idx" ON "payload_locked_documents_rels" USING btree ("team_id");
   CREATE INDEX "payload_locked_documents_rels_availability_sessions_id_idx" ON "payload_locked_documents_rels" USING btree ("availability_sessions_id");
   CREATE INDEX "payload_locked_documents_rels_media_id_idx" ON "payload_locked_documents_rels" USING btree ("media_id");
+  CREATE INDEX "payload_locked_documents_rels_icons_id_idx" ON "payload_locked_documents_rels" USING btree ("icons_id");
   CREATE INDEX "payload_locked_documents_rels_users_id_idx" ON "payload_locked_documents_rels" USING btree ("users_id");
   CREATE INDEX "payload_locked_documents_rels_redirects_id_idx" ON "payload_locked_documents_rels" USING btree ("redirects_id");
   CREATE INDEX "payload_locked_documents_rels_forms_id_idx" ON "payload_locked_documents_rels" USING btree ("forms_id");
@@ -6947,6 +6861,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "_team_v" CASCADE;
   DROP TABLE "availability_sessions" CASCADE;
   DROP TABLE "media" CASCADE;
+  DROP TABLE "icons" CASCADE;
   DROP TABLE "users_sessions" CASCADE;
   DROP TABLE "users" CASCADE;
   DROP TABLE "redirects" CASCADE;
@@ -7002,9 +6917,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "custom_styles_presets" CASCADE;
   DROP TABLE "custom_styles" CASCADE;
   DROP TABLE "design_system" CASCADE;
-  DROP TYPE "public"."enum_pages_hero_meta_items_icon";
   DROP TYPE "public"."enum_pages_hero_links_link_type";
-  DROP TYPE "public"."enum_pages_hero_links_link_icon";
   DROP TYPE "public"."enum_pages_hero_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_heading_level";
   DROP TYPE "public"."enum_pages_blocks_heading_size";
@@ -7012,7 +6925,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_text_size";
   DROP TYPE "public"."enum_pages_blocks_text_align";
   DROP TYPE "public"."enum_pages_blocks_button_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_button_links_link_icon";
   DROP TYPE "public"."enum_pages_blocks_button_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_button_size";
   DROP TYPE "public"."enum_pages_blocks_button_align";
@@ -7024,18 +6936,14 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_divider_style";
   DROP TYPE "public"."enum_pages_blocks_divider_width";
   DROP TYPE "public"."enum_pages_blocks_divider_align";
-  DROP TYPE "public"."enum_pages_blocks_icon_block_icon";
   DROP TYPE "public"."enum_pages_blocks_icon_block_size";
   DROP TYPE "public"."enum_pages_blocks_icon_block_color";
   DROP TYPE "public"."enum_pages_blocks_icon_block_align";
   DROP TYPE "public"."enum_pages_blocks_content_columns_size";
   DROP TYPE "public"."enum_pages_blocks_content_columns_link_type";
-  DROP TYPE "public"."enum_pages_blocks_content_columns_link_icon";
   DROP TYPE "public"."enum_pages_blocks_content_columns_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_cta_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_cta_links_link_icon";
   DROP TYPE "public"."enum_pages_blocks_cta_links_link_appearance";
-  DROP TYPE "public"."enum_pages_blocks_faq_items_icon";
   DROP TYPE "public"."enum_pages_blocks_faq_text_colour";
   DROP TYPE "public"."enum_pages_blocks_faq_columns";
   DROP TYPE "public"."enum_pages_blocks_faq_item_style";
@@ -7045,12 +6953,9 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_faq_container_width";
   DROP TYPE "public"."enum_pages_blocks_faq_rule_style";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_links_link_icon";
-  DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_icon";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_accent";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_theme";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_link_type";
-  DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_link_icon";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_cards_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_text_colour";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_background";
@@ -7059,8 +6964,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_motion";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_hover_effect";
   DROP TYPE "public"."enum_pages_blocks_gateway_cards_shadow";
-  DROP TYPE "public"."enum_pages_blocks_feature_grid_items_details_icon";
-  DROP TYPE "public"."enum_pages_blocks_feature_grid_items_icon";
   DROP TYPE "public"."enum_pages_blocks_feature_grid_text_colour";
   DROP TYPE "public"."enum_pages_blocks_feature_grid_background";
   DROP TYPE "public"."enum_pages_blocks_feature_grid_columns";
@@ -7070,34 +6973,28 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_feature_grid_motion";
   DROP TYPE "public"."enum_pages_blocks_feature_grid_hover_effect";
   DROP TYPE "public"."enum_pages_blocks_feature_grid_shadow";
-  DROP TYPE "public"."enum_pages_blocks_process_steps_steps_icon";
   DROP TYPE "public"."enum_pages_blocks_process_steps_steps_badge_style";
   DROP TYPE "public"."enum_pages_blocks_process_steps_text_colour";
   DROP TYPE "public"."enum_pages_blocks_process_steps_background";
   DROP TYPE "public"."enum_pages_blocks_process_steps_variant";
   DROP TYPE "public"."enum_pages_blocks_process_steps_number_style";
-  DROP TYPE "public"."enum_pages_blocks_process_steps_placeholder_icon";
   DROP TYPE "public"."enum_pages_blocks_process_steps_columns";
   DROP TYPE "public"."enum_pages_blocks_process_steps_container_width";
   DROP TYPE "public"."enum_pages_blocks_process_steps_motion";
   DROP TYPE "public"."enum_pages_blocks_process_steps_hover_effect";
   DROP TYPE "public"."enum_pages_blocks_process_steps_shadow";
-  DROP TYPE "public"."enum_pages_blocks_specialty_grid_items_icon";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_items_link_type";
-  DROP TYPE "public"."enum_pages_blocks_specialty_grid_items_link_icon";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_text_colour";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_background";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_source";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_taxonomy";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_variant";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_columns";
-  DROP TYPE "public"."enum_pages_blocks_specialty_grid_default_icon";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_container_width";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_motion";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_hover_effect";
   DROP TYPE "public"."enum_pages_blocks_specialty_grid_shadow";
   DROP TYPE "public"."enum_pages_blocks_people_grid_footer_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_people_grid_footer_links_link_icon";
   DROP TYPE "public"."enum_pages_blocks_people_grid_footer_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_people_grid_text_colour";
   DROP TYPE "public"."enum_pages_blocks_people_grid_background";
@@ -7111,7 +7008,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_people_grid_hover_effect";
   DROP TYPE "public"."enum_pages_blocks_people_grid_shadow";
   DROP TYPE "public"."enum_pages_blocks_services_grid_footer_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_services_grid_footer_links_link_icon";
   DROP TYPE "public"."enum_pages_blocks_services_grid_text_colour";
   DROP TYPE "public"."enum_pages_blocks_services_grid_background";
   DROP TYPE "public"."enum_pages_blocks_services_grid_source";
@@ -7137,19 +7033,12 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_stats_band_background";
   DROP TYPE "public"."enum_pages_blocks_stats_band_container_width";
   DROP TYPE "public"."enum_pages_blocks_stats_band_motion";
-  DROP TYPE "public"."enum_pages_blocks_aamle_education_items_icon";
   DROP TYPE "public"."enum_pages_blocks_aamle_education_background";
-  DROP TYPE "public"."enum_pages_blocks_aamle_education_badge_icon";
   DROP TYPE "public"."enum_pages_blocks_aamle_education_link_type";
-  DROP TYPE "public"."enum_pages_blocks_aamle_education_link_icon";
   DROP TYPE "public"."enum_pages_blocks_aamle_education_container_width";
   DROP TYPE "public"."enum_pages_blocks_aamle_education_motion";
-  DROP TYPE "public"."enum_pages_blocks_split_feature_rows_bullets_icon";
-  DROP TYPE "public"."enum_pages_blocks_split_feature_rows_placeholder_icon";
   DROP TYPE "public"."enum_pages_blocks_split_feature_rows_image_side";
-  DROP TYPE "public"."enum_pages_blocks_split_feature_rows_icon";
   DROP TYPE "public"."enum_pages_blocks_split_feature_rows_link_type";
-  DROP TYPE "public"."enum_pages_blocks_split_feature_rows_link_icon";
   DROP TYPE "public"."enum_pages_blocks_split_feature_text_colour";
   DROP TYPE "public"."enum_pages_blocks_split_feature_background";
   DROP TYPE "public"."enum_pages_blocks_split_feature_row_style";
@@ -7159,33 +7048,26 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_split_feature_container_width";
   DROP TYPE "public"."enum_pages_blocks_split_feature_motion";
   DROP TYPE "public"."enum_pages_blocks_cta_band_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_cta_band_links_link_icon";
   DROP TYPE "public"."enum_pages_blocks_cta_band_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_cta_band_container_width";
   DROP TYPE "public"."enum_pages_blocks_cta_band_motion";
-  DROP TYPE "public"."enum_pages_blocks_tabs_tabs_icon";
   DROP TYPE "public"."enum_pages_blocks_tabs_text_colour";
   DROP TYPE "public"."enum_pages_blocks_tabs_background";
   DROP TYPE "public"."enum_pages_blocks_tabs_tab_style";
   DROP TYPE "public"."enum_pages_blocks_tabs_container_width";
   DROP TYPE "public"."enum_pages_blocks_tabs_motion";
   DROP TYPE "public"."enum_pages_blocks_callout_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_callout_links_link_icon";
   DROP TYPE "public"."enum_pages_blocks_callout_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_callout_style";
-  DROP TYPE "public"."enum_pages_blocks_callout_icon";
-  DROP TYPE "public"."enum_pages_blocks_contact_details_items_icon";
   DROP TYPE "public"."enum_pages_blocks_contact_details_text_colour";
   DROP TYPE "public"."enum_pages_blocks_contact_details_container_width";
   DROP TYPE "public"."enum_pages_blocks_contact_details_motion";
-  DROP TYPE "public"."enum_pages_blocks_icon_list_items_icon";
   DROP TYPE "public"."enum_pages_blocks_icon_list_text_colour";
   DROP TYPE "public"."enum_pages_blocks_icon_list_heading_align";
   DROP TYPE "public"."enum_pages_blocks_icon_list_columns";
   DROP TYPE "public"."enum_pages_blocks_icon_list_container_width";
   DROP TYPE "public"."enum_pages_blocks_icon_list_motion";
   DROP TYPE "public"."enum_pages_blocks_map_embed_actions_link_type";
-  DROP TYPE "public"."enum_pages_blocks_map_embed_actions_link_icon";
   DROP TYPE "public"."enum_pages_blocks_map_embed_actions_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_map_embed_text_colour";
   DROP TYPE "public"."enum_pages_blocks_map_embed_kind";
@@ -7194,14 +7076,10 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_map_embed_motion";
   DROP TYPE "public"."enum_pages_blocks_leadership_spotlight_text_colour";
   DROP TYPE "public"."enum_pages_blocks_leadership_spotlight_background";
-  DROP TYPE "public"."enum_pages_blocks_leadership_spotlight_placeholder_icon";
   DROP TYPE "public"."enum_pages_blocks_leadership_spotlight_link_type";
-  DROP TYPE "public"."enum_pages_blocks_leadership_spotlight_link_icon";
   DROP TYPE "public"."enum_pages_blocks_leadership_spotlight_container_width";
   DROP TYPE "public"."enum_pages_blocks_leadership_spotlight_motion";
-  DROP TYPE "public"."enum_pages_blocks_portal_cta_tiles_icon";
   DROP TYPE "public"."enum_pages_blocks_portal_cta_links_link_type";
-  DROP TYPE "public"."enum_pages_blocks_portal_cta_links_link_icon";
   DROP TYPE "public"."enum_pages_blocks_video_embed_text_colour";
   DROP TYPE "public"."enum_pages_blocks_video_embed_provider";
   DROP TYPE "public"."enum_pages_blocks_video_embed_aspect";
@@ -7233,7 +7111,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_archive_event_style";
   DROP TYPE "public"."enum_pages_blocks_archive_columns";
   DROP TYPE "public"."enum_pages_blocks_archive_view_all_link_link_type";
-  DROP TYPE "public"."enum_pages_blocks_archive_view_all_link_link_icon";
   DROP TYPE "public"."enum_pages_blocks_slide_carousel_slides_accent";
   DROP TYPE "public"."enum_pages_blocks_specialist_directory_text_colour";
   DROP TYPE "public"."enum_pages_blocks_specialist_directory_background";
@@ -7251,11 +7128,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_resources_grid_motion";
   DROP TYPE "public"."enum_pages_blocks_resources_grid_hover_effect";
   DROP TYPE "public"."enum_pages_blocks_resources_grid_shadow";
-  DROP TYPE "public"."enum_appt_guide_types_tabs_items_icon";
-  DROP TYPE "public"."enum_hcards_icon";
-  DROP TYPE "public"."enum_appt_guide_types_tabs_icon";
   DROP TYPE "public"."enum_appt_guide_types_tabs_callout_style";
-  DROP TYPE "public"."enum_appt_guide_types_icon";
   DROP TYPE "public"."enum_appt_guide_text_colour";
   DROP TYPE "public"."enum_pages_blocks_mission_pillars_background";
   DROP TYPE "public"."enum_pages_blocks_mission_pillars_text_colour";
@@ -7265,23 +7138,18 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_blocks_value_cards_background";
   DROP TYPE "public"."enum_pages_blocks_value_cards_container_width";
   DROP TYPE "public"."enum_pages_blocks_value_cards_motion";
-  DROP TYPE "public"."enum_pages_blocks_why_verify_items_icon";
   DROP TYPE "public"."enum_pages_blocks_why_verify_text_colour";
   DROP TYPE "public"."enum_pages_blocks_why_verify_container_width";
   DROP TYPE "public"."enum_pages_blocks_why_verify_motion";
   DROP TYPE "public"."enum_pages_blocks_audience_pathways_pathways_variant";
   DROP TYPE "public"."enum_pages_blocks_audience_pathways_pathways_link_type";
-  DROP TYPE "public"."enum_pages_blocks_audience_pathways_pathways_link_icon";
   DROP TYPE "public"."enum_pages_blocks_audience_pathways_text_colour";
   DROP TYPE "public"."enum_pages_blocks_audience_pathways_background";
   DROP TYPE "public"."enum_pages_blocks_audience_pathways_container_width";
   DROP TYPE "public"."enum_pages_blocks_audience_pathways_motion";
   DROP TYPE "public"."enum_bkchooser_halves_links_link_type";
-  DROP TYPE "public"."enum_bkchooser_halves_links_link_icon";
-  DROP TYPE "public"."enum_bkchooser_halves_icon";
   DROP TYPE "public"."enum_bkchooser_halves_accent";
   DROP TYPE "public"."enum_bkchooser_density";
-  DROP TYPE "public"."enum_pages_blocks_cost_grid_cards_icon";
   DROP TYPE "public"."enum_pages_blocks_cost_grid_text_colour";
   DROP TYPE "public"."enum_pages_blocks_featured_articles_source";
   DROP TYPE "public"."enum_pages_blocks_featured_articles_background";
@@ -7302,9 +7170,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum_pages_hero_definition_definition_style";
   DROP TYPE "public"."enum_pages_hero_definition_interaction";
   DROP TYPE "public"."enum_pages_status";
-  DROP TYPE "public"."enum__pages_v_version_hero_meta_items_icon";
   DROP TYPE "public"."enum__pages_v_version_hero_links_link_type";
-  DROP TYPE "public"."enum__pages_v_version_hero_links_link_icon";
   DROP TYPE "public"."enum__pages_v_version_hero_links_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_heading_level";
   DROP TYPE "public"."enum__pages_v_blocks_heading_size";
@@ -7312,7 +7178,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_text_size";
   DROP TYPE "public"."enum__pages_v_blocks_text_align";
   DROP TYPE "public"."enum__pages_v_blocks_button_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_button_links_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_button_links_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_button_size";
   DROP TYPE "public"."enum__pages_v_blocks_button_align";
@@ -7324,18 +7189,14 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_divider_style";
   DROP TYPE "public"."enum__pages_v_blocks_divider_width";
   DROP TYPE "public"."enum__pages_v_blocks_divider_align";
-  DROP TYPE "public"."enum__pages_v_blocks_icon_block_icon";
   DROP TYPE "public"."enum__pages_v_blocks_icon_block_size";
   DROP TYPE "public"."enum__pages_v_blocks_icon_block_color";
   DROP TYPE "public"."enum__pages_v_blocks_icon_block_align";
   DROP TYPE "public"."enum__pages_v_blocks_content_columns_size";
   DROP TYPE "public"."enum__pages_v_blocks_content_columns_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_content_columns_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_content_columns_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_cta_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_cta_links_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_cta_links_link_appearance";
-  DROP TYPE "public"."enum__pages_v_blocks_faq_items_icon";
   DROP TYPE "public"."enum__pages_v_blocks_faq_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_faq_columns";
   DROP TYPE "public"."enum__pages_v_blocks_faq_item_style";
@@ -7345,12 +7206,9 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_faq_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_faq_rule_style";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_links_link_icon";
-  DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_icon";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_accent";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_theme";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_cards_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_background";
@@ -7359,8 +7217,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_motion";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_hover_effect";
   DROP TYPE "public"."enum__pages_v_blocks_gateway_cards_shadow";
-  DROP TYPE "public"."enum__pages_v_blocks_feature_grid_items_details_icon";
-  DROP TYPE "public"."enum__pages_v_blocks_feature_grid_items_icon";
   DROP TYPE "public"."enum__pages_v_blocks_feature_grid_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_feature_grid_background";
   DROP TYPE "public"."enum__pages_v_blocks_feature_grid_columns";
@@ -7370,34 +7226,28 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_feature_grid_motion";
   DROP TYPE "public"."enum__pages_v_blocks_feature_grid_hover_effect";
   DROP TYPE "public"."enum__pages_v_blocks_feature_grid_shadow";
-  DROP TYPE "public"."enum__pages_v_blocks_process_steps_steps_icon";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_steps_badge_style";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_background";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_variant";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_number_style";
-  DROP TYPE "public"."enum__pages_v_blocks_process_steps_placeholder_icon";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_columns";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_motion";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_hover_effect";
   DROP TYPE "public"."enum__pages_v_blocks_process_steps_shadow";
-  DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_items_icon";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_items_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_items_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_background";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_source";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_taxonomy";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_variant";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_columns";
-  DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_default_icon";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_motion";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_hover_effect";
   DROP TYPE "public"."enum__pages_v_blocks_specialty_grid_shadow";
   DROP TYPE "public"."enum__pages_v_blocks_people_grid_footer_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_people_grid_footer_links_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_people_grid_footer_links_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_people_grid_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_people_grid_background";
@@ -7411,7 +7261,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_people_grid_hover_effect";
   DROP TYPE "public"."enum__pages_v_blocks_people_grid_shadow";
   DROP TYPE "public"."enum__pages_v_blocks_services_grid_footer_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_services_grid_footer_links_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_services_grid_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_services_grid_background";
   DROP TYPE "public"."enum__pages_v_blocks_services_grid_source";
@@ -7437,19 +7286,12 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_stats_band_background";
   DROP TYPE "public"."enum__pages_v_blocks_stats_band_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_stats_band_motion";
-  DROP TYPE "public"."enum__pages_v_blocks_aamle_education_items_icon";
   DROP TYPE "public"."enum__pages_v_blocks_aamle_education_background";
-  DROP TYPE "public"."enum__pages_v_blocks_aamle_education_badge_icon";
   DROP TYPE "public"."enum__pages_v_blocks_aamle_education_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_aamle_education_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_aamle_education_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_aamle_education_motion";
-  DROP TYPE "public"."enum__pages_v_blocks_split_feature_rows_bullets_icon";
-  DROP TYPE "public"."enum__pages_v_blocks_split_feature_rows_placeholder_icon";
   DROP TYPE "public"."enum__pages_v_blocks_split_feature_rows_image_side";
-  DROP TYPE "public"."enum__pages_v_blocks_split_feature_rows_icon";
   DROP TYPE "public"."enum__pages_v_blocks_split_feature_rows_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_split_feature_rows_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_split_feature_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_split_feature_background";
   DROP TYPE "public"."enum__pages_v_blocks_split_feature_row_style";
@@ -7459,33 +7301,26 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_split_feature_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_split_feature_motion";
   DROP TYPE "public"."enum__pages_v_blocks_cta_band_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_cta_band_links_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_cta_band_links_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_cta_band_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_cta_band_motion";
-  DROP TYPE "public"."enum__pages_v_blocks_tabs_tabs_icon";
   DROP TYPE "public"."enum__pages_v_blocks_tabs_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_tabs_background";
   DROP TYPE "public"."enum__pages_v_blocks_tabs_tab_style";
   DROP TYPE "public"."enum__pages_v_blocks_tabs_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_tabs_motion";
   DROP TYPE "public"."enum__pages_v_blocks_callout_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_callout_links_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_callout_links_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_callout_style";
-  DROP TYPE "public"."enum__pages_v_blocks_callout_icon";
-  DROP TYPE "public"."enum__pages_v_blocks_contact_details_items_icon";
   DROP TYPE "public"."enum__pages_v_blocks_contact_details_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_contact_details_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_contact_details_motion";
-  DROP TYPE "public"."enum__pages_v_blocks_icon_list_items_icon";
   DROP TYPE "public"."enum__pages_v_blocks_icon_list_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_icon_list_heading_align";
   DROP TYPE "public"."enum__pages_v_blocks_icon_list_columns";
   DROP TYPE "public"."enum__pages_v_blocks_icon_list_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_icon_list_motion";
   DROP TYPE "public"."enum__pages_v_blocks_map_embed_actions_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_map_embed_actions_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_map_embed_actions_link_appearance";
   DROP TYPE "public"."enum__pages_v_blocks_map_embed_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_map_embed_kind";
@@ -7494,14 +7329,10 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_map_embed_motion";
   DROP TYPE "public"."enum__pages_v_blocks_leadership_spotlight_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_leadership_spotlight_background";
-  DROP TYPE "public"."enum__pages_v_blocks_leadership_spotlight_placeholder_icon";
   DROP TYPE "public"."enum__pages_v_blocks_leadership_spotlight_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_leadership_spotlight_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_leadership_spotlight_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_leadership_spotlight_motion";
-  DROP TYPE "public"."enum__pages_v_blocks_portal_cta_tiles_icon";
   DROP TYPE "public"."enum__pages_v_blocks_portal_cta_links_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_portal_cta_links_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_video_embed_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_video_embed_provider";
   DROP TYPE "public"."enum__pages_v_blocks_video_embed_aspect";
@@ -7533,7 +7364,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_archive_event_style";
   DROP TYPE "public"."enum__pages_v_blocks_archive_columns";
   DROP TYPE "public"."enum__pages_v_blocks_archive_view_all_link_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_archive_view_all_link_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_slide_carousel_slides_accent";
   DROP TYPE "public"."enum__pages_v_blocks_specialist_directory_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_specialist_directory_background";
@@ -7551,11 +7381,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_resources_grid_motion";
   DROP TYPE "public"."enum__pages_v_blocks_resources_grid_hover_effect";
   DROP TYPE "public"."enum__pages_v_blocks_resources_grid_shadow";
-  DROP TYPE "public"."enum__appt_guide_v_types_tabs_items_icon";
-  DROP TYPE "public"."enum__hcards_v_icon";
-  DROP TYPE "public"."enum__appt_guide_v_types_tabs_icon";
   DROP TYPE "public"."enum__appt_guide_v_types_tabs_callout_style";
-  DROP TYPE "public"."enum__appt_guide_v_types_icon";
   DROP TYPE "public"."enum__appt_guide_v_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_mission_pillars_background";
   DROP TYPE "public"."enum__pages_v_blocks_mission_pillars_text_colour";
@@ -7565,23 +7391,18 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_blocks_value_cards_background";
   DROP TYPE "public"."enum__pages_v_blocks_value_cards_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_value_cards_motion";
-  DROP TYPE "public"."enum__pages_v_blocks_why_verify_items_icon";
   DROP TYPE "public"."enum__pages_v_blocks_why_verify_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_why_verify_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_why_verify_motion";
   DROP TYPE "public"."enum__pages_v_blocks_audience_pathways_pathways_variant";
   DROP TYPE "public"."enum__pages_v_blocks_audience_pathways_pathways_link_type";
-  DROP TYPE "public"."enum__pages_v_blocks_audience_pathways_pathways_link_icon";
   DROP TYPE "public"."enum__pages_v_blocks_audience_pathways_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_audience_pathways_background";
   DROP TYPE "public"."enum__pages_v_blocks_audience_pathways_container_width";
   DROP TYPE "public"."enum__pages_v_blocks_audience_pathways_motion";
   DROP TYPE "public"."enum__bkchooser_v_halves_links_link_type";
-  DROP TYPE "public"."enum__bkchooser_v_halves_links_link_icon";
-  DROP TYPE "public"."enum__bkchooser_v_halves_icon";
   DROP TYPE "public"."enum__bkchooser_v_halves_accent";
   DROP TYPE "public"."enum__bkchooser_v_density";
-  DROP TYPE "public"."enum__pages_v_blocks_cost_grid_cards_icon";
   DROP TYPE "public"."enum__pages_v_blocks_cost_grid_text_colour";
   DROP TYPE "public"."enum__pages_v_blocks_featured_articles_source";
   DROP TYPE "public"."enum__pages_v_blocks_featured_articles_background";
@@ -7610,19 +7431,10 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__events_v_version_status";
   DROP TYPE "public"."enum_services_category";
   DROP TYPE "public"."enum_services_service_group";
-  DROP TYPE "public"."enum_services_icon";
-  DROP TYPE "public"."enum_resources_icon";
   DROP TYPE "public"."enum_resources_resource_type";
   DROP TYPE "public"."enum_resources_audience";
-  DROP TYPE "public"."enum_specialties_icon";
-  DROP TYPE "public"."enum_specialty_categories_icon";
-  DROP TYPE "public"."enum_accreditations_icon";
-  DROP TYPE "public"."enum_streams_icon";
-  DROP TYPE "public"."enum_categories_icon";
-  DROP TYPE "public"."enum_specialists_qualifications_icon";
   DROP TYPE "public"."enum_specialists_profile_photo_shape";
   DROP TYPE "public"."enum_specialists_status";
-  DROP TYPE "public"."enum__specialists_v_version_qualifications_icon";
   DROP TYPE "public"."enum__specialists_v_version_profile_photo_shape";
   DROP TYPE "public"."enum__specialists_v_version_status";
   DROP TYPE "public"."enum_team_profile_photo_shape";
@@ -7631,28 +7443,20 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__team_v_version_status";
   DROP TYPE "public"."enum_availability_sessions_mode";
   DROP TYPE "public"."enum_availability_sessions_status";
+  DROP TYPE "public"."enum_icons_colour";
   DROP TYPE "public"."enum_redirects_to_type";
   DROP TYPE "public"."enum_forms_confirmation_type";
   DROP TYPE "public"."enum_payload_jobs_log_task_slug";
   DROP TYPE "public"."enum_payload_jobs_log_state";
   DROP TYPE "public"."enum_payload_jobs_task_slug";
   DROP TYPE "public"."enum_payload_folders_folder_type";
-  DROP TYPE "public"."enum_article_settings_sidebar_cards_icon";
   DROP TYPE "public"."enum_article_settings_sidebar_cards_link_type";
-  DROP TYPE "public"."enum_article_settings_sidebar_cards_link_icon";
-  DROP TYPE "public"."enum_specialist_profile_portal_cta_tiles_icon";
   DROP TYPE "public"."enum_header_nav_items_sub_items_sub_sub_items_link_type";
-  DROP TYPE "public"."enum_header_nav_items_sub_items_sub_sub_items_link_icon";
   DROP TYPE "public"."enum_header_nav_items_sub_items_link_type";
-  DROP TYPE "public"."enum_header_nav_items_sub_items_link_icon";
   DROP TYPE "public"."enum_header_nav_items_link_type";
-  DROP TYPE "public"."enum_header_nav_items_link_icon";
   DROP TYPE "public"."enum_header_cta_link_type";
-  DROP TYPE "public"."enum_header_cta_link_icon";
   DROP TYPE "public"."enum_footer_columns_links_link_type";
-  DROP TYPE "public"."enum_footer_columns_links_link_icon";
   DROP TYPE "public"."enum_footer_social_platform";
   DROP TYPE "public"."enum_footer_legal_links_link_type";
-  DROP TYPE "public"."enum_footer_legal_links_link_icon";
   DROP TYPE "public"."enum_design_system_typography_text_scale";`)
 }

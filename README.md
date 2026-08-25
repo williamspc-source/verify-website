@@ -268,16 +268,33 @@ pnpm build
 ```
 
 **The schema is frozen behind a single baseline migration.** `src/migrations/` holds one
-`20260825_082446_fresh_baseline`, generated on 2026-08-25 against an empty scratch database and
-verified against the dev-pushed schema: **311 `CREATE TABLE`, 653 `CREATE TYPE`, 978 `CREATE INDEX`,
+`20260825_113153_fresh_baseline`, generated on 2026-08-25 against an empty scratch database and
+verified against the dev-pushed schema: **312 `CREATE TABLE`, 542 `CREATE TYPE`, 981 `CREATE INDEX`,
 zero drops and zero type conversions**, with a whitespace-insensitive column-level checksum of both
 catalogues matching exactly (3,632 columns each).
+
+It supersedes `20260825_082446_fresh_baseline`, which was deleted **with its `.json` snapshot** —
+`migrate:create` diffs against that file, so leaving it produces an incremental that looks like a
+baseline. The type count fell by 111 because the **112 icon enums are gone**: icon fields are
+`varchar` now, plus one new `enum_icons_colour`. The table count rose by one for `icons`.
 
 It replaces the previous `20260823_130006_baseline` and the two `editor_controls` migrations, which
 were deleted: the box is being wiped and reseeded, so it creates the final shape directly rather than
 replaying an `ALTER TYPE` sequence. Two changes that were pending as separate migrations are now baked
 into the baseline — `availability_sessions` has no `location` column, and `specialists.profile_photo_shape`
 defaults to `'square'` (Team stays `'tall'`).
+
+**Icon uploads landed on 2026-08-25**, and with them the last of the icon enums. `iconField`
+(`src/fields/blockFields.ts`) and the link icon (`src/fields/link.ts`) are `text` rather than
+`select`, because a select is a Postgres enum and an enum cannot hold a value an editor creates.
+
+**On a wiped box this costs nothing** — the baseline creates `varchar` columns directly. **On a box
+that is migrated instead**, it is 112 enum types to drop across live and `_v` tables, which is
+destructive: run `src/migrations/REFERENCE-icon-enum-to-text.sql` by hand FIRST and then deploy the
+config, so the push finds no drift. Read that file's header before doing so — an earlier attempt
+converted the columns while leaving `link.ts` declaring a select, and the resulting drift made the
+local site hang on every request until the database was rebuilt. `docs/TRAPS.md` #i57-59 has the
+whole account.
 
 **Event Types became a collection on 2026-08-25**, so `events.event_type` (a Postgres enum) is now
 `events.event_type_id`, an FK to `event_types`, and the two enums are gone. On a wiped box the baseline
@@ -351,14 +368,14 @@ zsh tests/int/prove-guards.sh   # re-applies each deliberate break; every case m
 
 | Gate | Result | Count it with |
 |---|---|---|
-| `pnpm test:int` | **289 passed, 14 files** | `pnpm test:int` |
-| `pnpm test:e2e` | **68 passed** on a clean run | `pnpm test:e2e` |
+| `pnpm test:int` | **324 passed, 17 files** | `pnpm test:int` |
+| `pnpm test:e2e` | **69 passed** on a clean run | `pnpm test:e2e` |
 | `zsh tests/int/prove-guards.sh` | **11 cases** | `grep -c '^run_case "' tests/int/prove-guards.sh` |
 | `referenceCssDiff.mjs` | **13 families**, all zero | the `FAMILIES` object in the harness |
 | `computedSnapshot.mjs` | **21 routes, 39 properties** | the `ROUTES` and `PROPS` arrays |
 
 The e2e count **cannot be derived from source** — `images.e2e.spec.ts` and `richTextRender.e2e.spec.ts`
-each parameterise one test per route, so 41 `test(` declarations expand to far more. Run it.
+each parameterise one test per route, so 42 `test(` declarations expand to far more. Run it.
 
 **A red e2e run is not automatically a regression.** Taking these very readings, a second full run
 against an already-hammered dev server gave `2 failed, 2 did not run, 57 passed` — the two failures
@@ -402,6 +419,7 @@ Three habits separate these from the guards that rotted:
 | `tests/int/seedWrites.int.spec.ts` | No seed file calls `payload.create`/`update` directly, bypassing the rich-text lift |
 | `tests/int/{eventTiming,headingId,qualificationIcon,lexicalText,inlineRichText}` | The unit halves of event timing, anchor ids, qualification icons, and rich-text reading/rendering |
 | `tests/e2e/frontend.e2e.spec.ts` | Skip link (both states), centred-heading wrap, hero weight, testimonial hover, a one-panel Booking Chooser filling its band, and that nothing unclickable reacts to the pointer |
+| `tests/e2e/uploadedIcons.e2e.spec.ts` | An uploaded icon is painted the same colour a built-in one is on the same band, and a placement colour beats the icon's own default. Uploads its own icon and borrows one stream's `icon` field, restoring both in `finally` |
 | `tests/e2e/links.e2e.spec.ts` | Every internal link and every `#fragment` has a target |
 | `tests/e2e/images.e2e.spec.ts` | Images are served at the size they render |
 | `tests/e2e/carousel.e2e.spec.ts` | The carousel cannot be clicked past its own end. **Note it clicks with `{ force: true }`** — Playwright's normal click waits for stability, so a "rapid" burst is not rapid and the test passes against the broken component |

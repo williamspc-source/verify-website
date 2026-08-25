@@ -9,6 +9,7 @@ import {
   textColorField,
 } from '@/fields/richTextColors'
 import { brandTextColorFeature } from '@/fields/richTextColorFeature'
+import { ON_DARK_SELECTORS } from '@/fields/richTextColors'
 
 /**
  * The editor's colour palette has two halves that can drift apart.
@@ -310,5 +311,40 @@ describe('textColorField', () => {
       INHERIT_COLOR,
       ...BRAND_TEXT_COLORS.map((c) => c.key),
     ])
+  })
+})
+
+describe('ON_DARK_SELECTORS', () => {
+  /**
+   * One list, two consumers.
+   *
+   * `.vf-tc-*`'s dark re-points are hand-written in globals.css; the per-icon
+   * default colours the layout publishes (`iconDefaultCss`) are generated in TS
+   * and cannot inherit them, because they are keyed by `[data-vf-icon]` rather
+   * than by class. So the same three selectors are needed in both places — and
+   * "two lists that must name the same things" is the drift this repo keeps
+   * recording.
+   *
+   * This ties them together: the constant is what generates the icon rules, and
+   * globals.css must use exactly it for `.vf-tc-*`.
+   *
+   * Proven red by: dropping `.vf-section--dark` from ON_DARK_SELECTORS, and by
+   * adding a fourth selector that globals.css does not use.
+   */
+  it('is exactly what globals.css uses to re-point .vf-tc-*', () => {
+    // Every prefix that appears before a `.vf-tc-` class in a descendant rule.
+    const used = new Set<string>()
+    for (const m of CSS.matchAll(/(\.[a-z0-9-]+)\s+\.vf-tc-[a-z]+(?![a-z-])/g)) {
+      used.add(m[1])
+    }
+
+    // Positive control: the scan must find prefixes at all, or the comparison
+    // below is between two empty sets and proves nothing.
+    expect(used.size, 'found no `.x .vf-tc-*` rules — the scan is not matching').toBeGreaterThan(0)
+
+    expect(
+      [...used].sort(),
+      'globals.css re-points .vf-tc-* through selectors ON_DARK_SELECTORS does not name (or vice versa) — the icon default colours will disagree with the text palette on a dark band',
+    ).toEqual([...ON_DARK_SELECTORS].sort())
   })
 })

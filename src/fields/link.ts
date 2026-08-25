@@ -2,7 +2,6 @@ import type { Field, GroupField } from 'payload'
 import { inlineRichTextField } from '@/fields/blockFields'
 
 import deepMerge from '@/utilities/deepMerge'
-import { iconOptions } from '@/components/Icon'
 
 export type LinkAppearances = 'default' | 'outline'
 
@@ -178,12 +177,21 @@ export const link: LinkType = ({
   // document rather than as a third kind of destination.
   linkResult.fields.push(anchorField)
 
+  // `text` + the picker, for the reason written up on `iconField` in
+  // blockFields.ts: a select is an enum and an enum cannot hold an uploaded
+  // icon. This is the SECOND declaration of the same field — 45 of the 112 icon
+  // columns are link icons — and the first attempt at icon uploads converted
+  // only the other one, leaving drift the schema push could never settle.
+  //
+  // Deliberately no colour default of its own: a link icon sits inside a button
+  // whose colour comes from its appearance, so it follows that. An editor can
+  // still force one through the picker.
   linkResult.fields.push({
     name: 'icon',
-    type: 'select',
-    options: iconOptions,
+    type: 'text',
     admin: {
       description: 'Optional leading icon shown before the label.',
+      components: { Field: '@/fields/IconSelect#IconSelect' },
     },
   })
 

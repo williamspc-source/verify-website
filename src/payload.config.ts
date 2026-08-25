@@ -6,6 +6,7 @@ import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
+import { Icons } from './collections/Icons'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
@@ -163,6 +164,9 @@ export default buildConfig({
     // Availability
     AvailabilitySessions,
     Media,
+    // Same `Media` admin group, so it sits beside the media library rather than
+    // opening a group of its own — the sidebar's order comes from this array.
+    Icons,
     Users,
   ],
   cors: [getServerSideURL()].filter(Boolean),

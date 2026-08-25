@@ -39,3 +39,176 @@
     padding-block: 0.5rem;
   }
 }
+
+/* ── The icon picker (`@/fields/IconSelect`) ──────────────────────────────────
+   Scoped to the field's own wrapper. Selectors are read off the rendered admin,
+   not guessed: Payload's own `.field-type` supplies the outer spacing, so only
+   the picker's internals are styled here. */
+.vf-icon-select {
+  &__current {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 4px;
+    background: var(--theme-input-bg);
+    min-height: 44px;
+  }
+
+  &__current-label {
+    flex: 1 1 auto;
+    font-size: 0.9rem;
+  }
+
+  &__empty {
+    flex: 1 1 auto;
+    color: var(--theme-elevation-400);
+    font-size: 0.9rem;
+  }
+
+  &__toggle,
+  &__clear {
+    flex: 0 0 auto;
+    background: none;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  &__toggle:hover,
+  &__clear:hover {
+    border-color: var(--theme-elevation-400);
+  }
+
+  &__panel {
+    margin-top: 8px;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 4px;
+    padding: 10px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: var(--theme-input-bg);
+  }
+
+  &__search {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 3px;
+    background: var(--theme-bg);
+    color: inherit;
+    font-size: 0.9rem;
+  }
+
+  &__group-title {
+    margin: 12px 0 6px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--theme-elevation-500);
+
+    span {
+      opacity: 0.7;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 6px;
+  }
+
+  &__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 9px 4px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.65rem;
+    line-height: 1.25;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  &__option:hover {
+    border-color: var(--theme-elevation-200);
+    background: var(--theme-elevation-50);
+  }
+
+  &__option--selected {
+    border-color: var(--theme-success-500, #22c55e);
+    background: var(--theme-elevation-100);
+  }
+
+  &__none,
+  &__more {
+    font-size: 0.75rem;
+    color: var(--theme-elevation-500);
+    margin: 8px 2px 0;
+  }
+}
+
+/* ── The colour control, and the preview swatches ─────────────────────────────
+   The colour rides in the icon's own stored value (`brain@deep`), so this is one
+   control on one field rather than a second column — see
+   `src/components/Icon/value.ts` for the measurement behind that choice.
+
+   `__preview` paints `currentColor` through the artwork's alpha, exactly as the
+   site's `.vf-icon-mask` does, so an icon previews here in the admin's text
+   colour and a white-on-white upload is still visible. */
+.vf-icon-select {
+  &__preview {
+    display: inline-block;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  &__colour {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+
+    label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--theme-elevation-500);
+    }
+
+    select {
+      flex: 1 1 auto;
+      padding: 6px 8px;
+      border: 1px solid var(--theme-elevation-150);
+      border-radius: 3px;
+      background: var(--theme-input-bg);
+      color: inherit;
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Transparent when the colour is inherited, so "no choice" does not look like
+     a colour that happens to be black. */
+  &__swatch {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--theme-elevation-200);
+  }
+}

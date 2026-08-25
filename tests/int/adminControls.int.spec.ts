@@ -461,6 +461,14 @@ describe('admin controls are wired', () => {
     const ALLOWED = [
       // Sitemaps and the legacy redirect gate on draftMode() / _status themselves.
       'src/endpoints/', // seed runs as an authenticated admin request
+      // Runs only inside the Icons `beforeDelete` hook, to answer "does ANY
+      // document reference this icon". It has to see every document including
+      // drafts — an icon referenced only by an unpublished draft comes back the
+      // moment that draft is published — and it never returns a document to a
+      // visitor, only a count and a title in an error message shown to the admin
+      // performing the delete. This is the one shape `overrideAccess: true` is
+      // correct for, so it is listed rather than the guard being widened.
+      'src/utilities/iconUsage.ts',
     ]
 
     /** Extract the full `payload.find({...})` argument by matching braces. */

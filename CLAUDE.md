@@ -123,7 +123,11 @@ several look arbitrary until you see what happened without them.
 
 54. **`selfSpaced` membership is decided by MEASURING a block's own computed padding, not by reading its source.** A block's padding may come from a page-scoped rule or an editor-chosen `cssClass`, so removing its `.my-16` wrapper can strip spacing on another page. And `grep '<Section'` matches `<SectionHeader` and comments. <sub>[why](docs/TRAPS.md)</sub>
 55. **Colour a Phosphor icon through `color` on its container, never `stroke`.** They are duotone and filled; a `stroke` rule applies and paints nothing. Use the same token as the adjacent text so the two cannot drift. <sub>[why](docs/TRAPS.md)</sub>
+
 56. **A layout that divides a band by a fixed share must say what ONE child means.** `flex: 0 1 50%` on a chooser with a single panel is not half a design, it is half a band and half a void — measured 720px of 1440, and 379px of a 520px band on a phone. Decide the count BEFORE the markup (a child filtered out inside the `.map` is invisible to the container's class), and prefer `flex-grow` to `flex-basis: 100%`: it absorbs the free space a hover rule frees up, so the slide stops without a specificity fight, and it is not a *height* when the row turns column. Guarded by `frontend.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i56)</sub>
+57. **A Payload `select` is a Postgres ENUM, so a field whose values an editor can CREATE must be `text`.** An enum can only hold labels that existed when the schema was built, so an uploaded icon (`upload:12`) can never go in one. Converting later is destructive — 112 enum types had to be dropped — and Payload's dev push then stops on an invisible prompt with every request queued behind it. Decide `text` at the point the field is *designed*, not after. Guarded by `iconLibrary.int.spec.ts`. <sub>[why](docs/TRAPS.md#i57)</sub>
+58. **A field declared by more than one helper must be changed in ALL of them — grep the field NAME, never the helper.** `icon` is declared in `blockFields.ts` (65 columns) *and* `link.ts` (45). Converting one and not the other left the config and the database permanently disagreeing, so the schema push rebuilt the same enums on every boot and no amount of `rm -rf .next` cleared it. <sub>[why](docs/TRAPS.md#i58)</sub>
+59. **An icon an editor uploads is an empty `<svg>`, painted by `mask-image`, never a `<span>` and never an `<img>`.** `globals.css` sizes and colours icons through **66** rules that select `svg`; a `<span>` matches none of them, so an upload renders at the wrong size in the wrong colour everywhere. An `<img>` cannot take the band's colour at all. Guarded by `uploadedIcons.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i59)</sub>
 
 ## Commands
 
@@ -169,6 +173,10 @@ disagreeing numbers for the same suite.
 | `tests/int/cssTokens.int.spec.ts` | `buildTokenCss`/`safeTokenValue` sanitisation — editor-supplied values land inside a `<style>` tag. |
 | `tests/int/eventTiming.int.spec.ts` | `isPast` at start-of-day, `registrationOpen` and its fallback, and that the two are allowed to disagree. The unit half of **Event timing** below. |
 | `tests/int/headingId.int.spec.ts` | `headingId`/`slugify` — stable slugs, `[[accent]]` stripping, collision disambiguation. The unit half of the anchor-id invariant. |
+| `tests/int/iconLibrary.int.spec.ts` | Where an icon can be chosen (a config walk, so a block nested four deep is covered), that `iconUsage` FINDS things rather than merely says no, and — the load-bearing one — that **no icon field is a `select`**, which is the 10-minute hang reduced to a test. |
+| `tests/int/iconValue.int.spec.ts` | `parseIconValue`/`formatIconValue` — the one place an icon field's stored value is interpreted. Its important case is the silent direction: an unknown `@suffix` must NOT be cut off the key. |
+| `tests/int/svgIcon.int.spec.ts` | `normaliseSvgIcon` — what survives an upload and what does not. Payload 3.85 also refuses hostile SVGs at the upload layer, so this is defence in depth, not the only defence. |
+| `tests/e2e/uploadedIcons.e2e.spec.ts` | An uploaded icon is painted the same colour a built-in one is on the same band, measured rather than written down, and a placement colour beats the icon's own default. Seeds its own user via `globalSetup` and puts the borrowed field back in `finally`. |
 | `tests/int/qualificationIcon.int.spec.ts` | Re-derives every qualification→icon pair from the design reference and asserts `qualificationIcon()` reproduces it, returns only icons in `iconMap`, and falls back. |
 | `tests/int/api.int.spec.ts` | **One boot smoke test** (`fetches users`). The name promises a suite; it is not one. |
 | `tests/int/productionEnv.int.spec.ts` | The boot gate: which environment variables are required while serving, that `next build` waives them all, and that `ALLOW_MISSING_SMTP` waives `SMTP_HOST` **and nothing else**. The negative assertion is the point — a test of only the happy branch cannot tell a targeted opt-out from a waiver of everything. |
@@ -498,6 +506,45 @@ because the two codemods share one (`ls tests/visual/*.mjs | wc -l`):
 - `node tests/visual/findDeadCss.mjs` — emits **candidates, not a verdict**. It has already
   produced false positives that would each have broken a live page; read the header's caveats
   before deleting any selector.
+
+### Icons
+
+Two tiers, one **string** column. `iconField` (`src/fields/blockFields.ts`) and the link icon
+(`src/fields/link.ts`) are both `text` with the `IconSelect` picker — **not** `select`, because a
+select is a Postgres enum and an enum cannot hold a value an editor creates. See invariants 57-59.
+
+| Stored | Renders |
+|---|---|
+| `brain` | one of the curated Phosphor components in `src/components/Icon`, unchanged |
+| `brain@deep` | the same, forced to a brand palette colour |
+| `upload:12` | an SVG in the **Icons** collection, in that icon's own default colour |
+| `upload:12@white` | the same upload, forced to White |
+
+`src/components/Icon/value.ts` is the **only** place that shape is interpreted. The colour rides in
+the value rather than in a second column because `iconField` has 38 call sites and 45 `<Icon>` render
+sites: a separate field would be 110 new columns and 83 edits, and one forgotten render site is a
+control that silently does nothing — the `textColour` failure in invariant 33.
+
+**Nothing an editor uploads is ever served back.** `normaliseSvgIcon` (`src/utilities/svgIcon.ts`)
+keeps recognised geometry and **reconstructs** the SVG, so the output is markup this codebase wrote;
+anything unrecognised is absent by construction rather than by having been matched and removed.
+Colours are dropped deliberately — an upload is painted by the site through `mask-image`.
+
+Three routes serve the artwork, and **none imports the Phosphor barrel**: `/api/icon/builtin`
+(the curated list, so the client picker never pulls the 101 components into the admin bundle),
+`/api/icon/builtin/[name]` and `/api/icon/upload/[id]`.
+
+Each uploaded icon carries a **default colour**, published once per page by the layout as
+`[data-vf-icon="12"]{color:…}` (`iconDefaultCss`, from `getCachedIconDefaults`), so changing it
+repaints every placement. Its on-dark re-point is derived from the same `BRAND_TEXT_COLORS` entry
+`.vf-tc-*` uses; `ON_DARK_SELECTORS` is the single list, tied to `globals.css` by
+`richTextColors.int.spec.ts`.
+
+Deleting an uploaded icon that is in use is **refused**, naming the documents. `iconUsage`
+(`src/utilities/iconUsage.ts`) decides which collections to scan by walking the sanitised config,
+then searches their documents rather than querying 250 derived paths, because a seven-level nested
+block path in a `where` is something Payload could not be confirmed to resolve — and a query that
+silently matches nothing would let the deletion through.
 
 ### Content model
 
