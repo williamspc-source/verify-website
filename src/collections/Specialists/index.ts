@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
@@ -71,7 +71,16 @@ export const Specialists: CollectionConfig<'specialists'> = {
               relationTo: 'media',
               admin: { description: 'Optional. Falls back to an initials avatar on the frontend.' },
             },
-            portraitShapeField,
+            {
+              ...portraitShapeField,
+              // Square for specialists, tall for Team. The specialist headshots
+              // are square cut-outs on a transparent background (the seeded set
+              // is uniformly 230×230), so a 2:3 box crops the sides of every one
+              // of them for nothing. Team photography is genuinely portrait and
+              // keeps `tall`. Existing rows are moved by
+              // `repairSpecialistPortraitShape` in the seed.
+              defaultValue: 'square',
+            } as Field,
             {
               name: 'bio',
               type: 'richText',

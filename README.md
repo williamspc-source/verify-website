@@ -293,7 +293,12 @@ migration drops a column, stop and find out why.**
 page. The generated migration should contain exactly one statement,
 `ALTER TABLE availability_sessions DROP COLUMN location`, and nothing else; if it contains anything
 more, the rule above applies and you should stop. The data lost is four seeded demo values
-("Brisbane CBD", "Gold Coast"). Verified 2026-08-25 that the box is up to date with `main` before
+("Brisbane CBD", "Gold Coast"). A second, harmless change rides along in the same pass: the
+Specialists `profilePhotoShape` default moves from `tall` to `square`, which generates an
+`ALTER COLUMN … SET DEFAULT` and touches no data. The existing 26 rows are moved by
+`repairSpecialistPortraitShape`, run from the seed — **so this deploy needs the seed as well as the
+migration**, or the specialists keep the tall frame they shipped with.
+Verified 2026-08-25 that the box is up to date with `main` before
 this commit — the `editor_controls` migration applied (its `colors.inkBlack` / `inkCharcoal` /
 `inkGrey` fields are live on `/api/globals/site-settings`) — so this drop is the only outstanding
 schema change.

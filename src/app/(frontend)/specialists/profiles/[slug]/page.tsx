@@ -155,7 +155,14 @@ export default async function SpecialistProfilePage({ params: paramsPromise }: A
               .join(' ')}
             >
               {photo ? (
-                <Media resource={photo} alt={s.title} size="230px" />
+                /* `fill` is load-bearing: without it the image renders at its
+                   intrinsic size inside the shaped box, so `object-fit: cover`
+                   on `.profile-avatar img` never applies and a non-square photo
+                   leaves a band of empty gradient (measured: a 230×230 image in
+                   the 230×345 tall box left 115px). `.profile-avatar` is already
+                   `position: relative`-equivalent via `overflow: hidden` + the
+                   absolute fill; see docs/TRAPS.md on object-fit without fill. */
+                <Media resource={photo} alt={s.title} size="230px" fill />
               ) : (
                 <span>{initials(s.title)}</span>
               )}

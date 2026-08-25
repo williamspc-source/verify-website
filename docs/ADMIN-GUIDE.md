@@ -268,8 +268,11 @@ you move someone. The list also shows 10 at a time, so moving a person a long wa
 across pages.
 
 **The photo's shape is per person.** **Photo shape on the profile page** gives you Tall (2:3, the
-default and the same proportion as the founder photograph on the About page), Portrait (4:5) or
-Square. It changes the frame on that specialist's own profile page only — their card in the panel and
+same proportion as the founder photograph on the About page), Portrait (4:5) or Square. **For
+specialists the default is Square**, because the headshots are square cut-outs on a transparent
+background and a tall frame cropped the sides off every one of them. Team members default to Tall,
+where the photography really is portrait. It changes the frame on that specialist's own profile page
+only — their card in the panel and
 the directories keeps its fixed shape. If the photo is *framed* badly rather than the wrong shape,
 move the focal point on the image under Media instead; that fixes every place it appears at once.
 
@@ -326,7 +329,7 @@ different one on their own profile:
 | **Team photo** | Meet the Team, and the byline photo wherever they are credited on an article. Also their profile page, unless the next field is set. |
 | **Profile photo** | Their profile page **only**. Leave it empty to use the Team photo in both places. |
 | **Show no photo on the profile page** | No photo on the profile; they still appear with their Team photo on Meet the Team. This wins over both uploads, so you can hide a photo without deleting it. |
-| **Photo shape on the profile page** | The shape of the frame on their profile page — **Tall (2:3)**, **Portrait (4:5)** or **Square**. Tall matches the founder photograph on the About page and is the default, because most portrait photography is taller than it is wide and a square frame cuts the top and bottom off. Meet the Team and bylines are unaffected. |
+| **Photo shape on the profile page** | The shape of the frame on their profile page — **Tall (2:3)**, **Portrait (4:5)** or **Square**. Tall matches the founder photograph on the About page and is the default **for Team**, because most portrait photography is taller than it is wide and a square frame cuts the top and bottom off. **Specialists default to Square** — their headshots are square cut-outs, so a tall frame only cropped the sides. Meet the Team and bylines are unaffected. |
 
 With no photo *and* no qualifications, the profile's bio widens to the full page rather than leaving
 a gap where the photo was. For a bad crop, see **Media** below — it is fixed there, once, for every

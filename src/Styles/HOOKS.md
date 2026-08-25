@@ -385,7 +385,7 @@ is no help if you are looking for the setting. Each of these is a normal field o
 | Row | **Vertical alignment** | Top, centre, bottom or stretch — how columns of different heights line up |
 | Column | **Column span** | How many of the row's columns this one occupies |
 | Anywhere an icon appears | **the icon picker** | A fixed set of icons. Type to filter; only icons in the set can be chosen, so an icon can never fail to draw |
-| A person's record (Team / Specialists) | **Photo shape on the profile page** | Tall (2:3), Portrait (4:5) or Square. Changes the shape of the frame on **that person's own profile page only** — their card on the listing pages, in directories and on article bylines keeps its fixed shape, so one person cannot make a grid ragged. If the photo is *badly framed* rather than the wrong shape, move the focal point on the image in Media instead |
+| A person's record (Team / Specialists) | **Photo shape on the profile page** | Tall (2:3), Portrait (4:5) or Square. **Team defaults to Tall, Specialists to Square** (their headshots are square cut-outs; a tall frame cropped the sides). Changes the shape of the frame on **that person's own profile page only** — their card on the listing pages, in directories and on article bylines keeps its fixed shape, so one person cannot make a grid ragged. If the photo is *badly framed* rather than the wrong shape, move the focal point on the image in Media instead |
 
 **Blocks this guide had never mentioned.** They are in the *Add block* list and they work; there was
 simply nowhere describing them, and the one page that displayed them was deleted on 2026-08-20:
