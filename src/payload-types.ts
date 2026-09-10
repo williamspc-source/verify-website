@@ -1523,11 +1523,14 @@ export interface Stream {
   createdAt: string;
 }
 /**
+ * Admin logins. Everyone here has full access — there are no restricted roles, so only add people you trust with the whole site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
+  name?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -12884,6 +12887,7 @@ export interface IconsSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
