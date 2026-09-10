@@ -21,6 +21,12 @@ because there is nothing to obey — only something to check.
 - [Running the e2e suite](#running-the-e2e-suite)
 - [Searching, grepping, and reading a tool's output](#searching-grepping-and-reading-a-tools-output)
 - [Driving a browser](#driving-a-browser)
+- [An inline style defeats every media query, so a responsive rule can be dead](#an-inline-style-defeats-every-media-query-so-a-responsive-rule-can-be-dead)
+- [`pnpm dev` and a desktop-only test suite cannot see a responsive fault](#pnpm-dev-and-a-desktop-only-test-suite-cannot-see-a-responsive-fault)
+- [`stroke` on a filled icon, and other rules that read correctly and do nothing](#stroke-on-a-filled-icon-and-other-rules-that-read-correctly-and-do-nothing)
+- [The `.my-16` wrapper: two ways it costs 64px](#the-my-16-wrapper-two-ways-it-costs-64px)
+- [Taxonomy-before-content in `payload.config.ts` is a convention, not a requirement](#taxonomy-before-content-in-payloadconfigts-is-a-convention-not-a-requirement)
+- [A hook that throws a plain `Error` tells the editor nothing](#a-hook-that-throws-a-plain-error-tells-the-editor-nothing)
 - [Writing a guard that can actually fail](#writing-a-guard-that-can-actually-fail)
 - [Writing a guard against a stylesheet: CSS-shaped text inside a COMMENT](#writing-a-guard-against-a-stylesheet-css-shaped-text-inside-a-comment)
 - [`computedSnapshot.mjs` is NOT deterministic on `/about`](#computedsnapshotmjs-is-not-deterministic-on-about)
@@ -298,6 +304,24 @@ A `shape_cols` helper table left in `verify_cms` hung `getPayload()` for ten min
 **51. A field on a publicly-readable collection is public, wherever it sits in the admin**
 
 AvailabilitySessions is `access.read: anyone`, so its `notes` field — a staff note — was served to unauthenticated callers on `/api/availability-sessions`. Measured: an anonymous `curl` returned the `notes` key, and returned real values for the collection's other optional fields (`location` came back as "Brisbane CBD"), so the exposure was live rather than theoretical. Moving a field to the sidebar, labelling it "Internal note" and writing "staff only" in its description change nothing — only field-level `access.read` removes it from the response. Guarded by `tests/int/availabilityNotes.int.spec.ts`, whose second assertion is the positive control: without it the test passes just as happily against a field that is empty, misspelled or deleted.
+
+<a id="i53"></a>
+**53. The header's collapse breakpoint is written in three places**
+
+`1024px`, not `768px`, and it appears three times in `globals.css` — measured 2026-08-26:
+**line 683** (the nested `components` sub-layer), **line 3703** (the extracted block) and
+**line 4141** (the drawer block). The file says so itself at 4141: *"1024, matching the two blocks
+above: all three must move together or the header half-collapses."*
+
+Change one and the change appears to do nothing, because the other two still hold the old value and
+un-sublayered rules beat sublayered ones per declaration. The breakpoint is 1024 rather than 768 for
+a measured reason recorded at line 683: between 769 and 1024 the full desktop bar (logo, seven
+nowrap links, CTA) does not fit `.container`, so the document grew sideways — **scrollWidth 1191
+against a 1024 viewport** — and every full-bleed band stopped short of the right edge. Collapsing
+here also gives touch tablets the dropdowns, which are hover-only above this width.
+
+`tests/e2e/responsive.e2e.spec.ts` is what goes red on this; note that `overflow-x: clip` on `html`
+once made that spec unable to fail on the very defect it was written for.
 
 <a id="i56"></a>
 **56. A layout that divides a band by a fixed share must say what ONE child means**
@@ -738,6 +762,8 @@ Playwright will happily measure the wrong thing and report it as a pass.
   *change*; a recovery keyed on exact values is not a bound. `FeaturedArticles` was unaffected — it
   advances with `(c + 1) % count`.
 
+<a id="i52"></a>
+
 ## An inline style defeats every media query, so a responsive rule can be dead
 
 **A `@media` rule that reads correctly, sits in the right file and matches the right selector can
@@ -784,6 +810,8 @@ Also: `computedSnapshot.mjs` keys nodes by **structural index path**, so inserti
 with `after: undefined`. That is not a style regression. Check whether any node *outside* the changed
 subtree moved — on this pass, zero did.
 
+<a id="i55"></a>
+
 ## `stroke` on a filled icon, and other rules that read correctly and do nothing
 
 **A Phosphor icon in this repo is DUOTONE and filled** — `<svg fill="currentColor">` with two paths
@@ -797,6 +825,8 @@ half maps onto our renderer, and the port kept the wrong one.
 Colour the **container**, with the same token the neighbouring text already uses, so the two cannot
 drift. `.ct-info-item-icon` had already solved this and said so in a comment — the gateway rules were
 the one place contradicting it.
+
+<a id="i54"></a>
 
 ## The `.my-16` wrapper: two ways it costs 64px
 
@@ -1330,7 +1360,7 @@ and the text renders uncoloured — which is exactly why this is invisible: the 
 whether the value is still there or has just been destroyed, and re-adding the key to the palette
 will not bring it back.
 
-`richTextColors.ts` and `README.md` §19 both used to say stored content was never at risk. That was
+`richTextColors.ts` and `README.md` §10.19 both used to say stored content was never at risk. That was
 written about a Payload *API* change, where it is true, and it read as a general guarantee, where it
 is not. Retire a colour only with a repair that rewrites the affected nodes first.
 

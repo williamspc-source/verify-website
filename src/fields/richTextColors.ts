@@ -24,7 +24,7 @@ import type { Field } from 'payload'
  * selection an editor made by hand does not.
  *
  * What was not reconsidered is where colours come from. Mid-paragraph colour is
- * still drawn from this seven-entry brand palette and never from a colour wheel.
+ * still drawn from this sixteen-entry brand palette and never from a colour wheel.
  *
  * ## Why keys and tokens rather than stored colour values
  *

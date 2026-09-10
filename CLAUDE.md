@@ -49,8 +49,8 @@ five are right. Added 2026-08-26, on request, with that constraint written into 
 This set was **ten** documents and 9,554 lines. It collapsed to five because the rule above could not
 be held at that size: on 2026-08-24, one day after a full "update every document" pass, three
 documents gave three different counts for the same shell script, and the status file still described
-a deploy that had already happened. Four files were deleted as history (`git log` holds them), one
-was merged, and the trap log moved out of this file. **Read that before adding a seventh.**
+a deploy that had already happened. Three files were merged into `README.md` and three were deleted as
+history (`git log` holds all six), and the trap log moved out of this file. **Read that before adding a seventh.**
 
 `docs/ADMIN-GUIDE.md` and `src/Styles/HOOKS.md` share a reader and must not share content. HOOKS.md
 owns *"how do I change how this looks"*; ADMIN-GUIDE.md owns *"what is this thing and what feeds off
@@ -124,16 +124,16 @@ several look arbitrary until you see what happened without them.
 
 51. **A field on a collection with `access.read: anyone` is public unless field-level `access.read` says otherwise.** Admin placement, a label and a description change nothing about what the API returns. Guarded by `tests/int/availabilityNotes.int.spec.ts`. <sub>[why](docs/TRAPS.md#i51)</sub>
 
-52. **A block must never write `grid-template-columns` (or any responsive property) inline** — inline beats every media query, so the mobile rule silently never applies. Emit `--vf-cols` and let `globals.css` own the breakpoints. An inline *custom property* also beats a stylesheet one, so the mobile rule sets `grid-template-columns` directly rather than resetting the variable. Guarded by `tests/e2e/responsive.e2e.spec.ts`. <sub>[why](docs/TRAPS.md)</sub>
-53. **The header's collapse breakpoint is 1024px and is written in THREE places** — the nested `components` sub-layer, an extracted block, and the drawer block. Changing one leaves the other two and the change appears to do nothing. <sub>[why](docs/TRAPS.md)</sub>
+52. **A block must never write `grid-template-columns` (or any responsive property) inline** — inline beats every media query, so the mobile rule silently never applies. Emit `--vf-cols` and let `globals.css` own the breakpoints. An inline *custom property* also beats a stylesheet one, so the mobile rule sets `grid-template-columns` directly rather than resetting the variable. Guarded by `tests/e2e/responsive.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i52)</sub>
+53. **The header's collapse breakpoint is 1024px and is written in THREE places** — the nested `components` sub-layer, an extracted block, and the drawer block. Changing one leaves the other two and the change appears to do nothing. <sub>[why](docs/TRAPS.md#i53)</sub>
 
-54. **`selfSpaced` membership is decided by MEASURING a block's own computed padding, not by reading its source.** A block's padding may come from a page-scoped rule or an editor-chosen `cssClass`, so removing its `.my-16` wrapper can strip spacing on another page. And `grep '<Section'` matches `<SectionHeader` and comments. <sub>[why](docs/TRAPS.md)</sub>
-55. **Colour a Phosphor icon through `color` on its container, never `stroke`.** They are duotone and filled; a `stroke` rule applies and paints nothing. Use the same token as the adjacent text so the two cannot drift. <sub>[why](docs/TRAPS.md)</sub>
+54. **`selfSpaced` membership is decided by MEASURING a block's own computed padding, not by reading its source.** A block's padding may come from a page-scoped rule or an editor-chosen `cssClass`, so removing its `.my-16` wrapper can strip spacing on another page. And `grep '<Section'` matches `<SectionHeader` and comments. <sub>[why](docs/TRAPS.md#i54)</sub>
+55. **Colour a Phosphor icon through `color` on its container, never `stroke`.** They are duotone and filled; a `stroke` rule applies and paints nothing. Use the same token as the adjacent text so the two cannot drift. <sub>[why](docs/TRAPS.md#i55)</sub>
 
 56. **A layout that divides a band by a fixed share must say what ONE child means.** `flex: 0 1 50%` on a chooser with a single panel is not half a design, it is half a band and half a void — measured 720px of 1440, and 379px of a 520px band on a phone. Decide the count BEFORE the markup (a child filtered out inside the `.map` is invisible to the container's class), and prefer `flex-grow` to `flex-basis: 100%`: it absorbs the free space a hover rule frees up, so the slide stops without a specificity fight, and it is not a *height* when the row turns column. Guarded by `frontend.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i56)</sub>
 57. **A Payload `select` is a Postgres ENUM, so a field whose values an editor can CREATE must be `text`.** An enum can only hold labels that existed when the schema was built, so an uploaded icon (`upload:12`) can never go in one. Converting later is destructive — 112 enum types had to be dropped — and Payload's dev push then stops on an invisible prompt with every request queued behind it. Decide `text` at the point the field is *designed*, not after. Guarded by `iconLibrary.int.spec.ts`. <sub>[why](docs/TRAPS.md#i57)</sub>
 58. **A field declared by more than one helper must be changed in ALL of them — grep the field NAME, never the helper.** `icon` is declared in `blockFields.ts` (65 columns) *and* `link.ts` (45). Converting one and not the other left the config and the database permanently disagreeing, so the schema push rebuilt the same enums on every boot and no amount of `rm -rf .next` cleared it. <sub>[why](docs/TRAPS.md#i58)</sub>
-59. **An icon an editor uploads is an empty `<svg>`, painted by `mask-image`, never a `<span>` and never an `<img>`.** `globals.css` sizes and colours icons through **66** rules that select `svg`; a `<span>` matches none of them, so an upload renders at the wrong size in the wrong colour everywhere. An `<img>` cannot take the band's colour at all. Guarded by `uploadedIcons.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i59)</sub>
+59. **An icon an editor uploads is an empty `<svg>`, painted by `mask-image`, never a `<span>` and never an `<img>`.** `globals.css` sizes and colours icons through **69** rules that select `svg` (re-measured 2026-08-26; `grep -cE "^[^{}]*svg[^{}]*\{" 'src/app/(frontend)/globals.css'` counts 71 including two inside comments); a `<span>` matches none of them, so an upload renders at the wrong size in the wrong colour everywhere. An `<img>` cannot take the band's colour at all. Guarded by `uploadedIcons.e2e.spec.ts`. <sub>[why](docs/TRAPS.md#i59)</sub>
 
 ## Commands
 
@@ -228,11 +228,15 @@ where the editor's manual lives). It is no longer the Payload template's.
 
 Fully isolated from production — it never touches the live database.
 
-- **Database:** Homebrew `postgresql@15` on `127.0.0.1:5432`, dedicated DB `verify_cms`
-  (owner `swinchester`, no password). `psql`/`createdb` live at
-  `/opt/homebrew/opt/postgresql@15/bin/`.
-  - A separate `vmls_dev` DB in the same Postgres belongs to an **unrelated Prisma app** —
-    leave it alone.
+- **Database:** PostgreSQL 15+ on `127.0.0.1:5432`, dedicated DB `verify_cms`, owned by the
+  developer's own login. It is a throwaway — it is rebuilt from `migrate` + seed rather than
+  backed up, and nothing in it is shared with production.
+  - The original development machine was a Mac with Homebrew `postgresql@15`, where `psql` and
+    `createdb` are not on `PATH` by default and live under `/opt/homebrew/opt/postgresql@15/bin/`.
+    On Linux they are on `PATH`. If a `psql` command in these docs is "not found", that is why.
+  - **Only ever point `DATABASE_URL` at a database this project owns.** The dev schema push
+    reshapes whatever it is given to match the config, so a shared Postgres instance can hold
+    unrelated databases safely — but naming one of them here would rewrite it.
 - **Env:** `.env` (gitignored, local-only) sets `DATABASE_URL` to `verify_cms` with a fresh
   local `PAYLOAD_SECRET`. `.env.example` documents every variable and marks the three the
   server refuses to boot without (`SMTP_HOST`, `NEXT_PUBLIC_SERVER_URL`, `PREVIEW_SECRET`) —
@@ -274,10 +278,10 @@ Fully isolated from production — it never touches the live database.
 
 ## Deploy workflow
 
-Production builds/migrates on a remote Proxmox box (reached via Tailscale; managed through the
-Proxmox dashboard). Loop: edit code locally → commit & push → the box pulls, builds, and
-migrates against the **live** database. The local `.env` and `verify_cms` DB stay on the Mac
-and are never pushed.
+Production builds and migrates on **the production host** — a Linux server the site's owner
+controls. Loop: edit code locally → commit & push → the host pulls, builds, and migrates against
+the **live** database. Nothing about the code assumes a particular host; the local `.env` and
+`verify_cms` database stay on the development machine and are never pushed.
 
 After a `CollectionConfig`/`GlobalConfig` field change, the server sequence is:
 `pnpm payload generate:types` → `pnpm payload migrate:create <name>` → `pnpm payload migrate` →
@@ -550,8 +554,8 @@ The barrel import in `/api/icon/phosphor/[name]` is the price of serving all 1,5
 compile step went 5.4s → 6.4s.** It is a route handler, so nothing reaches a browser as JavaScript.
 
 `src/components/Icon/value.ts` is the **only** place that shape is interpreted. The colour rides in
-the value rather than in a second column because `iconField` has 38 call sites and 45 `<Icon>` render
-sites: a separate field would be 110 new columns and 83 edits, and one forgotten render site is a
+the value rather than in a second column because `iconField` has 38 call sites and 84 `<Icon>` render
+sites (re-measured 2026-08-26): a separate field would be 110 new columns and 122 edits, and one forgotten render site is a
 control that silently does nothing — the `textColour` failure in invariant 33.
 
 **A two-COLOUR upload becomes a two-TONE one.** Phosphor duotone is a solid path plus one at

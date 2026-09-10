@@ -456,10 +456,10 @@ that nobody would notice.
 
 Only SVG files are accepted, and an SVG carrying anything other than shapes is rejected at upload.
 
-### Icon Library  *(under Design)*
+### Icon Library *(under Design)*
 
-**Everything to do with icons is on this one screen.** Open **Design → Icon Library** and you see all
-1,523 of them at once — the 1,513 Phosphor ships, plus any SVG you have uploaded — with the ones
+**Everything to do with icons is on this one screen.** Open **Design → Icon Library** and you see
+every icon at once — the **1,513** names Phosphor ships, plus any SVG you have uploaded — with the ones
 editors can currently choose already ticked.
 
 - **Tick or untick to decide what editors are offered.** No searching required to see them; search
@@ -591,6 +591,10 @@ page:
 
 **Custom Styles** and **Design System** — see [`HOOKS.md`](../src/Styles/HOOKS.md).
 
+**Icon Library** — the one screen where icons are chosen, uploaded, renamed, recoloured and
+deleted. It is documented in full at [Icon Library](#icon-library-under-design) above, beside the
+other upload screens, because that is where you go looking for it.
+
 ---
 
 ## 7a. Formatting: what the toolbars mean
@@ -659,7 +663,7 @@ to those, so make them when you are ready.
   Articles and Events save themselves continuously so live preview works, which means clicking
   *Create New* to have a look and then navigating away leaves an empty `<No Title>` row behind. If
   you open one by mistake, delete it before you leave. (74 of these had built up and were cleared on
-  18 Aug 2026 — one Article and one Event from clicking about, the rest from the test suite.)
+  2026-08-18 — one Article and one Event from clicking about, the rest from the test suite.)
 - **An article with no Stream has no web address.** It will not appear anywhere.
 - **Deleting a Stream strands every article in it.** Move them first.
 - **Changing a page's Parent changes its URL** and breaks saved links. Add a Redirect.

@@ -1,5 +1,7 @@
 # Architecture
 
+*Added 2026-08-26. Last reviewed 2026-08-26.*
+
 The VERIFY Medico-Legal Solutions website: how it is put together, and where each part lives.
 
 ## What this document is, and what it deliberately is not
@@ -287,19 +289,10 @@ trust a written number.
 **Local** is fully isolated: a dedicated Postgres database, a local `.env`, throwaway admin
 credentials, and schema pushed on boot. It never touches production.
 
-**Production** builds and migrates on a remote box: commit and push, the box pulls, generates types,
-creates and runs a migration, builds. A boot-time environment check refuses to start a server missing
+**Production** builds and migrates on the production host: commit and push, the host pulls,
+generates types, creates and runs a migration, builds. A boot-time environment check refuses to start a server missing
 the variables whose absence would otherwise degrade *invisibly* — mail credentials, the public URL,
 the preview secret — because a half-alive server passes a deploy smoke test.
 
 `README.md` has the exact sequence, and the flags that exist for standing a box up before mail
 credentials do.
-
-## Where the bodies are buried
-
-Most of the hard-won knowledge in this project is not architectural — it is a list of things that
-looked true and were not. A stale build that faked a passing test. A media query defeated by an inline
-style. A field that saved perfectly and was read by nothing.
-
-That is what `CLAUDE.md`'s invariants and `docs/TRAPS.md` are for, and neither is summarised here on
-purpose. Before believing a measurement, read the matching trap.

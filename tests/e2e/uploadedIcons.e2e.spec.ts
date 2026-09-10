@@ -16,8 +16,8 @@ import { login } from '../helpers/login'
  *
  * It caught two real defects on the way in, neither visible in the source:
  *
- *  · The mask was a `<span>`. globals.css sizes and colours icons through **66**
- *    rules that select `svg` — `.ni-card-img svg { width: 36px }`,
+ *  · The mask was a `<span>`. globals.css sizes and colours icons through **69**
+ *    rules that select `svg` (re-measured 2026-08-26) — `.ni-card-img svg { width: 36px }`,
  *    `.img-qa svg { color: … }` — and a span matches none of them, so an upload
  *    rendered at 24px in `rgb(65,64,66)` where the built-in it replaced was 36px
  *    in a tinted blue. It is an empty `<svg>` now, painted entirely by

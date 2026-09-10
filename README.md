@@ -55,7 +55,13 @@ developer, and adding a hardcoded value takes something away from them.
 
 ## 2. Standing a box up from nothing
 
-**Prerequisites:** Node 20+, `pnpm`, PostgreSQL 15+.
+**Prerequisites:** Node 22 LTS (`package.json` requires `>=20.9.0`; Node 20 left maintenance in
+April 2026, so a new host should be on 22), `pnpm` 9 or 10, PostgreSQL 15+.
+
+> **This section is the summary.** The command-at-a-time version for someone who has not done it
+> before — provisioning Ubuntu, systemd, Cloudflare, TLS, email — is
+> `VERIFY-Deployment-Runbook.md`, which ships **alongside** this repository, not inside it. Use it
+> for a first deploy; use the six steps below as the checklist once you know the shape.
 
 ```bash
 createdb verify_cms            # 1. a database
@@ -85,14 +91,18 @@ specialists, team, events and settings.
 changes live URLs, and overwrites editable copy from code fixtures. It is a scaffolding tool, not an
 admin feature.
 
-### Two things that are empty on a fresh install and look like faults
+### After a seed: what to do, and what only looks like a fault
 
 1. **Admin → System → Search → Reindex.** Search results store their own canonical URL (`uri`),
    written on save. Documents that predate a seed keep whatever they had, and a result with no `uri`
    renders unlinked. On one local database only 7 of 66 search documents had one until it was
-   reindexed.
+   reindexed. **This one is required after every seed or bulk import.**
 2. **Admin → Site → Site Settings** — the breadcrumb separator (`Home` / `›` / `Breadcrumb`) and the
-   brand assets start empty.
+   brand assets start empty. Not a fault; fill them when you have the artwork.
+3. **If the nav, footer or branding still looks stale**, open **Site → Header** and **Site → Footer**
+   and press **Save** on each. You should not need to: `seedVerify` ends by purging `global_*` for
+   all ten cached globals and `revalidatePath('/', 'layout')`, which was added for exactly this
+   symptom. Saving forces the same purge, and is the recovery step if it did not take.
 
 ---
 
@@ -124,7 +134,10 @@ requiring mail credentials to build an artifact just breaks the build, so the bu
 
 ## 4. Email — read this even if you skip everything else
 
-**This install is currently running without email**, via `ALLOW_MISSING_SMTP=1` in `.env`.
+**The site is handed over with email switched off**, and is designed to run that way until real
+SMTP credentials exist. You turn it off with `ALLOW_MISSING_SMTP=1` in `.env`; a development machine
+may instead be using `LOCAL_PROD_REPRO=1`, which waives all three required variables rather than
+just this one. Either way the behaviour below is the same.
 
 **What still works.** Enquiries, contact forms and newsletter signups are **captured normally**.
 They are in the admin under **Forms → Form Submissions**. Nothing is lost.
@@ -260,9 +273,14 @@ rm -f /tmp/wt/node_modules && git worktree remove --force /tmp/wt
 
 ## 7. Deploying
 
-Production builds and migrates on a remote Proxmox box, reached over Tailscale and managed through
-the Proxmox dashboard. The loop is: commit locally → push → the box pulls, builds and migrates
-against the **live** database.
+Production builds and migrates on **the production host** — a Linux server the site's owner
+controls, reached however that host is normally administered. The loop is: commit locally → push →
+the host pulls, builds and migrates against the **live** database. Nothing below assumes a
+particular machine, operating system or network; every command is about the code.
+
+> **If you have just inherited this project, the host does not exist yet.** The site was built and
+> proven on the original developer's own server, which did not transfer. Standing one up is
+> `VERIFY-Deployment-Runbook.md`, which ships alongside this repository rather than inside it.
 
 ```bash
 git pull
@@ -382,12 +400,12 @@ pnpm exec tsc --noEmit
 zsh tests/int/prove-guards.sh   # re-applies each deliberate break; every case must report PASS
 ```
 
-**Measured 2026-08-24 — re-run these rather than trusting the numbers:**
+**Re-measured 2026-08-26 — re-run these rather than trusting the numbers:**
 
 | Gate | Result | Count it with |
 |---|---|---|
 | `pnpm test:int` | **334 passed, 17 files** | `pnpm test:int` |
-| `pnpm test:e2e` | **72 passed** on a clean run | `pnpm test:e2e` |
+| `pnpm test:e2e` | **72 total.** Last full run: 70 passed, 2 failed — one the flake in [§10.1](#1-four-e2e-specs-flake-under-a-loaded-dev-server) (passed alone), one the real database-state fault in [§10.32](#32-deleting-an-uploaded-icon-leaves-it-ticked-in-the-icon-library) | `pnpm test:e2e` |
 | `zsh tests/int/prove-guards.sh` | **11 cases** | `grep -c '^run_case "' tests/int/prove-guards.sh` |
 | `referenceCssDiff.mjs` | **13 families**, all zero | the `FAMILIES` object in the harness |
 | `computedSnapshot.mjs` | **21 routes, 39 properties** | the `ROUTES` and `PROPS` arrays |
@@ -398,7 +416,7 @@ each parameterise one test per route, so 45 `test(` declarations expand to far m
 **A red e2e run is not automatically a regression.** Taking these very readings, a second full run
 against an already-hammered dev server gave `2 failed, 2 did not run, 57 passed` — the two failures
 being `admin.e2e.spec.ts`'s `beforeAll` timing out at `browser.newContext()`, with two more skipped
-behind it by serial mode. Re-run alone: **4 passed in 32s**. That is [§10.1](#1-two-e2e-specs-flake-under-a-loaded-dev-server),
+behind it by serial mode. Re-run alone: **4 passed in 32s**. That is [§10.1](#1-four-e2e-specs-flake-under-a-loaded-dev-server),
 not a defect, and the failing spec's *name* is not diagnostic — any spec can draw the short straw.
 
 ### The doctrine
@@ -576,8 +594,7 @@ undone. A stale register is worse than none, because people trust it.
 
 | # | Issue | Live today? | Impact | Effort |
 |---|---|---|---|---|
-| 0 | Playwright had no mobile project until 2026-08-25 | Fixed | Four responsive faults shipped under a fully green suite | Done — `responsive.e2e.spec.ts` |
-| 1 | Three e2e specs flake under a loaded dev server | Test-only | `pnpm test` fails intermittently on a healthy machine | ~10 min |
+| 1 | Four e2e specs flake under a loaded dev server | Test-only | `pnpm test` fails intermittently on a healthy machine | ~10 min |
 | 2 | Three template hero types render their title at 400 | Latent | An editor who picks one gets a visibly unstyled heading | ~30 min **+ a data migration** |
 | 3 | `.contact-form` padding follows the reference's superseded rule | Cosmetic | 12px more padding than one reference page shows | ~5 min |
 | 4 | Light-band breadcrumbs are darker and heavier than the reference | Cosmetic, ~25 pages | A slightly heavier trail | ~10 min + re-baseline |
@@ -606,13 +623,41 @@ undone. A stale register is worse than none, because people trust it.
 | 27 | The text-colour palette cannot be extended by an editor | Yes, mild | "Add a colour" needs a developer and a deploy; the 16 values are all editable | Not fixable in the toolbar — see below |
 | 28 | `computedSnapshot.mjs` is not deterministic on `/about` | Test-only | A clean change can report a 2–3 node diff, or none, run to run | Unknown — needs a settle, not a tolerance |
 | 29 | Drag-ordering specialists means dragging across pages | Yes, mild | The admin list shows 10 of 26, so moving someone far is awkward | Raise the list `limit`, ~1 line |
-| 31 | Two blocks still render two-across on a phone by design | Yes, mild | `form-row` (two short form fields) stays 2-up below 600px | Deliberate — see below |
-| 30 | An availability edit can take up to an hour to reach the live site | Yes, mild | Editors read a cached page as a lost save and re-enter the slot | See below — needs a box-side reading first |
+| 30 | An availability edit can take up to an hour to reach the live site | Yes, mild | Editors read a cached page as a lost save and re-enter the slot | See below — needs a host-side reading first |
+| 31 | What still sits two-across on a phone | Yes, mild | `form-row` (two short form fields) stays 2-up below 600px | Deliberate — see below |
+| 32 | Deleting an uploaded icon leaves it ticked in the Icon Library | Yes | A permanently-ticked entry with no tile, and a red `uploadedIcons` spec until it is unticked | ~10 lines in a hook, or in `iconUsage` |
 
-### 1. Three e2e specs flake under a loaded dev server
+### 32. Deleting an uploaded icon leaves it ticked in the Icon Library
 
-`admin.e2e.spec.ts`, `links.e2e.spec.ts` and `tryBooking.e2e.spec.ts` fail intermittently, and
-**only in a full run**. `tryBooking` was added to this list on 2026-08-24: *"the fallback booking link
+**Measured 2026-08-26**, on a database where the `icons` collection was empty and
+`icon_library_texts` held **103** rows — 102 Phosphor names plus a dangling **`upload:51`**.
+`uploadedIcons.e2e.spec.ts:449` goes red with *"103 of the 102 icons on offer are ticked"*, and it
+reproduces in isolation, so it is not the flake above.
+
+**The mechanism, traced rather than guessed.** `iconUsage` (`src/utilities/iconUsage.ts`) is the
+guard that refuses to delete an icon that is in use, and it *does* scan globals — but its loop opens
+`if (!iconFieldPaths(global.fields).length) continue`. The Icon Library global's list is
+`name: 'icons', type: 'text'` (`src/IconLibrary/config.ts:42`), declared directly rather than
+through `iconField`, so `iconFieldPaths` finds nothing on it and **the one global that exists to
+hold icon choices is the one global the guard skips.** Deleting a ticked upload therefore succeeds
+and orphans its entry: the library counts it as ticked and renders no tile for it.
+
+`uploadedIcons.e2e.spec.ts` reaches this by design — its `finally` deletes the icon it uploaded
+(line 381) but never unticks it — so **running that spec is what plants the orphan**, and every
+later full run fails until the entry is removed.
+
+*Fix:* either have `iconUsage` treat the Icon Library's own list as usage (so the delete is refused,
+matching every other holder), or prune the key from the global in the Icons `afterDelete` hook (so
+the delete stays allowed and cleans up after itself). The second is closer to what an editor
+expects. Until then, untick the stale entry in **Design → Icon Library** — the screen shows it as
+ticked with nothing beside it.
+
+### 1. Four e2e specs flake under a loaded dev server
+
+`admin.e2e.spec.ts`, `links.e2e.spec.ts`, `tryBooking.e2e.spec.ts` and `frontend.e2e.spec.ts` fail
+intermittently, and **only in a full run**. `frontend` was added on 2026-08-26: *"the booking-portal
+tiles do not, and the enquiry button does"* failed at the end of a full run and passed alone
+immediately after (**1 passed in 32s**) — the same signature as the three below. `tryBooking` was added to this list on 2026-08-24: *"the fallback booking link
 is present and correct when the widget cannot load"* failed once at the end of a full run and passed
 4/4 in isolation immediately after, which is the same signature as the two below. Measured
 across six full runs: *"Admin Panel › can navigate to dashboard"* failed twice; it passes every time
@@ -896,7 +941,7 @@ deliberately.
 ### 24. This deployment runs without email, on purpose
 
 Covered in full at [§4](#4-email--read-this-even-if-you-skip-everything-else). Recorded here so it
-cannot be forgotten on the box that matters. **The risk this entry exists for is leaving
+cannot be forgotten on the host that matters. **The risk this entry exists for is leaving
 `ALLOW_MISSING_SMTP` set on the site that takes real enquiries.**
 
 ### 25. Nothing exercises the seed
@@ -939,7 +984,7 @@ our wiring:
 **Pre-declared empty slots were considered and rejected.** Six spare rows in Site Settings would
 work mechanically, but an unfilled slot still renders as a pickable toolbar swatch whose `var()`
 resolves to nothing — text that visibly does not change. That is the exact failure invariant 2 and
-`TRAPS.md` #43 exist to prevent, it cannot be hidden (the admin does not load the brand tokens at
+`TRAPS.md` [#i43](docs/TRAPS.md#i43) exist to prevent, it cannot be hidden (the admin does not load the brand tokens at
 all), and it would ship four permanently-dead controls to answer a request for one live one.
 
 The block-level dropdown *alone* could be made dynamic, following the `CssClassSelect` precedent.
@@ -975,30 +1020,32 @@ Custom looks like nothing happened until a row is actually moved.
 
 ### 30. An availability edit can take up to an hour to reach the live site
 
-Reported on 2026-08-25 as *"the availability chip tooltip never renders even with a note saved"*. The
-code is correct and **is deployed**: `https://pl.wxn.au/make-a-booking` serves all 12 chips with a
-`note` key in its payload, so the box has the wiring. Locally, saving a note put `title="…"` in the
-served HTML within two seconds.
+Reported on 2026-08-25 as *"the availability chip tooltip never renders even with a note saved"*.
+**The code is correct.** Locally, saving a note put `title="…"` in the served HTML within two
+seconds, and a production build served all 12 chips with a `note` key in the payload — so the
+wiring is there.
 
-**What is measured, and what is not.** The caching is real:
+**What is measured, and what is not.** The caching is real. Taken against a production build of
+this site (`next start`, not `pnpm dev` — the dev server does not cache and cannot reproduce this):
 
 ```
-$ curl -sD- -o/dev/null https://pl.wxn.au/make-a-booking
+$ curl -sD- -o/dev/null https://<your-host>/make-a-booking
 cache-control: s-maxage=3600, stale-while-revalidate=31532400
 x-nextjs-cache: HIT
 ```
 
 `x-nextjs-cache: HIT` means the page is served without re-rendering, and the
-`stale-while-revalidate` window is **roughly a year** — so once the 3600s freshness lapses, a visitor
-is served the *stale* page while the refresh happens behind them, and only the reload *after* that
-shows the change. An editor saving a slot and reloading can therefore see the old page well past the
-hour. That is the "appears to work when it doesn't" shape, and it applies to every availability edit,
-not just the note.
+`stale-while-revalidate` window is **roughly a year** — so once the 3600s freshness lapses, a
+visitor is served the *stale* page while the refresh happens behind them, and only the reload
+*after* that shows the change. An editor saving a slot and reloading can therefore see the old page
+well past the hour. That is the "appears to work when it doesn't" shape, and it applies to every
+availability edit, not just the note.
 
-**Not confirmed:** whether the reported note ever reached the box's database. There are **zero**
-sessions with a note there now, so it was either never saved or removed after the test, and the two
-cannot be told apart after the fact. Do not record the cache as the proven cause of *that* report —
-record it as a measured fault that would produce exactly that symptom.
+**Not confirmed:** whether the reported note ever reached the database it was reported against.
+There were **zero** sessions carrying a note there when it was checked, so it was either never saved
+or removed after the test, and the two cannot be told apart after the fact. Do not record the cache
+as the proven cause of *that* report — record it as a measured fault that would produce exactly that
+symptom.
 
 **Take this reading before changing anything.** `safeRevalidatePath` deliberately never throws —
 losing the write is worse than serving a stale page — so a failed purge is visible *only* in the
@@ -1009,11 +1056,11 @@ Revalidation skipped (path /make-a-booking): … The write itself succeeded; aff
 ```
 
 That line is real and reachable: a full `pnpm test:e2e` run produces it as
-`Invariant: static generation store missing in revalidatePath /`. Save a session on the box, then grep
-its log for `Revalidation skipped`. If it appears, the purge is failing and the fix belongs in the
-hook's calling context. If it does not, the purge works and the delay is the SWR window. **Do not
-"fix" this by lowering `revalidate` before taking that reading** — it would mask a broken purge behind
-more frequent rebuilds.
+`Invariant: static generation store missing in revalidatePath /`. Save a session on the production
+host, then grep its log for `Revalidation skipped`. If it appears, the purge is failing and the fix
+belongs in the hook's calling context. If it does not, the purge works and the delay is the SWR
+window. **Do not "fix" this by lowering `revalidate` before taking that reading** — it would mask a
+broken purge behind more frequent rebuilds.
 
 Editors are told about the delay in `docs/ADMIN-GUIDE.md` so that a slow update does not get
 re-entered as a lost save.
@@ -1124,7 +1171,8 @@ so a square box cropped away the top and bottom of the frame. Changed to `2/3`.
 framed every portrait square — `.staff-photo` at `1/1`, `.profile-avatar` at a fixed 230×230 — and
 were doing the same crop to every photo. They now default to `2/3` and carry a per-person **Photo
 shape on the profile page** control (Tall / Portrait / Square) on the Team and Specialists records.
-Do not "restore" either to a square: the square was the bug this and §6 both fix. Exactly one
+Do not "restore" either to a square: the square was the bug in both cases — the founder
+photograph above, and every portrait on both profile templates. Exactly one
 Leadership Spotlight block exists site-wide, on `/about`; `.leader-badge` is absolutely positioned
 against that box and was re-measured rather than assumed.
 
