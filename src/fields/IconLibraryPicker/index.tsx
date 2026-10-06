@@ -44,10 +44,11 @@ const artworkUrl = (value: string): string =>
     : `${getClientSideURL()}/api/icon/phosphor/${encodeURIComponent(value)}`
 
 /** A tile's artwork, fetched only once the tile is close to being seen. */
-const Artwork: React.FC<{ value: string; observer: IntersectionObserver | null }> = ({
-  value,
-  observer,
-}) => {
+const Artwork: React.FC<{
+  value: string
+  observer: IntersectionObserver | null
+  size?: number
+}> = ({ value, observer, size = 26 }) => {
   const ref = useRef<HTMLSpanElement | null>(null)
   const [seen, setSeen] = useState(false)
 
@@ -75,9 +76,9 @@ const Artwork: React.FC<{ value: string; observer: IntersectionObserver | null }
       aria-hidden
       className="vf-icon-select__preview"
       style={{
-        width: 26,
-        height: 26,
-        flex: '0 0 26px',
+        width: size,
+        height: size,
+        flex: `0 0 ${size}px`,
         ...(visible
           ? {
               WebkitMaskImage: `url("${artworkUrl(value)}")`,
@@ -325,8 +326,10 @@ export const IconLibraryPicker: React.FC<{
                   disabled={readOnly}
                   onChange={() => toggle(e.value)}
                 />
-                <Artwork value={e.value} observer={observer} />
-                <span>{e.label}</span>
+                <span className="vf-icon-library__thumb">
+                  <Artwork value={e.value} observer={observer} size={44} />
+                </span>
+                <span className="vf-icon-library__name">{e.label}</span>
               </label>
               {e.upload && !readOnly ? (
                 <button
