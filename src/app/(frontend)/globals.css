@@ -7841,24 +7841,6 @@
 }
 .event-toc__list a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* Host callout box (Run by AAMLE / Hosted by VERIFY) */
-.event-callout {
-  margin-top: 24px;
-  padding: 18px 22px;
-  background: #f0f7ff;
-  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
-  border-left: 3px solid var(--primary);
-  border-radius: var(--vf-radius-chip);
-}
-.event-callout p { margin: 0; color: var(--text-mid); }
-/* The callout is rich text now, and nothing else supplies a weight here. */
-.event-callout strong { font-weight: 700; color: var(--text-dark); }
-.event-callout--verify {
-  background: #f5f8fc;
-  border: 1px solid var(--border-light);
-  border-left: 3px solid var(--primary);
-}
-
 /* How-to-attend / recap block */
 .event-attend__heading {
   font-family: var(--font-heading);

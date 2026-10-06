@@ -15,7 +15,6 @@ const hostGroup = (name: string, label: string): Field => ({
     // both of these ("presented by the **Australian Academy of Medico-Legal
     // Education (AAMLE)**", "Run by **AAMLE**"), which a text field cannot express.
     { name: 'blurb', type: 'richText', label: 'Program blurb', admin: { description: 'Intro paragraph shown on every event by this host.' } },
-    { name: 'callout', type: 'richText', label: 'Callout', admin: { description: 'The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."' } },
     {
       type: 'row',
       fields: [

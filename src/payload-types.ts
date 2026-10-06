@@ -13406,24 +13406,6 @@ export interface EventsSetting {
       };
       [k: string]: unknown;
     } | null;
-    /**
-     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
-     */
-    callout?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
     attendHeading?: {
       root: {
         type: string;
@@ -13481,24 +13463,6 @@ export interface EventsSetting {
      * Intro paragraph shown on every event by this host.
      */
     blurb?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    /**
-     * The tinted one-line panel under the intro, e.g. "Run by AAMLE — VERIFY’s education & training arm."
-     */
-    callout?: {
       root: {
         type: string;
         children: {
@@ -15140,7 +15104,6 @@ export interface EventsSettingsSelect<T extends boolean = true> {
     | T
     | {
         blurb?: T;
-        callout?: T;
         attendHeading?: T;
         recapHeading?: T;
         attendBody?: T;
@@ -15152,7 +15115,6 @@ export interface EventsSettingsSelect<T extends boolean = true> {
     | T
     | {
         blurb?: T;
-        callout?: T;
         attendHeading?: T;
         recapHeading?: T;
         attendBody?: T;

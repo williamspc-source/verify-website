@@ -16,7 +16,6 @@ import { generateMeta } from '@/utilities/generateMeta'
 import { PersonCard, type PersonCardData } from '@/components/PersonCard'
 import { mediaFocal } from '@/utilities/focalPoint'
 import { getCachedGlobal } from '@/utilities/getGlobals'
-import { cn } from '@/utilities/ui'
 import { EVENTS_INDEX_PATH, eventPath, specialistPath, teamPath } from '@/utilities/routes'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { eventCrumbs, getCrumbSettings } from '@/utilities/breadcrumbs'
@@ -123,7 +122,6 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   const hasDescription = !isRichTextEmpty(event.description)
   const hasRecap = !isRichTextEmpty(event.recap)
   const hasBlurb = !isRichTextEmpty(host.blurb)
-  const hasCallout = !isRichTextEmpty(host.callout)
 
   // The event's own image turns the flat hero into the same full-bleed treatment
   // an article gets. Reused rather than reimplemented: `.art-hero*` already does
@@ -268,12 +266,6 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               {hasBlurb ? (
                 <RichText data={host.blurb as never} enableGutter={false} enableProse={false} />
               ) : null}
-            </div>
-          ) : null}
-
-          {hasCallout ? (
-            <div className={cn('event-callout', hostKey === 'verify' && 'event-callout--verify')}>
-              <RichText data={host.callout as never} enableGutter={false} enableProse={false} />
             </div>
           ) : null}
 

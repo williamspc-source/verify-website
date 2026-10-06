@@ -86,14 +86,13 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
   await seedUpdateGlobal(payload, {
     slug: 'events-settings',
     data: {
-      // `blurb` and `callout` are richText. The `**…**` runs are parsed into
-      // Lexical bold nodes by plainTextToLexical — the design reference bolds the
-      // academy's name in both, and the old plain-text fields could not.
+      // `blurb` is richText. The `**…**` runs are parsed into Lexical bold nodes
+      // by plainTextToLexical — the design reference bolds the academy's name,
+      // and the old plain-text field could not.
       aamle: {
         blurb: plainTextToLexical(
           'This session is presented by the **Australian Academy of Medico-Legal Education (AAMLE)**, VERIFY’s education and training arm, as part of its complimentary, CPD-eligible program for legal, insurance, and medical professionals.',
         ),
-        callout: plainTextToLexical('Run by **AAMLE** — VERIFY’s education & training arm.'),
         attendHeading: 'How to Attend',
         recapHeading: 'Event Recap',
         attendBody:
@@ -106,7 +105,6 @@ export const seedContentGlobals = async ({ payload, req }: Ctx): Promise<void> =
         blurb: plainTextToLexical(
           'This event is hosted by **VERIFY Medico-Legal Solutions** as part of our commitment to supporting best practice across the industry.',
         ),
-        callout: plainTextToLexical('Hosted by **VERIFY** Medico-Legal Solutions.'),
         attendHeading: 'How to Attend',
         recapHeading: 'Event Recap',
         attendBody:

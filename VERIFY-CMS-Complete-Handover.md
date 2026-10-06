@@ -3761,9 +3761,9 @@ above a Downloads list, tells the visitor to email you for the file they are loo
 - The **"Contact Us"** button that replaces "Register" once registrations close goes to
   **Events Settings → Event page labels → Contact page URL** (`/contact` by default). It used to
   reuse the event's registration link, which sent people to a booking page they could no longer use.
-- The **AAMLE / VERIFY intro paragraph and the tinted callout** under it are shared by every event
-  with that host and live in **Events Settings → AAMLE events / VERIFY events**. Both are rich text,
-  so you can bold a name or link out.
+- The **AAMLE / VERIFY intro paragraph** is shared by every event with that host and lives in
+  **Events Settings → AAMLE events / VERIFY events**. It is rich text, so you can bold a name or
+  link out.
 
 #### Feature cards can have a tinted header band
 

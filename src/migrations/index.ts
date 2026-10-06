@@ -1,6 +1,7 @@
 import * as migration_20260825_130820_fresh_baseline from './20260825_130820_fresh_baseline';
 import * as migration_20261006_122247_add_reset_password_requested_at from './20261006_122247_add_reset_password_requested_at';
 import * as migration_20261006_124320_add_map_embed_image from './20261006_124320_add_map_embed_image';
+import * as migration_20261006_125749_remove_event_callout from './20261006_125749_remove_event_callout';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20261006_124320_add_map_embed_image.up,
     down: migration_20261006_124320_add_map_embed_image.down,
-    name: '20261006_124320_add_map_embed_image'
+    name: '20261006_124320_add_map_embed_image',
+  },
+  {
+    up: migration_20261006_125749_remove_event_callout.up,
+    down: migration_20261006_125749_remove_event_callout.down,
+    name: '20261006_125749_remove_event_callout'
   },
 ];
