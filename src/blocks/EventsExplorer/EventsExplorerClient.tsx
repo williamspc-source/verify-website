@@ -20,6 +20,8 @@ export type EventItem = {
   date: string // ISO
   timeLabel: string
   location: string
+  /** The location as the editor left it (links intact); `location` is its plain text. */
+  locationRich?: RichTextValue
   eventType: string
   typeLabel: string
   cpdEligible: boolean
@@ -210,9 +212,18 @@ const EventRow: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, cta
             </span>
           ) : null}
           {event.location ? (
-            <a href={href}>
-              <Icon name="map-pin" /> {event.location}
-            </a>
+            // Drawn from the editor's own value, so this is a link ONLY when the
+            // editor made one. It used to be an unconditional <a> to the event's own
+            // page around the flattened text, which meant unlinking the location in
+            // the editor changed where it pointed rather than removing the link.
+            <span>
+              <Icon name="map-pin" />
+              <InlineRichText
+                as="span"
+                className="event-list-location"
+                data={event.locationRich ?? event.location}
+              />
+            </span>
           ) : null}
         </div>
         {event.excerpt ? <p className="event-list-excerpt">{event.excerpt}</p> : null}
@@ -260,7 +271,9 @@ const EventCard: React.FC<{ event: EventItem; ctaLabel: string }> = ({ event, ct
         {event.excerpt ? <p className="event-card-desc">{event.excerpt}</p> : null}
         <div className="event-card-meta">
           {event.timeLabel ? <span>{event.timeLabel}</span> : null}
-          {event.location ? <span>{event.location}</span> : null}
+          {event.location ? (
+            <InlineRichText as="span" data={event.locationRich ?? event.location} />
+          ) : null}
         </div>
         <a className="event-card-link" href={href}>
           {/* Explicit space: JSX collapses the newline between the expression and

@@ -12237,6 +12237,13 @@ button.events-filter-date:hover,
   text-underline-offset: 3px;
 }
 
+/* The location's text, beside its icon. `.event-list-meta span` makes every span a
+   flex row with a gap, which would pull a partly-linked location apart ("The Grove
+   [gap] Rooftop"); the words themselves should flow as ordinary inline text. */
+.event-list-meta span.event-list-location {
+  display: inline;
+}
+
 .event-list-excerpt {
   color: var(--text-dark);
   line-height: 1.65;

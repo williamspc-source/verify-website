@@ -68,6 +68,10 @@ const serialise = (e: Event, photoWidth: number): EventItem => ({
   // silently. The search box would simply stop finding events.
   timeLabel: richTextToPlain(e.timeLabel),
   location: richTextToPlain(e.location),
+  // The editor's own value, link and all. `location` above is the flattened string
+  // the search box matches on; this is what is DRAWN, so a link exists on the page
+  // only if the editor put one in the field — and points where they pointed it.
+  locationRich: e.location as RichTextValue,
   // `eventType` is a relationship now, so the slug is on the populated row.
   // Kept on the DTO because the client type declares it — and because the
   // orphan-field guard needs a real `x.eventType` read outside the config.
