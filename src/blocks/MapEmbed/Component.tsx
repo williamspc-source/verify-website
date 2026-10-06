@@ -4,7 +4,7 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
 
-import type { MapEmbedBlock as Props, Office } from '@/payload-types'
+import type { MapEmbedBlock as Props, Media as MediaDoc, Office } from '@/payload-types'
 
 import { CMSLink } from '@/components/Link'
 import { Icon } from '@/components/Icon'
@@ -12,6 +12,7 @@ import { Section } from '@/components/Section'
 import { SectionHeader } from '@/components/SectionHeader'
 import { cn } from '@/utilities/ui'
 import { toClassName } from '@/utilities/cssClass'
+import { mediaSrc } from '@/utilities/mediaSrc'
 
 // Aspect-ratio presets → CSS. `map` is a tall fixed-height frame.
 const RATIOS: Record<string, string> = { '16-9': '16 / 9', '4-3': '4 / 3', '1-1': '1 / 1' }
@@ -39,6 +40,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
     kind = 'map',
     office: officeRef,
     embedUrl,
+    image: imageRef,
     aspect = '16-9',
     title,
     showOfficeInfo,
@@ -72,6 +74,25 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
     }
   }
 
+  // Optional picture that stands in for the map. Same id-or-object handling as
+  // the office above: populated at depth > 0, otherwise a bare id to look up.
+  let image: MediaDoc | null = null
+  if (kind === 'map' && imageRef) {
+    if (typeof imageRef === 'object') {
+      image = imageRef
+    } else {
+      try {
+        const payload = await getPayload({ config: configPromise })
+        image = await payload.findByID({ collection: 'media', id: imageRef, depth: 0 })
+      } catch {
+        image = null
+      }
+    }
+  }
+  // Sized for the widest the frame gets (692 CSS px measured), doubled for retina.
+  const imageSrc = mediaSrc(image, 1400)
+  const hasImage = Boolean(imageSrc)
+
   // Derive the iframe src: explicit embedUrl → office's own embed URL → build a
   // Google Maps embed from the office address.
   let src: string | null = embedUrl?.trim() || null
@@ -83,7 +104,8 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
     }
   }
 
-  const hasFrame = Boolean(src)
+  // A picture, when set, replaces the map entirely (including a custom embed URL).
+  const hasFrame = hasImage || Boolean(src)
   const hasPanel = Boolean(kind === 'map' && office && showOfficeInfo !== false)
   const showSplit = hasFrame && hasPanel
   const hasActions = Array.isArray(actions) && actions.length > 0
@@ -97,7 +119,8 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
 
   // The bare iframe. In the split layout it lives inside the reference
   // ".ct-map-wrap" (fixed aspect-ratio); otherwise it keeps the generic frame.
-  const iframe = hasFrame ? (
+  const pictureAlt = image?.alt || title || office?.title || 'Map'
+  const iframe = hasFrame && !hasImage ? (
     <iframe
       src={src as string}
       title={title || office?.title || 'Embedded map'}
@@ -113,15 +136,26 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
       className="vf-map-embed__frame"
       style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--vf-radius-md)', ...frameStyle }}
     >
-      <iframe
-        src={src as string}
-        title={title || office?.title || 'Embedded map'}
-        loading="lazy"
-        allowFullScreen
-        referrerPolicy="no-referrer-when-downgrade"
-        sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
-      />
+      {hasImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageSrc as string}
+          alt={pictureAlt}
+          loading="lazy"
+          decoding="async"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      ) : (
+        <iframe
+          src={src as string}
+          title={title || office?.title || 'Embedded map'}
+          loading="lazy"
+          allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+        />
+      )}
     </div>
   ) : null
 
@@ -284,7 +318,20 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
       {showSplit ? (
         <div className="ct-location-module">
           <div className="ct-map-col">
-            <div className="ct-map-wrap">{iframe}</div>
+            <div className={cn('ct-map-wrap', hasImage && 'ct-map-wrap--image')}>
+              {hasImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="ct-map-image"
+                  src={imageSrc as string}
+                  alt={pictureAlt}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                iframe
+              )}
+            </div>
             {mapActions}
           </div>
           {infoPanel}

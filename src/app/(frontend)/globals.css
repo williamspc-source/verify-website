@@ -8038,6 +8038,11 @@
 .ct-map-col { display: flex; flex-direction: column; }
 .ct-map-wrap { border-radius: 18px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent); box-shadow: 0 8px 32px color-mix(in srgb, var(--primary) 10%, transparent); flex: 1 1 auto; min-height: 420px; background: var(--accent); }
 .ct-map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+/* A picture in place of the map. Absolutely filled, so the frame keeps the size
+   the map had (stretching to the info panel, 420px minimum) and the picture's own
+   proportions never drive the row height. */
+.ct-map-wrap--image { position: relative; }
+.ct-map-wrap--image .ct-map-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .ct-map-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
 .ct-map-action { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 18px 10px; background: var(--white); border: 1.5px solid var(--primary); border-radius: var(--vf-radius-card); font-family: var(--font-heading); font-size: 0.9rem; font-weight: 700; color: var(--primary); transition: all var(--transition); text-align: center; }
 .ct-map-action:hover { background: var(--primary); color: var(--white); border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 16px color-mix(in srgb, var(--primary) 22%, transparent); }

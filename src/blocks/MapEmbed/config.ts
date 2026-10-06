@@ -36,6 +36,17 @@ export const MapEmbed: Block = {
       },
     },
     {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Picture instead of map',
+      admin: {
+        condition: (_, s) => s?.kind === 'map',
+        description:
+          'Optional. Shows this picture (e.g. a JPG of the area) in place of the Google Map. The office info and action buttons still appear beside it. Remove the picture to bring the map back.',
+      },
+    },
+    {
       name: 'embedUrl',
       type: 'text',
       label: 'Embed URL',

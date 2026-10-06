@@ -6085,6 +6085,10 @@ export interface MapEmbedBlock {
    */
   office?: (number | null) | Office;
   /**
+   * Optional. Shows this picture (e.g. a JPG of the area) in place of the Google Map. The office info and action buttons still appear beside it. Remove the picture to bring the map back.
+   */
+  image?: (number | null) | Media;
+  /**
    * Map embed src, or a YouTube/Vimeo URL. Overrides the office map if set.
    */
   embedUrl?: string | null;
@@ -11592,6 +11596,7 @@ export interface MapEmbedBlockSelect<T extends boolean = true> {
   textColour?: T;
   kind?: T;
   office?: T;
+  image?: T;
   embedUrl?: T;
   aspect?: T;
   title?: T;
