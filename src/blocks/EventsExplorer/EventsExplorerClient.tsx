@@ -1,7 +1,7 @@
 'use client'
 import { InlineRichText } from '@/components/RichText/Inline'
 import { hasRichText, type RichTextValue } from '@/utilities/lexicalText'
-import React, { useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import React, { useId, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { Icon } from '@/components/Icon'
 import { EventCalendar } from '@/components/EventCalendar'
@@ -371,6 +371,22 @@ const EventGroup: React.FC<{
   )
 }
 
+// "2026-12-11" (a date input's value) -> local midnight, or null when empty or
+// not a real date. Local, not UTC: `isEventPast` and the date labels are local
+// too, so a range picked here means the same days the visitor sees printed.
+const inputDayStart = (value: string): number | null => {
+  if (!value) return null
+  const t = new Date(`${value}T00:00:00`).getTime()
+  return Number.isNaN(t) ? null : t
+}
+
+const shortDay = (ms: number, withYear: boolean): string =>
+  new Date(ms).toLocaleDateString('en-AU', {
+    day: 'numeric',
+    month: 'short',
+    ...(withYear ? { year: 'numeric' } : {}),
+  })
+
 // Faithful port of the reference events listing behaviour. Upcoming vs past is
 // decided HERE, at view time, from each event's `date` versus the browser's
 // current date — computed after mount so a statically-rendered page never goes
@@ -388,6 +404,18 @@ export const EventsExplorerClient: React.FC<Props> = ({
   const style: 'list' | 'card' = cardStyle === 'card' ? 'card' : 'list'
   const now = useSyncExternalStore(subscribeToNothing, getToday, getTodayServer)
   const [query, setQuery] = useState('')
+  // The bar's other controls. They were decorative `aria-hidden` divs — a date
+  // box and three icons that looked clickable and did nothing — and are now real
+  // buttons, each with the state it implies.
+  const [panel, setPanel] = useState<'dates' | 'filters' | null>(null)
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
+  const [typeSlug, setTypeSlug] = useState('')
+  const [cpdOnly, setCpdOnly] = useState(false)
+  const [reversed, setReversed] = useState(false)
+  // Starts as the block's configured presentation; the visitor may flip it.
+  const [view, setView] = useState<'list' | 'card'>(style)
+  const panelId = useId()
 
   // Resolve editable strings once, falling back to the original literals when a
   // field is empty/absent (empty string counts as "use default" via `||`).
@@ -409,14 +437,57 @@ export const EventsExplorerClient: React.FC<Props> = ({
 
   const q = query.trim().toLowerCase()
 
-  const filtered = useMemo(() => {
-    if (!q) return events
-    return events.filter((e) =>
-      [e.title, e.excerpt, e.typeLabel, e.location].some((v) =>
-        (v || '').toLowerCase().includes(q),
-      ),
+  // Only offer a type filter when there is a real choice to make.
+  const typeOptions = useMemo(() => {
+    const seen = new Map<string, string>()
+    events.forEach((e) => {
+      if (e.eventType && !seen.has(e.eventType)) seen.set(e.eventType, e.typeLabel)
+    })
+    return Array.from(seen, ([slug, label]) => ({ slug, label })).sort((a, b) =>
+      a.label.localeCompare(b.label),
     )
-  }, [events, q])
+  }, [events])
+  const hasCpd = useMemo(() => events.some((e) => e.cpdEligible), [events])
+
+  const fromMs = inputDayStart(from)
+  const toMs = inputDayStart(to)
+  const datesActive = fromMs !== null || toMs !== null
+  const optionsActive = Boolean(typeSlug) || cpdOnly
+  const filtersActive = Boolean(q) || datesActive || optionsActive
+
+  // The year is printed whenever a chosen day is not in the current year — a
+  // listing that reaches back several years makes "1 Jan – 31 Dec" ambiguous.
+  // `now` is the browser clock (null until mount), so no render-time Date().
+  const thisYear = now === null ? null : new Date(now).getFullYear()
+  const withYear = [fromMs, toMs].some(
+    (ms) => ms !== null && (thisYear === null || new Date(ms).getFullYear() !== thisYear),
+  )
+  const datesLabel = !datesActive
+    ? L.dates
+    : fromMs !== null && toMs !== null
+      ? `${shortDay(fromMs, withYear)} – ${shortDay(toMs, withYear)}`
+      : fromMs !== null
+        ? `From ${shortDay(fromMs, withYear)}`
+        : `Until ${shortDay(toMs as number, withYear)}`
+
+  const filtered = useMemo(() => {
+    if (!q && fromMs === null && toMs === null && !typeSlug && !cpdOnly) return events
+    return events.filter((e) => {
+      if (typeSlug && e.eventType !== typeSlug) return false
+      if (cpdOnly && !e.cpdEligible) return false
+      if (fromMs !== null || toMs !== null) {
+        const day = startOfDay(new Date(e.date).getTime())
+        // An event with no usable date cannot be placed in a range, so it is out.
+        if (Number.isNaN(day)) return false
+        if (fromMs !== null && day < fromMs) return false
+        if (toMs !== null && day > toMs) return false
+      }
+      if (!q) return true
+      return [e.title, e.excerpt, e.typeLabel, e.location].some((v) =>
+        (v || '').toLowerCase().includes(q),
+      )
+    })
+  }, [events, q, fromMs, toMs, typeSlug, cpdOnly])
 
   const { upcoming, past } = useMemo(() => {
     if (now === null) return { upcoming: [] as EventItem[], past: [] as EventItem[] }
@@ -430,10 +501,13 @@ export const EventsExplorerClient: React.FC<Props> = ({
       if (isEventPast(e, now)) pa.push(e)
       else up.push(e)
     })
-    up.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()) // soonest first
-    pa.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // most recent first
+    // Default: soonest upcoming first, most recent past first. The sort button
+    // reverses both, so each group reads in the opposite order.
+    const dir = reversed ? -1 : 1
+    up.sort((a, b) => dir * (new Date(a.date).getTime() - new Date(b.date).getTime()))
+    pa.sort((a, b) => dir * (new Date(b.date).getTime() - new Date(a.date).getTime()))
     return { upcoming: up, past: pa }
-  }, [filtered, now])
+  }, [filtered, now, reversed])
 
   const showUpcoming = mode !== 'past-only'
   const showPast = mode !== 'upcoming-only'
@@ -454,6 +528,9 @@ export const EventsExplorerClient: React.FC<Props> = ({
           className="events-filter-bar"
           role="search"
           onSubmit={(e) => e.preventDefault()}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && panel) setPanel(null)
+          }}
         >
           <label className="events-filter-field">
             <Icon name="magnifying-glass" />
@@ -465,18 +542,124 @@ export const EventsExplorerClient: React.FC<Props> = ({
               onChange={(e) => setQuery(e.target.value)}
             />
           </label>
-          <div className="events-filter-date" aria-hidden="true">
+          <button
+            type="button"
+            className={cn('events-filter-date', datesActive && 'is-active')}
+            aria-expanded={panel === 'dates'}
+            aria-controls={`${panelId}-dates`}
+            onClick={() => setPanel(panel === 'dates' ? null : 'dates')}
+          >
             <Icon name="calendar" />
-            <span>{L.dates}</span>
-          </div>
-          <div className="events-filter-icons" aria-hidden="true">
-            <Icon name="sliders" />
-            <Icon name="list" />
-            <Icon name="sort-ascending" />
+            <span>{datesLabel}</span>
+          </button>
+          <div className="events-filter-icons" role="group" aria-label="Filter, layout and sort">
+            <button
+              type="button"
+              className={cn('events-filter-icon', (panel === 'filters' || optionsActive) && 'is-active')}
+              aria-label="Filters"
+              title="Filters"
+              aria-expanded={panel === 'filters'}
+              aria-controls={`${panelId}-filters`}
+              onClick={() => setPanel(panel === 'filters' ? null : 'filters')}
+            >
+              <Icon name="sliders" />
+            </button>
+            <button
+              type="button"
+              className="events-filter-icon"
+              aria-label={view === 'card' ? 'Show as a list' : 'Show as cards'}
+              title={view === 'card' ? 'Show as a list' : 'Show as cards'}
+              onClick={() => setView(view === 'card' ? 'list' : 'card')}
+            >
+              <Icon name={view === 'card' ? 'list' : 'squares-four'} />
+            </button>
+            <button
+              type="button"
+              className={cn('events-filter-icon', reversed && 'is-active is-reversed')}
+              aria-label="Reverse the order of events"
+              title={reversed ? 'Order reversed — click to restore' : 'Reverse the order of events'}
+              aria-pressed={reversed}
+              onClick={() => setReversed(!reversed)}
+            >
+              <Icon name="sort-ascending" />
+            </button>
           </div>
           <button className="events-filter-button" type="submit">
             {L.searchButton}
           </button>
+
+          {panel === 'dates' ? (
+            <div className="events-filter-panel" id={`${panelId}-dates`} role="group" aria-label="Filter by date">
+              <label>
+                <span>From</span>
+                <input
+                  type="date"
+                  value={from}
+                  max={to || undefined}
+                  onChange={(e) => setFrom(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>To</span>
+                <input
+                  type="date"
+                  value={to}
+                  min={from || undefined}
+                  onChange={(e) => setTo(e.target.value)}
+                />
+              </label>
+              <button
+                type="button"
+                className="events-filter-clear"
+                disabled={!datesActive}
+                onClick={() => {
+                  setFrom('')
+                  setTo('')
+                }}
+              >
+                Clear dates
+              </button>
+            </div>
+          ) : null}
+
+          {panel === 'filters' ? (
+            <div className="events-filter-panel" id={`${panelId}-filters`} role="group" aria-label="Filter events">
+              {typeOptions.length > 1 ? (
+                <label>
+                  <span>Event type</span>
+                  <select value={typeSlug} onChange={(e) => setTypeSlug(e.target.value)}>
+                    <option value="">All types</option>
+                    {typeOptions.map((t) => (
+                      <option key={t.slug} value={t.slug}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+              {hasCpd ? (
+                <label className="events-filter-check">
+                  <input
+                    type="checkbox"
+                    checked={cpdOnly}
+                    onChange={(e) => setCpdOnly(e.target.checked)}
+                  />
+                  <span>CPD eligible only</span>
+                </label>
+              ) : null}
+              <button
+                type="button"
+                className="events-filter-clear"
+                disabled={!optionsActive}
+                onClick={() => {
+                  setTypeSlug('')
+                  setCpdOnly(false)
+                }}
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : null}
         </form>
       ) : null}
 
@@ -489,7 +672,7 @@ export const EventsExplorerClient: React.FC<Props> = ({
           {showUpcoming ? (
             <EventGroup
               label={showBothLabels ? L.upcomingHeading : undefined}
-              cardStyle={style}
+              cardStyle={view}
               header={
                 style === 'card' ? (
                   <SectionHeader
@@ -504,7 +687,7 @@ export const EventsExplorerClient: React.FC<Props> = ({
               list={upcoming}
               ctaLabel={L.moreInfo}
               pageSize={pageSize}
-              emptyText={q ? L.emptyUpcomingSearch : L.emptyUpcoming}
+              emptyText={filtersActive ? L.emptyUpcomingSearch : L.emptyUpcoming}
             />
           ) : null}
           {bothGroups && dividerStyle ? (
@@ -521,7 +704,7 @@ export const EventsExplorerClient: React.FC<Props> = ({
             <EventGroup
               className={pastBand}
               label={showBothLabels ? L.pastHeading : undefined}
-              cardStyle={style}
+              cardStyle={view}
               header={
                 style === 'card' ? (
                   <SectionHeader
@@ -536,7 +719,7 @@ export const EventsExplorerClient: React.FC<Props> = ({
               list={past}
               ctaLabel={L.viewRecap}
               pageSize={pageSize}
-              emptyText={q ? L.emptyPastSearch : L.emptyPast}
+              emptyText={filtersActive ? L.emptyPastSearch : L.emptyPast}
             />
           ) : null}
         </>

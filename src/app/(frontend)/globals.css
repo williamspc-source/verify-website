@@ -11804,7 +11804,7 @@
 
 .events-filter-bar {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 160px auto 112px;
+  grid-template-columns: minmax(220px, 1fr) 190px auto 112px;
   align-items: center;
   gap: 0;
   border: 1px solid #d9d9d9;
@@ -11856,13 +11856,137 @@
   font-size: 0.88rem;
 }
 
+/* The date control and the three icons are real buttons now (they were inert
+   divs). Reset the button chrome, keep the bar's own dividers. */
+button.events-filter-date {
+  width: 100%;
+  border: 0;
+  border-right: 1px solid #e3e3e3;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.events-filter-date span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+button.events-filter-date:hover,
+.events-filter-icon:hover {
+  background: #f4f6f8;
+}
+
+.events-filter-date.is-active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.events-filter-date:focus-visible,
+.events-filter-icon:focus-visible,
+.events-filter-clear:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
 .events-filter-icons {
   justify-content: center;
-  gap: 18px;
+  gap: 4px;
+  padding: 0 12px;
 }
 
 .events-filter-icons svg {
   color: #555;
+}
+
+.events-filter-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+}
+
+.events-filter-icon.is-active,
+.events-filter-icon.is-active svg {
+  color: var(--primary);
+}
+
+.events-filter-icon.is-active {
+  background: #eaf3fb;
+}
+
+/* The sort icon points the other way once the order is reversed. */
+.events-filter-icon.is-reversed svg,
+.events-filter-icon.is-reversed i {
+  transform: scaleY(-1);
+}
+
+/* Date range / filter panel: a row spanning the whole bar. Inside the bar's grid
+   rather than floating over it, because the bar clips its overflow. */
+.events-filter-panel {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 24px;
+  padding: 16px 20px;
+  border-top: 1px solid #e3e3e3;
+  background: #f8fafc;
+}
+
+.events-filter-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-mid);
+}
+
+.events-filter-panel input[type='date'],
+.events-filter-panel select {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--text-dark);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+}
+
+.events-filter-panel .events-filter-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+}
+
+.events-filter-clear {
+  min-height: 38px;
+  margin-left: auto;
+  padding: 0 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--text-dark);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.events-filter-clear:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .events-filter-button {
@@ -12173,6 +12297,15 @@
   .events-filter-icons {
     border-right: 0;
     border-bottom: 1px solid #e3e3e3;
+  }
+
+  button.events-filter-date {
+    border-right: 0;
+    border-bottom: 1px solid #e3e3e3;
+  }
+
+  .events-filter-clear {
+    margin-left: 0;
   }
 
   .event-list-row {
