@@ -127,7 +127,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
       loading="lazy"
       allowFullScreen
       referrerPolicy="no-referrer-when-downgrade"
-      sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
+      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
     />
   ) : null
 
@@ -152,7 +152,7 @@ export const MapEmbedBlock: React.FC<Props & { bare?: boolean }> = async (props)
           loading="lazy"
           allowFullScreen
           referrerPolicy="no-referrer-when-downgrade"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
         />
       )}
