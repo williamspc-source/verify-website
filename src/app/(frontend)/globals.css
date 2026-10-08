@@ -13046,17 +13046,47 @@ button.events-filter-date:hover,
 
 /* Desktop dropdowns were hover-only, so a keyboard user could tab to a parent
    link and never reach its 13 children — they were unreachable without a
-   pointer. `:focus-within` opens the same panel on focus. Paired with each
-   existing :hover rule rather than replacing it. */
-.nav-links li:focus-within > .nav-dropdown {
+   pointer. Focus inside the item opens the same panel. Paired with each existing
+   :hover rule rather than replacing it.
+
+   Focus opens it EXCEPT focus that came from a mouse click. A click leaves focus
+   on the link after the pointer has gone (`:focus` but not `:focus-visible`), and
+   plain `:focus-within` treated that as "still open" — click "Specialists", move
+   away, and the menu stayed pinned until you clicked elsewhere. The `:not(:has(…))`
+   removes just that case, so a mouse user gets pure hover (opens on roll-over,
+   closes on roll-off) and a keyboard user still gets the panel for as long as
+   focus is inside it.
+
+   Why `:focus-within` stays in the rule rather than `:has(:focus-visible)` alone:
+   that was tried first and broke tabbing INTO the menu. As focus leaves the parent
+   link, `:focus-visible` has a momentary gap, the panel closes, its links become
+   `visibility: hidden` and so unfocusable, and focus fell to the page body.
+   `:focus-within` is continuous across that move. Measured both ways. */
+.nav-links li:focus-within:not(:has(:focus:not(:focus-visible))) > .nav-dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
-.has-submenu:focus-within > .sub-dropdown {
+.has-submenu:focus-within:not(:has(:focus:not(:focus-visible))) > .sub-dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
+}
+
+/* A browser too old for `:has()` would drop the rules above and lose keyboard
+   access altogether, so it keeps the plain `:focus-within` behaviour: the
+   sticky-after-click quirk is the lesser problem than an unreachable menu. */
+@supports not selector(:has(*)) {
+  .nav-links li:focus-within > .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .has-submenu:focus-within > .sub-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+  }
 }
 
 }
